@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>作业批改</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <style>
+        .close-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 999;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="close-btn" tapmode onclick="closeFrame()">关闭</div>
+    <iframe id="contentFrame" class="iframe-container"></iframe>
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script src="../../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            var uid = api.pageParam.uid;
+            var xtid = api.pageParam.xtid;
+            var classid = api.pageParam.classid;
+            var kcid = api.pageParam.kcid;
+            var ytlx = api.pageParam.ytlx;
+            let domainName;
+            if(Number(apiUrlIndex) === 3){
+                domainName = 'http://k12-test.12xue.com/homework/correctnew/aiindex'
+            }else{
+                domainName = 'http://newk12.12xue.com/homework/correctnew/aiindex'
+            }
+            var url = domainName +
+            // var url = 'http://newk12.12xue.com/homework/correctnew/aiindex' +
+                     '?uid=' + uid +
+                     '&classid=' + classid +
+                     '&kcid=' + kcid +
+                     '&xtid=' + xtid +
+                     '&ytlx=' + ytlx ;      
+                     console.log(url);
+            document.getElementById('contentFrame').src = url;
+        };
+        
+        function closeFrame() {
+            api.closeFrame();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.4);
+            position: relative;
+        }    .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .show {
+            width: 300px;
+            top:  calc(50% - 105px);
+            position: absolute;
+            left: calc(50% - 150px);
+            background: #fff;
+            border-radius: 5px;
+            padding-top: 2rem;
+            height: 210px;
+            overflow-y: auto;
+        }
+        .item {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #fff;
+            width: 60%;
+            height: 46px;
+            line-height: 46px;
+            margin: 0 auto;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background: #4bc7c7;
+        }
+        .item:active{
+            background: #3fa6a6;
+        }
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="backgroud" tapmode onclick="api.closeFrame({
+    name: 'frame-tab'
+});"></div>
+<div class="show">
+    <!--<p id="3" class="item aui-border-b" tapmode onclick="itemClick(this)">全部</p>-->
+    <!--<p id="2" class="item aui-border-b" tapmode onclick="itemClick(this)">未发送</p>-->
+    <!--<p id="1" class="item aui-border-b" tapmode onclick="itemClick(this)">发送过</p>-->
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        array = api.pageParam.array;
+        arrayId = api.pageParam.arrayId;
+
+        for (var i = 0; i < array.length; i++) {
+            $api.append($api.dom('.show'), '<p id="' + i + '" class="item aui-border-b" tapmode onclick="itemClick(this,\'' + api.pageParam.item + '\')">' + array[i] + '</p>');
+        }
+    };
+    var arrayId;//作业问答中用来获取学科id
+    var array;
+    function itemClick(context, item) {
+        var js;
+        var contenttype;
+        var xd;
+        var identitytype;
+        var xkid;
+        switch (item) {
+            case 'type-request':
+                js = 'status = ' + context.id + ';p = 1;isClean = true;allRecordArr=[]; vm.delclick=false;vm.getQuestionList();api.showProgress();';
+                break;
+            case 'type-subject':
+                xkid = arrayId[context.id];
+                js = "xkidS = '" + xkid + "';p = 1;isClean = true;allRecordArr=[]; vm.delclick=false;vm.getQuestionList();api.showProgress();";
+                break;
+        }
+        var func = "$api.text($api.dom('." + item + "'), '"+array[context.id]+"');";
+        api.execScript({
+            script: func
+        });
+
+        api.execScript({
+            frameName: api.pageParam.frameName,
+            script: js
+        });
+
+        api.closeFrame({
+            name: 'frame-tab'
+        });
+    }
+</script>
+</html>

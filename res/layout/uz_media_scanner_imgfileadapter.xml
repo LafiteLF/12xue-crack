@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/filephoto_imgview" android:background="#66cdc9c9" android:layout_width="80.0dp" android:layout_height="80.0dp" android:layout_margin="5.0dp" android:layout_marginLeft="10.0dp" android:src="@drawable/uz_media_scanner_imgbg" android:scaleType="centerCrop" />
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dp" android:layout_toRightOf="@id/filephoto_imgview" android:layout_centerVertical="true">
+        <TextView android:textAppearance="?android:textAppearanceMedium" android:textColor="@android:color/black" android:id="@id/filename_textview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件名称" />
+        <TextView android:textSize="16.0dp" android:textColor="#8b7d7b" android:id="@id/filecount_textview" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10.0dp" android:text="几张" />
+    </LinearLayout>
+    <ImageView android:layout_width="20.0dp" android:layout_height="20.0dp" android:layout_marginRight="20.0dp" android:src="@drawable/item_arrow_indicator" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    <View android:background="#99adadad" android:layout_width="match_parent" android:layout_height="1.0px" android:layout_marginLeft="5.0dp" android:layout_marginRight="10.0dp" android:layout_alignParentBottom="true" />
+</RelativeLayout>

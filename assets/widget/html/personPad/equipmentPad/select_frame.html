@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>选择班级</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .vue-content {
+            width: 35%;
+            height: 60%;
+            top:15%;
+            left: 32.5%;
+            border-radius: 3px;
+            overflow-y: auto;
+            background: #fff;
+            position: absolute;
+
+
+        }
+        .vue-content .aui-input-row {
+            line-height: 55px;
+            font-size: 0.8rem;
+            color: #333333;
+            border-bottom: 1px solid #e3e3e3;
+            padding-left:  5%;
+            width: 100%;
+            height: 55px;
+            display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+
+        }
+        .aui-checkbox.aui-checkbox-info:checked,
+        .aui-checkbox.aui-checkbox-info.aui-checked {
+            background-color: #4bc7c7;
+            border: solid 1px #4bc7c7;
+        }
+
+        .aui-checkbox{
+            margin: 14px;
+        }
+
+        .aui-input-row{
+            height: 60px;
+            line-height: 60px;
+            border: solid 1px #f5f5f5;
+        }
+
+        .aui-input-addon{
+            padding-left: 20px;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #4bc7c7;
+            -webkit-box-shadow: #4bc7c7;
+        }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: #4bc7c7;
+        }
+        .close{
+            width: 100%; height: 100%;
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="closeFrame()" ></div>
+<div class="vue-content" v-cloak>
+    <div class="aui-content" v-for="item,index in dataList">
+        <ul class="aui-input-row">
+            <li class="aui-input-addon aui-ellipsis-1" :id = "item.id" :text = "item.realname"  v-text="item.realname" tapmode onclick="check(this)"></li>
+        </ul>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+
+    var vm;
+    var apiObj;
+    var idx;
+    apiready = function(){
+        idx = api.pageParam.idx;
+        initVue();
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        vm.initData();
+    };
+
+    function closeFrame() {
+        api.closeFrame();
+    }
+
+    function initVue() {
+        vm = new Vue({
+            el: '.vue-content',
+            data: {
+                dataList:[]
+            },
+
+            methods: {
+                initData: function () {
+                    getData();
+                }
+
+            }
+        })
+
+    }
+    
+    
+    function getData() {
+        apiObj.Get(UrlRouter.Channels, {
+            values: {
+                type: idx
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.dataList = ret.data;
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+
+    function check(context) {
+//        alert($api.attr(context, 'text'));
+
+        api.sendEvent({
+            name: 'selectFinish',
+            extra: {idx: idx, name: $api.attr(context, 'text'), id: $api.attr(context, 'id')}
+        });
+        api.closeFrame();
+    }
+    
+
+</script>
+</html>

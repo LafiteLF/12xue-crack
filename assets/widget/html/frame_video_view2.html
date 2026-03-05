@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title></title>
+</head>
+<style>
+</style>
+<body>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script>
+
+    var ijkplayer;
+    var videoPlayer;
+    var title;
+    apiready = function () {
+
+        if (api.pageParam.title) {
+            title = api.pageParam.title;
+        } else {
+            title = '';
+        }
+        if (api.systemType == 'android') {
+            ijkplayer = api.require('ijkplayer');
+            ijkplayer.open({
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.frameWidth,
+                    h: api.frameHeight
+                },
+                path: api.pageParam.path,
+                autoPlay: true,
+                coverImg:'widget://image/video/video_k.png',
+                isAutorotate: false,
+                enableFull: false,
+                isBackBtn: true,
+                isSmallOpenGesture: true,
+                isFullBtn: false,
+                fixedOn: 'frame_video_view2',
+                fixed: true,
+
+                texts: {
+                    head: {
+                        title: title
+                    }
+                },
+                styles: {
+                    repeat:{
+                        repeatwidth: 40,
+                        repeatheight: 40,
+                        repeatImg:''
+                    },
+                    head: {
+                        bg: 'rgba(0.5,0.5,0.5,0.7)',
+                        height: 44,
+                        titleSize: 18,
+                        titleColor: '#fff',
+                        backSize: 44,
+                        backImg: 'widget://image/video/video_d.png',
+                        hide: true
+                    },
+                    foot: {
+                        bg: 'rgba(0.5,0.5,0.5,0.7)',
+                        height: 44,
+                        playSize: 44,
+                        playImg: 'widget://image/video/video_f.png',
+                        pauseImg: 'widget://image/video/video_b.png',
+                        timeSize: 14,
+                        timeColor: '#fff',
+                        sliderImg: 'fs://img/slder.png',
+                        progressColor: '#696969',
+                        progressSelected: '#76EE00',
+                        hide:false,
+                        verticalImg:'widget://image/video/video_l.png',
+                        horizontalImg:'widget://image/video/video_l.png'
+                    }
+                }
+            });
+
+            ijkplayer.addEventListener({
+                name: 'click'
+            }, function(ret, err) {
+                if (ret) {
+                    if (ret.eventType == 'clickBack') {
+                        keyback();
+                    }
+
+                }
+            });
+        } else {
+            var videoPlayer = api.require('videoPlayer');
+            videoPlayer.play({
+                texts: {
+                    head: {
+                        title: title
+                    }
+                },
+                styles: {
+                    head: {
+                        bg: 'rgba(0.5,0.5,0.5,0.7)',
+                        height: 0,
+                        titleSize: 18,
+                        titleColor: '#fff',
+                        backSize: 44,
+                        backImg: 'widget://image/video/video_d.png',
+                        setSize: 44,
+                        setImg: 'widget://image/video/video_e.png'
+                    },
+                    foot: {
+                        bg: 'rgba(0.5,0.5,0.5,0.7)',
+                        height: 44,
+                        playSize: 44,
+                        playImg: 'widget://image/video/video_f.png',
+                        pauseImg: 'widget://image/video/video_b.png',
+                        nextSize: 44,
+                        nextImg: 'widget://image/video/video_i.png',
+                        timeSize: 14,
+                        timeColor: '#fff',
+                        sliderImg: 'fs://img/slder.png',
+                        progressColor: '#696969',
+                        progressSelected: '#76EE00',
+                        verticalImg: 'widget://image/video/video_l.png',
+                        horizontalImg: 'widget://image/video/video_l.png'
+                    }
+                },
+                path: api.pageParam.path, //（可选项）字符串类型；文档的路径，支持网络和本地（fs://）路径；默认：未传值时不播放
+                //在 android 平台上不支持 widget://
+                autoPlay: true, //（可选项）布尔类型；打开时是否自动播放；默认：true（自动播放）
+                coverImg: 'widget://image/video/video_k.png',
+                autorotation: false,
+                audio: api.pageParam.isMp3
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.eventType == 'back') {
+                        videoPlayer.close();
+                        keyback();
+                    }
+                } else {
+                    keyback();
+                }
+            });
+        }
+
+
+        api.addEventListener({
+            name: 'closeVideo'
+        }, function (ret, err) {
+            keyback();
+        });
+
+    };
+
+    function keyback() {
+        if (api.systemType == 'android') {
+            ijkplayer.close();
+        }
+
+        api.sendEvent({
+            name: 'backVideo'
+        });
+
+        api.closeWin();
+    }
+
+</script>
+</html>

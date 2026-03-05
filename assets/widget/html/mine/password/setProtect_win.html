@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>设置问题</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        body{
+            background-color:#e5e5e5
+        }
+        .qr{ border: 1px solid #00c8c8; border-radius: 3px; margin-top: 0.5rem; font-size: 0.7rem!important;  margin-right: 10px;}
+        .aui-bar-nav .aui-iconfont {line-height: 1.25rem}
+        .aui-icon-check:before {
+            margin-right: 5px;}
+        .qr:active{
+            background: #00c8c8;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()' ></span>设置问题
+    </a>
+    <span class="aui-iconfont aui-icon-check aui-pull-right qr" tapmode onclick="commitOpinion()"> 确认</span>
+</header>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready=function () {
+        var header=document.querySelector('header');
+//        $api.fixStatusBar(header);
+        var headerH=$api.offset(header).h;
+        var frameH= padWinHeight-headerH;
+//        alert(headerH);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.openFrame({
+            name: 'setProtect_framePlanB',
+            url: 'setProtectPlanB_frame.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: {headerH: headerH},
+            bounces: true
+        });
+
+    };
+    function commitOpinion() {
+//        api.showProgress();
+        var jsfun='setProtect();';
+        api.execScript({
+//            frameName: 'setProtect_frame',
+            frameName:'setProtect_framePlanB',
+            script: jsfun
+        });
+    }
+</script>
+</body>
+</html>

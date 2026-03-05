@@ -1,0 +1,1329 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>首页</title>
+    <style>
+        html {
+            --wrem: 0.1vw;
+            --hrem: 0.1vh;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        img {
+            display: block;
+        }
+
+        #main {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stu_main_background.jpg");
+            background-size: 100% 100%;
+        }
+    </style>
+</head>
+
+<body>
+<div id="main">
+    <div id="header" v-if="loaded"
+         style="display: grid; grid-template-columns: auto 1fr repeat(3, auto); width: 100%; padding: calc(40 * var(--hrem)) calc(60 * var(--wrem)); align-items: center; box-sizing: border-box;">
+        <div style="display: flex; flex-direction: row; align-items: center;">
+            <div @click.stop="openFrame('线上会员')" style="display: flex; position: relative;">
+                <img style="width: calc(85 * var(--wrem));height: calc(85 * var(--wrem));border-radius: 50%;"
+                     :src="`${userData.avatarUrl}`" alt="头像">
+                <img v-if="comboData.data['level'] !== 'nomal'"
+                     style="position: absolute; width: calc(120 * var(--wrem)); left: 50%;top: 50%;transform: translate(-50%,-55%);"
+                     :style="avatarStyle"
+                     :src="`../image/onlineMember/${comboData.data['level']}/avatar-frame.png`"
+                     alt="头像框">
+            </div>
+            <div @click.stop="openFrame('个人中心')"
+                 style="margin-left: calc(50 * var(--wrem));display: grid; grid-auto-flow: row; grid-auto-rows: 1fr; row-gap: calc(10 * var(--hrem)); color: #009696; font-size: calc(24 * var(--wrem));">
+                <div style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-width: 20vw;">
+                    {{ userData.name }}
+                </div>
+                <div style="display: flex; flex-direction: row;">
+                    <span>{{ userData.grade }}</span>
+                    <span style="margin-left: calc(20 * var(--wrem))">{{ userData.class }}</span>
+                </div>
+                <div>{{ userData.school }}</div>
+            </div>
+        </div>
+        <div></div>
+        <div style="display: grid; grid-auto-flow: column; grid-auto-columns: auto; margin-right: calc(60 * var(--wrem)); color: #777777; font-family: 'Consolas',serif; font-size: calc(40 * var(--wrem)); column-gap: calc(90 * var(--wrem)); align-items: center;">
+            <div @click.stop="openFrame(1)"
+                 :style="selectFrameIndex === 1 ? {'color': '#333333', 'font-weight': 'bold', 'transform': 'scale(1.15)'} : {}">
+                个性化学习
+            </div>
+            <div @click.stop="openFrame(2)"
+                 style="position: relative;">
+                <div :style="selectFrameIndex === 2 ? { 'color': '#333333', 'font-weight': 'bold', 'transform': 'scale(1.15)'} : {}">
+                    消息
+                </div>
+                <div v-if="messageCount > 0"
+                     style="position: absolute; top:0; right: 0; transform: translate(50%,-50%); background: red; border-radius: 50%; width: calc(40 * var(--wrem)); height: calc(40 * var(--wrem)); color: white; font-size: calc(25 * var(--wrem)); display: flex; align-items: center; justify-content: center;">
+                    {{ messageCount }}
+                </div>
+            </div>
+            <div @click.stop="openFrame(3)"
+                 :style="selectFrameIndex === 3 ? {'color': '#333333', 'font-weight': 'bold', 'transform': 'scale(1.15)'} : {}">
+                课外趣研站
+            </div>
+            <div @click.stop="openFrame(4)"
+                 :style="selectFrameIndex === 4 ? {'color': '#333333', 'font-weight': 'bold', 'transform': 'scale(1.15)'} : {}">
+                关于12xue
+            </div>
+        </div>
+        <img @click.stop="openFrame('联系客服')" src="../image/stu_customer_service.png"
+             style="width: calc(70 * var(--wrem)); margin-right: calc(30 * var(--wrem))" alt="客服">
+        <img @click.stop="scanner" src="../image/scan_the_QR_code.png" style="width: calc(60 * var(--wrem));"
+             alt="扫码">
+    </div>
+</div>
+</body>
+
+</html>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/login/login.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/fastclick.js"></script>
+<script type="text/javascript" src="../script/vue.global.prod-3.5.18.js"></script>
+<script type="text/javascript" src="../script/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+
+    let timer;
+    let tab;
+    let headerPos;
+    let body_h;
+    let isFirstOpen = true;
+    let header;
+    let app;
+    let hwid;
+
+    // $api.setStorage('test', 1)
+    // $api.clearStorage()
+    // console.log($api.getStorage('test'));
+    const {createApp, ref, onBeforeMount, computed} = Vue
+
+    apiready = async function () {
+        app = createApp({
+            setup() {
+                const loaded = ref(false)
+                const comboData = ref({})
+                const userData = ref({
+                    avatarUrl: '',
+                    name: $api.getStorage('realname'),
+                    grade: '',
+                    class: '',
+                    school: ''
+                })
+                const selectFrameIndex = ref(1)
+                const messageCount = ref(0)
+                const avatarStyle = computed(() => {
+                    switch (comboData.value.data['level']) {
+                        case 'professional':
+                            return {
+                                width: 'calc(115 * var(--wrem))'
+                            }
+                        case 'offprofessional':
+                            return {
+                                transform: 'translate(-50%,-50%)'
+                            }
+                        case 'offplus':
+                            return {
+                                transform: 'translate(-40%,-55%)'
+                            }
+                        case 'offmax':
+                            return {
+                                transform: 'translate(-50%,-52%)',
+                                width: 'calc(150 * var(--wrem))'
+                            }
+                        default:
+                            return {}
+                    }
+                })
+
+                onBeforeMount(() => {
+                    $('html').css({
+                        '--wrem': window.innerWidth / 1920 + 'px',
+                        '--hrem': window.innerHeight / 1200 + 'px',
+                        'width': window.innerWidth + 'px',
+                        'height': window.innerHeight + 'px',
+                    })
+                })
+
+                function openFrame(index) {
+                    if (typeof index === 'number') {
+                        if (index !== 3) {
+                            api.closeFrame({
+                                name: 'frame-myscorezoo'
+                            })
+                        }
+                        selectFrameIndex.value = index;
+                    }
+
+                    switch (index) {
+                        case 1: //个性化学习
+                            api.setFrameGroupIndex({
+                                name: 'win-stu-main-group',
+                                index: 0
+                            });
+                            break
+                        case 2: //消息
+                            if (String($api.getStorage('isLogin')) === 'true') {//登陆了
+                                getteacherSwitch('3');
+                            } else {
+                                api.closeToWin({
+                                    name: 'root',
+                                    animation: {
+                                        type: 'type',
+                                        subType: 'subtype',
+                                        duration: 500
+                                    }
+                                });
+                            }
+                            break
+                        case 3: //课外趣研站
+                            api.setFrameGroupIndex({
+                                name: 'win-stu-main-group',
+                                index: 2,
+                                reload: true
+                            })
+                            break
+                        case 4: //关于12Xue
+                            api.setFrameGroupIndex({
+                                name: 'win-stu-main-group',
+                                index: 3
+                            });
+                            break
+                        case '联系客服':
+                            api.openFrame({
+                                name: 'xskf',
+                                url: 'xskf.html',
+                                rect: {
+                                    x: '0',
+                                    y: '0',
+                                    w: 'auto',
+                                    h: api.winHeight
+                                },
+                                pageParam: {},
+                                bounces: false
+                            });
+                            break
+                        case '线上会员':
+                            if($api.getStorage('account').toLowerCase().startsWith('student') && api.systemType === 'ios') return;
+                            api.openFrame({
+                                name: 'member',
+                                url: './onlineMember/frame-member.html'
+                            })
+                            break
+                        case '个人中心':
+                            api.openWin({
+                                name: 'win-person-pad',
+                                url: './personPad/win-person-pad.html'
+                            });
+                            break
+                    }
+                }
+
+                function scanner() {
+
+                    if (!checkPermission(['camera', 'storage'])) {
+                        return;
+                    }
+
+                    if (String($api.getStorage('isLogin')) === 'true') {
+                        var connection = api.connectionType;
+                        if (connection === 'none' || connection === 'unknown') {
+                            api.toast({
+                                msg: '链接错误，请检查网络或者请求配置是否正确',
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        } else {
+                            if (String($api.getStorage('gzxd')) === '34' && String($api.getStorage('schoolid')) === '1007140989450038416' && String($api.getStorage('njmc')) === '2020') {
+                                api.toast({
+                                    msg: '暂时没有权限',
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                                return;
+                            }
+                            if (String(api.deviceModel) !== '12xue_minis') {
+                                var FNScanner = api.require('FNScanner');
+                                FNScanner.open({
+                                    autorotation: true,
+                                    isAlbum: true,
+                                    isLight: true
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (String(ret.eventType) === "success") {
+                                            scanSuccess(ret);
+                                        }
+                                    } else {
+                                        api.toast({
+                                            msg: err.msg,
+                                            duration: 2000,
+                                            location: 'middle'
+                                        });
+                                    }
+                                });
+                            } else {
+                                api.addEventListener({
+                                    name: 'scanSuccess'
+                                }, function (ret, err) {
+                                    scanSuccess(ret.value);
+                                });
+                                api.sendEvent({
+                                    name: 'openScannerForAndroid'
+                                });
+                            }
+                        }
+
+                    } else {
+                        // 未登录
+                        api.openWin({
+                            name: 'login_win',
+                            url: 'login/login_win.html'
+                        });
+                    }
+                }
+
+                return {
+                    loaded,
+                    comboData,
+                    userData,
+                    avatarStyle,
+                    selectFrameIndex,
+                    messageCount,
+                    openFrame,
+                    scanner,
+                }
+            }
+        }).mount('#main')
+
+        getNofiNum();
+        //强制横屏
+        api.setScreenOrientation({
+            orientation: 'landscape_left' //auto_landscape
+        });
+        api.setFullScreen({
+            fullScreen: true
+        });
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.closeFrame({
+                name: 'frm_Purchase'
+            });
+            api.hideProgress();
+        });
+
+        api.addEventListener({
+            name: 'HomeKey'
+        }, function (ret, err) {
+            api.closeFrame({
+                name: 'frame-choose-sex'
+            });
+            if ($api.getStorage('inClass') == '1') { //当前在课堂里面  屏蔽home键
+                api.sendEvent({
+                    name: 'inClassAnswer'
+                });
+            }
+        });
+
+        api.addEventListener({
+            name: 'viewappear'
+        }, function (ret, err) {
+            if ($api.getStorage('inClass') == '1') {
+                setLeaveClassMsg();
+            }
+            $api.setStorage('inClass', '0');//在进入课堂的时候，home键的功能暂时隐藏
+            api.sendEvent({           //回到首页  发送一次广播
+                name: 'closeToLauncher'
+            });
+
+            //关闭打分按钮
+            api.sendEvent({
+                name: 'closeScoreBt'
+            });
+            api.setKeepScreenOn({
+                keepOn: false
+            });
+
+            getRenewCheck();
+
+        });
+
+
+        api.addEventListener({
+            name: 'UnlockScreen'
+        }, function (ret, err) {
+            if ($api.getStorage('isLogin') == 'true') {
+                //判断token是否即将过期，然后刷新 86400
+                if (parseInt($api.getStorage('expires_in')) + 43200 < parseInt(new Date().getTime() / 1000)) {
+                    refreshToken();
+                } else {
+                    simulateLogin();
+                }
+            } else {
+                api.confirm({
+                    title: '提示',
+                    msg: '登陆状态已过期，请重新登陆',
+                    buttons: ['确定', '取消']
+                }, function (ret, err) {
+                    if (ret.buttonIndex == 1) {
+                        //领创  发送广播
+                        if ($api.getStorage('deviceModel') == 1) {
+                            api.sendEvent({
+                                name: 'closeToLispirer'
+                            });
+                        }
+                        $api.setStorage('isLogin', 'false');
+                        api.closeToWin({
+                            name: 'root'
+                        });
+                    }
+                });
+            }
+
+            getRenewCheck();
+
+        });
+
+
+        loginSuccessEvent();
+        getmsg();
+        api.addEventListener({
+            name: 'refreshMessageCount'
+        }, function (ret, err) {
+            getmsg();
+        });
+        if (checkPassword($api.getStorage('psw'))) {
+            setTimeout(function () {
+                api.openWin({
+                    name: 'win-change-pwd-pad',
+                    url: 'login/win-change-pwd-pad.html',
+                    pageParam: {password: $api.getStorage('psw')}
+                });
+            }, 500);//0.5秒后跳转
+        }
+
+        api.addEventListener({ //扫码视频，解锁后回调
+            name: 'shuaxin-frame_scannerView'
+        }, function (ret, err) {
+            GetPracticeMicroclassinfo(hwid, videoData.sxcid, 'jiesuo');
+        });
+
+        //获取线上会员套餐详情
+
+        api.addEventListener({
+            name: 'upgrade-updateComboData'
+        }, function () {
+            app.comboData = JSON.parse($api.getStorage('comboData'));
+        });
+
+        $api.setStorage('upgradeQRCode', '1');
+        try {
+            //学校信息
+            await new Promise((resolve, reject) => {
+                apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        identitytype: '3'
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret === 0 && ret.data.length > 0) {
+                            $api.setStorage('schoolid', ret.data[0].id);
+                            app.userData.school = ret.data[0]['xxmc']
+                            if (ret.data[0].class.length > 0) {
+                                ret.data[0].class.forEach((c) => {
+                                    if (c.type === 1) {
+                                        app.userData.grade = ret.data[0].class[0]['xdtitle']
+                                        app.userData.class = ret.data[0].class[0]['bjmc']
+                                    }
+                                })
+                            } else {
+                                app.userData.class = '暂无班级'
+                            }
+                        } else {
+                            app.userData.grade = '暂无学校和班级'
+                        }
+                        resolve();
+                    } else {
+                        reject(err)
+                    }
+                });
+            })
+            await Promise.all([
+                //头像
+                new Promise((resolve, reject) => {
+                    apiObj.Get(UrlRouter.GetPortrait, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            size: 'b'
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret === 0) {
+                                app.userData.avatarUrl = ret.face;
+                                $api.setStorage('head_url', ret.face);
+                            }
+                            resolve()
+                        } else {
+                            reject(err)
+                        }
+                    });
+                }),
+                new Promise((resolve, reject) => {
+                    apiObj.Get(UrlRouter.GetPayfeeUserInfo, {
+                        values: {
+                            uid: $api.getStorage("uid"),
+                            schoolid: $api.getStorage("schoolid"),
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            app.comboData = ret;
+                            $api.setStorage('comboData', JSON.stringify(ret));
+                            resolve();
+                        } else {
+                            reject(err);
+                        }
+                    });
+                }),
+                new Promise((resolve, reject) => {
+                    apiObj.Get(UrlRouter.GetSchoolConfig, {
+                        values: {
+                            schoolid: $api.getStorage("schoolid"),
+                            type: 'ai_pay_tip'
+                        }
+                    }, function (res, err) {
+                        if (res) {
+                            if ((res.data.length > 0 && (String(res.data[0].value) === "0" || String(res.data[0].value) === "")) || res.data.length === 0) {
+                                $api.setStorage('upgradeQRCode', '0');
+                            } else {
+                                $api.setStorage('upgradeQRCode', '1');
+                            }
+                            resolve();
+                        } else {
+                            reject(err);
+                        }
+                    });
+                })
+            ])
+        } catch (e) {
+            console.log(e)
+            alert('套餐获取失败')
+        }
+
+        app.loaded = true
+
+        await app.$nextTick();
+        header = $('#header')[0];
+        headerPos = $api.offset(header);
+        body_h = $api.getStorage('padHeight');
+
+        api.openFrameGroup({
+            name: 'win-stu-main-group',
+            scrollEnabled: false,
+            preload: 0,
+            rect: {
+                x: 0,
+                y: headerPos.h,
+                w: 'auto',
+                h: body_h - headerPos.h
+            },
+            frames: [{
+                name: 'frame-stu-home-pad',
+                url: 'frame-stu-home-pad.html',
+                bounces: false
+            }, {
+                name: 'frame-message-home.html',
+                url: 'message/frame-message-home.html',
+                bounces: false,
+            }, {
+                name: 'frame-extracurricularInterestResearchStation',
+                url: './stuMain/frame-extracurricularInterestResearchStation.html',
+                pageParam: {
+                    header: {
+                        h: headerPos.h,
+                    }
+                }
+            }
+                , {
+                    name: 'frame-about',
+                    url: './stuMain/frame-about.html',
+                    bounces: false,
+                    vScrollBarEnabled: false
+                }]
+        })
+
+        // 打开个性化学习
+        app.openFrame(1)
+    };
+
+    var times = 0;
+    var stopTime = 15;
+
+    //登陆成功检测缴费状态
+    function getRenewCheck() {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.GetRenewCheck, {
+            values: {
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            if (ret.ret == 0 && ret.data != '') {
+                api.openFrame({
+                    name: 'renew_tips',
+                    url: 'renew_tips.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: api.winWidth,
+                        h: api.winHeight
+                    },
+                    pageParam: {
+                        ret: ret.data
+                    },
+                    bounces: false
+                });
+            }
+        });
+    }
+
+
+    //检测登陆成功
+    function loginSuccessEvent() {
+        api.addEventListener({
+            name: 'init_user'
+        }, function (ret, err) {
+            getteacherSwitch(0);
+            GetStudentAuditNotify();
+            clearInterval(timer);
+            timer = setInterval("getmsg()", 30000); //获取并显示动态消息状态
+        });
+    }
+
+    function getteacherSwitch(number) {
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+            values: {
+                uid: $api.getStorage('uid'),
+                identitytype: '3'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') {
+                    var schoolid = 0;
+                    if (ret.data.length > 0) {
+                        schoolid = ret.data[0].id;
+                        $api.setStorage('schoolid', schoolid);
+                        $api.setStorage('errorxxxz', ret.data[0].xxxz);
+                        $api.setStorage('errorczxz', ret.data[0].czxz);
+                        $api.setStorage('errorgzxz', ret.data[0].gzxz);
+                        if (ret.data[0].class && ret.data[0].class.length > 0) {
+                            $api.setStorage('haveclass', 1);
+                        } else {
+                            $api.setStorage('haveclass', 0);
+                        }
+                    } else {
+                        schoolid = 0;
+                        $api.setStorage('haveclass', 0);
+                    }
+
+                    if (number == 0) {
+                        return;
+                    }
+
+                    apiObj.Get(UrlRouter.GetWeiboSetting, {
+                        values: {
+                            schoolid: schoolid,
+                            uid: $api.getStorage('uid'),
+                            identitytype: '3'
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $api.setStorage('studentSwitch', ret.data.studentdynamic);//学生是否可以发布动态
+                                $api.setStorage('teacherSwitch', ret.data.teacherdynamic);//名师模块开关
+                                $api.setStorage('classSwitch', ret.data.classdynamic);//班校模块开关
+                                $api.setStorage('followSwitch', ret.data.followdynamic);//关注者模块开关
+                                $api.setStorage('sameageSwitch', ret.data.sameagedynamic);//同龄人模块开关
+                                $api.setStorage('boutique', ret.data.boutique); //智能岛链开关
+                                if (number == '2') {
+                                    if (ret.data.teacherdynamic != 1 && ret.data.classdynamic != 1 && ret.data.followdynamic != 1 && ret.data.sameagedynamic != 1) {
+                                        api.openFrame({
+                                            name: 'notIn',
+                                            url: 'moments/notIn.html',
+                                            rect: {x: 0, y: headerPos.h, w: 'auto', h: body_h - headerPos.h},
+                                            pageParam: {x: 0, y: headerPos.h, w: 'auto', h: body_h - headerPos.h},
+                                            bounces: false,
+                                            reload: true
+                                        });
+
+                                    } else {
+                                        api.openFrame({
+                                            name: 'frame-moments-main',
+                                            url: 'moments/frame-moments-main.html',
+                                            rect: {x: 0, y: headerPos.h, w: 'auto', h: body_h - headerPos.h},
+                                            pageParam: {x: 0, y: headerPos.h, w: 'auto', h: body_h - headerPos.h},
+                                            bounces: false,
+                                            reload: true
+                                        });
+
+                                        if (isFirstOpen) {
+                                            isFirstOpen = false;
+                                        } else {
+                                            var jsfun3 = "openFrame();";
+                                            api.execScript({
+                                                frameName: 'frame-moments-main',
+                                                script: jsfun3
+                                            });
+                                        }
+                                    }
+                                } else if (number == '3') {
+                                    api.setFrameGroupIndex({
+                                        name: 'win-stu-main-group',
+                                        index: 1,
+                                        reload: true,
+                                    });
+                                } else if (number == '4') {
+                                    if (ret.data.boutique != 1) {
+                                        zhinengTogo();
+
+                                    } else {
+                                        api.openFrame({
+                                            name: 'notIn',
+                                            url: 'moments/notIn.html',
+                                            rect: {x: 0, y: headerPos.h, w: 'auto', h: body_h - headerPos.h},
+                                            pageParam: {x: 0, y: headerPos.h, w: 'auto', h: body_h - headerPos.h},
+                                            bounces: false,
+                                            reload: true
+                                        });
+                                    }
+                                }
+
+
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    let count;
+
+    //获取顶部消息数量和动态提醒
+    function getmsg() {
+        count = $api.getStorage('all_message');
+        //console.log('asdasd',count);
+        //判断消息数量
+        if (count > 0) {
+            app.messageCount = count;
+        } else {
+            app.messageCount = 0;
+        }
+    }
+
+
+    function zhinengTogo() {
+        api.closeToWin({
+            name: 'win-stu-main'
+        });
+        tab.setActive(4);
+        api.openFrame({
+            name: 'frame-Intelligence',
+            url: 'newIntelligence/frame-Intelligence.html',
+            rect: {x: 0, y: $api.offset(header).h, w: 'auto', h: api.winHeight - $api.offset(header).h},
+            bounces: false,
+            vScrollBarEnabled: false
+        });
+    }
+
+    //刷新token
+    function refreshToken() {
+        apiObj.Post(UrlRouter.GetRefreshToken, {
+            values: {
+                grant_type: 'refresh_token',
+                client_id: '12xue_stu',
+                refresh_token: $api.getStorage('refresh_token')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    $api.setStorage('token', ret.access_token);
+                    $api.setStorage('refresh_token', ret.refresh_token);
+                    //判断token有效期使用
+                    $api.setStorage('expires_in', parseInt(new Date().getTime() / 1000));
+
+                    apiObj.SetAuthToken(ret.access_token);
+                    simulateLogin();
+                    api.sendEvent({
+                        name: 'init_user',
+                        extra: {token: ret.access_token}
+                    });
+                } else if (ret.ret == 1104) {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                } else {
+                    PostUserlogin($api.getStorage('account'), $api.getStorage('psw'), 'autoLogin');//自动登录
+                }
+            } else {
+                api.toast({
+                    msg: '用户信息刷新失败，请检查网络',
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        });
+    }
+
+    //统计学生使用频率
+    function simulateLogin() {
+        apiObj.Post(UrlRouter.GetSimulateLogin, {
+            values: {
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+        });
+    }
+
+
+    function setLeaveClassMsg() {
+        if ($api.getStorage('connectType') == 'Lan') {
+            var ClassApiObj = new GridOpenApi('http://' + $api.getStorage('ip'), source, version);
+            ClassApiObj.Get(UrlRouter.GetCheckStuOnLine, {
+                values: {
+                    action: 'someoneleave',
+                    uid: $api.getStorage('uid'),
+                    classid: $api.getStorage('classid')
+                }
+            }, function (ret, err) {
+            });
+
+        } else {
+            var ClassApiObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+            ClassApiObjForCloud.Get(UrlRouter.GetCheckStuOnLine, {
+                values: {
+                    action: 'someoneleave',
+                    from: 'stuClassReceiveMessage_2',
+                    uid: $api.getStorage('uid'),
+                    classid: $api.getStorage('classid'),
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+            });
+
+        }
+    }
+
+    var nofi = 0, me = 0, comm = 0, zan = 0, xgr = 0, faq = 0, course = 0, homework = 0, exam = 0;
+
+    function getNofiNum() {
+        //消息数量
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.Getpullmessage, "", function (ret, err) {
+            if (ret && ret.ret == 0) {
+                if (ret.data.normalnotify_dynamic.bchange) {
+                    nofi = ret.data.normalnotify_dynamic.count;
+                } else {
+                    nofi = 0;
+                }
+                getFaq();
+            }
+
+        });
+    }
+
+    //学生作业问答消息数量
+    function getFaq() {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.Getstumessage, "", function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.faq_dynamic.bchange) {
+                        faq = ret.data.faq_dynamic.count;
+                    } else {
+                        faq = 0;
+                    }
+                    getHomeworkNum();
+                }
+            }
+        });
+    }
+
+    //作业消息数量
+    function getHomeworkNum() {
+        apiObj.Get(UrlRouter.Getstuhomeworkmessage, {value: {identitytype: 3}}, function (ret, err) {
+            if (ret && ret.ret == 0) {
+                if (ret.data.homework_dynamic.bchange) {
+                    homework = ret.data.homework_dynamic.count;
+                } else {
+                    homework = 0;
+                }
+                getCourse();
+            }
+
+        });
+    }
+
+    //讲义消息数量
+    function getCourse() {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.Getclassmessage, {values: {identitytype: 3}}, function (ret, err) {
+            if (ret && ret.ret == 0) {
+                //@我
+                if (ret.data.course_dynamic.bchange) {
+                    course = ret.data.course_dynamic.count;
+                } else {
+                    course = 0;
+                }
+                Getnewexammessage();
+            }
+        });
+    }
+
+    //考试消息数量
+    function Getnewexammessage() {
+        apiObj.Get(UrlRouter.Getnewexammessage, {
+            values: {
+                uid: $api.getStorage("uid"),
+            }
+        }, function (ret, err) {
+            if (ret.ret == 0) {
+                if (ret.data.exammsg_dynamic.bchange) {
+                    exam = ret.data.exammsg_dynamic.count;
+                } else {
+                    exam = 0;
+                }
+                numAdd();
+                // getPullcommon();
+            }
+        })
+    }
+
+    function numAdd(){
+        count = nofi + course + faq + homework + exam;
+        //本地存储未读消息总数
+        $api.setStorage('all_message', count);
+        if (count != 0) {
+            $api.css($api.dom('.aui-dot1'), 'display:block;');
+            $api.text($api.dom('.aui-dot1'), count);
+        }else {
+            $api.css($api.dom('.aui-dot1'), 'display:none;');
+            $api.setStorage('all_message', 0);
+        }
+    }
+    //首次查询消息数量
+    function getPullcommon() {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.Getpullcommon, "", function (ret, err) {
+            if (ret && ret.ret == 0) {
+                me = ret.data.at_dynamic.count;
+                comm = ret.data.commentme_dynamic.count;
+                zan = ret.data.thumbup_dynamic.count;
+                xgr = ret.data.follow_dynamic.count;
+                if ($api.getStorage('teacherSwitch') == 1) {
+                    count = nofi + course + faq + homework + exam;
+                } else {
+                    count = nofi + comm + me + zan + xgr + course + faq + homework + exam;
+                }
+                //本地存储未读消息总数
+                $api.setStorage('all_message', count);
+                if (count != 0) {
+                    $api.css($api.dom('.aui-dot1'), 'display:block;');
+                    $api.text($api.dom('.aui-dot1'), count);
+                }
+            } else {
+                $api.css($api.dom('.aui-dot1'), 'display:none;');
+                $api.setStorage('all_message', 0);
+            }
+        });
+    }
+
+    //扫码完成后操作
+    function scanSuccess(ret) {
+        $api.setStorage('scanType', 'main');
+        var content = ret.content;
+        if (content.indexOf('homework') > 0 || content.indexOf('material') > 0 || content.indexOf('videoshow') > 0) {
+            var all = content.split('?')[1].split('&');
+            var type = '';
+            var sxcid = '';
+            var dyid = '';
+            var fxfw = 5;
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].split('=')[0] == 'id') {
+                    hwid = all[i].split('=')[1];
+                    //                    $api.setStorage('shwid', hwid);
+                } else if (all[i].split('=')[0] == 'type') {
+                    type = all[i].split('=')[1];
+                } else if (all[i].split('=')[0] == 'sxcid') {
+                    sxcid = all[i].split('=')[1];
+                    //                    $api.setStorage('ssxcid', sxcid);
+                } else if (all[i].split('=')[0] == 'dyid') {
+                    dyid = all[i].split('=')[1];
+                    //                    $api.setStorage('sdyid', dyid);
+                } else if (all[i].split('=')[0] == 'fxfw') {
+                    fxfw = all[i].split('=')[1];
+                    //                    $api.setStorage('fxfw', fxfw);
+                }
+            }
+            if (type == 'homework') {//智能导练
+                GetPracticePracticeinfo(hwid, sxcid, dyid);
+            } else if (type == 'material') {//精品素材
+                GetPracticeMicroclassinfo(hwid, sxcid);
+            } else if (type == 'videoshow') {//普通视频
+                GetSpaceResourceinfo(hwid, fxfw);
+            } else {
+                api.toast({
+                    msg: '扫描的二维码不符合规则~',
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        } else {
+            api.toast({
+                msg: '扫描的二维码不符合规则~',
+                duration: 2000,
+                location: 'middle'
+            });
+        }
+    }
+
+    function GetPracticeMicroclassinfo(hwid, sxcid, jiesuo) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetPracticeMicroclassinfo, {
+            values: {
+                id: hwid,
+                sxcid: sxcid,
+                mac_addr: $api.getStorage('macAdress')
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+
+                    videoData = ret.data;
+                    if (ret.data.paystatus == 1) {
+                        if (ret.data.type == 'video') {
+                            if (ret.data.convert_status == 1) {//转码成功
+                                if (jiesuo == 'jiesuo' || api.systemType == 'ios') {
+                                    setTimeout(function () {
+                                        video(ret.data);
+                                    }, 1000);
+                                } else {
+                                    video(ret.data);
+                                }
+
+                            } else if (ret.data.convert_status == 0) {
+                                api.toast({
+                                    msg: '视频正在转码，请稍后再试',
+                                    duration: 3000,
+                                    location: 'middle'
+                                });
+                            } else if (ret.data.convert_status == 2) {
+                                api.toast({
+                                    msg: '视频转码失败，暂时无法播放',
+                                    duration: 3000,
+                                    location: 'middle'
+                                });
+                            }
+                        } else {
+                            api.openWin({
+                                name: 'win_sucai',
+                                url: 'win_sucai.html',
+                                pageParam: {
+                                    item: ret.data
+                                },
+                                slidBackEnabled: false
+                            });
+                        }
+                    } else if (ret.data.paystatus == 0) {
+
+                        //                        api.openWin({
+                        //                            name: 'not_opened',
+                        //                            url: 'not_opened.html'
+                        //                        });
+
+                        api.openWin({
+                            name: 'win-Intelligence-Unlock',
+                            url: 'newIntelligence/win-Intelligence-Unlock.html',
+                            pageParam: {
+                                data: videoData,
+                                issaoma: 'shipin'
+                            },
+                            slidBackEnabled: false
+                        });
+
+                    }
+
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2500,
+                        location: 'middle'
+                    });
+                    api.closeToWin({
+                        name: 'win-stu-main'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2500,
+                    location: 'middle'
+                });
+            }
+        });
+    }
+
+    var videoData;
+
+    function video(list) {
+        var isMp3 = getFileType(videoData.filetype);
+
+        api.openWin({
+            name: 'win_video_view2',
+            url: 'win_video_view2.html',
+            slidBackEnabled: false,
+            pageParam: {
+                path: videoData.serverpath + videoData.preview_link,
+                title: videoData.title,
+                isMp3: isMp3,
+                item: list,
+                filetime: videoData.filetime
+            }
+        });
+    }
+
+    function getFileType(fileType) {
+        if (fileType == '.mp3' || fileType == '.wma') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function GetPracticePracticeinfo(hwid, sxcid, dyid) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetPracticePracticeinfo, {
+            values: {
+                hwid: hwid,
+                sxcid: sxcid,
+                dyid: dyid,
+                mac_addr: $api.getStorage('macAdress'),
+                is_record: 1
+                //                                            mac_addr:'A0:57:E3:60:8A:D6'
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    $api.setStorage('sversion', ret.data.version);
+                    if (ret.data.paystatus == 1) {
+                        api.hideProgress();
+                        if (ret.data.complet == 4 || ret.data.complet == 0) {
+                            api.openWin({
+                                name: 'win-Intelligence-Detail',
+                                url: 'newIntelligence/win_detail.html',
+                                pageParam: {
+                                    index: 0,
+                                    hwid: hwid,
+                                    sxcid: sxcid,
+                                    dyid: dyid,
+                                    issaoma: 'zuoye',
+                                    version: ret.data.version,
+                                    bjlist: ret.data.bjlist,
+                                    bjcheck: ret.data.bjcheck,
+                                    smxkid: ret.data.xkid,
+                                },
+                                slidBackEnabled: false
+                            });
+                        } else {
+                            api.openWin({
+                                name: 'win_exercise_list',
+                                url: 'newIntelligence/win_exercise_list.html',
+                                pageParam: {
+                                    hwid: hwid,
+                                    sxcid: sxcid,
+                                    dyid: dyid,
+                                    issaoma: 'zuoye',
+                                    status: ret.data.complet,
+                                    version: ret.data.version,
+                                    bjlist: ret.data.bjlist,
+                                    bjcheck: ret.data.bjcheck,
+                                    smxkid: ret.data.xkid
+                                },
+                                slidBackEnabled: false
+                            });
+                        }
+                    } else {
+                        //                        api.openWin({
+                        //                            name: 'not_opened',
+                        //                            url: 'not_opened.html'
+                        //                        });
+                        var newData = ret.data;
+                        api.openWin({
+                            name: 'win-Intelligence-Unlock',
+                            url: 'newIntelligence/win-Intelligence-Unlock.html',
+                            pageParam: {
+                                data: newData,
+                                issaoma: 'zuoye'
+                            },
+                            slidBackEnabled: false,
+                            reload: true
+                        });
+
+                    }
+                } else {
+                    api.toast(
+                        {
+                            msg: ret.msg,
+                            duration: 2500,
+                            location: 'middle'
+                        }
+                    )
+                }
+            } else {
+                api.toast(
+                    {
+                        msg: err.msg,
+                        duration: 2500,
+                        location: 'middle'
+                    }
+                )
+            }
+
+        });
+    }
+
+    function GetSpaceResourceinfo(hwid, fxfw) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetResourceCodeMaterialInfo, {
+            values: {
+                id: hwid,
+                schoolid: $api.getStorage('schoolid'),
+                fxfw: fxfw,
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+                    if (ret.type == 'video') {
+                        videoData = ret;
+                        if (ret.convert_status == 1) {//转码成功
+                            if (api.systemType == 'ios') {
+                                setTimeout(function () {
+                                    video(ret);
+                                }, 1000)
+                            } else {
+                                video(ret);
+                            }
+                        } else if (ret.convert_status == 0) {
+                            api.toast({
+                                msg: '视频正在转码，请稍后再试',
+                                duration: 3000,
+                                location: 'middle'
+                            });
+                        } else if (ret.convert_status == 2) {
+                            api.toast({
+                                msg: '视频转码失败，暂时无法播放',
+                                duration: 3000,
+                                location: 'middle'
+                            });
+                        }
+                    } else {
+                        api.openWin({
+                            name: 'win_sucai',
+                            url: 'win_sucai.html',
+                            pageParam: {
+                                item: ret
+                            },
+                            slidBackEnabled: false
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2500,
+                        location: 'middle'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2500,
+                    location: 'middle'
+                });
+            }
+
+        })
+    }
+
+    //检查学校服务是否关闭
+    var apiObj2 = new GridOpenApi('http://blacklist.12xue.com/api', source, version);
+
+    function getIndexCheck() {
+        apiObj2.Get(UrlRouter.GetIndexCheck, {
+            values: {
+                identitytype: '3',
+                schoolid: $api.getStorage('schoolid')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.data == 1) {
+                    setTimeout(function () {
+
+                        $api.setStorage('isLogin', 'false');
+
+
+                        api.sendEvent({
+                            name: 'openIndexCheck'
+                        });
+
+                        api.closeToWin({
+                            name: 'root'
+                        });
+
+                    }, 1000);//1秒后跳转
+                }
+            }
+        });
+    }
+
+
+</script>

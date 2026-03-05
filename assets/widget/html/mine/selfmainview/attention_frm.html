@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background: #f2f2f2
+        }
+
+        .aui-content {
+            width: 80%;
+            margin: 0 auto
+        }
+
+        .aui-card-list-user-avatar {
+            width: 3rem;
+            height: 3rem;
+            position: relative;
+        }
+        .sex {
+            color: dodgerblue;
+            top: 55px;
+            position: absolute;
+            right: 10px;
+            text-align: right;
+            font-size: 1.1rem;width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 55px;
+            position: absolute;
+            right: 10px;
+            text-align: right;
+            font-size: 1.1rem;width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+        .followAvatar {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        .aui-label {
+            padding: 0.1rem 0.25rem;
+            vertical-align: middle;
+            margin-bottom: 0.2rem;
+        }
+
+        .aui-card-list {
+            margin-bottom: 0;
+            min-height: 5rem;
+        }
+
+        .aui-card-list-user-avatar img {
+            height: 90%;
+            max-height: 90%;
+            width: 90%;
+            max-width: 90%;
+        }
+
+        .btn-follow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+
+        .aui-card-list-content-padded .content-text img, .aui-card-list-content-padded .forward-content-text img {
+            width: inherit;
+            display: inline-block;
+        }
+
+        .aui-label-info {
+            background-color: #6b8fec;
+        }
+
+        .aui-card-list-content {
+            padding: 0.1rem 0;
+        }
+
+        /*名字过长会与右侧关注重合 8-15 朱震*/
+        .aui-text-primaryDiv {
+            padding-right: 90px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .username {
+            max-width: 6rem;
+            float: left;
+            display: block;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .aui-list li {
+            margin: 10px 0px;
+        }
+        .aui-text-primary{
+            max-width: 44%;
+            height: 1.2rem;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;  white-space:nowrap;  text-overflow:ellipsis;
+        }
+        .aui-label-info{ margin: 0 10px; margin-bottom: 3px;}
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="aui-content">
+        <ul class="aui-list">
+
+            <!--<li class="aui-card-list aui-border-b">-->
+                <!--<div class="aui-card-list-header aui-card-list-user">-->
+                    <!--<div class="aui-card-list-user-avatar followAvatar">-->
+                        <!--<img src="test.png" class="aui-img-round"/>-->
+                    <!--</div>-->
+                    <!--<div class="aui-font-size-16">-->
+                        <!--<div class="aui-text-primary">我是乔帮主我是乔帮主我是乔帮主我是乔帮主我是乔帮主我是乔帮主 </div>-->
+                        <!--<span class="aui-label aui-label-info">V3 </span>-->
+                        <!--<span class="identitytype">（学生）</span>-->
+                    <!--</div>-->
+                    <!--<div class="aui-card-list-content aui-text-default aui-invisible" style="display: block;opacity:0;">-->
+                        <!--<span>初中 数学</span></div>-->
+                    <!--<div class="aui-card-list-content aui-text-default" style="display: block;font-size:12px;">烟台第五中学-->
+                    <!--</div><div class="aui-btn aui-btn-warning aui-btn-infome" onclick="concern(this)">-->
+                         <!--<span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+                <!--</div>-->
+            <!--</li>-->
+
+            <!--<li class="aui-card-list aui-border-b">-->
+                <!--<div class="aui-card-list-header aui-card-list-user">-->
+                    <!--<div class="aui-card-list-user-avatar followAvatar">-->
+                        <!--<img src="test.png" class="aui-img-round"/>-->
+                    <!--</div>-->
+                    <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+                        <!--<div class="aui-text-primary">我是乔帮主我是乔帮主我是乔帮主我是乔帮主我是乔帮主我是乔帮主 <span-->
+                                <!--class="aui-label aui-label-info">V3</span><span-->
+                                <!--class="identitytype">（老师）</span></div>-->
+                    <!--</div>-->
+                    <!--<div class="aui-card-list-content aui-text-default" style="display: flex"><span>初中 数学</span></div>-->
+                    <!--<div class="aui-card-list-content aui-text-default" style="display: flex;font-size:12px;">烟台第五中学-->
+                    <!--</div>-->
+
+                    <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</li>-->
+
+        </ul>
+    </div>
+    <div style="width: 100%;height: 1px"></div>
+</section>
+<div class="no-data" style="display: none;height: 100%;">
+    <div style="height: 35%;"></div>
+    <div style="margin: 0 auto 0px auto;text-align: center">
+        <img src="../../../image/stuHomePad/noContent.png" style="width:30%">
+    </div>
+</div>
+</body>
+
+
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="attention.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+
+    var page = 1;
+    var otheruid;
+    var fans;
+    var totalPage;
+    apiready = function () {
+
+        otheruid = api.pageParam.otheruid;
+        fans = api.pageParam.fans;
+        getfanslist();
+
+        //下拉刷新
+        var pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                setTimeout(function () {
+                    page = 1;
+                    getfanslist();
+                    pullRefresh.cancelLoading(); //刷新成功后调用此方法隐藏
+                }, 500)
+            }
+        });
+        //下拉到底部的监听
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            page++;
+            if(page>totalPage){
+                api.toast({
+                    msg: '已加载全部',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+                return;
+            }
+            getfanslist();
+        });
+
+
+    };
+
+
+</script>
+
+
+</html>

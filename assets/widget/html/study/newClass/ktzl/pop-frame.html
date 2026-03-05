@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <title>Title</title>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+       .PopView{
+           width: 46%;
+           background: white;
+           position: absolute;
+           color: #000;
+           left: 27%;
+           top: 35%;
+           overflow: auto;
+           border-radius: 5px;
+       }
+        .item {
+            text-align: center;
+            width: 100%;
+            font-size: 18px;
+            padding: 30px 10px;
+            color: black;
+            overflow: hidden;
+            text-overflow:ellipsis;
+        }
+
+        .class1{
+            height: 30px;
+            text-align: center;
+            font-size: 18px;
+            color: #999999;
+            margin-left: 20%;
+        }
+
+        .class2{
+            height: 30px;
+            text-align: center;
+            font-size: 18px;
+            color: #4bc7c7;
+            position: absolute;
+            right: 20%;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="backgroud" tapmode onclick="closeFrame()">
+</div>
+<div class="PopView">
+    <p  class="item">亲，老师刚刚为你发送了课堂学习资料</p>
+    <p style="height: 50px;width: 100%">
+        <span class="class1"  tapmode onclick="closeFrame()">取消</span>
+        <span class="class2"  tapmode onclick="openKTZL()">去查看</span>
+    </p>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script>
+    var isReady=false;
+    apiready = function () {
+        isReady=true;
+
+        api.addEventListener({
+            name: 'closePopFrame'
+        }, function (ret, err) {
+            api.closeFrame();
+        });
+
+    };
+    function closeFrame() {
+        if (isReady){
+            api.closeFrame();
+        }
+    }
+    
+    function openKTZL() {
+        api.openWin({
+            name: 'win-class-ktzl-pad',
+            url: 'win-class-ktzl-pad.html',
+            slidBackEnabled: false,
+            reload: true
+        });
+//        api.closeFrame();
+    }
+    
+</script>
+</html>

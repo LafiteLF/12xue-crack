@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/winDetailCss.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e5e5
+        }
+
+        .titlea {
+            width: 70%;
+            text-align: left;
+        }
+
+        .title-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .subject-select {
+            position: static;
+            transform: none;
+            margin-left: auto;
+            width: 80px;
+            border: 1px solid #00FF7F;
+            font-size: 12px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 8px;
+            background-color: transparent;
+            color: #333;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="clearfix">
+    <div class="title-container">
+        <div class="winTitle pull_left" topmode onclick="closeWin();">
+            AI伴学
+        </div>
+        <div class="center-text"
+             style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 12px; color: grey;;">
+            本月剩余问答次数：<span style="font-weight: bold;"
+                                   :style="{'color': aiStudy.count > 0 ? '#4BC7C7': '#F82A1A'}">{{ aiStudy.count }}</span>
+        </div>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <!-- <button onclick="deleteChat()"
+                style="margin-right: 10px; border: 1px solid #00FF7F; font-size: 12px; height: 24px; line-height: 24px; text-align: center; border-radius: 8px; background-color: transparent; color: #333;width: 80px;">删除当前对话</button> -->
+            <button onclick="selectChat(0)"
+                    style="margin-right: 10px; border: 1px solid #00FF7F; font-size: 12px; height: 24px; line-height: 24px; text-align: center; border-radius: 8px; background-color: transparent; color: #333;width: 80px;">
+                新对话
+            </button>
+            <select class="subject-select" onchange="selectChat(this.value)">
+                <option v-for="chat in chats" :index="chat.id" :value="chat.id">
+                    {{ chat.subject.substring(0, 20) }}{{ chat.subject.substring(0, 20) === chat.subject || chat.subject.substring(0, 20) === '历史对话' ? '' : '......' }}
+                </option>
+            </select>
+        </div>
+    </div>
+</header>
+
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript">
+    let vm = null;
+    let db = null;
+
+    function initVue() {
+        vm = new Vue({
+            el: '.clearfix',
+            data: {
+                title: 'AI伴学',
+                chats: [{'id': 1, 'subject': '测试1'}, {'id': 2, 'subject': '测试2'}, {'id': 3, 'subject': '测试3'}],
+                currentChatId: null, // 新增：用于存储当前选中的对话ID
+                aiStudy: {count: 0},
+            },
+            mounted: function () {
+                this.$watch('aiStudy', () => {
+                    $api.setStorage('aiStudy', JSON.stringify(this.aiStudy));
+                },{deep: true});
+                const apiObj = new GridOpenApi(UrlDomain, source, version);
+                apiObj.SetAuthToken($api.getStorage('token'));
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        type: 'ai_study',
+                        schoolid: $api.getStorage('schoolid'),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        this.aiStudy = ret.data;
+                    }else{
+                        this.aiStudy = {count: 0};
+                    }
+                })
+            },
+            methods: {
+                setChats: function (chats) {
+                    this.chats = [{'id': -1, 'subject': '历史对话'}, ...chats];
+                }
+            }
+        });
+    }
+
+    function selectChatTable() {
+        //查chats表
+        db.selectSql({
+            name: 'aiAssistants',
+            // sql: 'select * from chats order by id desc',
+            sql: 'select id,subject from chats order by id desc',
+        }, function (ret, err) {
+            if (ret.status) {//有chats表
+                console.log('有chats表:');
+                console.log(JSON.stringify(ret.data));
+                if (ret.data.length > 0) {
+                    //有数据
+                    //把数据放到vue
+                    vm.setChats(ret.data);
+                    //select标签设为显示
+                    let select = document.querySelector('.subject-select');
+                    select.style.display = 'block';
+                } else {
+                    //select标签设为隐藏
+                    let select = document.querySelector('.subject-select');
+                    select.style.display = 'none';
+                }
+
+            } else {
+                console.log(JSON.stringify(err));
+                if (err.msg.indexOf('no such table') !== -1) {//没有chats表
+                    //建表
+                    console.log('没有chats表');
+                    db.executeSql({
+                        name: 'aiAssistants',
+                        sql: 'CREATE TABLE chats(id INTEGER PRIMARY KEY AUTOINCREMENT, subject TEXT not null,messages TEXT not null,createdTime DATETIME DEFAULT CURRENT_TIMESTAMP,updatedTime DATETIME DEFAULT CURRENT_TIMESTAMP)'
+                    }, function (ret, err) {
+                        if (ret.status) {
+                            selectChatTable()
+                        } else {
+                            console.log(JSON.stringify(err));
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    apiready = function () {
+        // if ($api.getStorage('padType') != '2') {//如果不是应用商店的包
+        //     document.getElementById('aiAssistant_content_ai_alert').style.display = 'none';
+        // }
+        initVue();
+        db = api.require('db');
+        //打开数据库
+        db.openDatabaseSync({
+            name: 'aiAssistants',
+        });
+
+        //测试数据处理
+        // db.executeSql({
+        //     name: 'aiAssistants',
+        //     sql: 'drop table chats'
+        // }, function (ret, err) {
+        //     if (ret.status) {
+        //         console.log('删除表成功');
+        //     } else {
+        //         console.log(JSON.stringify(err));
+        //     }
+        // });
+
+        api.addEventListener({
+            name: 'aiAssistantFrameTryToSaveOk'
+        }, function (ret, err) {
+            selectChatTable()
+        });
+
+        // 监听frame页面发送的对话变更事件
+        api.addEventListener({
+            name: 'aiAssistantFrameChatChanged'
+        }, function (ret, err) {
+            vm.currentChatId = ret.value.chatId;
+        });
+
+        selectChatTable();
+        var header = document.querySelector('header');
+        headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.openFrame({
+            name: 'frame-aiAssistant',
+            url: './frame_aiAssistant.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: frameH
+            },
+            bounces: false,
+            pageParam: {
+                xtid: api.pageParam.xtid,
+                answer: api.pageParam.answer,
+                pictures: api.pageParam.pictures,
+            }
+        });
+        if (api.pageParam.xtid && api.pageParam.xtid !== '' && api.pageParam.xtid !== 'undefined' && api.pageParam.xtid !== 'null') {
+            //隐藏选择
+            setTimeout(() => {
+                let select = document.querySelector('.subject-select');
+                select.style.display = 'none';
+            }, 100);
+
+            let buttons = document.querySelectorAll('button');
+            buttons.forEach(function (button) {
+                button.style.display = 'none';
+            });
+            let frameWide = api.winWidth * 0.5;
+            // console.log('api.pageParam.pictures:', api.pageParam.pictures);
+
+            api.openFrame({
+                name: 'frame_aiAssiatant_pictures',
+                url: './frame_aiAssistant_pictures.html',
+                pageParam: {
+                    pictures: api.pageParam.pictures,
+                },
+                rect: {
+                    x: 0,
+                    y: headerH,
+                    w: frameWide,
+                    h: 'auto',
+                    marginBottom: 60,
+                },
+            })
+
+        }
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.hideProgress();
+            closeWin();
+
+        });
+
+
+    };
+
+    function closeWin() {
+        api.addEventListener({
+            name: 'aiAssistantWinClose'
+        }, function (ret, err) {
+            api.closeWin();
+        });
+
+        api.sendEvent({
+            name: 'aiAssistantWinWantToClose',
+        });
+    }
+
+    function changeChat(chatId, messageHistory) {
+        api.sendEvent({
+            name: 'aiAssistantWinWantToChange',
+            extra: {
+                chatId: chatId,
+                messageHistory: messageHistory
+            }
+        });
+    }
+
+    function deleteChat() {
+        api.sendEvent({
+            name: 'aiAssistantWinWantToDelete',
+        });
+    }
+
+    function selectChat(chatId) {
+        let select = document.querySelector('.subject-select');
+        chatId *= 1
+        // 如果选择的对话就是当前对话并且不是新对话按钮，则不做任何操作
+        if (chatId === vm.currentChatId && chatId !== 0) {
+            select.selectedIndex = 0;
+            return;
+        }
+
+        if (chatId === -1) {//"历史对话"选项
+            return
+        } else if (chatId === 0) {//新对话
+            console.log('新对话');
+            //select标签选中项改回第一个
+            select.selectedIndex = 0;
+            vm.currentChatId = chatId;
+            changeChat(0, []);
+        } else {//老对话
+            //查chats表
+            db.selectSql({
+                name: 'aiAssistants',
+                sql: 'SELECT messages FROM chats WHERE id = ' + chatId,
+            }, function (ret, err) {
+                if (ret.status) {
+                    console.log('查询成功');
+                    console.log(JSON.stringify(ret.data));
+                    vm.currentChatId = chatId;
+                    changeChat(chatId, JSON.parse(ret.data[0].messages));//ret.data[0].messages是字符串，需要解析成数组
+                    select.selectedIndex = 0;
+                } else {
+                    // api.alert({
+                    //     msg: JSON.stringify(err)
+                    // })
+                    console.error(JSON.stringify(err));
+
+                }
+            });
+        }
+
+    }
+
+    function postAiStudy() {
+        if (vm.aiStudy.count > 0) {
+            vm.aiStudy.count -= 1;
+        }
+    }
+</script>
+
+
+</html>

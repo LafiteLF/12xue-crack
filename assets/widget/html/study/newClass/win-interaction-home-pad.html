@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>课堂</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        .nav-spanBtn {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background:url("../../../image/stuHomePad/add.png") no-repeat  6px 6px #fff;
+            padding: 5px;
+            margin-right: 10px;
+            background-size: 18px;
+            padding-left: 28px;
+        }
+        .nav-spanBtn:active{
+            background:url("../../../image/stuHomePad/addactive.png") no-repeat  6px 6px #4bc7c7;
+            background-size: 18px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin()">
+        <span class="aui-iconfont aui-icon-left"></span>互动课堂
+    </a>
+    <div style="float: right" tapmode onclick="addClass()">
+        <span class="nav-spanBtn" style="font-size: 0.7rem">加入课堂</span>
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/class_score.js"></script>
+<script type="text/javascript">
+    var isSocket = false;
+    var socket;
+    var classid;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+
+        //课堂管控 刚进入课堂把classid置空
+        $api.setStorage('classid', '');
+        $api.setStorage('connectType', '');
+
+        api.openFrame({
+            name: 'frame-interaction-home-pad',
+            url: 'frame-interaction-home-pad.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            bounces: false,
+            pageParam: {classArr: api.pageParam.classArr,ip: api.pageParam.ip,classid: api.pageParam.classid}
+        });
+
+
+
+        api.addEventListener({
+            name: 'chooseClassRoom'
+        }, function (ret, err) {
+            classid = ret.value.classid;
+        });
+
+
+        //刚进入课堂ip地址置空
+        $api.setStorage('ip', '');
+        $api.setStorage('netIP', '');
+
+        api.addEventListener({
+            name: 'setIp'
+        }, function (ret, err) {
+            if (!isSocket) {
+                setSocket();
+            }
+            //加入课堂成功后请求打分情况
+            getScoreData();
+        });
+
+        api.addEventListener({
+            name: 'closeSocket'
+        }, function (ret, err) {
+            if (socket) {
+                socket.close(); //关闭socket
+            }
+            //加入课堂成功后请求打分情况
+            getScoreData();
+        });
+
+        api.addEventListener({
+            name: 'viewappear'
+        }, function (ret, err) {
+            viewdisappear = false;
+            if (popFrame) {
+                popFrame = false;
+                api.openFrame({
+                    name: 'pop-frame',
+                    url: 'ktzl/pop-frame.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: 'auto',
+                        h: api.winHeight
+                    },
+                    bounces: false
+                });
+            }
+        });
+
+        api.addEventListener({
+            name: 'inClassAnswer'
+        }, function (ret, err) {
+            ketangguangkong();
+        });
+
+
+        api.addEventListener({
+            name: 'viewdisappear'
+        }, function (ret, err) {
+            viewdisappear = true;
+        });
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+
+        api.addEventListener({
+            name: 'resume'
+        }, function (ret, err) {
+            if (!isSocket && $api.getStorage('connectType') == 'Lan') {
+                setSocket();
+            }
+        });
+
+
+        api.addEventListener({
+            name: 'checkScore'
+        }, function (ret, err) {
+            windows = api.windows();
+            topWinName = windows[windows.length-1].name;
+            api.sendEvent({
+                name: topWinName,
+                extra: {
+                    scoreData: scoreData,
+                    type: ret.value.type
+                }
+            });
+        });
+
+
+        api.addEventListener({
+            name: 'stuScoring'
+        }, function (ret, err) {
+            //打开学生打分功能
+            openStuScoring();
+        });
+
+        //接收打开打分的事件
+        api.addEventListener({
+            name: api.winName
+        }, function (ret, err) {
+            stuScorePublicFunction(ret.value.scoreData, ret.value.type);
+        });
+
+    };
+
+    //打分分发事件
+    var windows;
+    var topWinName;
+    function openStuScoring() {
+        if (scoreData.stu_evaluate || scoreData.group_evaluate) {
+            windows = api.windows();
+            topWinName = windows[windows.length - 1].name;
+            api.sendEvent({
+                name: topWinName,
+                extra: {
+                    scoreData: scoreData,
+                    type: type
+                }
+            });
+        } else {
+            api.toast({
+                msg: '暂无设置打分项',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+    //获取打分信息
+    var scoreData;
+    var type;
+    function getScoreData() {
+        apiObj.Get(UrlRouter.GetCheckScoreAudit, {
+            values: {
+                schoolid: $api.getStorage('schoolid'),
+                classid: $api.getStorage('classid')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    //显示按钮
+                    scoreData = ret.data;
+                    if (ret.data.lesson_stu != 0) {
+                        if (ret.data.lesson_group != 0) {
+                            type = 'stuGroup';
+                            getGroupInfo();
+                            buttonView();
+                        } else {
+                            type = 'stu';
+                            buttonView();
+                        }
+                    } else {
+                        if (ret.data.lesson_group != 0) {
+                            type = 'group';
+                            getGroupInfo();
+                            buttonView();
+                        } else {
+                            type = '';
+                        }
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            }
+        });
+    }
+
+    var floatButton;
+    function buttonView() {
+        //加入课堂成功，显示打分按钮
+        if (api.systemType == 'ios') {
+            api.addEventListener({
+                name: 'closeScoreBt'
+            }, function (ret, err) {
+                floatButton.hidenButton();
+            });
+
+            floatButton = api.require('floatButton');
+            floatButton.openButton({
+                rect : {
+                    x : 10,
+                    y : api.winHeight - 200,
+                    w : 72,
+                    h : 72
+                },
+                btnPic : 'widget://icon/score_icon.png'
+            }, function(ret) {
+            });
+
+            floatButton.setOnClickListener(function(ret) {
+                if (ret.status) {
+                    api.sendEvent({
+                        name: 'stuScoring'
+                    });
+                }
+            });
+
+        } else {
+            api.sendEvent({
+                name: 'openScoreBt'
+            });
+        }
+    }
+
+    function getGroupInfo() {
+        apiObj.Get(UrlRouter.GetGrouptechList, {
+            values: {
+                schoolid: $api.getStorage('schoolid'),
+                classid: $api.getStorage('classid'),
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                 if (ret.data.custom && ret.data.custom.length != 0) {
+                    for (var i=0; i<ret.data.custom.length; i++ ) {
+                        if (ret.data.custom[i].leader == $api.getStorage('realname')) {
+                            $api.setStorage('groupScoreName', ret.data.custom[i].title);
+                            $api.setStorage('groupScoreId', ret.data.custom[i].id);
+                            return;
+                        }
+                    }
+                 } else if (ret.data.default && ret.data.default.length != 0) {
+                     for (var i=0; i<ret.data.default.length; i++ ) {
+                         if (ret.data.default[i].leader == $api.getStorage('realname')) {
+                             $api.setStorage('groupScoreName', ret.data.default[i].title);
+                             $api.setStorage('groupScoreId', ret.data.default[i].id);
+                             return;
+                         }
+                     }
+                 }
+            }
+        });
+    }
+
+
+    var viewdisappear = false;
+    var popFrame = false;
+    function setSocket() {
+        $api.setStorage('inClass', '1'); //已经进入课堂
+
+        if ($api.getStorage('deviceModel') == 1) { //联想设备 进入课堂隐藏home recent键
+            api.sendEvent({
+                name: 'HomeAndRecent'
+            });
+        }
+
+        isSocket = true;
+        var wsUrl = "ws://" + $api.getStorage('ip') + "/socket";
+        socket = new WebSocket(encodeURI(wsUrl));
+        socket.onopen = function (evt) {
+            if (window.WebSocket) {
+
+                //学生进入课堂 注册
+//                stuEnter();
+
+                // 监听消息
+                socket.onmessage = function (event) {
+                    var ret = JSON.parse(event.data);
+                    if (ret) {
+                        if (ret.bjid == $api.getStorage('classid')) {
+                            if (ret.action == 'doc_withdraw') {
+                                //撤回
+                                api.sendEvent({
+                                    name: 'removeKtzl'
+                                });
+                            } else if (ret.action == 'doc_push') {
+                                if (viewdisappear) {
+                                    popFrame = true;
+                                } else {
+                                    //弹窗
+                                    api.openFrame({
+                                        name: 'pop-frame',
+                                        url: 'ktzl/pop-frame.html',
+                                        rect: {
+                                            x: 0,
+                                            y: 0,
+                                            w: 'auto',
+                                            h: api.winHeight
+                                        },
+                                        bounces: false
+                                    });
+                                }
+                            } else if (ret.action == 'class_close') {
+                                api.toast({
+                                    msg: '老师已退出课堂',
+                                    duration: 1500,
+                                    location: 'bottom'
+                                });
+                                $api.setStorage('connectSuccess', '1');
+                                $api.setStorage('inClass', '0');
+                                setTimeout(function () {
+                                    exitClassRoom();
+                                }, 1500);
+                            }
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                };
+            }
+        };
+        socket.onclose = function () {
+            //连接关闭
+            isSocket = false;
+        };
+    }
+
+
+    //学生加入课堂 socket注册
+    function stuEnter() {
+        var vet = {
+            request: "stu_enter",
+            uid: $api.getStorage("uid")
+        };
+        if (socket) {
+            socket.send(JSON.stringify(vet));
+        }
+
+    }
+
+
+
+    //加入班级
+    function addClass() {
+        api.openFrame({
+            name: 'frame-slect-class-pad',
+            url: 'frame-slect-class-pad.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            pageParam: {classArr: api.pageParam.classArr},
+            bounces: false
+        });
+    }
+
+
+
+    function exit_app() {
+
+        if (socket) {
+            socket.close(); //关闭socket
+        }
+        $api.setStorage('inClass', '0'); //退出课堂
+        $api.setStorage('classTN', '');
+        exitClassRoom();
+    }
+
+
+    function closeWin() {
+        // exit_app();
+        ketangguangkong();
+    }
+
+
+    function ketangguangkong() {
+        var checkClassid;
+        if ($api.getStorage('connectSuccess') == 0) {
+            checkClassid = classid;
+        } else {
+            checkClassid = $api.getStorage('classid');
+        }
+
+        if ($api.getStorage('connectType') == 'Lan') {
+            //用ajax自动定时  3秒无响应自动退出
+            var url = 'http://' + $api.getStorage('ip') + '/class_check?classid=' + checkClassid;
+            api.ajax({
+                url: url,
+                tag: 'checkClass',
+                method: 'get',
+                timeout: 3,
+                dataType: 'json',
+                returnAll: false,
+                cache: false,
+                data: null
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.status == 1) {
+                        api.toast({
+                            msg: '同学，老师正在上课中，不能退出互动课堂噢！',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    } else {
+                        exit_app();
+                    }
+                } else {
+                    if (socket) {
+                        socket.close(); //关闭socket
+                    }
+//                    $api.setStorage('inClass', '0'); //退出课堂
+                    $api.setStorage('classTN', '');
+                    api.cancelAjax({
+                        tag: 'checkClass'
+                    });
+                    exitClassRoom();
+                }
+            });
+        } else if ($api.getStorage('connectType') == 'Cloud') {
+            var urls = 'http://' + $api.getStorage('netIP') + '/class_check?classid=' + checkClassid + '&uid=' + $api.getStorage('uid')
+                    +'&vclass_token='+ $api.getStorage('vclass_token')+'&private_token='+$api.getStorage('private_token')+'&from=ReceiveMessage_1';
+            api.ajax({
+                url: urls,
+                tag: 'checkClass',
+                method: 'get',
+                timeout: 3,
+                dataType: 'json',
+                returnAll: false,
+                cache: false,
+                data: null
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.status == 1) {
+                        api.addEventListener({
+                            name: 'ReceiveMessage_1'
+                        }, function (ret, err) {
+                            rtnInfo = true;
+                            ProcessRet1(ret.value.receive);
+                        });
+
+                        //判断是否退出
+                        if (!firstClose) {
+                            firstClose = true;
+                            setTimeout(function () {
+                                firstClose = false;
+                                if (!rtnInfo) {
+//                                    $api.setStorage('inClass', '0');
+                                    exitClassRoom();
+                                }
+                                rtnInfo = false;
+                            }, 5000);
+                        }
+
+
+                    } else {
+                        api.toast({
+                            msg: 'PC端未响应',
+                            duration: 1500,
+                            location: 'bottom'
+                        });
+//                        $api.setStorage('inClass', '0'); //退出课堂
+                        $api.setStorage('classTN', '');
+                        setTimeout(function () {
+                            exitClassRoom();
+                        }, 1500);
+                    }
+                } else {
+//                    $api.setStorage('inClass', '0');
+                    exitClassRoom();
+                }
+
+            });
+        } else {
+//            $api.setStorage('inClass', '0');
+            exitClassRoom();
+        }
+    }
+
+
+    var rtnInfo = false; //判断pc端是否有返回信息
+    var firstClose = false; //第一次返回的标志
+
+    function ProcessRet1(ret) {
+        if (ret) {
+            if (ret.status == 1) {
+                api.toast({
+                    msg: '同学，老师正在上课中，不能退出互动课堂噢！',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                exit_app();
+            }
+        } else {
+//            $api.setStorage('inClass', '0'); //退出课堂
+            $api.setStorage('classTN', '');
+            exitClassRoom();
+        }
+    }
+    
+    //退出课堂
+    function exitClassRoom() {
+        // if (api.systemType == 'ios') {
+        //     floatButton.hidenButton();
+        // }
+        api.sendEvent({
+            name: 'closeScoreBt'
+        });
+        api.closeToWin({
+            name: 'win-stu-main',
+            animation: {
+                type: 'type',
+                subType: 'from_left',
+                duration: 500
+            }
+        });
+    }
+
+</script>
+</html>

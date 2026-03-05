@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>-->
+    <style>
+
+        body{
+            background-color: white;
+        }
+
+
+        .topdiv{
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            background-color:  #E85B81;
+            margin: 17px 10px 20px 20px;
+            display: inline-block;
+        }
+        .topP{width: 100px;margin: 10px 10px 10px 0;display: inline-block;vertical-align: top;font-size: 14px;}
+
+        .name{
+             width: 80px;display: inline-block;vertical-align: top;font-size: 14px;
+         }
+        [v-cloak] {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="content" v-cloak>
+
+
+        <div v-if="daipiNum!=0">
+            <div>
+                <div class="topdiv"></div>
+                <p class="topP">待批<span style="color: #E85B81;" v-text="daipiNum">2</span>人</p>
+            </div>
+            <div style="padding:0 20px;display: inline-block" v-for="item,index in daipiList" @click="changeXs(item.uid,index,'0','0')">
+                <div class="name" v-text="item.realname">组员一</div>
+            </div>
+        </div>
+
+        <div v-if="yipiNum!=0">
+            <div>
+                <div class="topdiv" style="background-color: #4bc7c7;"></div>
+                <p class="topP">已批<span style="color: #4bc7c7;" v-text="yipiNum">2</span>人</p>
+            </div>
+            <div style="padding:0 20px;display: inline-block" v-for="item,index in yipiList" @click="changeXs(item.uid,index,'1',item.score)">
+                <div class="name" v-if="item.is_true == 1" style="color: #4bc7c7" v-text="item.realname">组员一</div>
+                <div class="name" v-if="item.is_true == 2" style="color: #F57F17" v-text="item.realname">组员一</div>
+                <div class="name" v-if="item.is_true == 3" style="color: #FFCC00" v-text="item.realname">组员一</div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+        vm.GetcorrectAnswerOptionStudents();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                yipiList:api.pageParam.yipiList,
+                daipiList:api.pageParam.daipiList,
+                isFenzhi: api.pageParam.isFenzhi,
+                fz: api.pageParam.fz,
+                daipiNum: 0,
+                yipiNum: 0,
+            },
+            updated: function () {
+
+            },
+            methods: {
+                GetcorrectAnswerOptionStudents: function () {//待批主观题列表
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetcorrectAnswerOptionStudents, {
+                        values: {
+                            tuid: api.pageParam.tuid, //获取hwid
+                            hwid: api.pageParam.hwid, //获取hwid
+                            classid: api.pageParam.classid,
+                            xtid: api.pageParam.xtid,
+                            ytlx: api.pageParam.ytlx,
+                            leaderuid: $api.getStorage('uid'),
+                            tx_code:api.pageParam.tx_code,
+                            is_auto:'0',
+                            sort: api.pageParam.sortArr[api.pageParam.index],
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.yipiList = ret.data.ypList;
+                                vm.daipiList = ret.data.dpList;
+                                vm.daipiNum = ret.data.dpList.length;
+                                vm.yipiNum = ret.data.ypList.length;
+
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    })
+                },
+                changeXs:function (uid,index,isWP,score) {
+                    var pageIndex;
+                    if(isWP == '0'){
+                        pageIndex = index;
+                    }else {
+                        pageIndex = vm.daipiNum + index;
+                    }
+                    if(api.pageParam.sortArr.length == 0){
+                        api.sendEvent({
+                            name: 'changeWithUid',
+                            extra: {uid: uid}
+                        });
+                        api.closeFrame({
+                            name: 'frame_student'
+                        });
+                        api.closeFrame({
+                            name: 'frame_studentpage'
+                        });
+                        api.closeFrameGroup({
+                            name: 'frame_Marking_group'
+                        });
+
+                    }else if(api.pageParam.currentSort == api.pageParam.sortArr[api.pageParam.index]){
+                        api.sendEvent({
+                            name: 'changeWithUid',
+                            extra: {uid: uid}
+                        });
+                        api.closeFrame({
+                            name: 'frame_student'
+                        });
+                        api.closeFrame({
+                            name: 'frame_studentpage'
+                        });
+                        api.closeFrameGroup({
+                            name: 'frame_Marking_group'
+                        });
+                    }else {
+                        api.sendEvent({
+                            name: 'changeWithXT',
+                            extra: {uid: uid,sort:api.pageParam.sortArr[api.pageParam.index],pageIndex:pageIndex,fz:score}
+                        });
+                        api.closeFrame({
+                            name: 'frame_student'
+                        });
+                        api.closeFrame({
+                            name: 'frame_studentpage'
+                        });
+                        api.closeFrameGroup({
+                            name: 'frame_Marking_group'
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+
+
+</script>
+</html>

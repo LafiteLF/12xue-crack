@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>作业列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content {
+            padding: 10px 10px 50px 10px;
+        }
+
+        .content ul li {
+            width: 25%;
+            float: left;
+            padding: 8px;
+            position: relative;
+            height: 250px;;
+        }
+
+        .content ul li .item {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 5px;
+            background: #fff;
+            border: 1px solid #e4e4e8;
+        }
+
+        .content ul li .item h2 {
+            font-size: 0.8rem;
+            padding-top: 14%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 90%;
+            margin: 0 auto;
+            margin-bottom: 8px;
+            color: #333333;
+        }
+
+        .content ul li .item h2 span {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            margin-right: 5px;
+            font-size: 0.6rem;
+            background: #4bc7c7;
+            color: #fff;
+            border-radius: 3px;
+            vertical-align: top
+        }
+
+        .item p {
+            color: #666666;
+            font-size: 0.6rem;
+            width: 90%;
+            margin: 0 auto;
+            height: 1rem;
+            line-height: 1rem
+        }
+
+        .item p b {
+            font-weight: normal;
+            color: #4bc7c7;
+            padding: 0 3px;
+        }
+
+        .accuracy {
+            background: #ff778c;
+            padding: 3% 0;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 0.7rem;
+            position: absolute;
+            bottom: 0px;
+        }
+
+        .lianxice {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: auto;
+            height: auto;
+            max-width: 60px;
+            max-height: 30px;
+            z-index: 1;
+        }
+
+        .submit {
+            width: 100px;
+            height: 30px;
+            line-height: 31px;
+            color: #fff;
+            position: absolute;
+            top: 1px;
+            right: 0px;
+            text-align: center;
+            font-size: 0.6rem
+        }
+
+        .yiwancheng {
+            background: url("../../../image/stuHomePad/yiwancheng.png") no-repeat center top;
+            background-size: 100% auto;
+        }
+
+        .weikaishi {
+            background: url("../../../image/stuHomePad/weikaishi.png") no-repeat center top;
+            background-size: 100% auto;
+        }
+        .weitijiao{
+            background: url("../../../image/stuHomePad/weitijiao.png") no-repeat center top;
+            background-size: 100% auto;
+        }
+
+        .remarks {
+            position: fixed;
+            bottom: 0px;
+            left: 18px;
+            color: #666666;
+            font-size: 0.6rem;
+            height: 33px;
+            line-height: 24px;
+            padding: 5px 0px 20px 0px;
+            background: #f5f5f5;
+            width: 100%;
+        }
+
+        .remarks span {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            margin-right: 5px;
+            font-size: 0.6rem;
+            background: #4bc7c7;
+            color: #fff;
+            border-radius: 3px;
+            vertical-align: top;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        .accuracyCol {
+            background-color: #95d273
+        }
+        @media only screen and (min-width: 901px) and (max-width: 980px) {
+            .content ul li .item h2 {
+                font-size: 0.7rem;
+            }
+
+            .content ul li .item h2 span {
+                font-size: 0.55rem;
+            }
+
+            .item p {
+                font-size: 0.55rem;
+            }
+        }
+        @media only screen and (min-width: 800px) and (max-width: 900px) {
+            .content ul li .item h2 {
+                font-size: 0.6rem;
+            }
+
+            .content ul li .item h2 span {
+                font-size: 0.45rem;
+            }
+
+            .item p {
+                font-size: 0.45rem;
+            }
+        }
+        .xing{height: 20px;width: auto}
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="content" v-cloak>
+        <div class="kong" v-if="homeworkLists.length==0&&isNull" style="width: 30%; margin: 0 auto;   padding-top: 12%; text-align: center">
+            <img src="../../../image/stuHomePad/noContent.png" style="width: 100%; max-width: 508px;">
+        </div>
+        <ul v-else class="clearfix">
+            <li v-for="(homeworkList,index) in homeworkLists" @click="openHomeworkDetail(index,homeworkList)">
+                <div class="item">
+                    <img class="lianxice" v-if="homeworkList.sys_type==3" src="../../../image/newhomework/lianxice.png">
+                    <h2>
+                        <span :class="{hide:homeworkList.piyue!=1}">批</span><b style="font-weight: normal" v-html="homeworkList.title"></b>
+                    </h2>
+                    <p>
+                        <!--<span v-text="xkname" style="display: inline-block; vertical-align:bottom;max-width: 70px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" ></span>-->
+                        <span style="display: inline-block; margin-left: 2px;vertical-align:bottom;width: 100px;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" v-text="homeworkList.fbrxm + '老师'"></span>
+                    </p>
+                    <p>
+                        <!--<span v-if="homeworkList.xts == null" v-html="'习题 <b>'+0+'</b>'"></span>-->
+                        <!--<span v-else  v-html="'习题 <b>'+homeworkList.xts +'</b>'">/span>-->
+                        <span v-html="homeworkList.xts == null?'习题 <b>'+0+'</b>':'习题 <b>'+homeworkList.xts +'</b>'"></span>
+                        <span v-text="'截止：'+gettime(homeworkList.finish_time)"></span>
+                    </p>
+                    <p  v-if="homeworkList.nyd == 0">难易度：暂无 </p>
+                    <p v-if="homeworkList.nyd == 1">难易度：<img class="xing" src="../../../image/stuHomePad/1xing.png"> </p>
+                    <p v-if="homeworkList.nyd == 2">难易度：<img class="xing" src="../../../image/stuHomePad/2xing.png"> </p>
+                    <p v-if="homeworkList.nyd == 3">难易度：<img class="xing" src="../../../image/stuHomePad/3xing.png"> </p>
+                    <p v-text="'发送时间：'+fsgettime(homeworkList.fssj)" style="color:#999999"></p>
+                    <div class="accuracy" :style="homeworkList.complete!=2 ?'background:#4bc7c7':homeworkList.complete==2 && homeworkList.accuracy >=60?'background:#95d273':homeworkList.complete==2 && homeworkList.jcxts == 0?'background:#4bc7c7':'background:#ff778c'"  v-text="showkszy(homeworkList)"></div>
+                    <span class="submit":class="homeworkList.complete==0?'weikaishi':homeworkList.complete==1?'weitijiao':'yiwancheng'"
+                          v-text="homeworkList.complete==0 ?' 未开始':homeworkList.complete==1?' 未提交':'已完成'"></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+<p class="remarks"><span>批</span>表示老师对你的作业进行了手工批阅</p>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var homeworkListData = [];//作业列表的数据
+    var p = 1;
+    var totalP = '';
+    var date = [];
+    var num;
+    var dataNum = 0;
+    var clean = true;
+    var pullRefresh;
+    var vm;
+    apiready = function () {
+
+        vue();
+        vm.xkname = api.pageParam.xkname;
+        // api.addEventListener({
+        //     name: 'homeworkStatueRefresh'
+        // }, function (ret, err) {
+        //     clean = true;
+        //     p = 1;
+        //     date = [];
+        //     num = 0;
+        //     dataNum = 0;
+        //     homeworkListData = [];
+        //     vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid);
+        // });
+
+        // api.addEventListener({
+        //     name: 'chooseunit'
+        // }, function(ret, err) {
+        //     dyid=ret.value.dyid;
+        //     jieid='';
+        //     p = 1;
+        //     homeworkListData = [];
+        //     vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid);
+        // });
+        //
+        //
+        // api.addEventListener({
+        //     name: 'chooseChapter'
+        // }, function(ret, err) {
+        //     p = 1;
+        //     homeworkListData = [];
+        //     jieid=ret.value.jieid;
+        //     vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid);
+        // });
+
+        api.addEventListener({
+            name: 'chooseunit'
+        }, function (ret, err) {
+            vm.selectgrade=ret.value.selectgrade;
+            vm.selectsxc=ret.value.selectsxc;
+            vm.selectdy={'id':0,'name':'全部单元'};
+            clean = true;
+            p = 1;
+            date = [];
+            num = 0;
+            dataNum = 0;
+            homeworkListData = [];
+            vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid, vm.selectgrade.id,vm.selectsxc.id,vm.selectdy.id);
+        });
+        api.addEventListener({
+            name: 'chooseDy'
+        }, function (ret, err) {
+            vm.selectdy=ret.value.selectdy;
+            clean = true;
+            p = 1;
+            date = [];
+            num = 0;
+            dataNum = 0;
+            homeworkListData = [];
+            vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid, vm.selectgrade.id,vm.selectsxc.id,vm.selectdy.id);
+        });
+        // api.addEventListener({
+        //     name: 'shuaxin-frame-homework-list-pad',
+        // }, function (ret, err) {
+        //     // clean = true;
+        //     // p = 1;
+        //     // date = [];
+        //     // num = 0;
+        //     // dataNum = 0;
+        //     // homeworkListData = [];
+        //     // vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid);
+        //     // window.scrollTo(0, 0);
+        //     vm.GetStudenthomeworklistsIndex(api.pageParam.xkid, api.pageParam.classid,ret.value.index, vm.selectgrade.id,vm.selectsxc.id,vm.selectdy.id);//获取点击作业的作业状态
+        // });
+        vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid, vm.selectgrade.id,vm.selectsxc.id,vm.selectdy.id);
+        //下拉刷新
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                clean = true;
+                p = 1;
+                date = [];
+                num = 0;
+                dataNum = 0;
+                homeworkListData = [];
+                vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid, vm.selectgrade.id,vm.selectsxc.id,vm.selectdy.id);
+            }
+        });
+
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: -100           //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            p++;
+            if (p > totalP) {
+                api.toast({
+                    msg: '已经到底啦，没有更多作业了',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                clean = false;
+                vm.GetStudenthomeworklists(api.pageParam.xkid, api.pageParam.classid, vm.selectgrade.id,vm.selectsxc.id,vm.selectdy.id);
+            }
+        });
+
+    };
+    function vue(){
+        vm = new Vue({
+            el: '.content',
+            data: {
+                selectgrade:api.pageParam.selectgrade,
+                selectsxc:api.pageParam.selectsxc,
+                selectdy:api.pageParam.selectdy,
+                nowTime: new Date().getTime(),
+                homeworkLists:  [],
+                isNull:false,
+                xkname:''
+            },
+            methods: {
+                gettime: function (updateTime) {
+                
+
+                    var date = new Date(updateTime * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                    var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+                    var D = date.getDate();
+                    D = D < 10 ? ('0' + D) + ' ' : D + ' ';
+                    var h = date.getHours();
+                    h = h < 10 ? ('0' + h) + ':' : h + ':';
+                    var m = date.getMinutes();
+                    m = m < 10 ? ('0' + m): m ;
+                    return M+D+h+m;
+
+
+                },
+                fsgettime: function (updateTime) {
+                    var date = new Date();
+                    date.setTime(updateTime*1000);
+                    var y = date.getFullYear();
+                    var m = date.getMonth() + 1;
+                    m = m < 10 ? ('0' + m) : m;
+                    var d = date.getDate();
+                    d = d < 10 ? ('0' + d) : d;
+                    var h = date.getHours();
+                    h = h < 10 ? ('0' + h) : h;
+                    var minute = date.getMinutes();
+                    var second = date.getSeconds();
+                    minute = minute < 10 ? ('0' + minute) : minute;
+                    second = second < 10 ? ('0' + second) : second;
+                    return y + '-' + m + '-' + d+' '+h+':'+minute;
+                },
+                showkszy: function (item) {
+                    if (item.sfdjzsj==1 && item.complete != 2) {
+                        return '补交作业';
+                    } else if (item.sfdjzsj==0 && item.complete != 2) {
+                        return '开始作业';
+                    }else if(item.complete==2 && item.jcxts>0 && item.isshowanswer==1){
+                        // return '正确率'+Math.round(item.accuracy)+'%';
+                        return '正确率'+item.accuracy+'%';
+                    }else if((item.complete==2 && item.jcxts==0)|| (item.complete == 2 && item.isshowanswer==0)){
+                        return '查看';
+                    }
+                },
+                openHomeworkDetail: function (index, pageData) {
+                    //4 5
+                    if((pageData.sys_type == 4||pageData.sys_type == 5||pageData.sys_type == 6)&&(pageData.sxcid != null)){
+                        //打开收费界面
+                        apiObj.Get(UrlRouter.GetPracticeCheckPayInfo, {
+                            values: {
+                                xkid: api.pageParam.xkid ,
+                                njid: pageData.njid,
+                                sxcid:pageData.sxcid,
+                                mac_addr:$api.getStorage('macAdress')
+                            }
+                        }, function (ret, err) {
+                            api.hideProgress();
+                            if (ret) {
+                                if (ret.ret == 0) {
+                                    if(ret.data.status != 2){   //!=3
+                                        api.openWin({
+                                            name: 'not_opened',
+                                            url: '../../not_opened.html',
+                                        });
+//
+//                                     api.openFrame({
+//                                         name: 'frm_Purchase',
+//                                         url: 'Purchase/frm_Purchase.html',
+//                                         rect: {
+//                                             x: 0,
+//                                             y: 0,
+//                                             w: 'auto',
+//                                             h: api.winHeight
+//                                         },
+//                                         pageParam: {
+// //                                            detailData: params,
+//                                             data: ret.data
+//                                         },
+//                                         bounces: false
+//                                     });
+//
+                                    }else {
+                                        //直接进入
+                                        $api.setStorage('hwClassid',pageData.bjid);
+                                        if (pageData.complete== 2) {
+                                            api.openWin({
+                                                name: 'win_exercises_list',
+                                                url: 'win_exercises_list.html',
+                                                pageParam: {
+                                                    id: index,
+                                                    detailData: pageData,
+                                                    dansz: pageData.dansz,
+                                                    finishtime: pageData.finish_time,
+                                                    complete:pageData.complete,
+                                                    classid:api.pageParam.classid,
+                                                    homeworkIndex:index
+                                                },
+                                                slidBackEnabled: false
+                                            });
+                                        } else {
+                                            if(pageData.zys==0 && !pageData.zysm){
+                                                api.openWin({
+                                                    name: 'win_detail_kzxt',
+                                                    url: 'kzxt/win_detail_kzxt.html',
+                                                    pageParam: {
+                                                        detailData: pageData,
+                                                        complete:pageData.complete,
+                                                        index:0,
+                                                        homeworkIndex:index,
+                                                        classid:api.pageParam.classid
+                                                    },
+                                                    slidBackEnabled: false
+                                                });
+                                            }else{
+                                                api.openWin({
+                                                    name: 'win_detail',
+                                                    url: 'win_detail.html',
+                                                    pageParam: {
+                                                        detailData: pageData,
+                                                        complete:pageData.complete,
+                                                        index:0,
+                                                        homeworkIndex:index,
+                                                        classid:api.pageParam.classid
+                                                    },
+                                                    slidBackEnabled: false,
+                                                    reload:true
+                                                });
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    api.toast(
+                                        {
+                                            msg: ret.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        }
+                                    )
+                                }
+                            } else {
+                                api.toast(
+                                    {
+                                        msg: err.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        })
+                    }else {
+                        //直接进入
+                        $api.setStorage('hwClassid',pageData.bjid);
+                        if (pageData.complete== 2) {
+                            api.openWin({
+                                name: 'win_exercises_list',
+                                url: 'win_exercises_list.html',
+                                pageParam: {
+                                    detailData: pageData,
+                                    classid:api.pageParam.classid,
+                                    homeworkIndex:index
+                                },
+                                slidBackEnabled: false
+                            });
+                        } else {
+                            if(pageData.zys==0 && !pageData.zysm){
+                                api.openWin({
+                                    name: 'win_detail_kzxt',
+                                    url: 'kzxt/win_detail_kzxt.html',
+                                    pageParam: {
+                                        detailData: pageData,
+                                        complete:pageData.complete,
+                                        index:0,
+                                        classid:api.pageParam.classid,
+                                        homeworkIndex:index
+                                    },
+                                    slidBackEnabled: false
+                                });
+                            }else{
+                                api.openWin({
+                                    name: 'win_detail',
+                                    url: 'win_detail.html',
+                                    pageParam: {
+                                        detailData: pageData,
+                                        complete:pageData.complete,
+                                        index:0,
+                                        homeworkIndex:index,
+                                        classid:api.pageParam.classid
+                                    },
+                                    slidBackEnabled: false
+                                });
+                            }
+                        }
+                    }
+
+
+
+
+                    //
+//                $api.setStorage('hwClassid',pageData.bjid);
+//                if (pageData.submit == 100) {
+//                    api.openWin({
+//                        name: 'win_exercises_list',
+//                        url: 'win_exercises_list.html',
+//                        pageParam: {
+//                            id: index,
+//                            detailData: pageData,
+//                            submit: pageData.submit,
+//                            dansz: pageData.dansz,
+//                            finishtime: pageData.finish_time
+//                        },
+//                        slidBackEnabled: false
+//                    });
+//                } else {
+//                    api.openWin({
+//                        name: 'win_detail',
+//                        url: 'win_detail.html',
+//                        pageParam: {
+//                            id: index,
+//                            detailData: pageData,
+//                            submit: pageData.submit,
+//                            dansz: pageData.dansz,
+//                            finishtime: pageData.finish_time
+//                        },
+//                        slidBackEnabled: false
+//                    });
+//                }
+                    //
+                },
+                GetStudenthomeworklistsIndex:function(xkid,classid,index,njid,sxcid,dyid){
+                    var xkidS = xkid;
+                    var params = {};
+                    params['uid'] = $api.getStorage('uid');
+                    params['xkid'] = xkidS;
+                    params['page'] = index+1;
+                    params['num'] = 1;
+                    params['njid'] = njid;
+                    params['sxcid'] = sxcid;
+                    params['dyid'] = dyid;
+                    for (var i = 0; i < classid.length; i++) {
+                        params["classid[" + i + "]"] = classid[i];
+                    }
+                    apiObj.Get(UrlRouter.GetStudentGetstuhwlist, {
+                        values: params
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                var homeworkInfo = ret.data.data[0];
+                                vm.homeworkLists.splice(index,1,homeworkInfo);
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                            }
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    });
+                },
+                GetStudenthomeworklists: function (xkid, classid,njid,sxcid,dyid) {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    var xkidS = xkid;
+                    var uid = '';
+                    var params = {};
+                    params['uid'] = $api.getStorage('uid');
+                    params['xkid'] = xkidS;
+                    params['page'] = p;
+                    params['num'] = 12;
+                    params['njid'] = njid;
+                    params['sxcid'] = sxcid;
+                    params['dyid'] = dyid;
+                    for (var i = 0; i < classid.length; i++) {
+                        params["classid[" + i + "]"] = classid[i];
+                    }
+                    apiObj.SetAuthToken($api.getStorage('token'));
+                    apiObj.Get(UrlRouter.GetStudentGetstuhwlist, {
+                        values: params
+                    }, function (ret, err) {
+                        if (ret) {
+                            pullRefresh.cancelLoading();
+                            if (ret.ret == 0) {
+                                totalP = ret.data.totalPages;
+                                if (clean) {
+                                    vm.homeworkLists = '';
+                                    homeworkListData = [];
+                                }
+                                if(JSON.stringify(ret.data)=='{}'&& p>1){
+                                    api.toast({
+                                        msg: '已经到底啦，没有更多作业了',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }else if(JSON.stringify(ret.data)=='{}'&& p==1){
+                                    vm.isNull = true;
+                                }else{
+                                    if (ret.data.data.length > 0) {
+                                        homeworkListData = homeworkListData.concat(ret.data.data);
+                                        vm.homeworkLists = homeworkListData;
+                                        vm.prompt = '表示老师对你的作业进行了手工批阅';
+                                        vm.pyue = '批';
+                                        vm.showP = '1';
+                                    }else {
+                                        vm.isNull = true;
+                                    }
+                                }
+
+
+                                api.hideProgress();
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+</script>
+</html>

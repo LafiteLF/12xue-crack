@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>筛选</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /*滚动条样式*/
+        *::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            height: 30px;
+        }
+
+        *::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 8px;
+            -webkit-box-shadow: none;
+            background: #4bc7c7;
+        }
+
+        *::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 8px;
+            background: #4bc7c7;
+        }
+
+        .content {
+            width: 44%;
+            height: 55%;
+            top: 25%;
+            position: absolute;
+            left: 29%;
+            border-radius: 5px;
+        }
+
+        .left-div {
+            float: left;
+            width: 25%;
+            height: 100%;
+            background: #F2F2F2;
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+
+        .left-div ul {
+            width: 100%;
+            background: #F2F2F2;
+            margin: 0 auto;
+        }
+
+        .left-div ul li {
+            height: 55px;
+            line-height: 55px;
+            font-size: 0.7rem;
+            color: #333333;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;
+            text-align: center;
+        }
+
+        .left-div ul li:active {
+            line-height: 55px;
+            font-size: 0.7rem;
+            color: #4bc7c7;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;;
+        }
+
+        .right-div {
+            float: right;
+            width: 73%;
+            height: 100%;
+            background: #ffffff;
+            border-radius: 8px;
+        }
+
+        .right-div ul {
+            overflow-y: scroll;
+            margin: 1%;
+            width: 96%;
+            height: calc(55vh - 60px);
+            background: #f3fffa;
+        }
+
+        .right-div ul li {
+            height: 40px;
+            line-height: 40px;
+            font-size: 0.7rem;
+            border: 1px solid #4bc7c7;
+            text-align: center;
+            margin: 15px 20px;
+            color: #4bc7c7;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        .right-div ul li:active {
+            height: 40px;
+            line-height: 40px;
+            font-size: 0.7rem;
+            border: 1px solid #4bc7c7;
+            text-align: center;
+            margin: 15px 20px;
+            color: #FFFFFF;
+            background: #4bc7c7;
+            border-radius: 4px;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .top {
+            margin: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            background: #f3fffa;
+            border-radius: 8px;
+        }
+
+        .tb {
+            width: 30%;
+            line-height: 50px;
+            text-align: center;
+            margin: 0 5% 0 15%;
+            color: #4bc7c7;
+            font-size: 0.7rem;
+        }
+
+        .ks {
+            width: 30%;
+            line-height: 50px;
+            text-align: center;
+            margin: 0 15% 0 5%;
+            color: #4bc7c7;
+            font-size: 0.7rem;
+        }
+
+        .bottom-line {
+            border-bottom: 3px solid #4bc7c7;
+        }
+
+        .nody {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+        }
+
+        .nody img {
+            width: 160px;
+            height: 160px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="close" tapmode onclick="api.closeFrame({name: 'frame-tab-nj'});"></div>
+<div class="content" v-cloak="">
+    <div class="left-div">
+        <ul>
+            <li v-for="item in datalist"
+                :style="item.njid?item.njid==selectGradeId?'background: white':'background: #F2F2F2' : item.type==selectGradeId?'background: white':'background: #F2F2F2' "
+                @click="gradeClick(item)" v-text="item.name"></li>
+        </ul>
+    </div>
+    <div class="right-div">
+        <div class="top">
+            <div class="tb" tapmode @click="switch(0)">
+                同步错题
+            </div>
+            <div class="ks" tapmode @click="switch(1)">
+                考试错题
+            </div>
+        </div>
+        <div v-if="ctype == 'paper'">
+            <ul v-if="paper_chapt.length > 1 ">
+                <li class="item-content aui-ellipsis-1" v-for="item in chaptList" tapmode @click="itemClick(item)"
+                    :style="item.paper_type==selectDyId?'background: #4bc7c7;color: #fff':'background: #fff;color: #4bc7c7' "
+                    v-text="item.type_name"></li>
+            </ul>
+        </div>
+        <div v-else>
+            <ul v-if="switchflag == 0 && chapt.length > 1 ">
+                <li class="item-content aui-ellipsis-1" v-for="item in chaptList" tapmode @click="itemClick(item)"
+                    :style="item.dyid==selectDyId?'background: #4bc7c7;color: #fff':'background: #fff;color: #4bc7c7' "
+                    v-text="item.name"></li>
+            </ul>
+            <ul v-if="switchflag == 1 && paper_chapt.length > 1 ">
+                <li class="item-content aui-ellipsis-1" v-for="item in chaptList" tapmode @click="itemClick(item)"
+                    :style="item.paper_type==selectDyId?'background: #4bc7c7;color: #fff':'background: #fff;color: #4bc7c7' "
+                    v-text="item.type_name"></li>
+            </ul>
+        </div>
+        <div v-if="ctype == 'paper'">
+            <div v-if="paper_chapt.length == 1 " class="nody">
+                <img src="../../../image/error/nody.png" alt="">
+            </div>
+        </div>
+        <div v-else>
+            <div v-if="switchflag == 0 && chapt.length == 1 " class="nody">
+                <img src="../../../image/error/nody.png" alt="">
+            </div>
+            <div v-if="switchflag == 1 && paper_chapt.length == 1 " class="nody">
+                <img src="../../../image/error/nody.png" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        vue();
+        vm.gradeClick(vm.selectGradeData);
+        if(vm.switchflag == 0){
+            $('.tb').addClass('bottom-line');
+            $('.ks').removeClass('bottom-line');
+        }
+        else {
+            $('.tb').removeClass('bottom-line');
+            $('.ks').addClass('bottom-line');
+        }
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                datalist: api.pageParam.array,
+                selectGradeData: api.pageParam.gradeData,
+                selectGradeId: api.pageParam.gradeData.njid ? api.pageParam.gradeData.njid : api.pageParam.gradeData.type,
+                selectDyId: api.pageParam.selectDyId,
+                chaptList: [],
+                switchflag: api.pageParam.switchflag,
+                chapt: [],//同步错题
+                paper_chapt: [],//考试错题
+                ctype: api.pageParam.currentType,//中高考是paper，其他是chapt
+                selectedDyData: api.pageParam.selectedDyData,//上一次选中的单元
+                lastSelectedType: api.pageParam.gradeData.type,
+            },
+            methods: {
+                gradeClick: function (item) {
+                    vm.chapt = [];
+                    vm.paper_chapt = [];
+                    vm.chaptList = [];
+                    if(item.njid){
+                        vm.selectGradeId = item.njid;
+                    }
+                    else {
+                        vm.selectGradeId = item.type;
+                    }
+
+                    vm.selectGradeData = item;
+
+                    if(item.type){
+                        vm.ctype = item.type;
+                    }
+                    else {
+                        vm.ctype = 'chapt';
+                    }
+                    if (item.type == 'paper') {
+                        $('.top').css('display','none');
+                    } else {
+                        $('.top').css('display','flex');
+                    }
+
+                    var params = {};
+                    params['uid'] = $api.getStorage('uid');
+                    params['schoolid'] = $api.getStorage('newSchoolId');
+                    params['xkid'] = api.pageParam.xkid;
+                    params['online'] = api.pageParam.online;
+                    params['type'] = 3;
+
+                    if(item.njid == undefined){
+                        params['is_paper'] = 1;
+                    }
+                    else {
+                        params['njid'] = item.njid;
+                    }
+
+                    params['is_important'] = api.pageParam.is_important;
+                    params['xd'] = $api.getStorage('stuXD');
+
+
+                    apiObj.Get(UrlRouter.ExercisesWrongs, {
+                        values: params
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                var qbdy = [{dyid: '0', name: '全部单元'}];
+                                var qblx = [{paper_type: '0', type_name: '全部类型'}];
+                                vm.chapt = qbdy.concat(ret.data.chapt);
+                                vm.paper_chapt = qblx.concat(ret.data.paper_chapt);
+
+
+                                //判断选中状态
+//                                if(vm.lastSelectedType == 'paper'){//上次选中的是中高考
+//                                    if(vm.chapt.length > 1){
+//                                        vm.switchflag = 0;
+//                                    }else {
+//                                        if(vm.paper_chapt.length > 1){
+//                                            vm.switchflag = 1;
+//                                        }else {
+//                                            vm.switchflag = 0;
+//                                        }
+//                                    }
+//                                    switchline();
+//                                }else {
+//                                    if(vm.selectedDyData.paper_type){//上次选中的是考试错题 优先显示
+//                                        vm.switchflag = 1;
+//                                    }
+//                                    else {
+//                                        if(vm.chapt.length > 1){
+//                                            vm.switchflag = 0;
+//                                        }else {
+//                                            if(vm.paper_chapt.length > 1){
+//                                                vm.switchflag = 1;
+//                                            }else {
+//                                                vm.switchflag = 0;
+//                                            }
+//                                        }
+//                                    }
+//                                    switchline();
+//                                }
+
+                                if (item.type == 'paper'){
+                                    vm.chaptList = vm.paper_chapt;
+                                }
+                                else {
+                                    if (vm.switchflag == 0) {//同步错题
+                                        vm.chaptList = vm.chapt;
+                                    }
+                                    else {//考试错题
+                                        vm.chaptList = vm.paper_chapt;
+                                    }
+                                }
+
+                                if(vm.switchflag == 0 && vm.paper_chapt.length == 1){
+                                    $('.ks').css('color','#66e9e9');
+                                }
+                                if(vm.switchflag == 1 && vm.chapt.length == 1){
+                                    $('.tb').css('color','#66e9e9');
+                                }
+                            } else {
+                                toast12xue(ret.msg);
+                            }
+                        }
+                    });
+                },
+                itemClick: function (item) {
+                    if(vm.ctype == 'paper'){
+                        vm.selectDyId = item.paper_type;
+                    }
+                    else {
+                        if (vm.switchflag == 0) {
+                            vm.selectDyId = item.dyid;
+                        }
+                        else {
+                            vm.selectDyId = item.paper_type;
+                        }
+                    }
+                    vm.selectedDyData = item;
+                    api.sendEvent({
+                        name: 'selectnjdata',
+                        extra: {
+                            njdata: vm.selectGradeData,
+                            unit: vm.selectedDyData,
+                            switchflag: vm.switchflag,
+                            ctype: vm.ctype,
+                            selectDyId: vm.selectDyId
+                        }
+                    });
+                    api.closeFrame({
+                        name: 'frame-tab-nj'
+                    });
+                },
+                switch: function (item) {
+                    vm.switchflag = item;
+                    vm.chaptList = [];
+                    if (vm.switchflag == 0) {
+                        $('.tb').addClass('bottom-line');
+                        $('.ks').removeClass('bottom-line');
+
+                        vm.chaptList = vm.chapt;
+                    } else {
+                        $('.tb').removeClass('bottom-line');
+                        $('.ks').addClass('bottom-line');
+
+                        vm.chaptList = vm.paper_chapt;
+                    }
+
+                    if(vm.switchflag == 0 && vm.paper_chapt.length == 1){
+                        $('.ks').css('color','#66e9e9');
+                    }
+                    if(vm.switchflag == 1 && vm.chapt.length == 1){
+                        $('.tb').css('color','#66e9e9');
+                    }
+                },
+            }
+        });
+    }
+    function switchline() {
+        if(vm.switchflag == 0){
+            $('.tb').addClass('bottom-line');
+            $('.ks').removeClass('bottom-line');
+        }
+        else {
+            $('.tb').removeClass('bottom-line');
+            $('.ks').addClass('bottom-line');
+        }
+    }
+</script>
+</html>

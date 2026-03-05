@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择题</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/frameDetail.css"/>
+    <style>
+        .xzt_content {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<div class="kong_bg">
+    <div class="cxjz">
+        <div class="cxjztop clearfix">
+            <img src="../../../../image/newhomework/cxjz.png">
+            <p>您的网络开小差了<br>请检查网络环境并点击重新加载吧～</p>
+        </div>
+        <div class="cxjz_button" onclick="cxjz()">重新加载</div>
+    </div>
+</div>
+<div class="xzt_content">
+    <img v-if=" (data.sys_id!= undefined || data.sys_id) && material.zyqf == 2 && isShowAnswer && data.res_type!=2 && aiCorrect == 1"
+         class="Aipyicon noImgClick"
+         src="../../../../image/newhomework/Aipyicon.png" @click="openaiCorrect()">
+    <img v-if=" (data.sys_id!= undefined || data.sys_id) && material.zyqf == 2 && isShowAnswer && data.res_type!=2"
+         class="aibtn noImgClick"
+         src="../../../../image/newhomework/aiBtn.png" @click="PostAIBtn()">
+    <img v-if=" (data.sys_id!= undefined || data.sys_id) && material.zyqf == 2 && isShowAnswer && data.res_type!=2"
+         class="jrctb noImgClick"
+         :src="isctb!=1?'../../../../image/newhomework/join.png':'../../../../image/newhomework/out.png'"
+         @click="PostExercisesTriggerWrong()">
+    <div class="content">
+        <div class="stem">
+            <ul>
+                <li class="tixing clearfix">
+                    <div class="tihao" v-text="(index+1)+'.'"></div>
+                    <div class="tixingzi" v-text="material.zyqf != 1?'【'+material.txstr+'】':'【素材】'"></div>
+                </li>
+                <li v-if="material.zyqf == 2 && (data.sys_id!= undefined || data.sys_id)" class="zsd"
+                    @click="alertzsd(data.zsdmc)">
+                    <span>难易度：</span><img class="noImgClick"
+                                             :src="data.nyd==1?'../../../../image/newhomework/1xing.png':data.nyd==2?'../../../../image/newhomework/2xing.png':data.nyd==3?'../../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{ data.zsdmc }}
+                </li>
+            </ul>
+            <div class="tg_content font666" v-if="material.zyqf !=1"
+                 v-html="material.zyqf == 3 ?material.zymc:data.tg"></div>
+            <div class="tg_content font666" v-if="material.zyqf ==1" v-html="data.title"></div>
+            <div class="scyinpin clearfix" v-if="material.zyqf ==2 && material.tx=='tdjh'&& data.attachments">
+                <img class="scyp1 noImgClick" src="../../../../image/newhomework/yuyinimg.png">
+                <img class="scyp2 noImgClick" :playStatus='2' onclick="vm.studentRecord(this);"
+                     src="../../../../image/startPlay.png" alt="">
+                <div class="ypRange"><input oninput="vm.monitorRange(event)" class="myRange" type="range" min="0"
+                                            value="0" :max='data.attachments[0].filetime'></div>
+                <p class="ypTimeP" v-text="getOutTime(data.attachments[0].filetime)"></p>
+                <audio v-if="fileType == '.mp3'" class="hideenAudio"
+                       :src='data.attachments[0].serverpath + data.attachments[0].savename'></audio>
+                <audio v-if="fileType != '.mp3'" class="hideenAudio"
+                       :src='data.attachments[0].serverpath + data.attachments[0].preview_link'></audio>
+            </div>
+            <!--            <div class="tdjhxx"  v-if="material.zyqf ==2 && material.tx=='tdjh'">-->
+            <!--                <p v-for="list in data.option" v-html="'<span>'+list.xx+'</span>'+'.'+list.description"></p>-->
+            <!--            </div>-->
+            <!--素材开始-->
+            <div class="sucai" v-if="material.zyqf ==1">
+                <div class="sctupian" v-if="getFileType(fileType) == 'img'">
+                    <img :src="url" alt="">
+                </div>
+                <div class="pdf" v-if="getFileType(fileType) == 'doc'">
+                    <img class="noImgClick" v-if="convert_status == 0" src="../../../../image/newhomework/zhuanma.gif">
+                    <img class="noImgClick" v-if="convert_status == 2" src="../../../../image/newhomework/shibai.png">
+                    <p v-if="convert_status == 0|| convert_status == 2" v-text="getconvert(convert_status)"></p>
+                    <span v-if="convert_status == 1  " tapmode @click="openPDF(url)">点击查看内容</span>
+                </div>
+                <div class="pdf" v-if="getFileType(fileType) == 'pdf'">
+                    <span tapmode @click="openPDF(url)">点击查看内容</span>
+                </div>
+                <div class="pdf" v-if="getFileType(fileType) == 'video' && convert_status != 1">
+                    <img class="noImgClick" v-if="convert_status == 0" src="../../../../image/newhomework/zhuanma.gif">
+                    <img class="noImgClick" v-if="convert_status == 2" src="../../../../image/newhomework/shibai.png">
+                    <p v-if="convert_status == 0|| convert_status == 2" v-text="getconvert(convert_status)"></p>
+                </div>
+                <div class="scshipin" v-if="getFileType(fileType) == 'video'&& convert_status == 1"
+                     :url="getVideo(url)" onclick="vm.videoZYPlay(this);">
+                    <img class="noImgClick" src="../../../../image/bof_03.png">
+                </div>
+                <div class="pdf" v-if="getFileType(fileType) == 'swf'">
+                    <img class="noImgClick" src="../../../../image/newhomework/shibai.png">
+                    <p>swf资源暂不支持在移动端播放</p>
+                </div>
+
+            </div>
+            <!--素材结束-->
+        </div>
+        <!--答案部分开始-->
+        <dl v-if="material.zyqf == 2 && (data.sys_id!= undefined || data.sys_id)" class="wenda_answer bgFFF">
+            <div v-if="isShowAnswer" class="defen">
+                <img class="noImgClick" v-if="data.is_true!=0"
+                     :src="data.is_true==1?' ../../../../image/newhomework/zhengque.png':data.is_true==2?'../../../../image/newhomework/cuowu.png':data.is_true==3?'../../../../image/newhomework/bandui.png':''">
+                <span :style="data.is_true==1?'color: #4bc7c7':data.is_true==2?'color: #df7605':data.is_true==3?'color: #ffcd06':''"
+                      v-text="data.is_true==1?'正确':data.is_true==2?'错误':data.is_true==3?'正确率'+data.accuracy+'%':''"></span>
+                <span v-if="data.is_true==0" style="color: #ff778c">待批</span>
+            </div>
+            <dd :style="!isShowAnswer?'display:inline-block':'display:none'" class="tishi"><img
+                    src="../../../../image/newhomework/ts.png">未到正确答案显示时间，只展示学生答案哦~
+            </dd>
+            <dd>
+                <h2 class="wendah2">【我的答案】</h2>
+                <ul class="clearfix wendawdda">
+                    <li class="wendazi">
+                        <p v-html="data.xsdastr"></p>
+                    </li>
+                </ul>
+            </dd>
+            <dd v-if="data.audio && data.audio.length>0" :style="isShowAnswer?'display:block':'display:none'">
+                <h2 class="wendah2">【老师留言】</h2>
+                <ul class="clearfix">
+                    <li :class="ylist.type==1?'teacher_liuyan yuyin3':'teacher_liuyan_zi yuyin3'"
+                        v-for="(ylist , index) in data.audio" @click="yuyin(ylist,index)">
+                        <img v-if="ylist.type==1" class="audio-img img1 noImgClick"
+                             src="../../../../image/newhomework/yuyin1.png"/>
+                        <img v-if="ylist.type==1" class="audio-img img2 noImgClick"
+                             src="../../../../image/newhomework/yuyin2.gif"/>
+                        <span v-if="ylist.type==1" v-text="ylist.filetime+'″'"></span>
+                        <span v-if="ylist.type==2" v-text="ylist.descript"></span>
+                    </li>
+                </ul>
+            </dd>
+            <dd :style="isShowAnswer?'display:block':'display:none'" class="needpic">
+                <h2 class="wendah2" v-text="'【'+material.tx_tip+'】'"></h2>
+                <ul>
+                    <li class="wendazi" v-html="data.dastr==''?'无':data.dastr"></li>
+                </ul>
+            </dd>
+            <dd :style="isShowAnswer?'display:block':'display:none'" class="needpic">
+                <h2 class="wendah2">【答案解析】</h2>
+                <ul>
+                    <li class="wendazi" v-html="data.dajx==''?'无':data.dajx"></li>
+                </ul>
+            </dd>
+            <div class="jrctbkong"></div>
+        </dl>
+        <!--答案部分结束-->
+
+    </div>
+    <!--作答部分开始-->
+    <ul v-if=" material.zyqf == 2 && !(data.sys_id!= undefined || data.sys_id)" class="option">
+        <!--单选-->
+        <li v-for="list in data.option" v-if="data.tx!='duoxt'" :id="list.id"
+            :class="answer[0]==list.id?'danxoption xxactive':'danxoption'"
+            v-text="data.tx=='pdt'?list.description:list.xx" tapmode
+            onclick="vm.xxselectClicked(this)"></li>
+        <!--多选-->
+        <li v-for="list in data.option" v-if="data.tx=='duoxt'" :id="list.id"
+            :class="isdxactive(list.id)?'duoxoption xxactive':'duoxoption'" v-text="list.xx" tapmode
+            onclick="vm.xxselectClicked(this)"></li>
+        <!--<li class="bhz font4BC7C7" tapmode onclick="vm.checded(this)">-->
+        <!--<span :class="is_unable==1?'inputCheckactive':''"></span>不会做-->
+        <!--</li>-->
+    </ul>
+    <div class="tijiao" @click.stop="PostV2exercisesAnswer()"
+         v-if=" material.zyqf == 2 && !(data.sys_id!= undefined || data.sys_id)">提交
+    </div>
+    <!--作答部分结束-->
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script type="text/javascript" src="../../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var allTimes = 0;//音频播放
+    var sec = 0;
+    var timer = null;
+    var audioStreamer;
+    var downloadUrl = '';
+    var downloadFinshed = '0';
+    var playStatus;
+    windowError();
+    apiready = function () {
+        vue();
+        audioStreamer = api.require('audioStreamer');
+        if (vm.material.zyqf == 1) {//资源
+            vm.GetMaterialInfo();
+        } else if (vm.material.zyqf == 2) {//习题
+            vm.GetParentexercisesUrl()
+        }
+        api.addEventListener({//viewdisappear
+            name: 'pause'
+        }, function (ret, err) {
+            api.sendEvent({
+                name: 'yinpinCLose'
+            });
+        });
+        api.addEventListener({// 滑动暂停音频
+            name: 'yinpinCLose'
+        }, function (ret, err) {
+            if ($api.domAll('.scyp2').length >= 1) {
+                if ($('.scyp2').attr('playStatus') == 1) {
+                    $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                }
+                $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                vm.isplayed = '0';
+                clearInterval(timer);
+
+                audioStreamer.pause();
+            }
+            api.stopPlay();
+            $('.img1').show();
+            $('.img2').hide();
+        });
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.xzt_content',
+            data: {
+                index: api.pageParam.index,
+                material: api.pageParam.material,
+                xsbjid: api.pageParam.xsbjid,
+                schoolid: api.pageParam.schoolid,
+                complete: api.pageParam.complete,
+                data: [],
+                isShowAnswer: false,
+                aiCorrect: 0,
+                fileType: '',//素材类型
+                url: '',//素材路径
+                convert_status: '',//判断素材doc是否转码成功
+                answer: [],//答案数组
+                isPlaying: false,//老师留言是否播放中
+                isctb: '',
+                filetime: 0,
+                title: '',
+                isplayed: '0'
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+            },
+            methods: {
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                openaiCorrect: function () {
+                    var uid = $api.getStorage('uid');
+                    var xtid = vm.material.zyid;
+                    var classid = vm.xsbjid;
+                    var kcid = vm.material.hwid;
+                    api.openFrame({
+                        name: 'frame_zgtpy',
+                        url: '../frame_zgtpy.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            uid: uid,
+                            xtid: xtid,
+                            classid: classid,
+                            kcid: kcid
+                        },
+                        bounces: false
+                    });
+                },
+                PostExercisesTriggerWrong: function () {//错题本改版 ，添加错题本、移除错题本、表及重点
+                    var type;
+                    if (vm.isctb == 1) {
+                        type = 'outbook';
+                    } else {
+                        type = 'addbook';
+                    }
+                    apiObj.Header({'Content-Type': 'application/x-www-form-urlencoded'}).Post(UrlRouter.PostExercisesTriggerWrong, {
+                        values: {
+                            sys_id: vm.data.sys_id,
+                            kc_type: 2,
+                            type: type
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                if (type == 'outbook') {
+                                    vm.isctb = 0;
+                                    api.toast({
+                                        msg: '已移出错题本',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                } else {
+                                    vm.isctb = 1;
+                                    api.toast({
+                                        msg: '成功加入错题本',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                GetMaterialInfo: function () {//获取资源详情
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetMaterialInfo, {
+                        values: {
+                            id: vm.material.zyid
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.xzt_content').show();
+                                $('.kong_bg').hide();
+                                vm.data = ret;
+                                vm.fileType = ret.filetype;
+                                vm.convert_status = ret.convert_status;
+                                vm.url = ret.serverpath + ret.rootpath;
+                                vm.filetime = ret.filetime;
+                                vm.title = ret.title;
+                                vm.aiCorrect = ret.aiCorrect;
+                            } else {
+                                $('.xzt_content').hide();
+                                $('.kong_bg').show();
+                            }
+                        } else {
+                            $('.xzt_content').hide();
+                            $('.kong_bg').show();
+                        }
+                    })
+                },
+                GetParentexercisesUrl: function () {//获取作业习题详情及答题结果
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetParentexercisesUrl, {
+                        values: {
+                            hwid: vm.material.hwid,
+                            uid: $api.getStorage('uid'),
+                            xtid: vm.material.zyid,
+                            classid: vm.xsbjid,
+                            ytlx: vm.material.ytlx,
+                            step: 0,
+                            schoolid: vm.schoolid
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.xzt_content').show();
+                                $('.kong_bg').hide();
+                                vm.data = ret;
+                                vm.isctb = ret.is_ctb;
+                                if (vm.data.isshowanswer == 1) {
+                                    vm.isShowAnswer = true;
+                                } else {
+                                    vm.isShowAnswer = false;
+                                }
+                            } else {
+                                $('.xzt_content').hide();
+                                $('.kong_bg').show();
+                            }
+                        } else {
+                            $('.xzt_content').hide();
+                            $('.kong_bg').show();
+                        }
+                    })
+                },
+                getFileType: function (filetype) {
+                    if (filetype == '.png' || filetype == '.jpg' || filetype == '.jpeg' || filetype == '.gif' || filetype == '.bmp') {
+                        return 'img'
+                    } else if (filetype == '.doc' || filetype == '.docx' || filetype == '.ppt' || filetype == '.pptx' || filetype == '.xls' || filetype == '.xlsx' || filetype == '.txt') {
+                        return 'doc'
+
+                    } else if (filetype == '.pdf') {
+                        return 'pdf'
+
+                    } else if (filetype == '.swf') {
+                        return 'swf'
+                    } else if (filetype == '.mp3' || filetype == '.wma') {
+                        // if (api.systemType == 'ios') {
+                        return 'video';
+                        // } else {
+                        //     return 'audio'
+                        // }
+                    } else {
+                        return 'video'
+                    }
+                },
+                getconvert: function (convert_status) {
+                    if (convert_status == 0) {
+                        return '资源正在转码,请三分钟后回来';
+                    } else if (convert_status == 2) {
+                        return '资源转码失败';
+                    }
+                },
+                openPDF: function (url) {
+                    api.showProgress({
+                        style: 'default',
+                        animationType: 'fade',
+                        title: '提示',
+                        text: '正在下载素材',
+                        modal: true
+                    });
+                    var str = vm.material.zymc + vm.material.zyid;
+                    str = str.replace(/#/, '');
+                    api.download({
+                        url: url,
+                        savePath: 'fs://pdfDownload/' + str + '.pdf',
+                        report: false,
+                        cache: true,
+                        allowResume: true
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret.state == 1) {
+                            if (api.systemType == 'ios') {
+                                var docReader = api.require('docReader');
+                                docReader.open({
+                                    path: ret.savePath
+                                }, function (ret, err) {
+                                });
+                            } else {
+
+                                api.openWin({
+                                    name: 'win_pdf_view',
+                                    url: '../../../win_pdf_view.html',
+                                    pageParam: {
+                                        path: ret.savePath
+                                    }
+                                });
+
+
+                            }
+
+                        } else {
+                            //提示文档打开失败
+                            api.toast({
+                                msg: '文档下载失败，请检查网络，稍后再试！',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                },
+                getVideo: function (url) {
+                    return decodeURIComponent(url);
+                },
+                videoZYPlay: function (context) {
+
+                    var url = $api.attr(context, 'url');
+
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: vm.title,
+                            isMp3: false,
+                            filetime: vm.filetime
+                        }
+                    });
+                    api.addEventListener({
+                        name: 'backVideo'
+                    }, function (ret, err) {
+                        api.closeToWin({
+                            name: 'win-homework-Detail'
+                        });
+                    });
+                },
+                yuyin: function (audioItem, index) {
+                    if (audioItem.type == 1) {
+                        if (vm.isPlaying) {
+                            api.stopPlay();
+                            $('.img1').show();
+                            $('.img2').hide();
+                        } else {
+                            $('.img1').show();
+                            $('.img2').hide();
+                            var audioName = audioItem.savename;
+                            var path = "/audio/" + audioName + ".amr";
+                            api.download({
+                                url: audioItem.serverpath + "/" + audioItem.savename,
+                                savePath: 'fs:/' + path,
+                                report: false,
+                                cache: false,
+                                allowResume: false
+                            }, function (ret, err) {
+                                if (ret && ret.state == 1) {
+                                    // 下载成功  ret.savePath
+                                    isDownloading = false;
+                                    api.startPlay({
+                                        path: api.fsDir + path
+                                    }, function (ret, err) {
+                                        if (ret) {
+                                            vm.isPlaying = false;
+                                            $('.img1').show();
+                                            $('.img2').hide();
+
+                                        }
+                                    });
+
+                                    $('.yuyin3').eq(index).find('.img1').hide();
+                                    $('.yuyin3').eq(index).find('.img2').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img1').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img2').hide();
+                                }
+                            });
+                        }
+                        vm.isPlaying = !vm.isPlaying;
+                    }
+
+                },
+                isdxactive: function (xxid) {//判断多选选项是否选择了
+                    if (vm.answer.length > 0) {
+                        for (var i = 0; i < vm.answer.length; i++) {
+                            if (vm.answer[i] == xxid) {
+                                return true;
+                            }
+                        }
+                    }
+                },
+                xxselectClicked: function (context) {//选择判断题选项点击事件
+                    if (vm.data.tx == 'duoxt') {//判断是多选题 可以选多个答案
+                        if (vm.answer.length == 0) {
+                            vm.answer.push($(context).attr('id'));
+
+                        } else {
+                            for (var i = 0; i < vm.answer.length; i++) {
+                                if (vm.answer[i] == $(context).attr('id')) {
+                                    vm.answer.splice(i, 1);
+                                    return;
+                                } else if (i == vm.answer.length - 1) {
+                                    vm.answer.push($(context).attr('id'));
+                                    return;
+                                }
+                            }
+                        }
+                    } else {//判断是单选 或者判断题 只有一个选项的
+                        Vue.set(vm.answer, 0, $(context).attr('id'));
+                    }
+                },
+                checded: function (context) {//复选框不会做点击事件
+                    vm.answer = [];
+                },
+                PostV2exercisesAnswer: function () {
+                    if (vm.answer.length > 0) {
+                        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostV2exercisesAnswer, {
+                            body: $api.jsonToStr({
+                                xtid: vm.material.zyid,
+                                uid: $api.getStorage('uid'),
+                                ytlx: 4,
+                                xsbjid: vm.xsbjid,
+                                kcid: vm.material.hwid,
+                                tx: vm.data.tx,
+                                is_auto: vm.data.is_auto,
+                                daoptions: vm.data.daoption,
+                                xkid: api.pageParam.winData.xkid,
+                                njid: api.pageParam.winData.njid,
+                                bbid: api.pageParam.winData.bbid,
+                                sxcid: api.pageParam.winData.sxcid,
+                                dyid: api.pageParam.winData.dyid,
+                                jieid: api.pageParam.winData.jieid,
+                                da: vm.answer,
+                                descript: 'mobile',
+                                score: vm.material.score,
+                                is_txt: 0,
+                                kc_type: 'homework',
+                                tx_code: vm.data.tx_code,
+                                is_unable: 0
+                            })
+                        }, function (ret, err) {
+                            api.hideProgress();
+                            if (ret) {
+                                if (ret.ret == 0) {
+                                    api.hideProgress();
+                                    vm.GetParentexercisesUrl();
+                                } else {
+                                    api.hideProgress();
+                                    alert("12xue提交答案失败" + ret.msg);
+                                }
+                            } else {
+                                api.hideProgress();
+                                alert("12xue提交答案失败" + err.msg);
+                            }
+                        })
+                    } else {
+                        alert('提交答案不能为空！')
+                    }
+
+                },
+                monitorRange: function (event) {
+                    var range = $api.dom('.myRange');
+                    var recodetime = vm.data.attachments[0].filetime;
+                    sec = parseInt(event.target.value);
+                    allTimes = parseInt(recodetime - sec);
+                    var bfb = sec / recodetime * 100;
+                    bfb = bfb.toFixed(2);
+                    var ss = 'background-size: ' + bfb + '% 100%';
+                    $api.css($api.dom('.myRange'), ss);
+                    range.value = sec;
+                    var time = vm.getOutTime(allTimes);
+                    $api.text($api.dom('.ypTimeP'), time);
+                    seekToTime(sec);
+                },
+                studentRecord: function (context) {
+                    var url = vm.data.attachments[0].serverpath + vm.data.attachments[0].preview_link;   // 获取一下  data.attachments[0].serverpath + data.attachments[0].preview_link
+                    playStatus = $api.attr(context, 'playStatus');
+                    var recodetime = vm.data.attachments[0].filetime;  // 获取一下  filetime
+                    var range = $api.dom('.myRange');
+                    var bfb;
+                    var path = "/audio/" + vm.data.attachments[0].savename + ".amr";
+                    if (downloadFinshed == '0') {
+                        api.showProgress({
+                            title: '正在加载资源',
+                            text: '请稍后...',
+                            modal: true
+                        });
+                        api.download({
+                            url: url,
+                            savePath: 'fs://mp3s/' + path,
+                            report: true,
+                            cache: true,
+                            allowResume: false
+                        }, function (ret, err) {
+                            if (ret.state == 1 && ret.savePath) {
+                                api.hideProgress();
+                                downloadUrl = ret.savePath;
+                                downloadFinshed = '1';
+                                openPlayer(downloadUrl);
+                                $api.attr(context, 'playStatus', '1');
+                                vm.isplayed = '1';
+                                //resume(downloadUrl);
+                                if (sec == 0) {
+                                    allTimes = recodetime;
+                                } else {
+                                    setTimeout(function () {
+                                        seekToTime(sec);
+                                    }, 1000);
+                                }
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../../image/stop.png');
+                                timer = setInterval(function (e) {
+                                    sec = sec + 1;
+                                    allTimes = allTimes - 1;
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    if (allTimes == 0 || sec >= recodetime) {
+                                        $api.attr(context, 'playStatus', '2');
+                                        clearInterval(timer);
+                                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                        var time = vm.getOutTime(recodetime);
+                                        $api.text($api.dom('.ypTimeP'), time);
+                                        $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                                        range.value = 0;
+                                        audioStreamer.pause();
+                                        vm.isplayed = '0';
+                                        sec = 0;
+                                    } else {
+                                        range.value = sec;
+                                        var time = vm.getOutTime(allTimes);
+                                        $api.css($api.dom('.myRange'), ss);
+                                        $api.text($api.dom('.ypTimeP'), time);
+                                    }
+                                }, 1000);
+                            }
+                        });
+                    } else {
+                        if (sec == 0) {
+                            audioStreamer.stop();
+                            openPlayer(downloadUrl);
+                        }
+                        if (playStatus == '1') {//暂停
+                            $api.attr(context, 'playStatus', '2');
+                            vm.isplayed = '0';
+                            $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                            clearInterval(timer);
+                            audioStreamer.pause();
+                        } else {//播放
+                            $api.attr(context, 'playStatus', '1');
+                            vm.isplayed = '1';
+                            resume(downloadUrl);
+                            if (sec == 0) {
+                                allTimes = recodetime;
+                            }
+                            $api.attr($api.dom('.scyp2'), 'src', '../../../../image/stop.png');
+                            timer = setInterval(function (e) {
+                                sec = sec + 1;
+                                allTimes = allTimes - 1;
+                                bfb = sec / recodetime * 100;
+                                bfb = bfb.toFixed(2);
+                                var ss = 'background-size: ' + bfb + '% 100%';
+                                if (allTimes == 0 || sec >= recodetime) {
+                                    $api.attr(context, 'playStatus', '2');
+                                    clearInterval(timer);
+                                    $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                    var time = vm.getOutTime(recodetime);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                                    range.value = 0;
+                                    audioStreamer.pause();
+                                    vm.isplayed = '0';
+                                    sec = 0;
+                                } else {
+                                    range.value = sec;
+                                    var time = vm.getOutTime(allTimes);
+                                    $api.css($api.dom('.myRange'), ss);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                }
+                            }, 1000);
+                        }
+                    }
+                    //seekToTime(sec);
+                },
+                getOutTime: function (intime) {
+                    var outTime = '';
+                    if (intime <= 9) {
+                        outTime = '00:0' + intime;
+                    } else if (intime <= 59) {
+                        outTime = '00:' + intime;
+                    } else {
+                        var min = parseInt(intime / 60);
+                        var sec = intime % 60;
+                        if (sec <= 9) {
+                            if (min > 0 && min < 10) {
+                                outTime = '0' + min + ':0' + sec;
+                            } else if (min >= 10) {
+                                outTime = min + ':0' + sec;
+                            } else {
+                                outTime = '00:0' + sec;
+                            }
+                        } else {
+                            if (min > 0 && min < 10) {
+                                outTime = '0' + min + ':' + sec;
+                            } else if (min >= 10) {
+                                outTime = min + ':' + sec;
+                            } else {
+                                outTime = '00:' + sec;
+                            }
+                        }
+                    }
+                    return outTime;
+                },
+                PostAIBtn: async function () {
+                    if (vm.material.tx == 'tdjh') {
+                        api.toast({
+                            msg: '听力题暂不支持AI解析'
+                        })
+                        return;
+                    }
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostPayfeeOperationLog, {
+                            body: $api.jsonToStr({
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_analysis',
+                                resource_id: vm.data.xtid,
+                                count: aiAnalysis.count,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                ...(aiAnalysis.card_id !== undefined && {card_id: aiAnalysis.card_id}),
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                resolve(ret);
+                            } else {
+                                reject(err);
+                            }
+                        })
+                    });
+                    if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber')|| ret.ret === -1) {
+                        if ($api.getStorage('upgradeQRCode') === '1') {
+                            api.toast({
+                                msg: '本月剩余AI解析次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../../frame-number-exhausted.html',
+                            })
+                        }
+                        return
+                    }
+                    if(ret.ret === 0 && ret.data === ''){
+                        api.execScript({
+                            name: 'win_detail_kzxt',
+                            script: 'postAddOperationLog();'
+                        });
+                    }
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const tgContent = document.querySelector('.tg_content');
+                    const needPics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...needPics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            // 当所有图片都处理完成时
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.data.xtid,
+                                        imagePaths: imageUrls
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                },
+
+
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+
+    function cxjz() {
+        if (vm.material.zyqf == 1) {//资源
+            vm.GetMaterialInfo();
+        } else if (vm.material.zyqf == 2) {//习题
+            vm.GetParentexercisesUrl()
+        }
+    }
+
+    function openPlayer(url) {
+        audioStreamer.openPlayer({
+            path: url,
+        }, function (ret) {
+            if (ret.status) {
+            }
+        });
+    }
+
+    function seekToTime(sec) {
+        audioStreamer.seekToTime({
+            time: sec
+        });
+    }
+
+    function resume(url) {
+        if (api.systemType == 'ios') {
+            audioStreamer.resume();
+        } else {
+            openPlayer(url);
+        }
+    }
+</script>
+</html>

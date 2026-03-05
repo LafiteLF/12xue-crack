@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>习题列表</title>
+    <link rel="stylesheet" type="text/css" href="../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/winDetailCss.css"/>
+    <style>
+        header {
+            height: 49px;
+            background: #000;
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+        }
+        .winTitle {
+            width: calc(100% - 165px);
+            background: url(../image/newhomework/returnb.png) no-repeat 20px 15px;
+            background-size: 12px 20px;
+            color:#fff
+        }
+        .chooseclass{width: 23px; height: 23px; position: absolute; right: 10px; top: 13px}
+        .chooseclass img{ width: 100%}
+    </style>
+</head>
+<body>
+<header class="clearfix content1">
+    <div onclick="closeWin();" class="winTitle pull_left" >
+    </div>
+    <div class="chooseclass"  onclick="chooseclass()"><img src="../image/newhomework/chooseclassb.png"></div>
+</header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var superFile ;
+    var headerH;
+    var frameH;
+
+    var ijkplayer;
+    var schoolid;
+    var bjcheck;
+    var bjlist;
+    var homeworkItem;
+    apiready = function () {
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        $('.winTitle').html(api.pageParam.title);
+        homeworkItem = api.pageParam.item;
+        bjcheck = api.pageParam.item.bjcheck;
+        bjlist = api.pageParam.item.bjlist;
+        headerH = $api.offset(header).h;
+        frameH = api.winHeight - headerH;
+        GetUserSchoolinfo();
+        api.addEventListener({
+            name: 'ChooseClass'
+        }, function (ret, err) {
+            PostPracticeSetPracticeLog(ret.value.list)
+        });
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+
+    };
+    function GetUserSchoolinfo() {
+        apiObj.Get(UrlRouter.GetUserSchoolinfo, {
+            values: {
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    schoolid = ret.schoolid;
+                    if (api.systemType == 'android' && false) {
+                        api.openFrame({
+                            name: 'frame_video_view2',
+                            url: 'frame_video_view2.html',
+                            rect: {
+                                x: 0,
+                                y: headerH,
+                                w: api.winWidth,
+                                h: frameH
+                            },
+                            pageParam: {
+                                path: api.pageParam.path,
+                                title: api.pageParam.title,
+                                isMp3: api.pageParam.isMp3,
+                                filetime:api.pageParam.filetime,
+                            },
+                            bounces: false
+                        });
+                    }else{
+                        api.openFrame({
+                            name: 'video_frame',
+                            url: 'video_frame.html',
+                            rect: {
+                                x: 0,
+                                y: headerH,
+                                w: api.winWidth,
+                                h: frameH
+                            },
+                            pageParam: {
+                                path: api.pageParam.path,
+                                title: api.pageParam.title,
+                                isMp3: api.pageParam.isMp3,
+                                filetime:api.pageParam.filetime,
+                            },
+                            bounces: false
+                        });
+                    }
+
+                    if(bjcheck==0){//未选择过班级
+                        if(bjlist.length==1){
+                           PostPracticeSetPracticeLog(bjlist[0]);
+                        }else{
+                            api.openFrame({
+                                name: 'ChooseClass',
+                                url: '../html/newIntelligence/ChooseClass.html',
+                                bounces: false,
+                                rect: {
+                                    x: 0,
+                                    y: 0,
+                                    w: 'auto',
+                                    h: $api.getStorage('padHeight')
+                                },
+                                pageParam: {
+                                    bjlist:bjlist
+                                },
+                                bgColor: 'rgba(0,0,0,0)'
+                            });
+                        }
+
+                    }else{//已经选择过班级
+                        for (var i = 0; i < bjlist.length; i++) {
+                            if(bjlist[i].ischeck==1 ){
+                               PostPracticeSetPracticeLog(bjlist[i]);
+                            }
+                        }
+
+                    }
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    };
+    function PostPracticeSetPracticeLog(list) {//修改精品套题提交状态
+        checkClass=list;
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: true
+        });
+        apiObj.Post(UrlRouter.PostPracticeSetPracticeLog, {
+            values: {
+                tuid:list.uid,
+                classid:list.classid,
+                xkid:homeworkItem.xkid,
+                schoolid:schoolid,
+                xd:list.xd,
+                volume:homeworkItem.sxcid
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+                   bjlist = ret.data;
+                    api.closeFrame({
+                        name: 'ChooseClass'
+                    });
+                } else {
+                    api.toast(
+                        {
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                    )
+                }
+            } else {
+                api.toast(
+                    {
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    }
+                )
+            }
+
+        })
+    };
+    function chooseclass(){
+        api.openFrame({
+            name: 'ChooseClass',
+            url: '../html/newIntelligence/ChooseClass.html',
+            bounces: false,
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: $api.getStorage('padHeight')
+            },
+            pageParam: {
+                bjlist:bjlist,
+            },
+            bgColor: 'rgba(0,0,0,0)'
+        });
+    };
+    function closeWin() {
+        api.sendEvent({
+            name: 'closeVideo'
+        });
+    }
+
+</script>
+</html>

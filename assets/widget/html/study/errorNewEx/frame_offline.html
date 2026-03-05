@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>线下错题详情</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/ErrorBookLeftBtn.css">
+    <style>
+        html {
+            background-color: #f2f2f2;
+        }
+
+        body {
+            background-color: #f2f2f2;
+            font-size: 1.2rem;
+            padding-top: 0.5rem;
+        }
+
+        .ex-header {
+            width: 100%;
+            border-bottom: 1px solid #efefef;
+            padding-bottom: 10px;
+        }
+
+        .biaoji {
+            display: inline-block;
+            height: 100%;
+            padding-left: 10px;
+        }
+
+        .biaoji img {
+            width: 16px;
+            vertical-align: bottom;
+        }
+
+        .tg-content {
+            background-color: white;
+            min-height: 3rem;
+            padding: 8px 16px 2px 6px;
+            font-size: 1.2rem;
+        }
+
+        .tg-content img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .tixing {
+            color: #333;
+            font-size: 20px;
+            display: inline-block;
+            /*border-bottom: 1px solid #efefef;*/
+        }
+
+        .tigan {
+            padding-left: 16px;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .tigan, .tigan p {
+            color: #666;
+            font-size: 18px !important;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .contentd {
+            margin-left: 89px;
+            margin-right: 16px;
+            background-color: white;
+            border: 1px solid #e4e4e8;
+            min-height: calc(100% - 2px);
+        }
+
+        .all_offline_content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="all_offline_content" v-cloak>
+    <ul class="leftedit_btn">
+        <li id="leftedit_btn_edit" tapmode onclick="vm.onEditErroQustionClick();"><img class="noImgClick"
+                                                                                       src="../../../image/edit_errorquestion_up.png">
+        </li>
+        <li id="leftedit_btn_makepoint" tapmode onclick="vm.onMakePointClick();">
+            <img class="noImgClick"
+                 :src="important==0?'../../../image/make_point_up.png':'../../../image/make_point_down.png'">
+        </li>
+        <li id="leftedit_btn_remove" tapmode onclick="vm.onRemoveFromErrNoteClick();"><img class="noImgClick"
+                                                                                           src="../../../image/remove_from_errbook_up.png">
+        </li>
+    </ul>
+    <div class="contentd">
+        <div class="biankuang">
+            <div class="ex-header">
+                <p class="biaoji"><img src="../../../image/stuHomePad/bjerror.png" class="biaojitu"
+                                       v-if="important!=0">
+                </p>
+                <p class="tixing">【习题描述】</p>
+            </div>
+            <div class="tg-content">
+                <p class="tigan" v-text="content">
+                    <!--                    <a href="www.baidu.com">我是测试连接</a>-->
+                </p>
+            </div>
+        </div>
+        <div class="content-img" v-if="imageList.length!=0">
+            <div class="img-size4 aui-row ">
+                <ul class="tupian" style="width: 100%;">
+                    <li class="" style="width: 100%" v-for="(item,ind) in imageList" v-if="ind<7">
+                        <img style="height:60%;float: left;width: 80% ;left: 10%;position: relative"
+                             :src="item+'?imageMogr2/auto-orient/thumbnail/!65p'" alt=""
+                             :imageArr='imageList' :id="ind" v-if="imageList.length==1" onclick="imgClick(this);">
+                        <img style="height:10rem;float: left;width: 42%;margin: 0.7rem"
+                             :src="item+'?imageMogr2/auto-orient/thumbnail/!65p'" v-if="imageList.length==2"
+                             alt=""
+                             :imageArr='imageList' :id="ind" onclick="imgClick(this);">
+                        <img v-if="imageList.length >= 3"
+                             style="height:10rem;float: left;width: 30%;margin: 0.4rem"
+                             :src="item+'?imageMogr2/auto-orient/thumbnail/!65p'"
+                             alt=""
+                             :imageArr='imageList'
+                             :id="ind"
+                             onclick="imgClick(this);">
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<!--<script type="text/javascript" src="../../../script/ErrorHWJS/removeWrongBook.js"></script>-->
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token-stu'));
+    var data;
+    var sys_id;
+    var kc_type;
+    var vm;
+    var params = {};
+    var editcount = 0;
+    var moduleDialog = null;//弹窗模块bhzparam
+    apiready = function () {
+        api.addEventListener({
+            name: 'isImportant'
+        }, function (ret, err) {
+
+        });
+        api.addEventListener({
+            name: 'finishErroeReply'
+        }, function (ret, err) {
+            initData();
+        });
+        api.addEventListener({
+            name: 'removeErrordata'
+        }, function (ret, err) {
+            removeWrongBook(api.pageParam.index);
+        });
+        vm = new Vue({
+            el: '.all_offline_content',
+            data: {
+                totalCount: api.pageParam.totalCount,
+                current_page: api.pageParam.index,
+                datalist: [],
+                content: '',
+                imageList: [],
+                important: 0,
+                index: api.pageParam.index,
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>确认移出错题本？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('a').length; i++) {
+                    $api.css($api.domAll('a')[i], 'color: #666;');
+                    $api.domAll('a')[i].onclick = function () {
+                        return false;
+                    }
+                }
+
+            },
+            mounted: function () {
+
+            },
+            methods: {
+                onEditErroQustionClick: function () {
+                    api.openWin({
+                        name: 'win_error_reply',
+                        url: 'win_error_reply.html',
+                        pageParam: {
+                            xkid: api.pageParam.xkid,
+                            errorData: vm.datalist,
+                            lasterror: 0,
+                            editct: 1,
+                            important: vm.important
+                        }
+                    });
+                },
+                onMakePointClick: function () {
+                    apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                        body: $api.jsonToStr({
+                            uid: $api.getStorage('uid'),
+                            type: 'is_important',
+                            sys_id: sys_id,
+                            kc_type: kc_type,
+                            is_important: vm.important == 1 ? 0 : 1
+                        })
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                if (vm.important === 0) {
+                                    vm.important = 1;
+                                } else {
+                                    vm.important = 0;
+                                }
+                                api.sendEvent({
+                                    name: 'editImp',
+                                    extra: {}
+                                });
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                onRemoveFromErrNoteClick: function () {
+                    moduleDialog = api.require('moduleDialog');
+                    moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'ok') {
+                                apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                                    body: $api.jsonToStr({
+                                        uid: $api.getStorage('uid'),
+                                        type: 'outbook',
+                                        sys_id: sys_id,
+                                        kc_type: kc_type,
+                                    })
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.ret == 0) {
+                                            //在这处理删除第一题，最后一题以及总题数是否为0
+                                            vm.totalCount = vm.totalCount - 1;
+
+                                            if (vm.totalCount == 0) {
+                                                api.closeWin();
+                                            } else {
+                                                api.sendEvent({
+                                                    name: 'onTopIndexChange',
+                                                    extra: {index: vm.current_page},////
+                                                });
+                                            }
+                                            api.sendEvent({
+                                                name: 'removeError',
+                                                extra: {}
+                                            });
+                                        } else {
+                                            api.toast({
+                                                msg: ret.msg,
+                                                duration: 2000,
+                                                location: 'bottom'
+                                            });
+                                        }
+                                    } else {
+                                        api.toast({
+                                            msg: err.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                    }
+                                });
+                                dismissDialog();
+                            } else {
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+
+                    });
+                }
+            }
+        });
+        initData();
+    };
+
+    function openEdit() {
+        api.openWin({
+            name: 'win-error-note-reply',
+            url: 'win-error-note-reply.html',
+            pageParam: {
+                xkid: api.pageParam.xkid,
+                errorData: vm.datalist,
+                lasterror: 0,
+                editct: 1,
+                important: vm.important
+            }
+        });
+    }
+
+    function initData() {
+        params['xkid'] = api.pageParam.xkid;
+        params['page'] = vm.current_page;
+        params['dyid'] = api.pageParam.dyid;
+        params['njid'] = api.pageParam.njid;
+        params['num'] = 1;
+        params['type'] = 4;
+        params['is_important'] = api.pageParam.isImportant;
+        params['online'] = 2;
+        params['uid'] = $api.getStorage('uid');
+        params['schoolid'] = $api.getStorage('newSchoolId');
+        apiObj.Get(UrlRouter.ExercisesWrongs, {
+            values: params
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.content = ret.data.data[0].descript;
+                    vm.imageList = ret.data.data[0].content;
+                    vm.important = ret.data.data[0].is_important;
+                    vm.datalist = ret.data.data[0];
+                    sys_id = ret.data.data[0].sys_id;
+                    kc_type = ret.data.data[0].kc_type;
+                    data = ret.data.data[0];
+                    $api.css($api.dom('.all_offline_content'), 'display:block');
+                    // $('.all_offline_content').css('display','block');
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        var photoBrowser = api.require('photoBrowser');
+        photoBrowser.open({
+            images: [
+                src
+            ],
+            placeholderImg: 'widget://../image/loading_more.gif',
+            bgColor: '#fff'
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                photoBrowser.close();
+            }
+        });
+    }
+
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+</script>
+</html>

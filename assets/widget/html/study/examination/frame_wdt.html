@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>问答题，朗读题</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/wx-audio.css" />
+    <style>
+        .wdt_content {
+            display: none
+        }
+    </style>
+</head>
+
+<body>
+    <div class="kong_bg">
+        <div class="cxjz">
+            <div class="cxjztop clearfix">
+                <img src="../../../image/newhomework/cxjz.png">
+                <p>您的网络开小差了<br>请检查网络环境并点击重新加载吧～</p>
+            </div>
+            <div class="cxjz_button" onclick="cxjz()">重新加载</div>
+        </div>
+    </div>
+    <div class="wdt_content">
+        <!--<img  v-if="complete==2 && material.zyqf == 2 && isShowAnswer && data.res_type!=2" class="jrctb noImgClick" :src="isctb!=1?'../../../image/newhomework/join.png':'../../../image/newhomework/out.png'" @click="PostExercisesTriggerWrong()">-->
+        <div class="content">
+            <!--题干部分开始-->
+            <div class="stem">
+                <ul>
+                    <li class="tixing clearfix">
+                        <div class="tihao" v-text="material.sort+'.'"></div>
+                        <div class="tixingzi" v-text="'【'+material.txstr+'】'"></div>
+                    </li>
+                </ul>
+                <div class="tg_content font666" v-html="data.tg"></div>
+                <div class="ldcl" v-if="material.tx=='ldt' && data.dastr!=''">
+                    <h3>朗读材料：</h3>
+                    <p v-html="data.dastr==''?'无':data.dastr"></p>
+                </div>
+            </div>
+            <!--题干部分结束-->
+            <!--答案部分开始-->
+            <dl v-if="complete==5 || complete==4" class="wenda_answer bgFFF">
+                <dt v-if="isShowAnswer && complete==5" class="defen">
+                    <span v-if="data.is_true==0" style="color: #ff778c">待批</span>
+                    <b v-if="data.is_true!=0 "
+                        v-html="'本题得分<em>'+OneDecimalPlace(data.score)+'</em>/总分'+OneDecimalPlace(scorelist[0])"></b>
+                </dt>
+                <dd :style="!isShowAnswer?'display:inline-block':'display:none'" class="tishi"><img
+                        src="../../../image/newhomework/ts.png">未到答案显示时间，暂不显示正确答案哟~</dd>
+
+                <dd v-if="complete==5 ">
+                    <h2 class="wendah2">【我的答案】</h2>
+                    <div v-if="material.tx=='ldt'&& material.is_unable!=1 " class="lddayinpin clearfix">
+                        <img class="scyp2 noImgClick" src="../../../image/startPlay.png" onclick="vm.ZSrecordRun(this);"
+                            :playStatus='0' alt="">
+                        <div v-if="showinpin" class="lddaRange"><input class="myRange" type="range" min="0" value="0"
+                                :max='data.xsdaobj[0].filetime'></div>
+                        <p v-if="showinpin" class="ypTimeP" v-text="getTimes(data.xsdaobj[0].filetime)"></p>
+                    </div>
+                    <ul class="clearfix wendawdda" v-if="material.tx=='ldt'&& material.is_unable==1">
+                        <li class="wendazi">
+                            <p>未答</p>
+                        </li>
+                    </ul>
+
+                    <ul class="clearfix wendawdda" v-if="material.tx!='ldt'">
+                        <li v-for="list in data.xsdaobj" v-if="material.tx!='ldt'||(material.tx=='ldt'  )"
+                            :class="(list.is_txt==1  && !list.image)?'wendazi':list.is_txt==2?'wendayuyin imgborder':list.is_txt==3?'wendashipin imgborder':'wendatu imgborder'">
+                            <p v-if="list.is_unable==1 ||(list.is_txt==1 && list.is_unable==0 && !list.image)"
+                                v-html="list.is_unable==1?'未答':list.is_txt==1 && list.is_unable==0?list.descript:''">
+                            </p>
+                            <p v-if="list.is_txt==0 " v-html="list.thumbnail"></p>
+                            <p v-if="list.is_txt==2 || list.is_txt==3" :url="list.serverpath+list.preview_link" tapmode
+                                onclick="vm.videoZYPlay(this)" :filetime="list.filetime">
+                                <img class="noImgClick" src="../../../image/bof_03.png">
+                            </p>
+                        </li>
+                    </ul>
+                </dd>
+
+                <dd :style="isShowAnswer?'display:block':'display:none'" v-if="material.tx!='ldt'">
+                    <h2 class="wendah2" v-text="'【'+material.tx_tip+'】'">
+                    </h2>
+                    <ul>
+                        <li class="wendazi" v-html="data.dastr==''?'无':data.dastr">
+                        </li>
+                    </ul>
+                </dd>
+                <dd :style="isShowAnswer?'display:block':'display:none'">
+                    <h2 class="wendah2">【答案解析】</h2>
+                    <ul>
+                        <li class="wendazi" v-html="data.dajx==''?'无':data.dajx">
+                        </li>
+                    </ul>
+                </dd>
+                <div class="jrctbkong"></div>
+            </dl>
+            <!--答案部分结束-->
+        </div>
+        <!--答题部分开始-->
+        <div v-if="complete==1 || complete==2" class="da_content">
+            <textarea v-if='is_txt==1  && is_show_textarea==1 ' class="wdtzi" placeholder="请输入要填写的答案" cols="30"
+                rows="10" maxlength="500" :value="answer.length>0?answer[0].descript:''"
+                onchange="vm.shoudongpiyue(this);"></textarea>
+
+            <div class="lddayinpin clearfix" v-if="material.tx=='ldt' && answer.length>0">
+                <img class="scyp2 noImgClick" src="../../../image/startPlay.png" onclick="vm.recordRun(this);"
+                    :playStatus='0' alt="">
+                <div class="lddaRange"> <input class="myRange" type="range" min="0" value="0" :max='answer[0].filetime'>
+                </div>
+                <p class="ypTimeP" v-text="getTimes(answer[0].filetime)">00:00</p>
+                <div class="chacha" tapmode onclick="vm.deletePic(this);" id='0'>
+                    <img class="noImgClick" src="../../../image/newhomework/cha.png">
+                </div>
+            </div>
+
+            <dl class="clearfix " v-if="is_txt!=1 && answer.length>0 && material.tx!='ldt'">
+                <dd v-for="(list,index) in answer" :class="list.is_txt==0?'wendatu imgborder':'wendatu imgborder'">
+                    <img class="noImgClick" :id="index" onclick="showImage(this)" v-if="list.is_txt==0"
+                        :src="list.serverpath+list.savename+'?imageView2/2/w/300/h/300'"
+                        :fdsrc="list.serverpath+list.savename">
+                    <div :id="'luyin'+index" style="width: 100%; height: 100%">
+                    </div>
+                    <div :id="index" tapmode onclick="vm.deletePic(this);" class="chacha">
+                        <img class="noImgClick" src="../../../image/newhomework/cha.png">
+                    </div>
+                </dd>
+            </dl>
+            <div
+                :class="is_txt!=1 && answer.length>0?'wdAnswerTypeActive':is_txt==1  && is_show_textarea==1?'wdAnswerTypeActive':'wdAnswerType'">
+                <ul>
+                    <li class="openAnserType" tapmode onclick="vm.choose();"></li>
+
+                </ul>
+            </div>
+        </div>
+        <!--答题部分结束-->
+
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/wx-audio.js"></script>
+<script type="text/javascript" src="../../../script/ThridJS/qiniu.min.js"></script>
+<script type="text/javascript" src="../../../script/12xueUpload.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var uiMediaScanner;//打开相册需要的变量
+    var compressListener = {//打开相册需要的变量
+        allCount: 0,
+        successCount: 0
+    };
+    var queryHomewokAnswer;
+    var audioStreamer;
+    var timer = null;
+    var allTimes = 0;
+    var sec;
+    var downloadPath;
+    var moduleDialog = null;//弹窗模块bhzparam
+    var moduleImageScale = null;//图片放大旋转删除
+    var isfirst = 1;
+    windowError();
+    apiready = function () {
+        moduleDialog = api.require('moduleDialog');
+        moduleImageScale = api.require('moduleImageScale');
+        vue();
+        if (vm.complete == 1 || vm.complete == 2) {
+            if (JSON.stringify(api.pageParam.queryHomewokAnswer) == '[]') {
+                queryHomewokAnswer = {};
+            } else {
+                queryHomewokAnswer = JSON.parse(api.pageParam.queryHomewokAnswer[0].xtgroup.replace('&apos;', "'"));
+            }
+        } else {//答完题显示答案
+            vm.scorelist = api.pageParam.scorelist;
+        }
+        if (api.pageParam.showanswer == 1) {
+            vm.isShowAnswer = true;
+        } else {
+            vm.isShowAnswer = false;
+        }
+        vm.GetPaperPaperExercisesAnswer();//获取作业习题详情及答题结果
+        api.addEventListener({// 裁剪图片保存
+            name: 'cutPicture' + api.frameName
+        }, function (ret, err) {
+            var src = ret.value.src;
+            vm.compressImage(src);
+            api.closeFrame({
+                name: 'frame_cutPicture'
+            });
+        });
+        api.addEventListener({// 音频接收
+            name: 'giveRecoreData'
+        }, function (ret, err) {
+            if (ret.value.isfrom == 'jc') {
+                if (ret.value.index == vm.index) {
+                    vm.is_txt = 0;
+                    vm.answer = [];
+                    vm.giveData(ret.value.savename, ret.value.filetime, ret.value.Local_address);
+                }
+                api.closeWin({
+                    name: 'win_reading'
+                });
+            }
+        });
+        api.addEventListener({// 滑动暂停音频
+            name: 'yinpinCLose'
+        }, function (ret, err) {
+            if ($api.domAll('.scyp2').length >= 1) {
+                if ($('.scyp2').attr('playStatus') == 1) {
+                    $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                }
+                audioStreamer = api.require('audioStreamer');
+                clearInterval(timer);
+                audioStreamer.pause();
+                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                // if((vm.material.tx=='ldt' && vm.answer.length>0)||(vm.material.tx=='ldt'&& vm.material.is_unable!=1 )){
+                //     $api.dom('.myRange').disabled = true;
+                // }
+
+            }
+        });
+        api.addEventListener({// 画板
+            name: 'DrawingBoardImg'
+        }, function (ret, err) {
+            if (ret.value.name == api.frameName && ret.value.type == 'huaban') {
+                var imgsrc = ret.value.imgsrc;
+                if (vm.is_txt == 1) {
+                    vm.is_txt = 0;
+                    vm.answer = [];
+                } else {
+                    vm.is_txt = 0;
+                }
+                vm.qiniuUpfile(imgsrc);
+                api.closeWin({
+                    name: 'Drawing_board'
+                });
+            }
+        });
+        // if (vm .complete == 4||vm.complete == 5) {//答完题显示总分
+        //     vm.type = api.pageParam.type;
+        //     vm.scorelist = api.pageParam.scorelist;
+        // }
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.wdt_content',
+            data: {
+                index: api.pageParam.index,//当前frame的索引
+                material: api.pageParam.material,//当前习题资料
+                complete: api.pageParam.complete,//作业完成状态
+                data: [],//习题详情
+                schoolid: api.pageParam.schoolid,//学校id
+                answer: [],//答案数组
+                is_txt: 0,//是否是文字 1是文字 0不是文字
+                is_show_textarea: 0,//是否显示输入框（刚打开页面的时候）
+                isPlaying: false,//老师留言是否播放中
+                isShowAnswer: false,
+                type: '',//习题总分
+                scorelist: '',
+                isctb: '',
+                showinpin: false,
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>选择不会做，会将您已经填写的答案清空，是否确定不会做？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+                paizhaoparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 89,
+                        "h": 178,
+                        "w": 300
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "paizhao",
+                        "showText": "拍照",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41 + 58,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "xiangce",
+                        "showText": "从相册中选择",
+                        "textSize": 14
+                    }]
+                },
+                anniuparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 118,
+                        "h": 236,
+                        "w": 300
+                    },
+                    {
+                        "viewType": 104,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 118 + 40,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "img",
+                        "img": 'widget://image/newhomework/os_06.png',
+                        "img_down": 'widget://image/newhomework/20_06.png'
+
+                    },
+                    {
+                        "viewType": 104,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 118 + 100,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "input",
+                        "img": 'widget://image/newhomework/os_03.png',
+                        "img_down": 'widget://image/newhomework/20_03.png'
+
+                    },
+                    {
+                        "viewType": 104,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 118 + 160,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "shouxie",
+                        "img": 'widget://image/newhomework/os_18.png',
+                        "img_down": 'widget://image/newhomework/20_18.png'
+
+                    }
+                    ]
+                },
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+            },
+            methods: {
+                OneDecimalPlace: function (num) {
+                    return parseInt((num) * 10) / 10;
+                },
+                GetPaperPaperExercisesAnswer: function () {//考试获取习题and学生答题详情
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetPaperPaperExercisesAnswer, {
+                        values: {
+                            paper_id: vm.material.paper_id,
+                            uid: $api.getStorage('uid'),
+                            xtid: vm.material.resource_id,
+                            classid: api.pageParam.exambjid,
+                            schoolid: $api.getStorage('schoolid'),
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.wdt_content').show();
+                                $('.kong_bg').hide();
+                                vm.data = ret.data[0];
+                                // alert(vm.data.xsdaobj[0].filetime);
+                                vm.showinpin = true;
+                                // alert(JSON.stringify(vm.data));
+                                if (vm.complete == 2 || vm.complete == 1) {
+                                    if (queryHomewokAnswer[vm.material.resource_id] && queryHomewokAnswer[vm.material.resource_id].da.length > 0) {//缓存的答案
+                                        vm.answer = queryHomewokAnswer[vm.material.resource_id].da;
+                                        vm.is_txt = parseInt(queryHomewokAnswer[vm.material.resource_id].is_txt);
+                                    }
+                                    if (vm.is_txt == 1 && vm.answer.length > 0) {
+                                        vm.is_show_textarea = 1;
+                                    } else {
+                                        vm.is_show_textarea = 0;
+                                    }
+                                }
+                            } else {
+                                $('.kong_bg').show();
+                                $('.wdt_content').hide();
+                            }
+                        } else {
+                            $('.kong_bg').show();
+                            $('.wdt_content').hide();
+                        }
+                    }, '', '', false)
+                },
+                videoZYPlay: function (context) {
+                    var url = $api.attr(context, 'url');
+                    var filetime = $api.attr(context, 'filetime');
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: '',
+                            isMp3: false,
+                            filetime: filetime
+                        }
+                    });
+                },
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                // PostExercisesTriggerWrong:function(){//错题本改版 ，添加错题本、移除错题本、表及重点
+                //     var type;
+                //     if(vm.isctb==1){
+                //         type = 'outbook';
+                //     }else{
+                //         type = 'addbook';
+                //     }
+                //     apiObj.Post(UrlRouter.PostExercisesTriggerWrong, {
+                //         values: {
+                //             sys_id:vm.data.sys_id,
+                //             kc_type:2,
+                //             type:type
+                //         }
+                //     }, function (ret, err) {
+                //         if (ret) {
+                //             if (ret.ret == 0) {
+                //                 if(type=='outbook'){
+                //                     vm.isctb=0;
+                //                     api.toast({
+                //                         msg: '已移出错题本',
+                //                         duration: 2000,
+                //                         location: 'bottom'
+                //                     });
+                //                 }else{
+                //                     vm.isctb=1;
+                //                     api.toast({
+                //                         msg: '成功加入错题本',
+                //                         duration: 2000,
+                //                         location: 'bottom'
+                //                     });
+                //                 }
+                //
+                //             }else{
+                //                 api.toast({
+                //                     msg: ret.msg,
+                //                     duration: 2000,
+                //                     location: 'bottom'
+                //                 });
+                //             }
+                //         }else{
+                //             api.toast({
+                //                 msg: err.msg,
+                //                 duration: 2000,
+                //                 location: 'bottom'
+                //             });
+                //         }
+                //     })
+                // },
+
+                deletePic: function (context) {    //删除图片答案
+                    if (vm.material.tx == 'ldt') {
+                        var param = vm.bhzparam;
+                        param.data[1].showText = "<font color='#666666'>确定删除该音频吗？</font>";
+                        moduleDialog.showDialog(param, function (ret, err) {
+                            if (ret.state == 'success' && ret.clickID) {
+                                if (ret.clickID == 'ok') {
+                                    if ($api.domAll('.scyp2').length >= 1) {
+                                        if ($('.scyp2').attr('playStatus') == 1) {
+                                            $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                                        }
+                                        audioStreamer = api.require('audioStreamer');
+                                        clearInterval(timer);
+                                        audioStreamer.pause();
+                                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                        $api.dom('.myRange').disabled = true;
+                                    }
+                                    var index;
+                                    index = parseInt($(context).attr('id'));
+                                    vm.answer.splice(index, 1);//删除数据指定索引位置的url
+                                    vm.saveAnswer(vm.answer);
+                                    dismissDialog();
+                                } else {
+                                    dismissDialog();
+                                }
+                            } else {
+
+                            }
+
+                        });
+                    } else {
+                        var index;
+                        index = parseInt($(context).attr('id'));
+                        vm.answer.splice(index, 1);//删除数据指定索引位置的url
+                        vm.saveAnswer(vm.answer);
+                    }
+
+                },
+                choose: function () {//打开手动批阅题选择答题方式的页面
+                    if (!checkPermission(['camera', 'storage', 'microphone'])) {
+                        return;
+                    }
+                    if (vm.material.tx == 'ldt') {//朗读题
+                        if (vm.answer.length > 0) {
+                            var param = vm.bhzparam;
+                            param.data[1].showText = "<font color='#666666'>再次答题将清除之前录音内容，是否继续进行答题？</font>";
+                            moduleDialog.showDialog(param, function (ret, err) {
+                                if (ret.state == 'success' && ret.clickID) {
+                                    if (ret.clickID == 'ok') {
+                                        api.openWin({
+                                            name: 'win_reading',
+                                            url: 'win_reading.html',
+                                            pageParam: { index: vm.index, isform: 'jc', tg: vm.data.dastr }
+                                        });
+                                        dismissDialog();
+                                    } else {
+                                        dismissDialog();
+                                    }
+                                } else {
+
+                                }
+
+                            });
+                        } else {
+                            api.openWin({
+                                name: 'win_reading',
+                                url: 'win_reading.html',
+                                pageParam: { index: vm.index, isform: 'jc', tg: vm.data.dastr }
+                            });
+                        }
+
+                        // } else if(vm.material.tx == 'mx'){
+                        //     if (vm.getFileNum(0) >= 5) {
+                        //         api.toast({
+                        //             msg: "最多只能选择5张图片！",
+                        //             duration: 2000,
+                        //             location: 'bottom'
+                        //         });
+                        //         return;
+                        //     }
+                        //     var imgAccountMax = 5 - vm.getFileNum(0);// 还可以选择图片数量的最大值
+                        //     moduleDialog.showDialog(vm.paizhaoparam, function (ret, err) {
+                        //         if (ret.state == 'success' && ret.clickID) {
+                        //             if(ret.clickID=='xiangce'){//相册
+                        //                 vm.openMediaScanner(imgAccountMax);
+                        //                 dismissDialog();
+                        //             }else if(ret.clickID=='paizhao'){//拍照
+                        //                 api.getPicture({
+                        //                     sourceType: 'camera',
+                        //                     encodingType: 'jpg',
+                        //                     mediaValue: 'pic',
+                        //                     destinationType: 'url',
+                        //                     targetWidth: 1200,
+                        //                     //targetHeight: 100,
+                        //                     saveToPhotoAlbum: false,
+                        //                     quality: 100
+                        //                 }, function (ret, err) {
+                        //                     if (ret) {//如果拍了照片
+                        //                         if (ret.data.length > 0) {
+                        //                             if (vm.is_txt == 1) {
+                        //                                 vm.is_txt = 0;
+                        //                                 vm.answer = [];
+                        //                             } else {
+                        //                                 vm.is_txt = 0;
+                        //                             }
+                        //                             vm.is_unable = 0;//会做
+                        //                             vm.compressImage(ret.data);
+                        //                         }
+                        //                     } else {//如果点了取消
+                        //
+                        //                     }
+                        //                 });
+                        //                 dismissDialog();
+                        //             }
+                        //         } else {
+                        //
+                        //         }
+                        //
+                        //     });
+                    } else {
+                        moduleDialog.showDialog(vm.anniuparam, function (ret, err) {
+                            if (ret.state == 'success' && ret.clickID) {
+                                if (ret.clickID == 'input') {//输入
+                                    if (vm.is_txt != 1) {
+                                        vm.is_txt = 1;
+                                        vm.is_show_textarea = 1;
+                                        vm.answer = [];
+                                        vm.saveAnswer(vm.answer);
+                                    } else {
+                                        vm.is_txt = 1;
+                                        vm.is_show_textarea = 1;
+                                        vm.saveAnswer(vm.answer);
+                                    }
+                                    dismissDialog();
+                                } else if (ret.clickID == 'img') {//图片
+                                    dismissDialog();
+                                    if (vm.getFileNum(0) >= 5) {
+                                        api.toast({
+                                            msg: "最多只能选择5张图片！",
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                        return;
+                                    }
+                                    var imgAccountMax = 5 - vm.getFileNum(0);// 还可以选择图片数量的最大值
+                                    // moduleDialog.showDialog(vm.paizhaoparam, function (ret, err) {
+                                    //     if (ret.state == 'success' && ret.clickID) {
+                                    //         if(ret.clickID=='xiangce'){//相册
+                                    //             vm.openMediaScanner(imgAccountMax);
+                                    //             dismissDialog();
+                                    //         }else if(ret.clickID=='paizhao'){//拍照
+                                    api.getPicture({
+                                        sourceType: 'camera',
+                                        encodingType: 'jpg',
+                                        mediaValue: 'pic',
+                                        destinationType: 'url',
+                                        targetWidth: 1200,
+                                        //targetHeight: 100,
+                                        quality: 100
+                                    }, function (ret, err) {
+                                        if (ret) {//如果拍了照片
+                                            if (ret.data.length > 0) {
+                                                if (vm.is_txt == 1) {
+                                                    vm.is_txt = 0;
+                                                    vm.answer = [];
+                                                } else {
+                                                    vm.is_txt = 0;
+                                                }
+                                                CutPictures(ret.data, 0);
+                                                // vm.compressImage(ret.data);
+                                            }
+                                        } else {//如果点了取消
+
+                                        }
+                                    });
+                                    dismissDialog();
+                                    // }
+                                    //     } else {
+                                    //
+                                    //     }
+                                    //
+                                    // });
+
+                                } else if (ret.clickID == 'shouxie') {//手写
+                                    if (vm.getFileNum(0) >= 5) {
+                                        api.toast({
+                                            msg: "最多只能选择5张图片！",
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                        dismissDialog();
+                                        return;
+                                    }
+                                    api.openWin({
+                                        name: 'Drawing_board',
+                                        url: 'Drawing_board.html',
+                                        pageParam: { name: api.frameName, type: 'huaban' },
+                                        slidBackEnabled: false
+                                    });
+                                    dismissDialog();
+                                }
+                            } else {
+
+                            }
+
+                        });
+                    }
+
+                },
+                shoudongpiyue: function (context) {//手动批阅题文字的状态
+                    // var answer = clear_emoji($(context).val().replace(/(^\s*)|(\s*$)/g, ""));
+                    var answer = $(context).val().trim();
+                    vm.is_txt = 1;
+                    if (answer.length == 0) {
+                        vm.answer = [];
+                        vm.saveAnswer(vm.answer);
+                    } else {
+                        var da = { 'is_txt': vm.is_txt, 'descript': answer };
+                        Vue.set(vm.answer, 0, da);
+                        vm.saveAnswer(vm.answer);
+                    }
+
+                },
+                getFileNum: function (isTxt) {//answer里面图片 视频 音频各自的数量
+                    var num = 0;
+                    for (i = 0; i < vm.answer.length; i++) {
+
+                        if (vm.answer[i].is_txt == isTxt) {
+                            num = num + 1;
+                        }
+                    }
+                    return num;
+                },
+                openMediaScanner: function (max) {// 选择相册图片 可多选
+                    if (!uiMediaScanner) {
+                        uiMediaScanner = api.require('UIMediaScanner');
+                    }
+                    uiMediaScanner.open({
+                        type: 'picture',
+                        column: 4,
+                        classify: true,
+                        max: max ? max : 5,
+                        sort: {
+                            key: 'time',
+                            order: 'desc'
+                        },
+                        texts: {
+                            stateText: '已选*项',
+                            cancelText: '取消',
+                            finishText: '完成'
+                        },
+                        rotation: true,
+                        styles: {
+                            bg: '#fff',
+                            mark: {
+                                icon: '',
+                                position: 'bottom_left',
+                                size: 20
+                            },
+                            nav: {
+                                bg: '#4bc7c7',
+                                stateColor: '#fff',
+                                stateSize: 18,
+                                cancelBg: 'rgba(0,0,0,0)',
+                                cancelColor: '#fff',
+                                cancelSize: 18,
+                                finishBg: 'rgba(0,0,0,0)',
+                                finishColor: '#fff',
+                                finishSize: 18
+                            }
+                        }
+                    }, function (ret) {
+                        if (ret) {
+                            if (ret.eventType == 'confirm' && ret.list.length > 0) {//如果选了图片 点了确定
+                                if (vm.is_txt == 1) {
+                                    vm.is_txt = 0;
+                                    vm.answer = [];
+                                } else {
+                                    vm.is_txt = 0;
+                                }
+                                compressListener.successCount = 0;
+                                compressListener.allCount = ret.list.length;
+                                for (var i = 0; i < ret.list.length; i++) {
+                                    var selectImg = ret.list[i];
+                                    // 获取图片的路径
+                                    var selectimgPath = selectImg.path;
+                                    var selectimgThumbPath = selectImg.thumbPath;
+                                    // console.warn("image url :" + url);
+                                    if (api.systemType == "ios") {
+                                        uiMediaScanner.transPath({
+                                            path: selectimgPath
+                                        }, function (ret, err) {
+                                            if (ret) {
+                                                vm.compressImage(ret.path);
+                                            } else {
+                                                alert("ios地址转换失败：" + JSON.stringify(err));
+                                            }
+                                        });
+                                    } else {
+                                        vm.compressImage(selectimgPath);
+                                    }
+                                }
+                            } else {
+                            }
+                            // console.log(JSON.stringify(ret));
+                        } else {
+                            alert("图片选择器打开失败");
+                        }
+                    });
+                },
+                compressImage: function (url) {// 图片压缩处理
+                    var imageFilter = api.require('imageFilter');
+                    var imgName = vm.getUrlName(url);
+                    var quality;
+                    if (api.systemType == 'ios') {
+                        quality = 0.2;
+                    } else {
+                        quality = 0.8;
+                    }
+                    imageFilter.compress({
+                        img: url,
+                        quality: quality,
+                        save: {
+                            imgPath: "fs://img_compress/",
+                            imgName: imgName + ".jpg"
+                        }
+                    }, function (ret, err) {
+                        // console.log("compress result : ret=" + JSON.stringify(ret) + "  err:" + JSON.stringify(err));
+                        if (ret.status) {
+                            compressListener.successCount++;
+                            var newimgurl = api.fsDir + "/img_compress/" + imgName + ".jpg";
+                            vm.qiniuUpfile(newimgurl);
+                        } else {
+                        }
+                        imageFilter = '';
+                    })
+                },
+                getUrlName: function (url) {
+                    var index = url.lastIndexOf("/");
+                    var imgName;
+                    if (api.systemType == 'ios') {
+                        var idIndex = url.indexOf("id=");
+                        if (idIndex != -1) {
+                            var idStr = url.substr(idIndex);
+                            var andIndex = url.indexOf("&");
+                            imgName = url.substring(idIndex + 3, andIndex);
+                        } else {
+                            imgName = url.substring(index + 1);
+                        }
+                    } else {
+                        imgName = url.substring(index + 1);
+                    }
+                    return imgName;
+                },
+                qiniuUpfile: function (imgurl, type, index) {//上传图片
+                    api.showProgress({
+                        title: '正在上传图片',
+                        text: '请稍后',
+                        modal: true
+                    });
+                    var fileKey = (new Date()).valueOf() + imgurl;
+                    apiObj.Get(UrlRouter.GetQiNiuToken, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            bucket: 'vodresource',
+                            key: fileKey
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                var token = ret.data.token;
+                                var trans = api.require('trans');
+                                trans.decodeImgToBase64({
+                                    imgPath: imgurl
+                                }, function (ret, err) {
+                                    if (ret.status) {
+                                        var file = b64ImgToBlob(ret.base64Str);
+                                        var observable = qiniu.upload(file, fileKey, token, qiniuPutExtra, qiniuConfig);
+                                        observable.subscribe({
+                                            next(res) {
+                                                //进度
+                                            },
+                                            error(err) {
+                                                // 失败报错信息
+                                                api.toast({
+                                                    msg: '图片上传失败' + err.message + err.code,
+                                                    duration: 2000,
+                                                    location: 'middle'
+                                                });
+                                            },
+                                            complete(res) {
+                                                // 上传成功
+                                                var answerlist = {
+                                                    'serverpath': QINIU_DOMAIN,
+                                                    'savename': res.key,
+                                                    'filetime': 0,
+                                                    'is_txt': 0,
+                                                    'Local_address': QINIU_DOMAIN + res.key
+                                                }; //txt 0图片 2 音频  3视频   Local_address本地地址
+                                                if (type == 'modulesave') {
+                                                    Vue.set(vm.answer, index, answerlist);
+                                                    vm.saveAnswer(vm.answer);
+                                                } else {
+                                                    vm.answer.push(answerlist);//把答案图片放在数组里
+                                                    vm.saveAnswer(vm.answer);
+                                                }
+                                                api.hideProgress();
+                                            }
+                                        })
+                                    } else {
+                                        api.hideProgress();
+                                        _toast('图片转码失败，请重试');
+                                    }
+                                });
+
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: '图片上传失败，请重新提交答案',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    }, '', '', false
+                    );
+                },
+                giveData: function (savename, filetime, Local_address) {
+                    var answerlist = {
+                        'serverpath': QINIU_DOMAIN,
+                        'savename': savename,
+                        'filetime': filetime,
+                        'is_txt': 2,
+                        'Local_address': Local_address
+                    }; //txt 2 音频  3视频   Local_address本地地址
+                    vm.answer.push(answerlist);//把答案音频放在数组里
+                    vm.saveAnswer(vm.answer);
+                },
+                yuyin: function (audioItem, index) {
+                    if (audioItem.type == 1) {
+                        if (vm.isPlaying) {
+                            api.stopPlay();
+                            $('.img1').show();
+                            $('.img2').hide();
+                        } else {
+                            $('.img1').show();
+                            $('.img2').hide();
+                            var audioName = audioItem.savename;
+                            var path = "/audio/" + audioName + ".amr";
+                            api.download({
+                                url: audioItem.serverpath + "/" + audioItem.savename,
+                                savePath: 'fs:/' + path,
+                                report: false,
+                                cache: false,
+                                allowResume: false
+                            }, function (ret, err) {
+                                if (ret && ret.state == 1) {
+                                    // 下载成功  ret.savePath
+                                    isDownloading = false;
+                                    api.startPlay({
+                                        path: api.fsDir + path
+                                    }, function (ret, err) {
+                                        if (ret) {
+                                            vm.isPlaying = false;
+                                            $('.img1').show();
+                                            $('.img2').hide();
+
+                                        }
+                                    });
+
+                                    $('.yuyin3').eq(index).find('.img1').hide();
+                                    $('.yuyin3').eq(index).find('.img2').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img1').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img2').hide();
+                                }
+                            });
+                        }
+                        vm.isPlaying = !vm.isPlaying;
+                    }
+
+                },
+                saveAnswer: function (da) {//保存答案 发给win
+                    var eachxtgroup = {
+                        'is_auto': vm.data.is_auto,
+                        'tx': vm.data.tx,
+                        'xtid': vm.material.resource_id,
+                        'is_txt': vm.is_txt,
+                        'da': da,
+                        'daoptions': vm.data.daoption,
+                        'tx_code': vm.data.tx_code,
+                        'score': vm.material.score,
+                        'part_score': vm.material.part_score,
+                        'xts': vm.material.xts,
+                        'part_xts': vm.material.part_xts,
+                    };
+                    api.sendEvent({
+                        name: 'saveAnswerHuancun',
+                        extra: {
+                            eachxtgroup: eachxtgroup,
+                            zyid: vm.material.resource_id,
+                            index: vm.index
+                        }
+                    });
+                },
+                getTimes: function (value) {
+                    var secondTime = parseInt(value);// 秒
+                    var minuteTime = 0;// 分
+                    if (secondTime > 59) {//如果秒数大于60，将秒数转换成整数
+                        //获取分钟，除以60取整数，得到整数分钟
+                        minuteTime = parseInt(secondTime / 60);
+                        //获取秒数，秒数取佘，得到整数秒数
+                        secondTime = parseInt(secondTime % 60);
+                    }
+                    var result = "" + parseInt(secondTime);
+                    if (minuteTime > 0 && secondTime < 10) {
+                        if (minuteTime > 9) {
+                            result = parseInt(minuteTime) + ":0" + result;
+                        } else {
+                            result = "0" + parseInt(minuteTime) + ":0" + result;
+                        }
+                    } else if (minuteTime > 0 && secondTime >= 10) {
+                        if (minuteTime > 9) {
+                            result = parseInt(minuteTime) + ":" + result;
+                        } else {
+                            result = "0" + parseInt(minuteTime) + ":" + result;
+                        }
+                    } else if (minuteTime == 0 && secondTime < 10) {
+                        result = "00" + ":0" + result;
+                    } else {
+                        result = "00" + ":" + result;
+                    }
+                    return result;
+                },
+                recordRun: function (context) {
+                    audioStreamer = api.require('audioStreamer');
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var bfb;
+                    var recodetime;
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        sec = 0;
+                        allTimes = vm.answer[0].filetime;
+                        recodetime = vm.answer[0].filetime;
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.answer[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.answer[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.answer[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                        //                        if (api.systemType == 'ios') {
+                        //                            if (vm.answer[0].Local_address.indexOf(".mp3") != -1) {
+                        //                                audioStreamer.openPlayer({
+                        //                                    path: vm.answer[0].Local_address
+                        //                                }, function (ret) {
+                        //                                });
+                        //                            } else {
+                        //                                var audioTrans = api.require('audioTrans');
+                        //                                audioTrans.amrToWav({
+                        //                                    path: vm.answer[0].Local_address
+                        //                                }, function (ret) {
+                        //                                    if (ret) {
+                        //                                        var path1 = ret.path;
+                        //                                        audioStreamer.openPlayer({
+                        //                                            path: path1
+                        //                                        }, function (ret) {
+                        //                                        });
+                        //                                    }
+                        //                                });
+                        //                            }
+                        //
+                        //                        } else {
+                        audioStreamer.openPlayer({
+                            path: vm.answer[0].Local_address
+                        }, function (ret) {
+                        });
+                        //                        }
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        clearInterval(timer);
+                        audioStreamer.pause();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                        $api.dom('.myRange').disabled = true;
+                    } else {
+                        $api.dom('.myRange').disabled = false;
+                        $api.attr(context, 'playStatus', '1');
+                        recodetime = vm.answer[0].filetime;
+                        //这个是一样的  重新播放
+                        if (api.systemType == 'ios') {
+                            audioStreamer.resume();
+                        } else {
+                            audioStreamer.openPlayer({
+                                path: vm.answer[0].Local_address,
+                            }, function (ret) {
+                            });
+                        }
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.answer[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.answer[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.answer[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+                ZSrecordRun: function (context) {
+                    audioStreamer = api.require('audioStreamer');
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var bfb;
+                    var recodetime;
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        sec = 0;
+                        allTimes = vm.data.xsdaobj[0].filetime;
+                        recodetime = vm.data.xsdaobj[0].filetime;
+                        var url = vm.data.xsdaobj[0].serverpath + vm.data.xsdaobj[0].savename;
+                        var path = "/audio/" + url;
+                        api.download({
+                            url: url,
+                            savePath: 'fs:/' + path,
+                            report: false,
+                            cache: false,
+                            allowResume: false
+                        }, function (ret, err) {
+                            if (ret && ret.state == 1) {
+                                timer = setInterval(function (e) {
+                                    sec = sec + 1;
+                                    allTimes = allTimes - 1;
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    console.log(sec);
+                                    if (allTimes == 0 || sec >= vm.data.xsdaobj[0].filetime) {
+                                        clearInterval(timer);
+                                        $api.attr(context, 'playStatus', '0');
+                                        $api.dom('.myRange').value = 0;
+                                        $api.dom('.myRange').disabled = true;
+                                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                        $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.data.xsdaobj[0].filetime));
+                                        $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                                    } else {
+                                        var range = $api.dom('.myRange');
+                                        range.value = sec;
+                                        range.disabled = false;
+                                        range.onchange = function () {
+                                            sec = parseInt(this.value);
+                                            range.value = sec;
+                                            allTimes = vm.data.xsdaobj[0].filetime - sec;
+                                            var time = vm.getTimes(allTimes);
+                                            $api.text($api.dom('.ypTimeP'), time);
+                                            bfb = sec / recodetime * 100;
+                                            bfb = bfb.toFixed(2);
+                                            var ss = 'background-size: ' + bfb + '% 100%';
+                                            $api.css($api.dom('.myRange'), ss);
+                                            audioStreamer.seekToTime({
+                                                time: sec
+                                            });
+                                        };
+                                        var time = vm.getTimes(allTimes);
+                                        $api.css($api.dom('.myRange'), ss);
+                                        $api.text($api.dom('.ypTimeP'), time);
+                                    }
+                                }, 1000);
+                                downloadPath = api.fsDir + path;
+                                //                                if (api.systemType == 'ios') {
+                                //                                    if(downloadPath.indexOf('.mp3') != -1){
+                                //                                        audioStreamer.openPlayer({
+                                //                                            path: downloadPath
+                                //                                        }, function (ret) {
+                                //                                        });
+                                //                                    }else{
+                                //                                        var audioTrans = api.require('audioTrans');
+                                //                                        audioTrans.amrToWav({
+                                //                                            path: downloadPath
+                                //                                        }, function (ret) {
+                                //                                            if (ret) {
+                                //                                                var path1 = ret.path;
+                                //                                                audioStreamer.openPlayer({
+                                //                                                    path: path1
+                                //                                                }, function (ret) {
+                                //                                                });
+                                //                                            }
+                                //                                        });
+                                //                                    }
+                                //
+                                //                                } else {
+                                audioStreamer.openPlayer({
+                                    path: downloadPath
+                                }, function (ret) {
+                                });
+                                //                                }
+                            }
+                        });
+
+
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        clearInterval(timer);
+                        audioStreamer.pause();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                        $api.dom('.myRange').disabled = true;
+                    } else {
+                        $api.dom('.myRange').disabled = false;
+                        $api.attr(context, 'playStatus', '1');
+                        recodetime = vm.data.xsdaobj[0].filetime;
+                        //这个是一样的  重新播放
+                        if (api.systemType == 'ios') {
+                            audioStreamer.resume();
+                        } else {
+                            audioStreamer.openPlayer({
+                                path: downloadPath,
+                            }, function (ret) {
+                            });
+                        }
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.data.xsdaobj[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.data.xsdaobj[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.data.xsdaobj[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+            }
+
+        });
+    }
+
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+    function showImage(context) {
+        if ($api.getStorage('padType') != '1') {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    $(context).attr('fdsrc')
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+            return
+        }
+        var url = $(context).attr('fdsrc');
+        var index = $(context).attr('id');
+        var param = { "deviceType": "deviceType_pad", "url": url };
+        moduleImageScale.showImage(param, function (ret, err) {
+            if (ret) {
+                if (ret.state == "success" && ret.clickID == 'clickID_close') {
+                    moduleImageScale.dismissImage();
+                } else if (ret.state == "success" && ret.clickID == 'clickID_save') {
+                    vm.qiniuUpfile(ret.imageSavePath, 'modulesave', index);
+                    moduleImageScale.dismissImage();
+                } else if (ret.state == "success" && ret.clickID == 'clickID_delete') {
+                    vm.answer.splice(index, 1);
+                    vm.saveAnswer(0, vm.answer);
+                    moduleImageScale.dismissImage();
+                }
+            } else {
+                alert(JSON.stringify(err));
+            }
+
+
+        });
+
+    }
+    function cxjz() {
+        vm.GetPaperPaperExercisesAnswer();
+    }
+    function CutPictures(src, tkindex) {
+        api.openFrame({
+            name: 'frame_cutPicture',
+            url: '../../frame_cutPicture.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: api.winHeight
+            },
+            pageParam: { src: src, frameName: api.frameName, tkindex: tkindex },
+            bounces: false
+        });
+    }
+    function windowError() {
+        window.onerror = function (msg, file, number) {
+            api.ajax({
+                url: errorEmail,
+                method: 'post',
+                timeout: 30,
+                dataType: 'json',
+                returnAll: false,
+                data: {
+                    values: {
+                        msg: msg,
+                        file: file,
+                        number: number,
+                        version: api.appVersion,
+                        app: '12xue OS',
+                        system: api.systemType,
+                        system_version: api.systemVersion,
+                        device_id: '',
+                        device_mode: api.deviceModel,
+                        device_name: api.deviceName,
+                        uid: $api.getStorage('uid')
+                    },
+                }
+            }, function (ret, err) {
+
+            });
+        }
+    }
+</script>
+
+</html>

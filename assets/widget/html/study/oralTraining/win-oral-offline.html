@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>口语训练 - 离线模式</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #FEE4C4 0%, #FFEDC7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-right: 15px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .alert-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-title::before {
+            content: "⚠️";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .alert-message {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        .features {
+            margin-top: 30px;
+        }
+
+        .features-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .features-title::before {
+            content: "✨";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:active {
+            transform: scale(0.98);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .feature-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .tips-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tips-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tips-title::before {
+            content: "💡";
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-list li {
+            font-size: 14px;
+            color: #666;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .tips-list li::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:active {
+            background: #f8f9fa;
+            transform: translateY(2px);
+        }
+
+        .network-info {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .network-status {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .network-status.online {
+            color: #51cf66;
+        }
+
+        .network-status.offline {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="header-icon">🎤</div>
+            <div class="header-title">口语训练</div>
+        </div>
+        <div class="status-badge" id="statusBadge">离线模式</div>
+    </div>
+
+    <div class="content">
+        <div class="alert">
+            <div class="alert-title">服务暂时不可用</div>
+            <div class="alert-message">
+                当前无法连接到口语训练服务，可能是网络问题或服务正在维护。<br>
+                请检查网络连接后重试，或稍后再访问。
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="features-title">口语训练功能介绍</div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <div class="feature-name">单词训练</div>
+                    <div class="feature-desc">智能单词记忆与发音练习</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-name">句子跟读</div>
+                    <div class="feature-desc">标准句子发音与跟读训练</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <div class="feature-name">AI评分</div>
+                    <div class="feature-desc">智能语音识别与发音评分</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-name">学习报告</div>
+                    <div class="feature-desc">详细的学习进度与成绩分析</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <div class="tips-title">故障排查建议</div>
+            <ul class="tips-list">
+                <li>检查设备的 WiFi 或移动网络是否已连接</li>
+                <li>尝试访问其他网页，确认网络是否正常</li>
+                <li>如果使用 WiFi，尝试重启路由器</li>
+                <li>检查是否有网络限制或防火墙设置</li>
+                <li>服务可能正在维护，请稍后再试</li>
+                <li>如问题持续，请联系技术支持</li>
+            </ul>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="retryConnection()">
+                🔄 重新连接
+            </button>
+            <button class="btn btn-secondary" onclick="goBack()">
+                ← 返回首页
+            </button>
+        </div>
+    </div>
+
+    <div class="network-info">
+        <div class="network-status" id="networkStatus">
+            正在检测网络状态...
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script>
+        apiready = function() {
+            checkNetworkStatus();
+            
+            // 监听网络状态变化
+            api.addEventListener({
+                name: 'online'
+            }, function(ret, err) {
+                updateNetworkStatus(true);
+            });
+
+            api.addEventListener({
+                name: 'offline'
+            }, function(ret, err) {
+                updateNetworkStatus(false);
+            });
+
+            // 定期检测网络状态
+            setInterval(checkNetworkStatus, 5000);
+        };
+
+        function checkNetworkStatus() {
+            const connectionType = api.connectionType;
+            const isOnline = connectionType !== 'none' && connectionType !== 'unknown';
+            updateNetworkStatus(isOnline);
+        }
+
+        function updateNetworkStatus(isOnline) {
+            const statusEl = document.getElementById('networkStatus');
+            const statusBadge = document.getElementById('statusBadge');
+            
+            if (isOnline) {
+                statusEl.className = 'network-status online';
+                statusEl.innerHTML = '✓ 网络已连接 - 可以尝试重新连接服务';
+                statusBadge.textContent = '服务中断';
+                statusBadge.style.background = '#ff6b6b';
+            } else {
+                statusEl.className = 'network-status offline';
+                statusEl.innerHTML = '✗ 网络未连接 - 请检查网络设置';
+                statusBadge.textContent = '离线模式';
+                statusBadge.style.background = '#868e96';
+            }
+        }
+
+        function retryConnection() {
+            const connectionType = api.connectionType;
+            
+            if (connectionType === 'none' || connectionType === 'unknown') {
+                api.toast({
+                    msg: '请先连接网络',
+                    duration: 2000,
+                    location: 'middle'
+                });
+                return;
+            }
+
+            api.showProgress({
+                title: '重新连接中...',
+                text: '请稍候',
+                modal: true
+            });
+
+            // 获取参数
+            const apiUrlIndex = api.pageParam.apiUrlIndex || 0;
+            const ruurl = apiUrlIndex == '3' ? 'http://gitcode.12xue.com:4000' : 'https://en-web.12xue.com';
+            const board = $api.getStorage('oralTrainingBoard') == 'sentence' 
+                ? '/pages/html/sentences/win-sentence-main.html' 
+                : '/pages/html/word/win-main.html';
+            const path = api.systemType == 'ios' 
+                ? ruurl + '/pages/html/win-intro.html' 
+                : ruurl + board;
+
+            // 延迟1.5秒后尝试重新连接
+            setTimeout(function() {
+                api.hideProgress();
+                
+                // 关闭当前窗口
+                api.closeWin();
+                
+                // 尝试打开远程服务
+                api.openWin({
+                    name: 'oralTraining-win-main',
+                    url: path,
+                    pageParam: api.pageParam,
+                    slidBackEnabled: false
+                });
+            }, 1500);
+        }
+
+        function goBack() {
+            api.closeWin();
+        }
+    </script>
+</body>
+</html>

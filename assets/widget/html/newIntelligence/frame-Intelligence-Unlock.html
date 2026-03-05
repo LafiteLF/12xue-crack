@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>智能导练解锁</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body{background:#f2f2f2;  height: 100%}
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+        .clearfix:after {
+            clear: both;
+        }
+        /*清除浮动*/
+        .content {
+            width: 80%;  background: #fff;  margin: 0 auto;    height: 85%;
+            box-shadow: 0px 0px 10px #cecece;display: none;
+        }
+        .jstx{ text-align: center; padding: 40px 0 0 0; font-size: 0.8rem}
+        .kmxx{ width: 90%; margin: 0 auto; height: calc(100% - 100px)}
+        .kmleft{ float: left; width:225px; height: 215px; background: url("../../image/book.png") no-repeat center center; background-size: 100% 100%; margin-top: 10%; margin-left: calc(25% - 100px)}
+        .kmright{
+            float: right; width: 50%; height: 250px;margin-top: 10%; text-align: left; position: relative}
+        .jsm{     height: 40px;
+            width: 55%;
+            border: 1px solid #d5d5d5;
+            border-radius: 3px;
+            text-align: center;
+            line-height: 40px;
+            font-size: 0.6rem;
+            color: #d5d5d5;
+            position: absolute;}
+        #buy{ top:160px}
+        .jsm{     top: 86px;}
+        .qrjs{     height: 24px;
+            font-size: 0.6rem;
+            color: #666;
+            line-height: 24px;
+            text-align: left;
+            position: absolute;
+            top: 20px;}
+        .kmmc{ font-size: 0.8rem; color: #fff; text-align: center; line-height: 26px; padding: 20px 0 15px 0;}
+        .kmleft p{ font-size: 0.6rem; color: #fff; text-align: center; line-height: 26px;overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;}
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            background: #fff;
+            height: 17px;
+            border: 1px solid #4bc7c7;
+            width: 17px;
+            vertical-align: top;
+            margin-top: 3px;
+            margin-right: 10px;
+        }
+        input[type="checkbox"]:checked {
+            background: url("../../image/checked.png") no-repeat center;
+            background-size: 15px;
+        }
+    </style>
+</head>
+<body>
+<div style="height: 7%"></div>
+<div class="content" v-cloak>
+    <p class="jstx">请仔细检查要解锁的智能导练分册信息，解锁后不支持退换</p>
+    <div class="kmxx clearfix">
+        <div class="kmleft">
+            <div class="kmmc" v-text="data.xkname+'('+data.njname+')'"></div>
+            <p v-text="data.bbname"></p>
+            <p v-text="data.sxcname"></p>
+            <p v-text="data.xxmc"></p>
+        </div>
+        <div class="kmright">
+            <div class="qrjs"><input type="checkbox" id="islock" onchange="vm.issure()"> 我确认解锁该智能导练分册</div>
+            <input type="button"  style="background: #fff"  value="通过解锁码解锁" disabled="disabled" class="jsm" id="locknum"
+                   tapmode onclick='vm.Unlock()'>
+            <!--<input type="button"  style="background: #fff"  :value="'线上购买本册('+buydata.price+'元)'" disabled="disabled" class="jsm" id="buy"-->
+            <!--tapmode onclick='vm.buy()'>-->
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var issaoma;
+    apiready = function () {
+        issaoma = api.pageParam.issaoma;
+        vm.data=api.pageParam.data;
+        vm.GetPracticeVolumeprice( vm.data.bbid, vm.data.schoolid)
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            data:[],
+            buydata:''
+        },
+        updated:function(){
+            $api.css($api.dom('.content'),'display:block');
+        },
+        methods: {
+            GetPracticeVolumeprice: function (bbid,schoolid) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetPracticeVolumeprice, {
+                    values: {
+                        schoolid: schoolid,
+                        bbid:bbid
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            vm.buydata=ret.data;
+                        } else {
+                            api.toast(
+                                {
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                            )
+                        }
+                    } else {
+                        api.toast(
+                            {
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                        )
+                    }
+
+                })
+            },
+            issure:function () {
+                if( $('#islock').is(':checked')){
+                    $('.jsm').css({'color': '#4bc7c7','border':'1px solid #4bc7c7'}).removeAttr("disabled");
+                }else{
+                    $('.jsm').css({'color': '#d5d5d5','border':'1px solid #d5d5d5'}).attr("disabled", "disabled");
+                }
+            },
+            Unlock:function () {
+                api.openFrame({
+                    name: 'puk',
+                    url: 'puk.html',
+                    rect: {
+                        x: '0',
+                        y: '0',
+                        w: 'auto',
+                        h: api.winHeight
+                    },
+                    pageParam: {
+                        data:vm.data,
+                        issaoma:issaoma
+                    },
+                    bounces: false
+                });
+
+            },
+            buy:function () {
+                api.openWin({
+                    name: 'win_Zhifu',
+                    url: 'Purchase/win_Zhifu.html',
+                    pageParam: {
+                        data:vm.buydata,
+                        Purchase:vm.data,
+                        issaoma:issaoma
+                    },
+                    slidBackEnabled:  false
+                });
+            }
+        }
+    });
+</script>
+</html>

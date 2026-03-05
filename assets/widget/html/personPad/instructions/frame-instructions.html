@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            /*background: rgb(241, 242, 243);*/
+            background: white;
+            width: 100%;
+            height: auto;
+        }
+        .content {
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+        .listul {
+            height: 100%;
+            width: 100%;
+            background: white;
+            overflow-x: hidden;
+        }
+        .listul li {
+            height: 120px;
+            width: 100%;
+            display: flex;
+        }
+        .showimg img {
+            height: 80px;
+            width: 100px;
+            margin: 20px 0 20px 20px;
+            display: block;
+        }
+
+        .alltitle {
+            width: calc(100% - 180px);
+            margin-top: 30px;
+            margin-left: 30px;
+            height: 70px;
+        }
+        .title {
+            width: 100%;
+            font-size: 21px;
+            padding-right: 30px;
+            color: rgb(50, 51, 52);
+            font-weight: 500;
+        }
+        .subtitle {
+            width: 100%;
+            font-size: 14px;
+            padding-right: 30px;
+            color: rgb(135, 136, 137);
+            margin-top: 10px;
+            height: 22px;
+            line-height: 22px;
+        }
+        .aui-list:before {
+            height: 0;
+        }
+        .aui-list:after {
+            height: 0;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+        .bottom {
+            width: calc(100% - 60px);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+            position: absolute;
+            padding-top: 120px;
+            margin-left: 30px;
+        }
+        video {
+            display: none;
+        }
+        img {
+            display: none;
+        }
+        .nonealert {
+            width: 100%;
+            text-align: center;
+            height:auto;
+            margin-top: calc(50vh - 100px);
+            display: none;
+        }
+        .nonealert img {
+            width:140px;
+            height: 100px;
+            display: block;
+            margin-left: calc(50% - 70px);
+        }
+        .nonealert p {
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        a {
+            pointer-events:none
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <ul class="listul aui-list aui-media-list">
+        <li v-for="(list,index) in data"  onclick="todetail(this)" :id="list.id">
+            <div class="bottom"></div>
+            <div class="alltitle">
+                <div class="title aui-ellipsis-1">
+                    {{list.title}}
+                </div>
+                <div class="subtitle aui-ellipsis-1" v-html="list.content">
+
+                </div>
+            </div>
+            <div class="showimg">
+                <img :src="list.image" class="">
+            </div>
+        </li>
+    </ul>
+    <div class="nonealert">
+        <img src="../../../image/czzn_none.png" alt="">
+        <div>
+            <p>我们正在制作内容哦~</p>
+        </div>
+    </div>
+    <!--<ul class="listul aui-list aui-media-list">-->
+        <!--<li>-->
+            <!--<div class="alltitle">-->
+                <!--<div class="title aui-ellipsis-1">-->
+                    <!--哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈-->
+                <!--</div>-->
+                <!--<div class="subtitle aui-ellipsis-1">-->
+                    <!--哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="showimg">-->
+                <!--<img src="" class="">-->
+            <!--</div>-->
+            <!--<div class="bottom"></div>-->
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="alltitle">-->
+                <!--<div class="title aui-ellipsis-1">-->
+                    <!--哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈-->
+                <!--</div>-->
+                <!--<div class="subtitle aui-ellipsis-1">-->
+                    <!--哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="showimg">-->
+                <!--<img src="" class="">-->
+            <!--</div>-->
+            <!--<div class="bottom"></div>-->
+        <!--</li>-->
+    <!--</ul>-->
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+        getguidelist();
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data: [],
+            },
+            methods: {
+
+            }
+        });
+    }
+    function getguidelist() {
+        api.showProgress();
+        apiObj.Get(UrlRouter.GetGuideLists, {
+            values: {
+                type: 4,//4学生OS
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.data = ret.data;
+                    if(vm.data.length > 0 ){
+                        $('.nonealert').hide();
+                    }
+                    else {
+                        $('.nonealert').show();
+                    }
+                }else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            }else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        })
+    }
+    function todetail(param) {
+        api.openWin({
+            name: 'win-instructions-detail',
+            url: 'win-instructions-detail.html',
+            pageParam: {
+                id: $(param).attr('id'),
+            }
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .content {
+            width: 35%;
+            height: 70%;
+            top: 15%;
+            position: absolute;
+            left: 32.5%;
+            overflow-y: auto;
+
+        }
+
+        .content dl {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            margin: 0 auto;
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+
+        .content dl dt {
+            line-height: 55px;
+            font-size: 0.8rem;
+            /*color: #4bc7c7;*/
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;
+        }
+
+        .content dl dd {
+            line-height: 55px;
+            font-size: 0.8rem;
+            /*color: #333333;*/
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;
+            width: 100%;
+            height: 55px;
+            display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #4bc7c7;
+            -webkit-box-shadow: #4bc7c7;
+        }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: #4bc7c7;
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+<body>
+<div class="close" tapmode  ></div>
+<div class="content">
+    <dl style="display: none;">
+        <dt :style="jiemc =='全部章节'||jiemc ==''?'color:#4bc7c7':'color:#333333'"  @click="chooseChapter('全部章节' ,'' )">全部章节</dt>
+        <dd v-for="chapter in chapters" :style="chapter.name==jiemc?'color:#4bc7c7':'color:#333333'" v-text="chapter.name"  @click="chooseChapter(chapter.name,chapter.id)"></dd>
+    </dl>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var classid;
+    var xkid;
+    var dyid;
+    var index;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        $api.attr($api.dom('.close'), 'onclick', 'vm.closeFrame();');
+        classid = api.pageParam.classid;
+        xkid = api.pageParam.xkid;
+        index = api.pageParam.index;
+        api.showProgress();
+        vm.jiemc = api.pageParam.jiemc;
+        vm.getCourseChaptsData(classid, xkid,index)
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            chapters: [],
+            jiemc : '',
+        },
+        methods: {
+            getCourseChaptsData: function (classid, xkid,index) {
+                var params = {};
+                var classid = classid;
+                for (var i = 0; i < classid.length; i++) {
+                    params["classid[" + i + "]"] = classid[i];
+                }
+                params['xkid'] = xkid;
+                apiObj.Get(UrlRouter.GetCourseChaptsUrl, {
+                    values: params
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            vm.chapters = ret.data[0].data[index].data;
+                            $api.css($api.dom('dl'), 'display:block');
+                            api.hideProgress();
+                        } else {
+                            api.toast(
+                                {
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                            )
+                        }
+                    } else {
+                        api.toast(
+                            {
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                        )
+                    }
+                })
+            },
+            closeFrame: function () {
+                api.closeFrame({
+                    name: 'chapter-list'
+                });
+            },
+            chooseChapter:function (name,id) {
+                api.sendEvent({
+                    name: 'chooseChapter',
+                    extra: {
+                        jieid:id,
+                        jiemc:name
+                    }
+                });
+                vm.closeFrame();
+            }
+        }
+    });
+    function closeWin() {
+        api.closeWin();
+    }
+</script>

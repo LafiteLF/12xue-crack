@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>动态-音频重写(课堂资源包)</title>
+    <link rel="stylesheet" href="../../../css/publicCss.css">
+    <link rel="stylesheet" href="../../../css/frameDetail.css">
+    <style>
+        body{
+            background: white;
+        }
+        .wave {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 30px;
+        }
+        .wave img {
+            width: calc(100% - 130px);
+            padding: 40px 70px 40px 60px;
+            height: 100%;
+        }
+
+        .ypTimeP {
+            width: 100%;
+            float: right;
+            font-size: 2rem !important;
+            color: #999 !important;
+            text-align: center;
+            padding-top: 24px !important;
+            padding-right: 15px;
+        }
+
+        .startimg {
+            width: 100%;
+            text-align: center;
+            height: auto;
+            margin-top: 0;
+            margin-bottom: 20px;
+            float: left;
+        }
+
+        .startimg img {
+            width: 80px;
+            height: 80px;
+            float: none;
+        }
+
+        .scyinpin {
+            width: 100% !important;
+            padding: 0;
+            text-align: center;
+            float: left;
+            margin-left: 0;
+        }
+
+        .ypRange {
+            width: 100% !important;
+        }
+
+        .bottomdiv {
+            border: #ededed 1px solid;
+            height: auto;
+            display: inline-block;
+            width: calc(100% - 50px);
+            margin-left: 25px;
+            z-index: 999;
+            position: absolute;
+            top: 70px;
+        }
+        .xzt_content {
+            border: 0;
+            height: calc(100% - 10px)
+        }
+        .content {
+            border: 0;
+        }
+        .tixing {
+            font-family: sans-serif;
+            font-size: 18px;
+            color: #212121;
+        }
+        [v-cloak] {
+            display: none
+        }
+        .xzt_content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="xzt_content" v-cloak>
+    <div class="content">
+        <div class="stem">
+            <ul>
+                <li class="tixing clearfix">
+                    <div class="tihao" v-text="(index+1)+'.'"></div>
+                    <div class="tixingzi" v-text="zyqf != 1?'【'+data.txstr+'】':'【素材】'+ data.file_link"></div>
+                </li>
+            </ul>
+            <div class="bottomdiv">
+                <div class="wave">
+                    <img :src="isplayed == 0 ? '../../../image/video/wavewave.png' : '../../../image/video/wave.gif' "
+                         alt="">
+                </div>
+                <div>
+                    <p class="ypTimeP" v-text="pasttime + ' / ' + getOutTime(filetime)"></p>
+                </div>
+                <div class="scyinpin clearfix">
+                    <div class="ypRange"><input class="myRange" type="range" min="0" value="0" :max='filetime'></div>
+                    <audio class="hideenAudio" :src='url'></audio>
+                </div>
+                <div class="startimg">
+                    <img class="scyp2 noImgClick" :playStatus='0' onclick="vm.studentRecord(this);"
+                         :src="isplayed == 0 ? '../../../image/video/startPlay.png' : '../../../image/video/stop.png' "
+                         alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var allTimes = 0;//音频播放
+    var sec;
+    var timer = null;
+    apiready = function () {
+        if (api.pageParam.isConvert == '0' || api.pageParam.convertStatus == '1') {
+            vue();
+            vm.GetMaterialInfo();
+            api.addEventListener({// 滑动暂停音频
+                name: 'yinpinCLose'
+            }, function (ret, err) {
+                if($api.domAll('.scyp2').length>=1){
+                    if($('.scyp2').attr('playStatus')==1){
+                        $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                    }
+                    vm.isplayed = '0';
+                    //$api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                    clearInterval(timer);
+                    var hideenAudio = $api.dom('.hideenAudio');
+                    hideenAudio.pause();
+                }
+                api.stopPlay();
+            });
+        } else if (api.pageParam.convertStatus == '2') {
+            alert('转码失败！');
+        } else {
+            alert('资源正在转码,请三分钟后回来');
+        }
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.xzt_content',
+            data: {
+                index: api.pageParam.index,//当前frame的索引
+                url: '',
+                filetime: '',
+                pasttime: '00:00',//已播放的时间
+                isplayed: '0',//是否正在播放
+                data: [],//作业详情
+                zyqf:api.pageParam.zyqf,
+            },
+            updated: function () {
+            },
+            methods: {
+                studentRecord: function (context) {
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var recodetime = vm.filetime;  // 获取一下  filetime
+                    var hideenAudio = $api.dom('.hideenAudio');
+                    var range = $api.dom('.myRange');
+                    range.disabled = true;
+                    var bfb;
+                    //这是没有播放的情况  播放点击的音频  可能有其他音频正在播放  先关掉其他音频  再播放这个音频
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        vm.isplayed = '1';
+                        hideenAudio.play();
+                        sec = 0;
+                        allTimes = recodetime;
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            if (allTimes == 0 || sec >= recodetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                vm.isplayed = '0';
+                                vm.pasttime = vm.getOutTime(recodetime - allTimes);
+                                range.value = 0;
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+                                range.value = sec;
+                                vm.pasttime = vm.getOutTime(recodetime - allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                            }
+                        }, 1000);
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        vm.isplayed = '0';
+                        clearInterval(timer);
+                        hideenAudio.pause();
+                    } else {
+                        $api.attr(context, 'playStatus', '1');
+                        hideenAudio.play();
+                        vm.isplayed = '1';
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            if (allTimes == 0 || sec >= recodetime) {
+                                $api.attr(context, 'playStatus', '0');
+                                clearInterval(timer);
+                                vm.isplayed = '0';
+                                vm.pasttime = vm.getOutTime('0');// 0
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                                range.value = 0;
+                            } else {
+                                range.value = sec;
+                                vm.pasttime = vm.getOutTime(recodetime - allTimes);
+                                bfb = sec / recodetime * 100;
+                                bfb = bfb.toFixed(2);
+                                var ss = 'background-size: ' + bfb + '% 100%';
+                                $api.css($api.dom('.myRange'), ss);
+                            }
+                        }, 1000);
+                    }
+                },
+                GetMaterialInfo: function () {//获取资源详情
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetMaterialInfo, {
+                        values: {
+                            id: api.pageParam.zyid
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.filetime = ret.filetime;
+                                if(ret.filetype == '.mp3'){
+                                    vm.url = ret.serverpath + ret.savename;
+                                }
+                                else {
+                                    vm.url = ret.serverpath + ret.rootpath;
+                                }
+                                vm.data = ret;
+                                $('.xzt_content').css('display','block');
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                getOutTime: function (intime) {
+                    var outTime = '';
+                    if (intime <= 9) {
+                        outTime = '00:0' + intime;
+                    } else if (intime < 59) {
+                        outTime = '00:' + intime;
+                    } else {
+                        var min = parseInt(intime / 60);
+                        var sec = intime % 60;
+                        if (sec <= 9) {
+                            if (min > 0 && min < 10) {
+                                outTime = '0' + min + ':0' + sec;
+                            } else if (min >= 10) {
+                                outTime = min + ':0' + sec;
+                            } else {
+                                outTime = '00:0' + sec;
+                            }
+                        } else {
+                            if (min > 0 && min < 10) {
+                                outTime = '0' + min + ':' + sec;
+                            } else if (min >= 10) {
+                                outTime = min + ':' + sec;
+                            } else {
+                                outTime = '00:' + sec;
+                            }
+                        }
+                    }
+                    return outTime;
+                }
+            }
+        });
+    }
+</script>
+</html>

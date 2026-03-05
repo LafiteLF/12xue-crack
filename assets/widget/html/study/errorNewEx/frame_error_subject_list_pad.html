@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>学科列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content {
+            padding: 10px
+        }
+
+        .content ul li {
+            width: 25%;
+            float: left;
+            padding: 9px;
+            height: 180px;
+        }
+
+        .content ul li .item {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 3px
+        }
+
+        .content ul li .add-subject {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 3px;
+            background-color: #e9fefe;
+            border: 1px dashed #4bc7c7;
+            color: #4bc7c7;
+            text-align: center;
+        }
+
+        .content ul li .add-subject:active {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 3px;
+            background-color: #4bc7c7;
+            border: 1px dashed #4bc7c7;
+            color: #fff;
+        }
+
+        .content ul li .add-subject div:nth-of-type(1) {
+            background: url("../../../image/error/add-sub.png") no-repeat center center #e9fefe;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            margin-left: calc(50% - 20px);
+            top: 23%;
+        }
+
+        .content ul li .add-subject:active div:nth-of-type(1) {
+            background: url("../../../image/error/add-sub-active.png") no-repeat center center #4bc7c7;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+            width: 40px;
+            height: 40px;
+            margin-left: calc(50% - 20px);
+            position: absolute;
+            top: 23%;
+        }
+
+        .content ul li .add-subject div:nth-of-type(2) {
+            font-size: 18px;
+            position: absolute;
+            top: 62%;
+            text-align: center;
+            width: 100%
+        }
+
+        .content ul li .item img {
+            width: 45%;
+            max-width: 220px;
+            margin: 0 auto;
+            position: absolute;
+            left: 3%;
+            top: 11%;
+        }
+
+        .content ul li .item h2 {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            bottom: 13%;
+        }
+
+        .state span b {
+            padding: 0 10px;
+        }
+
+        .subject {
+            width: 85%;
+            /*max-width: 220px;*/
+            margin: 0 auto;
+            position: absolute;
+            left: 10%;
+            text-align: right;
+            top: 18%;
+        }
+
+        .allsub {
+            margin-top: 50px;
+            width: 100%;
+            text-align: center;
+            height: 30px;
+            display: none;
+        }
+        .allsub p {
+            font-size: 22px;
+            height: 22px;
+        }
+        @media only screen and (min-width: 800px) and (max-width: 900px) {
+           .zifbl{ font-size: 0.5rem!important;}
+        }
+        .noError {
+            display: none;
+            width: 100%;
+            height: auto;
+            text-align: center;
+            position: absolute;
+        }
+        .noError img {
+            height: auto;
+            width: 26%;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <div class="noError">
+        <img src="../../../image/stuHomePad/noError.png">
+    </div>
+    <ul class="clearfix">
+        <li v-if="subjects.length > 0" v-for="subject in subjects" :id="subject.xkid" :title="subject.xkmc" tapmode onclick="vm.openWin(this)">
+            <div class="item"
+                 :style="{background:subjectBackground(subject.xkmc),border:'1px solid'+subjectBorder(subject.xkmc)}">
+                <img :src="'../../../image/stuHomePad/'+subjectImg(subject.xkmc)+'.png'">
+                <!--<h2 v-text="subject.name"></h2>-->
+                <div class="subject">
+                    <div style="font-size: 0.9rem;color: white" v-text="subject.xkmc"></div>
+                    <div class="zifbl" style="font-size: 0.7rem;margin-top: 20px;color: #effaf3"
+                         v-text="'线上错题'+subject.online_num+'道'"></div>
+                    <div v-if="closeWrong" class="zifbl"  style="font-size: 0.7rem;color: #effaf3" v-text="'线下错题'+subject.inline_num+'道'"></div>
+                </div>
+            </div>
+        </li>
+<!--        <li class="addError" @click="openAddSubject()" v-if="othersub.length > 0&&schoolId != '1033144472405681455'&&schoolId != '1007140989450038416'&&schoolId != '1033144472591015736'&&schoolId != '1005140914742096168'">-->
+        <li class="addError" @click="openAddSubject()" v-if="othersub.length > 0&&closeWrong">
+            <div class="add-subject" style="">
+                <div></div>
+                <div style="">添加其他学科错题</div>
+            </div>
+        </li>
+    </ul>
+    <div class="allsub">
+        <p>已创建所有学科错题本~</p>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        api.addEventListener({
+            name: 'removeError'
+        }, function (ret, err) {
+            vm.GetExercisesXklists();//移除线下错题成功执行
+        });
+        vm.GetExercisesXklists();
+        getUserInfo();
+        settingGetSchoolset();
+
+        var top = $('.noError').height();
+        $('.noError').css('top', api.frameHeight/2 - top/2);
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            subjects: [],
+            othersub: [],
+            schoolId:$api.getStorage('newSchoolId'),
+            closeWrong:true
+        },
+        methods: {
+            openAddSubject: function () {
+                api.openFrame({
+                    name: 'frame_add_subject',
+                    url: 'frame_add_subject.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: api.winWidth,
+                        h: api.winHeight
+                    },
+                    pageParam: {othersub: vm.othersub},
+                    bounces: false
+                });
+            },
+            subjectBackground: function (subject) {//学科背景颜色
+                switch (subject) {
+                    case '数学':
+                        return '#00ce61';
+                        break;
+                    case '语文':
+                        return '#10d1b4';
+                        break;
+                    case '物理':
+                        return '#11c7d1';
+                        break;
+                    case '化学':
+                        return '#01b2ee';
+                        break;
+                    case '生物':
+                        return '#ffb526';
+                        break;
+                    case '英语':
+                        return '#a08aff';
+                        break;
+                    case '地理':
+                        return '#ef768a';
+                        break;
+                    case '历史':
+                        return '#96c04c';
+                        break;
+                    case '政治':
+                        return '#cb72c8';
+                        break;
+                    case '思想政治':
+                        return '#cb72c8';
+                        break;
+                    case '道德与法治':
+                        return '#cb72c8';
+                        break;
+                    case '政治/道法':
+                        return '#cb72c8';
+                        break;
+                    default:
+                        return '#8f8ac3';
+                        break;
+                }
+            },
+            subjectBorder: function (subject) {//学科边框颜色
+                switch (subject) {
+                    case '数学':
+                        return '#00b554';
+                        break;
+                    case '语文':
+                        return '#0fb89e';
+                        break;
+                    case '物理':
+                        return '#10aab8';
+                        break;
+                    case '化学':
+                        return '#01a0d4';
+                        break;
+                    case '生物':
+                        return '#f09e00';
+                        break;
+                    case '英语':
+                        return '#8b70ff';
+                        break;
+                    case '地理':
+                        return '#d66376';
+                        break;
+                    case '历史':
+                        return '#96c04c';
+                        break;
+                    case '政治':
+                        return '#ad66ab';
+                        break;
+                    case '思想政治':
+                        return '#ad66ab';
+                        break;
+                    case '道德与法治':
+                        return '#ad66ab';
+                        break;
+                    case '政治/道法':
+                        return '#ad66ab';
+                        break;
+                    default:
+                        return '#7b76aa';
+                        break;
+                }
+            },
+            subjectImg: function (subject) {//学科图片
+                switch (subject) {
+                    case '数学':
+                        return 'math';
+                        break;
+                    case '语文':
+                        return 'chinese';
+                        break;
+                    case '物理':
+                        return 'physics';
+                        break;
+                    case '化学':
+                        return 'chemistry';
+                        break;
+                    case '生物':
+                        return 'biology';
+                        break;
+                    case '英语':
+                        return 'english';
+                        break;
+                    case '地理':
+                        return 'geography';
+                        break;
+                    case '历史':
+                        return 'history';
+                        break;
+                    case '政治':
+                        return 'politics';
+                        break;
+                    case '思想政治':
+                        return 'politics';
+                        break;
+                    case '道德与法治':
+                        return 'politics';
+                        break;
+                    case '政治/道法':
+                        return 'politics';
+                        break;
+                    case '艺术':
+                        return 'ys';
+                        break;
+                    case '社会':
+                        return 'shehui';
+                        break;
+                    case '探究性课程':
+                        return 'tjxkc';
+                        break;
+                    case '自然':
+                        return 'zr';
+                        break;
+                    case '生命科学':
+                        return 'smkx';
+                        break;
+                    case '信息技术':
+                    case '信息科技':
+                        return 'xxjs';
+                        break;
+                    default:
+                        return 'other';
+                        break;
+                }
+            },
+            openWin: function (context) {//打开
+                var xkid = $(context).attr('id');
+                var xkmc = $(context).attr('title');
+                api.openWin({
+                    name: 'win_error_list_pad',
+                    url: 'win_error_list_pad.html',
+                    pageParam: {
+                        xkid: xkid,
+                        xkmc: xkmc,
+                        closeWrong:vm.closeWrong
+                    }
+                });
+            },
+            GetExercisesXklists: function () {//获取错题本科目列表
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.ExercisesWrongs, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        schoolid: $api.getStorage('newSchoolId'),
+                        xd:$api.getStorage('stuXD'),
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            if (ret.data.subject.length == 0) {
+                                vm.othersub = ret.data.othersub;
+                            } else {
+                                vm.subjects = ret.data.subject;
+                                vm.othersub = ret.data.othersub;
+                            }
+                            if(vm.othersub.length <= 0){
+                                $('.allsub').css({'display': 'block'});
+                            }
+                            if(vm.subjects.length == 0){
+                                $('.noError').css('display','block');
+                            }
+                            else {
+                                $('.noError').css('display','none');
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    function getUserInfo() {
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+            values: {
+                uid: $api.getStorage('uid'),
+                identitytype: '3'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') {
+                    if (ret.data.length > 0) {
+                        $api.setStorage('errorxxxz', ret.data[0].xxxz);
+                        $api.setStorage('errorczxz', ret.data[0].czxz);
+                        $api.setStorage('errorgzxz', ret.data[0].gzxz);
+
+                    }
+                }
+            }
+        });
+    }
+    function settingGetSchoolset() {
+        apiObj.Get(UrlRouter.settingGetSchoolset, {
+            values: {
+                schoolid: $api.getStorage('schoolid'),
+                type: 'wrong_book'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') {
+                    if(ret.status == 1){
+                        vm.closeWrong = true;
+                    }else {
+                        vm.closeWrong = false;
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+</html>

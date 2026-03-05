@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>填空题</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/frameDetail.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/ErrorBookLeftBtn.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .tishi {
+            height: 26px;
+            line-height: 26px;
+            background: #fef2ee;
+            color: #f9987d;
+            padding: 0 15px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            margin-top: 8px;
+            width: calc(100% - 50px);
+            border-radius: 0;
+            margin-left: 25px;
+            margin-right: 25px;
+        }
+
+        .tishi img {
+            width: 13px;
+            height: 13px;
+            vertical-align: bottom;
+            margin-right: 8px;
+        }
+
+        .tkt_left {
+            height: calc(100% - 55px);
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding-top: 55px;
+            z-index: 1;
+            padding-left: 10px;
+            overflow: auto;
+            padding-right: 50px;
+            /*overflow-y: scroll;*/
+            /*overflow-x: auto;*/
+            /*padding-right: 6px;*/
+        }
+        .all_tkt_content{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="all_tkt_content" style="height: 100%;width: 100%" v-cloak>
+    <ul class="leftedit_btn">
+        <!-- <li id="leftedit_btn_checkanswer" tapmode onclick="vm.onCheckAnswerClick();"><img class="noImgClick"
+                                                                                          id="leftedit_btn_checkanswer_src"
+                                                                                          :src="viewAnswer?'../../../../image/check_answer_down.png':'../../../../image/check_answer_up.png'">
+        </li>   -->
+        <li id="leftedit_btn_AI" v-if="complete||viewAnswer" tapmode @click="PostAIBtn();">
+            <img class="noImgClick" id="leftedit_btn_remove_src" src="../../../../image/newhomework/aiBtn.png"></li>
+    </ul>
+
+
+    <!--不含手动批阅的样式-->
+    <div v-if="hasauto == 0" class="tkt_content" id="tkt_content" style="margin-left: 89px;width: calc(100% - 91px)">
+        <div class="tkt_top">
+            <ul>
+                <li class="tixing" v-text="'【'+txstr+'】'"></li>
+                <li v-if="complete||viewAnswer" class="zsd" @click="alertzsd(data.zsdmc)">
+                    <span>难易度：</span><img class="noImgClick"
+                                          :src="data.nyd==1?'../../../../image/newhomework/1xing.png':data.nyd==2?'../../../../image/newhomework/2xing.png':data.nyd==3?'../../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{data.zsdmc}}
+                </li>
+            </ul>
+        </div>
+        <div class="tkt_left" id="left" style="width: calc(60% - 40px)">
+            <div style="padding-left: 14px;" class="tg_content font666" style="padding-left: 10px;"
+                 v-html="data.tg"></div>
+        </div>
+        <div class="tkt_right clearfix" id="right" style="width: calc(40% + 37px)">
+            <div class="tkt_right_content">
+                <div class="huakuai" id="huakuai"></div>
+                <!--答题部分开始-->
+                <!--<dl class="tktda_content" v-if="isShow(data.is_auto,complete,viewAnswer)">-->
+                <dl class="tktda_content" v-if="isShow(data.is_auto,complete,viewAnswer)">
+                    <dd v-for="(list,index) in data.daoptions" class="clearfix tkt_auto">
+                        <span class="kong_list" v-text="'空'+(index+1)+'：'"></span>
+                        <input class="input-area" style="width: calc(100% - 67px);" type="text" :id="index" :group="list.group" :inputid="list.id">
+                    </dd>
+
+                    <div class="tijiao" v-if="!complete" tapmode onclick="vm.checkAnswer()">提交</div>
+                </dl>
+                <!--答题部分结束-->
+
+                <!--自动批阅填空题答案展示-->
+                <dl v-for="(answer ,index) in answerArr" v-if="complete || viewAnswer"
+                    class="tkt_answer bgFFF">
+                    <div class="tktdefen">
+                        <img v-if="answer.is_true != 0" class="noImgClick"
+                             :src="answer.is_true==1?'../../../../image/newhomework/zhengque.png':'../../../../image/newhomework/cuowu.png'">
+                        <span v-if="answer.is_true != 0" :style="answer.is_true==1?'color: #4bc7c7':'color: #df7605'"
+                              v-text="answer.is_true==1?'正确':'错误'"></span>
+                        <span v-if="answer.is_true==0" style="color: #ff778c">待批</span>
+                    </div>
+                    <dt v-text="'空'+(index+1)+'：'"></dt>
+                    <dd>
+                        <h2 class="tkth2">【我的答案】</h2>
+                        <ul class="clearfix wendawdda tkt_answer_left">
+                            <li style="font-size: 1.6rem">{{answer.answer}}</li>
+                        </ul>
+                    </dd>
+                    <dd class="tktzqda needpic">
+                        <h2 class="tkth2">【{{data.tx_tip}}】</h2>
+                        <ul class="tkt_answer_left">
+                            <li class="tktzi"
+                                v-html="data.daoptions[index].description_rep==''?'无':tihuan(data.daoptions[index].description_rep)"></li>
+                        </ul>
+                    </dd>
+                </dl>
+                <dd v-if="complete || viewAnswer" class="tktzqda needpic">
+                    <h2 class="tkth2">【答案解析】</h2>
+                    <ul class="tkt_answer_left">
+                        <li class="tktzi"
+                            v-html="data.dajx==''?'无':data.dajx"></li>
+                    </ul>
+                </dd>
+                <!--答案部分结束-->
+            </div>
+        </div>
+    </div>
+    <!--含手动批阅的样式-->
+    <div v-if="hasauto == 1" class="tkt_content" style="margin-left: 89px;width: calc(100% - 91px)">
+        <div class="tkt_top" style="width: calc(100% - 35px)">
+            <ul>
+                <li class="tixing" v-text="'【'+txstr+'】'"></li>
+                <li v-if="complete||viewAnswer" class="zsd" @click="alertzsd(data.zsdmc)">
+                    <span>难易度：</span><img class="noImgClick"
+                                          :src="data.nyd==1?'../../../../image/newhomework/1xing.png':data.nyd==2?'../../../../image/newhomework/2xing.png':data.nyd==3?'../../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{data.zsdmc}}
+                </li>
+            </ul>
+        </div>
+
+        <div class="tkt_left" style="width: calc(100% - 60px);">
+            <div class="tg_content font666" style="padding-left: 10px;width: calc(100% - 20px);" v-html="data.tg"></div>
+            <div v-if="viewAnswer">
+                <div class="tishi">
+                    <img src="../../../../image/newhomework/ts.png">手动批阅仅支持查看答案~
+                </div>
+                <dl v-for="(list ,index) in data.xsdaobj" class="tkt_answer bgFFF" style="width: calc(100% - 20px)">
+                    <div class="tktdefen">
+                        <img class="noImgClick" v-if="list.is_true!=0"
+                             :src="list.is_true==1?' ../../../../image/newhomework/zhengque.png':list.is_true==2?'../../../../image/newhomework/cuowu.png':list.is_true==3?'../../../../image/newhomework/bandui.png':''">
+                        <span v-if="list.is_true!=0"
+                              :style="list.is_true==1?'color: #4bc7c7':list.is_true==2?'color: #df7605':list.is_true==3?'color: #ffcd06':''"
+                              v-text="list.is_true==1?'正确':list.is_true==2?'错误':list.is_true==3?'正确率'+list.accuracy+'%':''"></span>
+                        <span v-if="list.is_true==0" style="color: #ff778c">待批</span>
+
+                    </div>
+                    <dt v-text="'空'+(index+1)+'：'"></dt>
+                    <dd>
+                        <h2 class="tkth2">【我的答案】</h2>
+                        <ul class="clearfix wendawdda tkt_answer_left">
+                            <li v-for="item in list.value" :class="item.is_txt==1?'tktzi':'tktanswer_img'">
+                                <div v-if="item.is_txt==1 || item.is_txt==0"
+                                     v-html="list.is_unable==1?'无':list.is_unable==0 && item.is_txt==0?item.thumbnail:item.descript"></div>
+                                <div v-if="item.is_txt==2 || item.is_txt==3" :url="item.serverpath+item.preview_link"
+                                     tapmode onclick="vm.videoZYPlay(this)" :filetime="item.filetime">
+                                    <img class="noImgClick"
+                                         :src="item.is_txt==3?'../../../../image/newhomework/shipin.jpg':'../../../../image/newhomework/yuyinimg.jpg'">
+                                </div>
+                            </li>
+                        </ul>
+                    </dd>
+                    <dd class="tktzqda">
+                        <h2 class="tkth2">【{{data.tx_tip}}】</h2>
+                        <ul class="tkt_answer_left">
+                            <li v-if="data.daoptions[index].is_auto == 1 " class="tktzi"
+                                v-html="data.daoptions[index].description_rep==''?'无':tihuan(data.daoptions[index].description_rep)"></li>
+                            <li v-else class="tktzi"
+                                v-html="data.daoptions[index].description_rep==''?'无':data.daoptions[index].description_rep"></li>
+                        </ul>
+                    </dd>
+                </dl>
+                <dd class="tktzqda">
+                    <h2 class="tkth2">【答案解析】</h2>
+                    <ul class="tkt_answer_left">
+                        <li class="tktzi"
+                            v-html="data.dajx==''?'无':data.dajx"></li>
+                    </ul>
+                </dd>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var moduleDialog = null;//弹窗模块bhzparam
+    apiready = function () {
+
+        vue();
+        vm.isdt = api.pageParam.isdt;
+        vm.totalCount = api.pageParam.totalCount;
+        vm.index = api.pageParam.index;
+
+        vm.current_page = api.pageParam.index;///////
+
+        vm.huakuai();
+        // document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchstart', function () {
+        //     document.getElementById('leftedit_btn_checkanswer_src').src = "../../../../image/check_answer_down.png";
+        // });
+        // document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchend', function () {
+        //     document.getElementById('leftedit_btn_checkanswer_src').src = "../../../../image/check_answer_up.png";
+        // });
+        vm.getExInfo();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.all_tkt_content',
+            data: {
+                current_page: 0,
+                isdt: 1,
+                important: 0,
+                index: 0,
+                totalCount: 0,
+                data: {},
+                tx_type: '',
+                answerArr: [],//答案数组
+                complete: 0,
+                viewAnswer: 0,//查看答案
+                viewAnswerArr: [],//查看答案的数组 学生做错习题时的答案信息
+                nowAnswerArr: [],//学生本次的答案
+                answerStr: '',//答案字符串
+                dastr: '',//习题正确答案
+                is_true: '',//本次答题是否正确
+                txstr: '',
+                hasauto: 0,//是否含有手动批阅的小题
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>确认移出错题本？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+                for (var i = 0; i < $api.domAll('a').length; i++) {
+                    $api.css($api.domAll('a')[i], 'color: #666;');
+                    $api.domAll('a')[i].onclick = function () {
+                        return false;
+                    }
+                }
+            },
+            methods: {
+                videoZYPlay: function (context) {
+                    var url = $api.attr(context, 'url');
+                    var filetime = $api.attr(context, 'filetime');
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: '',
+                            isMp3: false,
+                            filetime: filetime
+                        }
+                    });
+                },
+                isShow: function (is_auto, complete, viewAnswer) {
+                    var isShow = false;
+                    if (is_auto == 1) {
+                        if (!complete && !viewAnswer) {
+                            //alert(1)
+                            isShow = true;
+                        } else {
+                            //alert(2)
+                            isShow = false
+                        }
+                    }
+                    else {
+                        //alert(3)
+                    }
+                    return isShow;
+                },
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                tihuan: function (content) {
+                    return content.replace(/#/g, "<font color='#999'>或</font>");
+                },
+                checkAnswer: function () {//提交
+                    var inputAreaArr = $api.domAll('.input-area');//拿到dom元素
+                    for (var i = 0; i < inputAreaArr.length; i++) {
+                        if ($api.val(inputAreaArr[i]).length == 0) {
+                            api.toast({
+                                msg: '答案文本不允许为空',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                            return false;
+                        }
+                    }
+                    var myAnswerArr = [];
+                    var trueAnswerArr = [];
+                    for (var i = 0; i < inputAreaArr.length; i++) {
+                        myAnswerArr.push({
+                            'myanswer': vm.qj2bj($api.trim($api.val(inputAreaArr[i]))),
+                            'showanswer':$api.trim($api.val(inputAreaArr[i])),
+                            'group': $(inputAreaArr[i]).attr('group'),
+                            'inputid': $(inputAreaArr[i]).attr('inputid')
+                        });
+                        trueAnswerArr.push({
+                            'trueanswer': vm.data.daoptions[i].description,
+                            'group': vm.data.daoptions[i].group,
+                            'inputid': vm.data.daoptions[i].id
+                        });
+                    }//我的答案和对应input色值数组
+
+                    var groupArr = [];
+                    for (var i = 0; i < vm.data.daoptions.length; i++) {
+                        if (groupArr.indexOf(vm.data.daoptions[i].group) == -1) {//不包含
+                            groupArr.push(vm.data.daoptions[i].group);
+                        }
+                    }//标记颜色数组
+
+                    vm.answerArr = [];
+                    for (var i = 0; i < myAnswerArr.length; i++) {
+                        vm.answerArr.push({'answer': myAnswerArr[i].showanswer, 'is_true': 0});
+                    }
+
+
+                    for (var k = 0; k < groupArr.length; k++) {//循环标记颜色数组 groupArr.length
+                        for (var i = 0; i < myAnswerArr.length; i++) {
+                            var mygroup = myAnswerArr[i].group;
+                            var myinputid = myAnswerArr[i].inputid;
+                            var myanswer = myAnswerArr[i].myanswer;
+                            if (myanswer.indexOf('#') != -1) {
+                                myanswer = myanswer.split('#');
+                            }
+
+                            if (mygroup != '0') {
+                                if (mygroup == groupArr[k]) {
+                                    for (var j = 0; j < trueAnswerArr.length; j++) {
+                                        var trueAnswer = vm.qj2bj(trueAnswerArr[j].trueanswer);
+                                        var truegroup = trueAnswerArr[j].group;
+                                        //判断正确答案是否含有 '或'
+                                        if (trueAnswer.indexOf('#') != -1) {//包含或
+                                            trueAnswer = trueAnswer.split('#');
+                                            if (truegroup == mygroup) {
+                                                if (trueAnswer.indexOf(myanswer) != -1) {//包含
+                                                    vm.answerArr[i].is_true = '1';
+                                                    //break之前先从trueAnswerArr中删除这个答案
+                                                    trueAnswerArr.splice($.inArray(trueAnswerArr[j], trueAnswerArr), 1);
+                                                    break;
+                                                } else {
+                                                    vm.answerArr[i].is_true = '2';
+                                                }
+                                            }
+                                        } else {
+                                            if (truegroup == mygroup) {
+                                                if ($api.trimAll(myanswer) != $api.trimAll(trueAnswer)) {//不包含
+                                                    vm.answerArr[i].is_true = '2';
+                                                } else {
+                                                    vm.answerArr[i].is_true = '1';
+                                                    //break之前先从trueAnswerArr中删除这个答案
+                                                    trueAnswerArr.splice($.inArray(trueAnswerArr[j], trueAnswerArr), 1);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                //处理非无序填空
+                                for (var j = 0; j < trueAnswerArr.length; j++) {
+                                    var trueAnswer = vm.qj2bj(trueAnswerArr[j].trueanswer);
+                                    if (trueAnswer.indexOf('#') != -1) {//包含或
+                                        trueAnswer = trueAnswer.split('#');
+                                        if (myinputid == trueAnswerArr[j].inputid) {
+                                            if (trueAnswer.indexOf(myanswer) != -1) {
+                                                vm.answerArr[i].is_true = '1';
+                                            } else {
+                                                vm.answerArr[i].is_true = '2';
+                                            }
+                                            trueAnswerArr.splice($.inArray(trueAnswerArr[j], trueAnswerArr), 1);
+                                            break;
+                                        }
+                                    }
+                                    else {
+                                        if (myinputid == trueAnswerArr[j].inputid) {
+                                            if ($api.trimAll(myanswer) == $api.trimAll(trueAnswer)) {
+                                                vm.answerArr[i].is_true = '1';
+                                            } else {
+                                                vm.answerArr[i].is_true = '2';
+                                            }
+                                            trueAnswerArr.splice($.inArray(trueAnswerArr[j], trueAnswerArr), 1);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    vm.complete = 1;
+                    var dataInfo = $api.jsonToStr({
+                        sxdaStr: vm.answerArr
+                    });
+                    //打开数据库
+                    var db = api.require('db');
+                    var retDatabaseSync = db.openDatabaseSync({
+                        name: dbName,
+                        path: 'fs://student_12xue.db'
+                    });
+                    var INSERTret = db.executeSqlSync({//插入一条数据
+                        name: dbName,
+                        sql: "INSERT INTO NewErrorBooKData(uid,sys_id,answerStr) VALUES (" + $api.getStorage('uid') + "," + vm.data.sys_id + ",'" + dataInfo.replace(/'/g, '&apos;') + "')"
+                    });
+                },
+                onMakePointClick: function () {
+                    apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                        body: $api.jsonToStr({
+                            uid: $api.getStorage('uid'),
+                            type: 'is_important',
+                            sys_id: vm.data.sys_id,
+                            kc_type: vm.data.kc_type,
+                            is_important: vm.important == 1 ? 0 : 1
+                        })
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                if (vm.important === 0) {
+                                    vm.important = 1;
+                                } else {
+                                    vm.important = 0;
+                                }
+                                api.sendEvent({
+                                    name: 'editImp',
+                                    extra: {}
+                                });
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                onCheckAnswerClick: function () {//查看答案
+                    vm.viewAnswer = !vm.viewAnswer;
+                    vm.answerArr = [];
+                    //vm.answerArr = vm.viewAnswerArr;
+                    for (var i = 0; i < vm.viewAnswerArr.length; i++) {
+                        vm.answerArr.push(vm.viewAnswerArr[i]);
+                    }
+                    if (vm.viewAnswer) {
+                        vm.complete = 0;
+                    }
+                },
+                onRemoveFromErrNoteClick: function () {
+                    moduleDialog = api.require('moduleDialog');
+                    moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'ok') {
+                                apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                                    body: $api.jsonToStr({
+                                        uid: $api.getStorage('uid'),
+                                        type: 'outbook',
+                                        sys_id: vm.data.sys_id,
+                                        kc_type: vm.data.kc_type,
+                                    })
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.ret == 0) {
+                                            //在这处理删除第一题，最后一题以及总题数是否为0
+                                            vm.totalCount = vm.totalCount - 1;
+
+                                            if (vm.totalCount == 0) {
+                                                api.closeWin();
+                                            }
+                                            else {
+                                                api.sendEvent({
+                                                    name: 'onTopIndexChange',
+                                                    extra: {index: vm.current_page},
+                                                });
+                                            }
+                                            api.sendEvent({
+                                                name: 'removeError',
+                                                extra: {}
+                                            });//刷新错题列表的frame数据
+
+                                        } else {
+                                            api.toast({
+                                                msg: ret.msg,
+                                                duration: 2000,
+                                                location: 'bottom'
+                                            });
+                                        }
+                                    } else {
+                                        api.toast({
+                                            msg: err.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                    }
+                                });
+                                dismissDialog();
+                            } else {
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+
+                    });
+                },
+                qj2bj: function (s) {
+                    /*正则转换中文标点*/
+                    s = s.replace(/：/g, ':');
+                    s = s.replace(/＃/g, '#');
+                    s = s.replace(/。/g, '.');
+                    s = s.replace(/“/g, '"');
+                    s = s.replace(/”/g, '"');
+                    s = s.replace(/【/g, '[');
+                    s = s.replace(/】/g, ']');
+                    s = s.replace(/《/g, '<');
+                    s = s.replace(/》/g, '>');
+                    s = s.replace(/〈/g, '<');
+                    s = s.replace(/〉/g, '>');
+                    s = s.replace(/‹/g, '<');
+                    s = s.replace(/›/g, '>');
+                    s = s.replace(/，/g, ',');
+                    s = s.replace(/？/g, '?');
+                    s = s.replace(/！/g, '!');
+                    s = s.replace(/、/g, ',');
+                    s = s.replace(/；/g, ';');
+                    s = s.replace(/（/g, '(');
+                    s = s.replace(/）/g, ')');
+                    s = s.replace(/‘/g, "'");
+                    s = s.replace(/’/g, "'");
+                    s = s.replace(/『/g, "[");
+                    s = s.replace(/』/g, "]");
+                    s = s.replace(/「/g, "[");
+                    s = s.replace(/」/g, "]");
+                    s = s.replace(/﹃/g, "[");
+                    s = s.replace(/﹄/g, "]");
+                    s = s.replace(/〔/g, "{");
+                    s = s.replace(/〕/g, "}");
+                    s = s.replace(/—/g, "-");
+                    s = s.replace(/·/g, ".");
+                    s = s.replace(/&lt;/g, '<');
+                    s = s.replace(/&lt;/g, '<');
+                    s = s.replace(/&gt;/g, '>');
+                    s = s.replace(/&nbsp;/g, " ");
+                    s = s.replace(/′/g, "'");
+                    s = s.replace(/&apos;/g, "'");
+                    s = s.replace(/&quot;/g, '"');
+                    s = s.replace(/&amp;/g, "&");
+                    s = s.replace(/[\r\n]/g, "");
+                    s = s.replace(/×/g, "*");
+                    s = s.replace(/x/g, "*");
+                    s = s.replace(/ｘ/g, "*");
+                    s = s.replace(/\u200B/gi, '').replace(/\u200b/gi, '');
+                    /*正则转换全角为半角*/
+                    //字符串先转化成数组
+                    s = s.split("");
+                    for (var i = 0; i < s.length; i++) {
+                        //全角空格处理
+                        if (s[i].charCodeAt(0) === 12288) {
+                            s[i] = String.fromCharCode(32);
+                        }
+                        /*其他全角*/
+                        if (s[i].charCodeAt(0) > 0xFF00 && s[i].charCodeAt(0) < 0xFFEF) {
+                            s[i] = String.fromCharCode(s[i].charCodeAt(0) - 65248);
+                        }
+                    }
+                    //数组转换成字符串
+                    s = s.join("");
+                    return s;
+                },
+                getExInfo: function () {
+                    vm.data = api.pageParam.material;
+                    vm.tx_type = vm.data.tx;
+                    vm.txstr = vm.data.txstr;
+                    vm.important = vm.data.is_important;
+                    vm.dastr = vm.data.dastr;
+                    vm.xsdastr = vm.data.is_unable ==1 ? '无' : vm.data.xsdastr;
+                    vm.is_true = vm.data.is_true;
+                    // for (var i = 0; i < vm.data.xsdaobj.length; i++) {
+                    //     var answerObj = {};
+                    //     answerObj = {
+                    //         'answer': vm.data.xsdaobj[i].value[0].is_unable == 1? '无':vm.data.xsdaobj[i].value[0].descript,
+                    //         'is_true': vm.data.xsdaobj[i].value[0].is_true
+                    //     };
+                    //     vm.viewAnswerArr.push(answerObj);
+                    // }
+                    //  //判断是否含有手动批阅
+                    // if (vm.data.is_auto == 0) {//手动
+                    //             vm.hasauto = 1;
+                    // } else {
+                    //     for (var i = 0; i < vm.data.xsdaobj.length; i++) {
+                    //         if (vm.data.xsdaobj[i].is_auto == 0) {
+                    //             vm.hasauto = 1;
+                    //             break;
+                    //         }
+                    //     }
+                    // }
+                    $('.all_tkt_content').css('display','block');
+                },
+                huakuai: function () {
+                    var tktcontent = document.getElementById('tkt_content'); //长线条
+                    var right = document.getElementById('right'); //小方块
+                    var left = document.getElementById('left');
+                    var huakuai = document.getElementById('huakuai');
+                    var ifBool = false; //判断鼠标是否按下
+                    //鼠标按下方块
+                    huakuai.addEventListener("touchstart", function (e) {
+                        e.stopPropagation();
+                        ifBool = true;
+                    });
+                    //拖动
+                    window.addEventListener("touchmove", function (e) {
+                        if (ifBool) {
+                            var x = e.touches[0].pageX || e.touches[0].clientX; //鼠标横坐标var x
+                            var lineDiv_left = getPosition(tktcontent).left; //长线条的横坐标
+                            var minDiv_left = x - lineDiv_left; //小方块相对于父元素（长线条）的left值
+                            if (minDiv_left >= tktcontent.offsetWidth - 15) {
+                                minDiv_left = tktcontent.offsetWidth - 15;
+                            }
+                            //设置拖动后小方块的left值
+                            var rightwidth;
+                            var leftwidth;
+
+                            var realWith = $(window).width() - 89;
+                            if ((realWith - minDiv_left) > (realWith * 0.7 + 37)) {
+                                rightwidth = realWith * 0.7 + 37;
+                                leftwidth = realWith * 0.3 - 40;
+                            } else if ((realWith - minDiv_left) < (realWith * 0.4 + 37)) {
+                                rightwidth = realWith * 0.4 + 37;
+                                leftwidth = realWith * 0.6 - 40;
+                            } else {
+                                rightwidth = realWith - minDiv_left;
+                                leftwidth = minDiv_left
+                            }
+
+                            right.style.width = rightwidth + "px";
+                            left.style.width = leftwidth + "px";
+                        }
+                    });
+                    //鼠标松开
+                    window.addEventListener("touchend", function (e) {
+                        ifBool = false;
+                    });
+
+                    //获取元素的绝对位置
+                    function getPosition(node) {
+                        var left = node.offsetLeft; //获取元素相对于其父元素的left值var left
+                        var top = node.offsetTop;
+                        current = node.offsetParent; // 取得元素的offsetParent
+                        // 一直循环直到根元素
+                        while (current != null) {
+                            left += current.offsetLeft;
+                            top += current.offsetTop;
+                            current = current.offsetParent;
+                        }
+                        return {
+                            "left": left,
+                            "top": top
+                        };
+                    }
+
+                },
+                PostAIBtn: async function () {
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostPayfeeOperationLog, {
+                            body: $api.jsonToStr({
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_analysis',
+                                resource_id: vm.data.xtid,
+                                count: aiAnalysis.count,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                ...(aiAnalysis.card_id !== undefined && {card_id: aiAnalysis.card_id}),
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                resolve(ret);
+                            } else {
+                                reject(err);
+                            }
+                        })
+                    });
+                    if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber')|| ret.ret === -1) {
+                        if ($api.getStorage('upgradeQRCode') === '1') {
+                            api.toast({
+                                msg: '本月剩余AI解析次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../../frame-number-exhausted.html',
+                            })
+                        }
+                        return
+                    }
+                    if(ret.ret === 0 && ret.data === ''){
+                        api.execScript({
+                            name: 'win_bst.html',
+                            script: 'postAiAnalysis()'
+                        });
+                    }
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const tgContent = document.querySelector('.tg_content');
+                    const needPics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...needPics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            // 保存图片到相册    
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            // 当所有图片都处理完成时
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../../newHomework/frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.data.xtid,
+                                        imagePaths: imageUrls
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                },
+            }
+        });
+    }
+
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+
+    function onTopIndexChanged(index) {
+        api.sendEvent({
+            name: 'onTopIndexChange',
+            extra: {index: index},
+        });
+    }
+
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+</script>
+</html>

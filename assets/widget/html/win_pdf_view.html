@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>pdf</title>
+    <link rel="stylesheet" type="text/css" href="../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/winDetailCss.css"/>
+    <style>
+    </style>
+</head>
+<body>
+<header class="clearfix">
+    <div tapmode onclick="closeWin();" class="winTitle pull_left overflow">文档详情</div>
+</header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var headerH;
+    var frameH;
+    var pdfReader;
+    apiready = function () {
+        var header = document.querySelector('header');
+        //$api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        headerH = $api.offset(header).h;
+        frameH = api.winHeight - headerH;
+        pdfReader = api.require('pdfReader');
+        pdfReader.openView({
+            rect:{
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            path:api.pageParam.path,
+            fixed:true
+        },function(ret){
+        });
+    };
+
+    function closeWin() {
+        pdfReader.closeView();
+        api.closeWin();
+    }
+
+</script>
+</html>

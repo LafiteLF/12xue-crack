@@ -1,0 +1,630 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8 ">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css" />
+    <style>
+        /*.bt{ text-align: left;display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width: 100%}*/
+        body {
+            background: #fff;
+        }
+
+        .mima {
+            width: 48px;
+            height: 25px;
+            position: absolute;
+            top: 16px;
+            right: 10px;
+            margin-right: 0.5rem;
+        }
+
+        .wjmm {
+            width: calc(100% - 1.5rem);
+            font-size: 0.8rem;
+            color: #999;
+            margin: 0 auto;
+            padding-top: 10px;
+        }
+
+        .footer {
+            position: fixed !important;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            bottom: 0.6rem;
+            text-align: center;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .footer>span {
+            color: #585858;
+            background-image: url("../../image/lxkf.png");
+            background-repeat: no-repeat;
+            background-size: contain;
+            padding-left: 1rem;
+            font-size: 15px;
+        }
+
+        .aui-list .aui-list-item:after {
+            height: 0px;
+        }
+
+        .aui-list-item-inner {
+            border-bottom: 1px solid #d5d5d5
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"] {
+
+            -webkit-appearance: none;
+
+        }
+
+        textarea {
+            -webkit-appearance: none;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 0px 30px 0px;
+        }
+
+        .aui-list .aui-list-item-input {
+            padding-left: 30px !important;
+        }
+
+        .tubiao {
+            width: 28px;
+            display: block;
+            left: 0px;
+            bottom: 7px;
+            position: absolute
+        }
+
+        .aui-switch {
+            border: 1px solid #ceebeb;
+            background-color: #ceebeb;
+        }
+
+        .aui-btn-block {
+            display: block;
+            width: 100%;
+            padding: 0.6rem 0;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        button,
+        .aui-btn {
+            background: #4bc7c7;
+            color: #c2e9e9
+        }
+
+        .aui-switch:checked {
+            border-color: #4bc7c7;
+            background-color: #4bc7c7;
+        }
+
+        .clear {
+            width: 25px;
+            position: absolute;
+            right: 0.55rem;
+            top: 21px;
+            display: none
+        }
+
+        .bottom {
+            text-align: center;
+            /*position: absolute;*/
+            width: 100%;
+        }
+
+        .bottom span {
+            display: inline-block;
+            margin-bottom: 3px;
+            color: #bbbbbb;
+            font-size: 0.7rem;
+        }
+
+        .aui-btn:active {
+            color: #212121;
+            background-color: #16bebe;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="position: relative; height: 100%; width: 100%">
+        <div class="logo"><img src="../../image/about12xue.png" width="200"></div>
+        <div class="aui-content aui-margin-b-15" style="padding-bottom: 10px">
+            <ul class="aui-list aui-form-list ">
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner">
+                        <span class="tubiao"><img src="../../image/stuHomePad/zhanghao.png" width="100%"></span>
+                        <div class="aui-list-item-input">
+                            <input type="text" placeholder="帐号" id="user" oninput='login()' style=" height: 56px;">
+                            <div class="clear" onclick='clearzhanghao()'><img src="../../image/stuHomePad/qingkong.png"
+                                    width="100%"></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="aui-list-item">
+                    <div class="aui-list-item-inner">
+                        <span class="tubiao"><img src="../../image/stuHomePad/mima.png" width="100%"></span>
+                        <div class="aui-list-item-input">
+                            <input type="password" placeholder="密码" id="dlpassword" oninput='login()'
+                                style=" height: 56px;">
+
+                            <div class="mima"><input type="checkbox" class="aui-switch" id="ShowHide"></div>
+
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <p style="width: calc(100% - 1.5rem); margin: 15px auto;">
+            <input type="button" style="color:rgba(255, 255, 255, 0.6)" value="登录" disabled="disabled"
+                class="aui-btn aui-btn-block" id="denglu" tapmode onclick='getMacAdress()'>
+        </p>
+        <div class="wjmm">
+            <span tapmode onclick='changjianwenti()'>常见问题？</span>
+            <span style="float:right;" tapmode onclick='wangjimima()'>忘记密码?</span>
+        </div>
+        <div class="bottom">
+            <img src="../../image/stuHomePad/kefu.png"
+                style="vertical-align: bottom; margin-right: 20px; width: 30px"><span>客服电话:</span><span class="spanTel"
+                id="spanTel">400-690-8887</span><span>(8:00-22:00)</span>
+            <p style="padding-top: 10px;color: #bbbbbb">
+                <input onclick="xuanzhongxieyi()" style="width: 0.9rem;height: 0.9rem" class="aui-checkbox"
+                    type="checkbox" name="demo1">
+                <span>已阅读并同意12xue学生</span>
+                <span style="text-decoration: underline;color: #4bc7c7" tapmode
+                    onclick="openUserAgreement()">用户协议</span>
+                和
+                <span style="text-decoration: underline;color: #4bc7c7" tapmode onclick="openUserPolicy()">用户隐私政策</span>
+            </p>
+        </div>
+    </div>
+
+
+    
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/md5.min.js"></script>
+<script type="text/javascript" src="../../script/login/login.js"></script>
+<script>
+    var online = false;
+    var deviceType = '';
+    var xieyi = false;
+    apiready = function () {
+
+        var account;
+        var psw = $api.getStorage("psw");
+        if ($api.getStorage('deviceModel') == 1) {
+            account = '';
+        } else {
+            account = $api.getStorage("account");
+            $('#dlpassword').val(psw);
+        }
+        try {
+            if (account.length > 2 && psw.length > 2) {
+                $('#user').val(account);
+                login();
+            }
+        } catch (e) {
+        }
+        deviceType = $api.getStorage('padType') == '3' ? 'hangzhi' : '';
+        api.addEventListener({
+            name: 'MacAdress'
+        }, function (ret, err) {
+            $api.setStorage('macAdress', ret.value.adress);
+            userlogin();
+        });
+        if ($api.getStorage('deviceModel') == 1) {
+            api.addEventListener({
+                name: 'autoLogin'
+            }, function (ret, err) {
+                $api.setStorage('macAdress', ret.value.macAdress);
+                var account = ret.value.account;
+                var psw = ret.value.psw;
+                AutoLogin(account, psw);
+            });
+
+            api.sendEvent({
+                name: 'getAccount'
+            });
+        } else {
+            var connectionType = api.connectionType.toLowerCase();
+            if (api.systemType == 'android') {
+                if ($api.getStorage('isLogin') == "true" && connectionType != 'none') {
+                    if (account != null && psw != null) {
+                        AutoLogin(account, psw);
+                    }
+                }
+            } else {
+                if ($api.getStorage('isLogin') == "true" && connectionType != 'none') {
+                    if (account != null && psw != null) {
+                        AutoLogin(account, psw);
+                    }
+                }
+            }
+        }
+        $api.css($api.dom('.bottom'), 'top:' + api.frameHeight * 0.85 + 'px;'); //适配不同的pad
+        api.addEventListener({
+            name: 'openIndexCheck'
+        }, function (ret, err) {
+            api.openFrame({
+                name: 'frame_index_check',
+                url: '../frame_index_check.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth,
+                    h: api.winHeight
+                },
+                bounces: false
+            });
+        });
+
+
+        /*
+         * 设置切换线路
+         * */
+        api.addEventListener({
+            name: 'resetLoginUrl'
+        }, function (ret, err) {
+            apiObj = new GridOpenApi(urlArr[ret.value.index], source, version);
+        });
+
+       
+        if($api.getStorage("padType")==='2'){
+            const  once= $api.getStorage("openOnce");
+            if (once===undefined || once===false){
+               $api.setStorage("openOnce",true);
+                getPermission();
+            }
+        }
+        else{
+            getPermission();
+        }
+        
+
+    };
+    $(function () {//密码显示隐藏
+        $("#ShowHide").click(function () {
+            if ($("#ShowHide").is(":checked")) {
+                $('#dlpassword').attr('type', 'text');
+            } else {
+                $('#dlpassword').attr('type', 'password');
+            }
+        });
+    });
+
+    function login() {//登录按钮变色
+        if ($('#user').val() != "") {
+            $('.clear').show();
+        } else {
+            $('.clear').hide();
+        }
+        if ($('#user').val() != "" && $('#dlpassword').val() != "") {
+            $('#denglu').css('color', '#fff').removeAttr("disabled");
+        } else {
+            $('#denglu').css('color', '#c2e9e9').attr("disabled", "disabled");
+        }
+    }
+
+    function getMacAdress() {
+        if (api.systemType == 'android') {
+            api.addEventListener({
+                name: 'MacAdress'
+            }, function (ret, err) {
+                $api.setStorage('macAdress', ret.value.adress);
+                userlogin();
+            });
+            //点击登录，先获取MAC地址
+            api.sendEvent({
+                name: 'getMacAdress'
+            });
+            userlogin();
+
+        } else {
+
+            userlogin();
+        }
+
+    }
+
+    var loginClick = true;
+
+    function userlogin() {//登录
+        if (loginClick) {
+
+            if (!xieyi) {
+                api.toast({
+                    msg: '请先阅读并同意协议内容与隐私政策',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+                return;
+            }
+
+            loginClick = false;
+            var user = $('#user').val();
+            var dlpassword = $.trim($('#dlpassword').val());
+            $api.setStorage('user', user);
+            $api.setStorage('dlpassword', dlpassword);
+            PostUserlogin(user, dlpassword, '');//用户登录
+            setTimeout("loginClick = true", 1000);
+        }
+
+    }
+
+    function changjianwenti() {//常见问题
+        api.openWin({
+            name: 'questions_win',
+            url: '../mine/question/questions_win.html',
+            pageParam: { road: 'weidenglu' }
+        });
+
+    }
+
+    function wangjimima() {//忘记密码
+        api.toast({
+            msg: '可联系班主任重置密码，可通过12xue家长APP重置密码',
+            duration: 3000,
+            location: 'bottom'
+        });
+        //        api.openWin({
+        //            name: 'win-forget-account',
+        //            url: 'win-forget-account.html'
+        //        });
+
+    }
+
+
+    function clearzhanghao() {
+        $('#user').val('');
+        $('.clear').hide();
+    }
+
+    //点击联系客服
+    function openLxkf() {
+        api.openFrame({
+            name: 'frame-contact-service',
+            url: '../frame-contact-service.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            bounces: false
+        });
+    }
+
+    function postDeviceReport(uid) {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Post(UrlRouter.PostDeviceReport, {
+            values: {
+                uid: uid,
+                mac_addr: '',
+                // serial_number: api.systemType == 'ios' ? api.deviceId : '',
+                serial_number: '',
+                device_type: deviceType
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data == 0) { //清理缓存的标志
+                        //创建打开数据库
+                        var db = api.require('db');
+                        var ret = db.openDatabaseSync({
+                            name: dbName,
+                            path: 'fs://student_12xue.db'
+                        });
+                        var truncatedb = db.executeSqlSync({
+                            name: dbName,
+                            sql: 'delete from IntelligenceAnswer '
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    function AutoLogin(account, psw) {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Post(UrlRouter.PostUserlogin, {
+            values: {
+                account: base64encode(account),
+                password: md5(psw),
+                client_id: '12xue_stu',
+                client_secret: 'a6c36548b3a7c78ef5d912e1d1a1bdce',
+                is_pad: '1',
+                mac_addr: $api.getStorage('macAdress'),
+                decrypt: 'md5_1',
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    $api.setStorage('isLogin', 'true');
+                    $api.setStorage('token', ret.access_token);
+                    $api.setStorage('refresh_token', ret.refresh_token);
+                    $api.setStorage('uid', ret.uid);
+                    $api.setStorage('openScanner', '1');
+                    $api.setStorage('sex', ret.sex);
+                    $api.setStorage('realname', ret.realname);
+                    $api.setStorage('account', ret.username);
+                    $api.setStorage('username', ret.username);
+                    $api.setStorage('psw', psw);
+
+                    //判断token有效期使用
+                    $api.setStorage('expires_in', parseInt(new Date().getTime() / 1000));
+
+                    //杭智管控判断强制绑定
+                    if ($api.getStorage('padType') == '3' && ret.pad_allow_login == 0) {
+                        checkAllowLogin();
+                    } else {
+                        GetStudentAuditNotify();
+                        postDeviceReport(ret.uid);
+                        api.openWin({
+                            name: 'win-stu-main',
+                            url: '../win-stu-main.html',
+                            slidBackEnabled: false,
+                            pageParam: { sex: ret.sex }
+                        });
+                    }
+
+                } else {
+
+                    //领创  发送广播
+                    if ($api.getStorage('deviceModel') == 1) {
+                        api.sendEvent({
+                            name: 'closeToLispirer'
+                        });
+                    }
+
+                    $api.setStorage('isLogin', 'false');
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+
+                //领创  发送广播
+                if ($api.getStorage('deviceModel') == 1) {
+                    api.sendEvent({
+                        name: 'closeToLispirer'
+                    });
+                }
+
+                $api.setStorage('isLogin', 'false');
+                api.toast({
+                    msg: '当前网络不可用，请检查网络设置',
+                    duration: 3000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+
+    function getPhone() {
+        apiObj.Get(UrlRouter.KfInfo, {
+            value: {}
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    $api.text($api.byId('spanTel'), ret.data.phone);
+                }
+            }
+        });
+    }
+
+    function openUserAgreement() {
+        api.openWin({
+            name: 'win-user-agreement',
+            url: '../win-user-agreement.html',
+            pageParam: {}
+        });
+    }
+
+    function openUserPolicy() {
+        api.openWin({
+            name: 'win-privacy-policise',
+            url: '../win-privacy-policise.html',
+            pageParam: {}
+        });
+    }
+
+    function xuanzhongxieyi() {
+        xieyi = !xieyi;
+    }
+
+    function getPermission() {
+
+        if (api.systemType == 'ios') {
+        // 如果是iOS设备，则不执行任何权限请求的逻辑
+        return;
+    }
+
+
+        // 1. 定义一个包含所有需要权限的数组
+        var permissions = ['camera', 'microphone', 'storage']; // 例如：相机、麦克风、存储
+        // 2. 检查这些权限的状态
+        var resultList = api.hasPermission({
+            list: permissions
+        });
+
+        // 3. 使用 Array.prototype.every 检查是否所有权限都已授予
+        // every() 方法测试一个数组内的所有元素是否都能通过某个指定函数的测试。它返回一个布尔值。
+        var allGranted = resultList.every(function (permission) {
+            return permission.granted;
+        });
+
+        if (allGranted) {
+            // 所有权限都已授权，可以继续下一步操作
+            // api.alert({
+            //     msg: '所需权限均已授权'
+            // });
+        } else {
+            // 至少有一个权限未被授予，提示用户
+            api.confirm({
+                title: '授权请求',
+                msg: '应用需要您的相机、麦克风和存储权限才能正常工作。相机权限用于拍照以及扫码，麦克风权限用于音频录制，存储权限用于用户数据的保存', // 修改提示信息
+                buttons: ['取消', '去设置'],
+                
+
+            }, function (ret) {
+                if (ret.buttonIndex == 2) {
+                    // 4. 请求整个权限列表
+                    api.requestPermission({
+                        list: permissions,
+                    }, function (res) {
+                       
+                        // 5. 再次检查返回的结果，确保所有请求的权限都被授予
+                        var allRequestGranted = res.list.every(function (permission) {
+                            return permission.granted;
+                        });
+
+                        if (allRequestGranted) {
+                            // 所有请求的权限都已授权，可以继续下一步操作
+                            api.alert({
+                                msg: '授权成功'
+                            });
+                        } else {
+                            // 用户在设置中没有授予全部权限
+                            api.alert({
+                                msg: '您有部分权限未授予，可能影响应用部分功能的使用'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+</script>
+
+</html>

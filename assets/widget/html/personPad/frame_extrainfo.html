@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <style>
+        html{background: rgba(0, 0, 0, 0)
+        }
+        body{ background: rgba(0, 0, 0, 0.56);
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+        .content{
+            width: 240px;
+            height: 298px;
+            background: url('../../image/book2.png') no-repeat  ;
+            background-size: 100% 100%;
+            position: absolute;
+            left:calc(50% - 120px);
+            top:calc(50% - 149px)
+        }
+        .content h2{ font-size:21px; color: #fff; text-align: center; padding: 20px 0 8px 0; width: 90%; margin: 0 auto ;overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;}
+        .content p{ font-size: 14px; color: #fff; text-align: center;overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap; width: 90%; margin: 0 auto; padding: 5px 0px;}
+
+
+    </style>
+</head>
+<body >
+<div class="content" onclick="closeframe()">
+    <h2 class="title1">物理（高一）</h2>
+    <p class="title2">鲁教版鲁教版鲁教版鲁教版鲁教版鲁教版鲁教版</p>
+    <p class="title3">上册上册上册上册上册上上册上册上册册上册</p>
+    <p class="title4">泛在物理泛在物理泛在物理泛在物理泛在物理泛在物理</p>
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script>
+
+
+    apiready = function () {
+        var wenzi = api.pageParam.extra;
+        var data = wenzi.split(' ');
+        $api.text($api.dom('.title1'), data[0]+'('+data[2]+')');
+        $api.text($api.dom('.title2'), data[3]);
+        $api.text($api.dom('.title3'), data[4]);
+        $api.text($api.dom('.title4'), data[1]);
+    };
+
+    function closeframe() {
+        api.closeFrame({
+            name: 'frame_extrainfo'
+        });
+    }
+
+
+</script>
+</html>

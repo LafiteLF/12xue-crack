@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MiSDKAppID</key>
+	<string>2882303761517606982</string>
+	<key>MiSDKAppKey</key>
+	<string>5901760613982</string>
+	<key>MiSDKRun</key>
+	<string>Debug</string>
+	<key>CFBundleURLSchemes</key>
+	<array>
+	       <string>gridinfo</string>
+	       <string>gridinfo-callback</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 头部设置：编码、视口、标题等，略 -->
+    <title>首页</title>
+    <!-- 引入样式表 -->
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <!-- ... 其他样式 ... -->
+    <style>
+        /* 这里是 CSS 样式，定义了 9 个宫格按钮的布局、背景图、文字位置等 */
+        /* 比如 .content ul li:nth-of-type(1) 对应第一个按钮（系统设置）的样式 */
+        /* ... 样式代码略 ... */
+    </style>
+</head>
+<body>
+<!-- Vue 挂载点，v-cloak 防止页面加载时闪烁 -->
+<div class="content" v-cloak>
+    <ul>
+        <!-- 
+          循环生成 9 个按钮 (li) 
+          listindex: 索引 0 到 8
+          onclick="vm.openFrame(this)": 点击时调用下面的 openFrame 函数，传入当前按钮元素
+        -->
+        <li v-for="(list1,listindex) in 9" :id="listindex" tapmode onclick="vm.openFrame(this)">
+            <div class="list">
+                <!-- 按钮内部结构，背景图在 CSS 里定义 -->
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+
+<!-- 引入 JS 库：APICloud原生桥接、路由、SDK、jQuery、Vue -->
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+
+<script>
+    // --- 全局变量 ---
+    var isReady = false; // 标记页面是否加载完成
+    var isOpen = false;
+    // 初始化 API 对象 (UrlDomain, source, version 应该在其他文件中定义)
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+
+    // APICloud 窗口加载完成后执行
+    apiready = function () {
+        setTimeout("isReady = true;", 500); // 0.5秒后允许点击
+        getSettingSwitch(); // 【关键】获取服务器权限配置
+    };
+
+    // Vue 实例
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            photoHeight: ''
+        },
+        methods: {
+            // 【核心函数】处理点击事件
+            openFrame: function (context) {
+                if (!isReady) return; // 如果没准备好，直接返回
+
+                var index = $(context).attr('id'); // 获取点击的是第几个按钮 (0-8)
+                var packageName; // 用于存放要打开的安卓包名
+
+                switch (index) {
+                    // ================= 案例 0: 系统设置 =================
+                    case '0': // 系统设置
+                        // 第一层判断：检查平板类型 (padType)
+                        if ($api.getStorage('padType') != '3') {
+                            // 🔴 第二层判断 (权限锁): 检查 newValue.item1 是否为 1
+                            if (newValue.item1 == 1) {
+                                packageName = 'com.android.settings'; // 设置包名
+                                openPackage(packageName); // 执行打开
+                            } else {
+                                // ❌ 权限不足，弹窗提示
+                                api.toast({
+                                    msg: '暂无权限打开此应用',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        }
+                        break;
+
+                    // ================= 案例 1: 音乐 =================
+                    case '1': // 音乐
+                        // 🔴 权限锁: 检查 newValue.item2
+                        if (newValue.item2 == 1) {
+                            // 根据设备型号决定打开哪个音乐播放器
+                            if (api.deviceModel == 'KOB2-W09HN' || /* ...更多型号... */) {
+                                packageName = 'com.huawei.music';
+                            } else {
+                                packageName = 'com.android.music';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+
+                    // ================= 案例 2: 下载管理器 (你的目标!) =================
+                    case '2': // 下载
+                        // 🔴 权限锁: 检查 newValue.item3
+                        // 如果服务器返回 item3: 0，这里就会进 else，提示无权限
+                        if (newValue.item3 == 1) {
+                            packageName = 'com.android.providers.downloads.ui'; // 下载管理器包名
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+
+                    // ================= 案例 3: 计算器 =================
+                    case '3': // 计算器
+                        if (newValue.item4 == 1) {
+                            // 根据型号选择计算器包名
+                            if (api.deviceModel == 'BZD-W00' /* ... */) {
+                                packageName = 'com.huawei.calculator';
+                            } else if (api.deviceModel == 'KOB2-W09HN' /* ... */) {
+                                packageName = 'com.hihonor.calculator';
+                            } else {
+                                packageName = 'com.android.calculator2';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+
+                    // ================= 案例 4: 电子邮件 =================
+                    case '4': 
+                        if (newValue.item5 == 1) {
+                            packageName = 'com.android.email';
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+
+                    // ================= 案例 5: 相机 =================
+                    case '5': 
+                        if (newValue.item6 == 1) {
+                            packageName = 'xiangji'; // 自定义事件名，下面有特殊处理
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+
+                    // ================= 案例 6: 图库 =================
+                    case '6': 
+                        if (newValue.item7 == 1) {
+                            // 根据型号选择图库包名
+                            if (api.deviceModel == 'Lenovo TB-8X04F') {
+                                packageName = 'org.codeaurora.gallery';
+                            } else if (/* 华为型号 */) {
+                                packageName = 'com.huawei.photos';
+                            } else if (/* 荣耀型号 */) {
+                                packageName = 'com.hihonor.photos';
+                            } else {
+                                packageName = 'com.android.gallery3d';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+
+                    // ================= 案例 7: 时钟 =================
+                    case '7': 
+                        if (newValue.item8 == 1) {
+                            // 根据型号选择时钟包名
+                            // ... 逻辑同上 ...
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+
+                    // ================= 案例 8: 日历 =================
+                    case '8': 
+                        if (newValue.item9 == 1) {
+                            // 根据型号选择日历包名
+                            // ... 逻辑同上 ...
+                            openPackage(packageName);
+                        } else {
+                            api.toast({ msg: '暂无权限打开此应用', ... });
+                        }
+                        break;
+                }
+            }
+        }
+    });
+
+    // --- 辅助函数：真正执行打开应用的逻辑 ---
+    function openPackage(packageName) {
+        if (packageName == 'xiangji') {
+            // 相机比较特殊，通过发送事件的方式打开 (可能是调用了原生插件)
+            api.sendEvent({
+                name: 'openApps',
+                extra: {packageName: packageName}
+            });
+        } else {
+            // 其他应用直接使用 APICloud 的 openApp 方法
+            api.openApp({
+                androidPkg: packageName
+            }, function(ret, err) {
+                if (ret) {
+                    // 打开成功
+                } else {
+                    // 打开失败 (比如设备上没这个应用)
+                    api.toast({
+                        msg: '应用打开失败',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+    }
+
+    // --- 核心数据源：全局变量 newValue ---
+    var newValue; 
+
+    // 【关键函数】从服务器获取权限开关配置
+    function getSettingSwitch() {
+        apiObj.SetAuthToken($api.getStorage("token")); // 设置 Token
+        apiObj.Get(UrlRouter.GetSchoolConfig, { // 请求配置接口
+            values: {
+                type: 'photo_switch', // 请求类型：照片/应用开关
+                schoolid: $api.getStorage('schoolid') // 学校 ID
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') { // 请求成功
+                    // 假设服务器返回 data[0].value 是字符串: '{"item1":1,"item2":0,"item3":0...}'
+                    // 这行代码把它解析成 JSON 对象，赋值给全局变量 newValue
+                    // 例如: newValue = { item1: 1, item2: 0, item3: 0 ... }
+                    newValue = $api.strToJson(ret.data[0].value);
+                    
+                    // 💡 调试技巧：你可以在这里加一行 console.log(newValue); 
+                    // 然后用 APICloud 调试工具看具体哪些是 0，哪些是 1
+                }
+            }
+        });
+    }
+</script>
+</html>

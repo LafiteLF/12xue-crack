@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>考试等待页面</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle {
+            width: calc(100% - 60px);
+        }
+
+    </style>
+</head>
+<body>
+<header class="clearfix">
+    <div onclick=" closewin();" class="winTitle pull_left">
+
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var headerH;
+    var moduleDialog = null;//弹窗模块bhzparam
+    var time;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        api.setKeepScreenOn({
+            keepOn: true
+        });
+        moduleDialog = api.require('moduleDialog');
+        var header = document.querySelector('header');
+        headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        $('.winTitle').html(api.pageParam.examXq.title);
+        api.openFrame({
+            name: 'frame_examing',
+            url: 'frame_examing.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: frameH
+            },
+            pageParam: {
+                examXq:api.pageParam.examXq,
+                list:api.pageParam.list
+            },
+//            bounces: true
+        });
+
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name:'keyback'
+        },function(ret,err){
+            closewin();
+
+        });
+    };
+    function closewin() {
+        var   jjtxparam= {
+            "data": [{
+                "viewType": 100,
+                "x": api.winWidth / 2 - 150,
+                "y": $api.getStorage('padHeight') / 2 - 75,
+                "h": 150,
+                "w": 300
+            }, {
+                "viewType": 101,
+                "x": api.winWidth / 2 - 150 + 30,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                "h": 48,
+                "w": 240,
+                "lineSpacting": 1.3,
+                "showText": "<font color='#666666'>考试马上开始，请不要退出考试？</font>",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 159,
+                "y":$api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "ok",
+                "showText": "仍要退出",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 40,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "no",
+                "showText": "不退出",
+                "textSize": 14
+            }]
+        };
+        moduleDialog.showDialog(jjtxparam, function (ret, err) {
+            if (ret.state == 'success' && ret.clickID) {
+                if (ret.clickID == 'ok')
+                {
+                    api.closeWin();
+                    dismissDialog();
+                }else{
+                    dismissDialog();
+                }
+            } else {
+
+            }
+        });
+
+    }
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+</script>
+</html>

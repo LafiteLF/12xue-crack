@@ -1,0 +1,418 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style type="text/css">
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.2);
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+
+        .pop-content {
+            width: 440px;
+            height: auto;
+            max-height: 250px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 3px;
+            position: absolute;
+            /*margin: 0 auto;*/
+            /*position: relative;*/
+            /*top: 50%;*/
+            /*transform: translateY(-50%)*/
+        }
+
+        .text1 {
+            width: auto;
+            height: 20px;
+            font-size: 0.6rem;
+            font-weight: normal;
+            font-stretch: normal;
+            line-height: 20px;
+            letter-spacing: 0;
+            color: #9a9a9a;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .item-content {
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            margin-top: 20px;
+            text-align: center;
+            overflow-y: scroll;
+        }
+
+        .item1 {
+            width: 100px;
+            height: 28px;
+            border-radius: 2px;
+            border: solid 1px #d6d6d6;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+        .item1:active {
+            width: 100px;
+            height: 28px;
+            border-radius: 2px;
+            background-color: #72d36d;
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+
+
+        .item2 {
+            width: 100px;
+            height: 28px;
+            border-radius: 2px;
+            border: solid 1px #d6d6d6;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+        .item2:active {
+            width: 100px;
+            height: 28px;
+            border-radius: 2px;
+            background-color: #ff788e;
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+
+        .span1 {
+            font-size: 0.5rem;
+            font-weight: normal;
+            font-stretch: normal;
+            color: #72d36d;
+        }
+        .span1:active {
+            font-size: 0.5rem;
+            font-weight: normal;
+            font-stretch: normal;
+            color: #ffffff;
+        }
+
+
+        .span2 {
+            font-size: 0.5rem;
+            font-weight: normal;
+            font-stretch: normal;
+            color: #ff788e;
+        }
+        .span2:active {
+            font-size: 0.5rem;
+            font-weight: normal;
+            font-stretch: normal;
+            color: #ffffff;
+        }
+
+        ul {
+            text-align: center;
+        }
+
+        ul li {
+            display: inline-block;
+            padding: 8px 10px;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+
+        [v-cloak] {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="api.closeFrame();"></div>
+<div v-cloak="" class="pop-content" >
+    <p class="text1">为<span v-text="type == 'stu' ? '自己' : '本小组'"></span>打分后，教师一体机大屏会显示哦~</p>
+    <ul class="item-content">
+        <li v-for="item in evaluate.chiled" tapmode @click="checkScore(item)">
+            <div :class="item.type == 1 ? 'item1' : 'item2'">
+                <span :class="item.type == 1 ? 'span1' : 'span2'" v-text="getTitle(item)"></span>
+            </div>
+        </li>
+
+        <!--<li>-->
+            <!--<div class="item1">-->
+                <!--<span class="span1">很好哈哈哈 (+2)</span>-->
+            <!--</div>-->
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="item1">-->
+                <!--<span class="span1">一般 (+1)</span>-->
+            <!--</div>-->
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="item1">-->
+                <!--<span class="span1">一般 (+1)</span>-->
+            <!--</div>-->
+        <!--</li>-->
+        <!--<li>-->
+            <!--<div class="item1">-->
+                <!--<span class="span1">一般 (+1)</span>-->
+            <!--</div>-->
+        <!--</li>-->
+
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    var classObj, classObjForCloud;
+    apiready = function () {
+        classObj = new GridOpenApi('http://' + $api.getStorage('ip'), source, version);
+        classObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+        initVue();
+    };
+
+    function initVue() {
+        vm = new Vue({
+            el: '.pop-content',
+            data: {
+                evaluate: api.pageParam.evaluate,
+                type: api.pageParam.type
+            },
+            methods: {
+                getTitle: function (item) {
+                    return textEllipsis(item.title) + '(' + item.score + ')';
+                },
+                checkScore: function (item) {
+                    if (api.pageParam.type == 'stu') {
+                        if ($api.getStorage('connectType') == 'Lan') {
+                            classObj.Get('/student_score_to_self', {
+                                values: {
+                                    classid: $api.getStorage('classid'),
+                                    uid: $api.getStorage('uid'),
+                                    student_name: $api.getStorage('realname'),
+                                    score: item.score,
+                                    score_id: item.id,
+                                    evaluate_id: item.evaluate,
+                                    title: item.title
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    ProcessRet1(ret, item);
+                                } else {
+                                    api.toast({
+                                        msg: '打分失败！',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                    api.closeFrame();
+                                }
+                            });
+
+                        } else {
+                            api.addEventListener({
+                                name: 'ReceiveMessage_stuScore1'
+                            }, function (ret, err) {
+                                ProcessRet1(ret.value.receive, item);
+                            });
+                            classObjForCloud.Get('/student_score_to_self', {
+                                values: {
+                                    classid: $api.getStorage('classid'),
+                                    student_name: $api.getStorage('realname'),
+                                    score: item.score,
+                                    score_id: item.id,
+                                    evaluate_id: item.evaluate,
+                                    title: item.title,
+                                    uid: $api.getStorage('uid'),
+                                    from: 'ReceiveMessage_stuScore1',
+                                    vclass_token: $api.getStorage('vclass_token'),
+                                    private_token: $api.getStorage('private_token')
+                                }
+                            }, function (ret, err) {
+                                if (ret && ret.status == 1) {
+                                } else {
+                                    api.toast({
+                                        msg: ret.info,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+                            });
+                        }
+
+                    } else {
+                        if ($api.getStorage('connectType') == 'Lan') {
+                            classObj.Get('/group_score_to_self', {
+                                values: {
+                                    classid: $api.getStorage('classid'),
+                                    groupid: $api.getStorage('groupScoreId'),
+                                    uid: $api.getStorage('uid'),
+                                    group_name: $api.getStorage('groupScoreName'),
+                                    score: item.score,
+                                    score_id: item.id,
+                                    evaluate_id: vm.evaluate.id,
+                                    title: item.title
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    ProcessRet2(ret, item);
+                                } else {
+                                    api.toast({
+                                        msg: '打分失败！',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                    api.closeFrame();
+                                }
+                            });
+                        } else {
+
+                            api.addEventListener({
+                                name: 'ReceiveMessage_stuScore2'
+                            }, function (ret, err) {
+                                ProcessRet2(ret.value.receive, item);
+                            });
+                            classObjForCloud.Get('/group_score_to_self', {
+                                values: {
+                                    classid: $api.getStorage('classid'),
+                                    groupid: $api.getStorage('groupScoreId'),
+                                    group_name: $api.getStorage('groupScoreName'),
+                                    score: item.score,
+                                    score_id: item.id,
+                                    evaluate_id: vm.evaluate.id,
+                                    title: item.title,
+                                    uid: $api.getStorage('uid'),
+                                    from: 'ReceiveMessage_stuScore2',
+                                    vclass_token: $api.getStorage('vclass_token'),
+                                    private_token: $api.getStorage('private_token')
+                                }
+                            }, function (ret, err) {
+                                if (ret && ret.status == 1) {
+                                } else {
+                                    api.toast({
+                                        msg: ret.info,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function textEllipsis(value) {
+        if (!value) return '';
+        if (value.length > 3) {
+            return value.slice(0,3) + '...'
+        }
+        return value
+    }
+
+
+    function ProcessRet1(ret, item) {
+        if (ret.status == 1) {
+            api.openFrame({
+                name: 'frame_finish_score',
+                url: 'frame_finish_score.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: 'auto'
+                },
+                pageParam: {
+                    title: item.title,
+                    score: item.score,
+                    type: api.pageParam.type
+                },
+                bounces: false
+            });
+            api.closeFrame();
+        } else {
+            api.toast({
+                msg: '打分失败',
+                duration: 2000,
+                location: 'bottom'
+            });
+            api.closeFrame();
+        }
+    }
+
+    function ProcessRet2(ret, item) {
+        if (ret.status == 1) {
+            api.openFrame({
+                name: 'frame_finish_score',
+                url: 'frame_finish_score.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: 'auto'
+                },
+                pageParam: {
+                    title: item.title,
+                    score: item.score,
+                    type: api.pageParam.type
+                },
+                bounces: false
+            });
+            api.closeFrame();
+        } else {
+            api.toast({
+                msg: '打分失败',
+                duration: 2000,
+                location: 'bottom'
+            });
+            api.closeFrame();
+        }
+    }
+
+
+    //字符串转base64
+    function encode(str) {
+// 对字符串进行编码
+        var encode = encodeURI(str);
+// 对编码的字符串转化base64
+        return btoa(encode);
+    }
+
+    //阻止冒泡的函数
+    function stopBubble(e) {
+        if (e && e.stopPropagation) {
+            e.stopPropagation();
+            return true;
+        }
+        window.event.cancelBubble = true;
+    }
+
+
+</script>

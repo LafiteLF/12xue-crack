@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>实验展示</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background-color: #F2F2F2FF;
+            margin: 0;
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .content {
+            padding-top: 1px;
+        }
+
+        .content ul {
+            padding: 10px;
+        }
+
+        .content ul li {
+            width: 25%;
+            float: left;
+            padding: 9px;
+            min-height: 180px;
+        }
+
+        .content ul li .item {
+            width: 100%;
+            position: relative;
+            border-radius: 8px;
+            background: transparent;
+            overflow: visible;
+            border: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-image-box{
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        .exp-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 140px;
+            object-fit: cover;
+        }
+
+        .exp-name {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #222;
+            width: 100%;
+            text-align: left;
+            margin-top: 8px;
+            padding: 0 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        /* 平板适配 */
+        @media screen and (min-width: 600px) and (max-width: 900px) {
+            .content ul li {
+                min-height: 200px;
+            }
+            .exp-img {
+                max-height: 160px;
+            }
+        }
+
+        @media screen and (min-width: 901px) {
+            .content ul li {
+                min-height: 220px;
+            }
+            .exp-img {
+                max-height: 180px;
+            }
+        }
+
+        .placeholder-box {
+            width: 40%;
+            margin: 0 auto;
+            margin-top: 10%;
+            text-align: center
+        }
+
+        .shuaxin {
+            width: 150px;
+            height: 40px;
+            line-height: 40px;
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+            background: #4bc7c7;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="aui-refresh-content">
+        <div class="content" v-cloak>
+            <ul  class="clearfix">
+                <li v-for="exp in experiments" :key="exp.id" tapmode @click="openPESY(exp.address)">
+                    <div class="item">
+                        <div class="card-image-box">
+                            <img class="exp-img" :src="'../../image/stuHomePad/sypetp.png'" :data-src="exp.video_thumbnail" @load="handleImageLoad($event)"  alt="实验图片">
+                        </div>
+                        <div class="exp-name" v-text="exp.knowledge_point"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script>
+    var vm;
+    var apiObj;
+    var pullRefresh;
+    var page = 1;
+    var isLoading = false;
+    var noMore = false;
+    apiready = function () {
+        vm.GetPhetScienceExperiment(page);
+
+        //下拉刷新
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                page = 1;
+                noMore = false;
+                vm.experiments = [];
+                vm.GetPhetScienceExperiment(  );
+            }
+        });
+
+        // 使用 APICLOUD 窗口级滚动事件
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 80           // 正数更稳定，接近底部时触发
+            }
+        }, function () {
+            if (isLoading || noMore) return;
+            vm.GetPhetScienceExperiment();
+        });
+
+
+    };
+
+    vm = new Vue({
+            el: '.content',
+            data: {
+                experiments: []
+            },
+            methods: {
+                GetPhetScienceExperiment: function () {
+                    if (isLoading) {
+                        return;
+                    }
+                    isLoading = true;
+                    apiObj = new GridOpenApi(UrlDomain, source, version);
+                    apiObj.SetAuthToken($api.getStorage('token'));
+                    api.showProgress({
+                         title: '加载中',
+                         text: '请稍后...',
+                         modal: false
+                    });
+                    var subject = api.pageParam.subject;
+                    if(api.pageParam.subject == '生物学'){
+                        subject = '生物';
+                    }
+                    if(api.pageParam.subject == '地理'){
+                        subject = '地球科学';
+                    }
+                    apiObj.Get(UrlRouter.GetPhetScienceExperiment, {
+                        values: {
+                            subject: subject,  
+                            p: page,
+                            num: 16
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();  
+                        if (ret && ret.ret == 0) {
+                            pullRefresh.cancelLoading();
+                            var list = (ret.data && ret.data.data) ? ret.data.data : [];
+                            // 首次页
+                            if (page == 1) {
+                                vm.experiments = list;
+                                if (list.length > 0) {
+                                    page = 2; // 仅在有数据时推进页码
+                                    noMore = false;
+                                } else {
+                                    noMore = true;
+                                }
+                            } else {
+                                if (list.length > 0) {
+                                    vm.experiments = vm.experiments.concat(list);
+                                    page++; // 仅在有数据追加成功后再推进页码
+                                } else {
+                                    noMore = true;
+                                    api.toast({
+                                        msg: '已经到底啦，没有更多内容了',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+                            }
+                            
+                        } else {
+                            pullRefresh.cancelLoading();
+                            if (err && err.msg && api && api.toast) {
+                                api.toast({ msg: err.msg, duration: 2000, location: 'bottom' });
+                            }
+                        }
+                        isLoading = false;
+                    });
+                },
+                openPESY:function(peurl){
+                    api.openWin({
+                        name: 'win-peSY',
+                        url: 'win-peSY.html',
+                        pageParam: { peurl: peurl },
+                        reload: true,
+                        slidBackEnabled: false
+                    })
+                },
+                handleImageLoad: function(event) {
+                    var img = event.target;
+                    var dataSrc = img.getAttribute('data-src');
+                    
+                    // 只在占位图加载完成后，且存在有效的网络图片地址时，才加载网络图片
+                    if (img.src.indexOf('sypetp.png') !== -1 && dataSrc && dataSrc !== '' && dataSrc !== 'null' && dataSrc !== 'undefined') {
+                        // 检查是否已经加载过网络图片（避免重复加载）
+                        if (!img.dataset.loading || img.dataset.loading === 'false') {
+                            img.dataset.loading = 'true';
+                            var networkImg = new Image();
+                            networkImg.onload = function() {
+                                // 网络图片加载成功，替换为网络图片
+                                img.src = dataSrc;
+                            };
+                            networkImg.onerror = function() {
+                                // 网络图片加载失败，保持占位图
+                                img.dataset.loading = 'false';
+                            };
+                            networkImg.src = dataSrc;
+                        }
+                    }
+                },
+            }
+        });
+
+</script>
+
+</html>
+
+

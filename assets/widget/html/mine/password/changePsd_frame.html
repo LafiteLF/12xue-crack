@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>title</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+    <style>
+        body{
+            background-color:#f2f2f2
+        }
+        .main{ width: 80%; margin: 0 auto}
+        .main ul { padding-left: 20px;background: #fff}
+        .main ul li{ height: 2.5rem; line-height:2.5rem; font-size: 0.7rem; list-style: none; color: #333;border-bottom: 1px solid #e5e5e9; }
+        .main ul li input{width: 100%; height: 100% ; border: none; padding: 0px; color: #333!important; background: none}
+        input[placeholder], [placeholder], *[placeholder] {
+            color:#999 !important;
+        }
+        .hide-li{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <ul>
+        <li id="hide-li"><input id="oldPsw" type="text" class="aui-input" placeholder="输入原密码"/></li>
+        <li> <input id="newPsw" type="password" class="aui-input" placeholder="输入新密码"/></li>
+        <li> <input id="againPsw" type="password" class="aui-input" placeholder="再次输入新密码"/></li>
+    </ul>
+</div>
+<!--<div class="aui-content">-->
+    <!--<div class="aui-form">-->
+        <!--<div class="aui-input-row " style="width:100%">-->
+            <!--<input id="oldPsw" type="text" class="aui-input" placeholder="输入原密码"/>-->
+        <!--</div>-->
+        <!--<div class="aui-input-row " style="width:100%">-->
+            <!--<input id="newPsw" type="password" class="aui-input" placeholder="输入新密码"/>-->
+        <!--</div>-->
+        <!--<div class="aui-input-row " style="width:100%">-->
+            <!--<input id="againPsw" type="password" class="aui-input" placeholder="再次输入新密码"/>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/password/changePsd.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        if(api.pageParam.type == 'must'){
+            $api.addCls($api.byId('hide-li'),'hide-li');
+        }
+    };
+</script>
+</html>

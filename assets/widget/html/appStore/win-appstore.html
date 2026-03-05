@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e5e5
+        }
+        .titlea {
+            width: 70%;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='closeWin()'></span>应用商店
+    </a>
+    <span class="aui-iconfont aui-icon-delete aui-pull-right" style="padding: 0 1rem; font-size: 1.2rem"  tapmode onclick="openManage()"></span>
+</header>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+
+    apiready = function () {
+
+        if(api.systemType == 'ios'){
+            api.setScreenOrientation({
+                orientation: 'landscape_left'
+            });
+        }else {
+            api.setScreenOrientation({
+                orientation: 'landscape_left'
+            });
+        }
+
+        api.addEventListener({
+            name: 'viewappear'
+        }, function (ret, err) {
+            api.setFullScreen({
+                fullScreen: false
+            });
+        });
+
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h + 25;
+        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            color: '#4bc7c7'
+        });
+        var frameH = padWinHeight - headerH;
+        api.openFrame({
+            name: 'frame-appstore',
+            url: 'frame-appstore.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: frameH
+            },
+            bounces: false
+        });
+
+//        api.addEventListener({
+//            name: 'keyback'
+//        }, function (ret, err) {
+//            closeWin();
+//        });
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.hideProgress();
+            api.closeWin();
+            //退出不做处理
+        });
+
+    };
+
+    function closeWin() {
+//        api.closeWin();
+        api.sendEvent({
+            name: 'closeActivity'
+        });
+    }
+    
+    function openManage() {
+
+        var fs = api.require('fs');
+        fs.rmdir({
+            path: 'storage/emulated/0/UZMap/A6919706055886/download'
+        }, function(ret, err) {
+            if (ret.status) {
+                api.toast({
+                    msg: '清理成功',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+
+
+
+//        var downloadManager = api.require('downloadManager');
+//        downloadManager.openManagerView({
+//            title: '12xue下载管理'
+//        }, function(ret, err) {
+//            if (ret) {
+//                downloadManager.openDownloadedFile({
+//                    id: ret.id
+//                }, function (ret, err) {
+//
+//                });
+//            } else {
+//            }
+//        });
+    }
+    
+</script>
+
+
+</html>

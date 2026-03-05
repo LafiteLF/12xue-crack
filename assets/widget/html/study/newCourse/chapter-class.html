@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>选择班级</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .aui-border-t:before, .aui-border-b:after {
+            height: 0px;
+        }
+
+        .content {
+            width: 35%;
+            height: 70%;
+            top: 15%;
+            position: absolute;
+            left: 32.5%;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            display: none
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #4bc7c7;
+            -webkit-box-shadow: #4bc7c7;
+        }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: #4bc7c7;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+        .unit-one {
+            display: inline-block;
+            color: #666666;
+            margin-left: 15%;
+            font-size: 0.7rem;
+            border: 1px solid #c8c8c8;
+            border-radius: 16px;
+            text-align: center;
+            width: 70%;
+            margin-top: 20px;
+            margin-bottom: 17px;
+            padding-top: 4px;
+        }
+        .unit {
+            display: inline-block;
+            color: #666666;
+            margin-left: 15%;
+            font-size: 0.7rem;
+            border: 1px solid #c8c8c8;
+            border-radius: 16px;
+            text-align: center;
+            width: 70%;
+            margin-bottom: 8px;
+            padding-top: 4px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+        }
+
+        /*[v-cloak] {*/
+            /*display: none;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="api.closeFrame()"></div>
+<div class="content" v-cloak="">
+    <div class="content-one">
+        <span class="unit-one" :style="selectclass.id==0?'color:#4bc7c7;border-color: #4bc7c7':''" @click="chooseDy(0,0,'当前所在班级')">当前所在班级</span>
+<!--        <span class="unit-one" @click="chooseDy({'id':0,'name':'全部单元'})" :style="selectdy.id==0?'color:#4bc7c7;border-color: #4bc7c':''">全部单元</span>-->
+        <p class="unit overflow" :style="selectclass.id==list.bjid?'color:#4bc7c7;border-color: #4bc7c7':''"    v-for="list in classlist"  @click="chooseDy(list.bjid,list.update_time,list.njmc+'级'+list.classname)"><span class="aui-ellipsis-1" style="display: block;width:70%;margin-left: 15%"  >{{list.njmc+'级'+list.classname}}<br><span style="font-size:12px">退班时间：{{timeZh(list.update_time)}}</span></span></p>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/DateUtil.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue()
+        vm.GetClassinfoHistoryclasslist()
+    };
+    function vue(){
+        vm = new Vue({
+            el: '.content',
+            data: {
+                classlist:[],
+                selectclass:api.pageParam.selectclass
+            },
+            methods: {
+                timeZh: function (time) {
+                    if (time > 0) {
+                        return DateUtil.formatDate(time * 1000, 'yyyy-MM-dd');
+                    } else {
+                        return '';
+                    }
+
+                },
+                GetClassinfoHistoryclasslist:function () {
+                    apiObj.Get(UrlRouter.GetClassinfoHistoryclasslist, {
+                        values: {
+                            schoolid:$api.getStorage('schoolid'),
+                            uid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                // alert(JSON.stringify(ret))
+                                vm.classlist=ret.data;
+
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                },
+                chooseDy:function (bjid,update_time,bjmc) {
+                    vm.selectclass= {id:bjid,update_time:update_time,bjmc:bjmc};
+                    api.sendEvent({
+                        name: 'chooseclass',
+                        extra: {
+                            selectclass:vm.selectclass,
+                        }
+                    });
+                    api.closeFrame();
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .title-header {
+            width: 50%;
+            height: 7rem;
+            background-color: #fff;
+            margin-left: 25%;
+            position: absolute;
+            top: 35%;
+            border-radius: 5px;
+
+        }
+
+        .title {
+            text-align: center;
+            padding-top: 1rem;
+            /*padding-bottom: 10px;*/
+            color: #333333;
+            font-size: 0.8rem;
+        }
+
+        .content {
+            text-align: center;
+            padding-top: 0.7rem;
+            /*padding-bottom: 10px;*/
+            font-size: 0.8rem;
+            color: #333333;
+        }
+
+        .doneBtn {
+            padding-top: 1rem;
+            float: right;
+            padding-right: 8%;
+            color: #4bc7c7;
+        }
+
+        .cancelBtn {
+            padding-top: 1rem;
+            float: right;
+            padding-right: 12%;
+            color: #999999;
+        }
+
+        /*[v-cloak]{*/
+        /*display: none;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="title-header">
+    <div class="title" v-text="'确定退出该班级吗？'"></div>
+    <div class="content" v-text="'待老师审核后方可退出？'"></div>
+    <span class="doneBtn" @click="doneClick(data)">确定</span>
+    <span class="cancelBtn" @click="cancelClick()">取消</span>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+
+<script type="text/javascript">
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token-stu'));
+    var vm;
+    apiready = function () {
+        vm = new Vue({
+            el: '.title-header',
+            data: {
+                data: api.pageParam.item,
+                alldata: api.pageParam.alldata,
+            },
+            methods: {
+                doneClick: function (data) {
+                    apiObj.Post(UrlRouter.PostExitClass, {
+                        values: {
+                            cuid: $api.getStorage('uid'),
+                            classid: api.pageParam.myId,
+                            type:2
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                api.sendEvent({
+                                    name: 'tuichuevent',
+                                    extra: {}
+                                });
+                                api.closeFrame();
+
+                            } else {
+                                toast12xue(ret.msg);
+                            }
+                        } else {
+                            toast12xue(err.msg);
+                        }
+                    })
+                },
+                cancelClick: function () {
+                    api.closeFrame();
+                }
+            }
+        });
+
+    };
+
+</script>

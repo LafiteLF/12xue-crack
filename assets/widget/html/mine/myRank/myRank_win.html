@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body{
+
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()' ></span>我的等级
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+//        var token='cf1eeff3a5bac416faa9edada448f798';
+//
+//        var uid='1033145308280423349';
+//        $api.setStorage('token',token);
+//        $api.setStorage('uid',uid);
+     var    nowtexp = api.pageParam.nowtexp;
+     var    rank_code = api.pageParam.rank_code;
+        var header = $api.dom('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.openFrame({
+            name: 'frame-myRank-pad',
+            url: 'frame-myRank-pad.html',
+            bounces: false,
+            vScrollBarEnabled: false,
+            rect: {
+                x: 0,
+                y: headerH ,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: {
+                nowtexp:nowtexp,
+                rank_code:rank_code
+            }
+        });
+    }
+</script>
+</html>

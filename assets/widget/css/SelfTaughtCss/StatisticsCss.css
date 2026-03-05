@@ -1,0 +1,101 @@
+body {
+    background: #fff;
+}
+
+.main_top {
+    width: 5rem;
+    height: 5rem;
+    border: 1px solid #8a8a8a;
+    border-radius: 2.5rem;
+    margin: 0 auto;
+    text-align: center;
+    line-height: 1.5rem;
+    padding-top: 0.5rem;
+}
+
+.sz {
+    font-size: 42px;
+    margin-top: 28px;
+    height: 46px;
+
+    line-height: 55px;
+}
+
+.zql {
+    font-size: 14px;
+    color: #494949;
+}
+
+.paiming {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+.paiming span {
+    font-weight: 700;
+    color: #4BC7C7;
+    line-height: 2.5rem;
+}
+
+.main_center {
+    width: 91%;
+    margin: 0 auto;
+    margin-top: 2rem;
+}
+
+.main_center li {
+    float: left;
+    width: 3.35rem;
+    text-align: center;
+}
+
+.main_center li span {
+    display: block;
+    float: left;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-top: 0.35rem;
+
+    margin-left: 14%;
+}
+
+.zfx {
+    background: #50b8b9
+}
+
+.zfx1 {
+    background: #f57f17
+}
+
+.zfx2 {
+    background: #dcdcdc
+}
+
+.tihao li {
+    width: 20%;
+    float: left;
+    text-align: center
+}
+
+.tihao li span {
+    width: 2.2rem;
+    height: 2.2rem;
+    background: #50b8b9;
+    border-radius: 1.5rem;
+    text-align: center;
+    line-height: 2.4rem;
+    font-size: 1.1rem;
+    color: #fff;
+    margin: 0 auto;
+    margin-top: 0.9rem;
+}
+
+.tihao {
+    width: 92%;
+    margin: 0 auto;
+}
+
+.main {
+    padding-top: 1.5rem;
+}

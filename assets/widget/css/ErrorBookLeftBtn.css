@@ -1,0 +1,34 @@
+.leftedit_btn {
+    position: fixed;
+    left: 10px;
+    /*top: calc(50% - 250px);*/
+    top: 90px;
+    width: 89px;
+}
+
+.leftedit_btn li {
+    border-radius: 3px;
+    width: 65px;
+    height: 59px;
+    margin: 9px 0;
+}
+
+#leftedit_btn_remove {
+    border-radius: 3px;
+    width: 65px;
+    height: 72px;
+    margin: 10px 0;
+}
+
+#leftedit_btn_AI {
+    border-radius: 3px;
+    width: 65px;
+    height: 65px;
+    margin: 10px 0;
+}
+
+
+.leftedit_btn li img {
+    width: 100%;
+    height: 100%;
+}

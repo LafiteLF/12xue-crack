@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>选择班级</title>
+    <link rel="stylesheet" href="../../css/sm.min.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+
+        .main {
+            width: 360px;
+            height: 200px;
+            position: absolute;
+            top: calc(50% - 100px);
+            left: calc(50% - 180px);
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            z-index: 2
+        }
+
+        .main h2 {
+            height: 60px;
+            line-height: 60px;
+            font-size: 0.7rem;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            border-bottom: 1px solid #e4e4e8;
+        }
+
+        .prompt {
+            height: 25px;
+            text-align: center;
+        }
+
+        .prompt span {
+            height: 25px;
+            line-height: 25px;
+            font-size: 0.5rem;
+            text-align: center;
+            color: #ff3e3e;
+            display: none;
+            display: block;
+        }
+
+        input[type="text"] {
+            width: 220px;
+            height: 35px !important;
+            min-height: 35px;
+            border: 1px solid #4bc7c7;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 0.6rem;
+            color: #999;
+            margin: 0 auto
+        }
+
+        .main ul {
+            width: 220px;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        .main ul li {
+            height: 35px;
+            line-height: 36px;
+            font-size: 0.7rem;
+            color: #fff;
+            border-radius: 3px;
+            background: #4bc7c7;
+            float: left;
+            width: 100px;
+            text-align: center;
+        }
+
+        .main ul li + li {
+            margin-left: 20px
+        }
+    </style>
+</head>
+<body>
+<div class="close"  ></div>
+<div class="main">
+    <h2>请输入解锁码</h2>
+    <p class="prompt"><span v-text="tishi"></span></p>
+    <input name="" type="text" class="puk" maxlength="16">
+    <!--onkeyup="value=value.replace(/[^a-zA-Z0-9]/g,'')"-->
+    <ul>
+        <li tapmode onclick="api.closeFrame();">取消</li>
+        <li tapmode onclick="vm.sure()">确定</li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var issaoma;
+    apiready = function () {
+        vm.data = api.pageParam.data;
+        issaoma = api.pageParam.issaoma;
+//        alert(JSON.stringify($api.getStorage('video')));
+    };
+    var vm = new Vue({
+        el: '.main',
+        data: {
+            data: [],
+            tishi:''
+        },
+        methods: {
+            sure: function () {
+                var unlock_code = $('.puk').val();
+                vm.GetPracticeUnlock(unlock_code)
+            },
+            GetPracticeUnlock: function (unlock_code) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetPracticeUnlock, {
+                    values: {
+                        unlock_code: unlock_code,
+                        xkid: vm.data.xkid,
+                        njid: vm.data.njid,
+                        bbid: vm.data.bbid,
+                        sxcid: vm.data.sxcid,
+                        version: vm.data.version,
+                        schoolid: vm.data.schoolid,
+                        remarks: vm.data.xkname + ' ' + vm.data.xxmc + ' ' + vm.data.njname + ' ' + vm.data.bbname + ' ' + vm.data.sxcname
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            $('.prompt span').hide();
+                            if(issaoma=='shipin'){
+
+                                if ($api.getStorage('scanType') == 'class') { //课堂扫码
+                                    api.sendEvent({
+                                        name: 'shuaxin-class'
+                                    });
+                                    api.closeToWin({
+                                        name: 'win-interaction-home-pad',
+                                        animation: {
+                                            type: 'reveal',
+                                            subType: 'from_left',
+                                            duration: 500
+                                        }
+                                    });
+                                } else {
+                                    api.sendEvent({
+                                        name: 'shuaxin-frame_scannerView'
+                                    });
+                                    api.closeToWin({
+                                        name: 'win-stu-main',
+                                        animation: {
+                                            type: 'reveal',
+                                            subType: 'from_left',
+                                            duration: 500
+                                        }
+                                    });
+                                }
+
+                            } else if (issaoma=='zuoye') {
+                                api.openWin({
+                                    name: 'win_detail',
+                                    url: 'win_detail.html',
+                                    pageParam: {
+                                        hwid:$api.getStorage('shwid'),
+                                        sxcid:$api.getStorage('ssxcid'),
+                                        dyid:$api.getStorage('sdyid'),
+                                        version:$api.getStorage('sversion'),
+                                        issaoma:'zuoye',
+                                        bjlist:vm.data.bjlist,
+                                        bjcheck:vm.data.bjcheck,
+                                        smxkid:vm.data.xkid,
+                                    },
+                                    slidBackEnabled: false
+                                });
+                            } else {
+                                api.closeToWin({
+                                    name: 'win-Intelligence-course-list'
+                                });
+                            }
+                            api.sendEvent({
+                                name: 'shuaxinframe'
+//                                extra: {index:vm.current}
+                            });
+
+                        } else {
+                            if($('.puk').val()==''){
+                                vm.tishi='请输入解锁码';
+                            }else{
+                                vm.tishi=ret.msg;
+                            }
+                            $('.prompt span').show();
+                        }
+                    } else {
+                        api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                        )
+                    }
+
+                })
+            }
+        }
+    });
+</script>
+</html>

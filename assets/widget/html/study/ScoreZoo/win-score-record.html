@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body{
+
+        }
+        .aui-tab-item.aui-active {
+            color: #4bc7c7;
+            border-bottom: 2px solid #4bc7c7;
+            z-index: 100;
+        }
+        /*自定义title*/
+        .aui-bar-nav .aui-12xue-title {
+            min-height: 2.25rem;
+            position: absolute;
+            margin: 0;
+            text-align: left;
+            white-space: nowrap;
+            right: 10rem;
+            left: 2rem;
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 2;
+        }
+        .aui-tab {
+            width: 27%;
+            margin: 15px auto;
+            border-radius: 3px;
+            border: 1px solid #4bc7c7;}
+        element.style {
+        }
+        .aui-tab-item {
+            height: 1.6rem;
+            line-height: 1.6rem;
+        }
+        .aui-tab-item.aui-active {
+             color: #fff;
+             border-bottom: none;
+             z-index: 100;
+            background:#4bc7c7 ;
+         }
+        .aui-tab-item.aui-active {
+            color: #fff;
+            background:#4bc7c7 ;
+            z-index: 100;
+        }
+        .aui-tab:after {height: 0px;}
+        .aui-tab-item{
+
+            color:#4bc7c7;
+        }
+        .aui-tab-item {
+         margin-left: 0px;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="api.closeWin();"></span>学分记录
+    </a>
+
+</header>
+<div class="aui-tab" id="tab">
+    <div id="persionItem" class="aui-tab-item aui-active" onclick="persionClicked()">个人</div>
+    <div id="groupItem" class="aui-tab-item" onclick="groupClicked()">小组</div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+//        var schoolid= api.pageParam.schoolid;
+//        alert(schoolid)
+        var header = $api.dom('header');
+        //$api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var title = $api.dom('.aui-tab');
+        var headerH = $api.offset(header).h;
+        var titleH = $api.offset(title).h;
+        var frameH = padWinHeight - headerH-titleH;
+
+
+        api.openFrameGroup({
+            name: 'score-record-frameGroup',
+            background: 'bgcolor',
+            scrollEnabled: true,
+            rect: {
+                x: 0,
+                y: headerH+titleH+30,
+                w: 'auto',
+                h: frameH-20
+            },
+            index: 0,
+            frames: [{
+                name: 'frame-score-record',
+                url: 'frame-score-record.html',
+                bgColor: 'bgcolor',
+                pageParam:{schoolid:api.pageParam.schoolid}
+            }, {
+                name: 'frame-score-record-group',
+                url: 'frame-score-record-group.html',
+                bgColor: 'bgcolor',
+                pageParam:{schoolid:api.pageParam.schoolid}
+            }]
+        }, function (ret, err) {
+            if(ret.index == 0){
+                var persionItem = $api.byId('persionItem');
+                $api.addCls(persionItem,'aui-active');
+                var groupItem = $api.byId('groupItem');
+                $api.removeCls(groupItem,'aui-active');
+            }else {
+                var groupItem = $api.byId('groupItem');
+                $api.addCls(groupItem,'aui-active');
+                var persionItem = $api.byId('persionItem');
+                $api.removeCls(persionItem,'aui-active');
+            }
+        });
+    };
+    function persionClicked() {
+        var persionItem = $api.byId('persionItem');
+        $api.addCls(persionItem,'aui-active');
+        var groupItem = $api.byId('groupItem');
+        $api.removeCls(groupItem,'aui-active');
+
+        api.setFrameGroupIndex({
+            name: 'score-record-frameGroup',
+            index: 0,
+            scroll: true
+        });
+
+    }
+    function groupClicked() {
+        var groupItem = $api.byId('groupItem');
+        $api.addCls(groupItem,'aui-active');
+        var persionItem = $api.byId('persionItem');
+        $api.removeCls(persionItem,'aui-active');
+        api.setFrameGroupIndex({
+            name: 'score-record-frameGroup',
+            index: 1,
+            scroll: true
+        });
+    }
+</script>
+</html>

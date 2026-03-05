@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>分组学习</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background: #f2f2f2 !important;
+        }
+
+        .renwu-title {
+            background-color: #ffffff;
+            width: 100%;
+            height: 2.5rem;
+            border-bottom: 0px solid #FFFFFF;
+
+        }
+
+        .renwu {
+            display: inline-block;
+            color: #FFFFFF;
+
+            line-height: 2.5;
+            background-color: #4bc7c7;
+            width: 5rem;
+            text-align: center;
+        }
+
+        .renwu-statusImage {
+            float: right;
+            color: #000;
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-right: 0rem
+        }
+
+        .button-div {
+            display: inline-block;
+            float: right;
+            line-height: 2.9
+        }
+
+        .button-btn {
+            width: 94px;
+            height: 30px;
+            margin-right: 0.55rem;
+            border: 1px solid #4bc7c7;
+            background-color: #FFFFFF;
+            color: #4bc7c7;
+            font-size: 0.5rem;
+            padding: 0px;
+            line-height: 30px;
+            border-radius: 3px !important;
+        }
+
+        ul.aui-list.aui-list-in::before {
+            background-color: #FFFFFF;
+        }
+
+        .aui-list-item-inner img {
+            /*width: 50px !important;*/
+            /*height: 30px !important;*/
+        }
+
+        .aui-content p {
+            width: 100%;
+            text-align: center;
+        }
+
+        .aui-content {
+            width: 100%;
+            height: 70%;
+            display: none;
+            /*margin-top: 30%;*/
+        }
+
+        .tishiP {
+            width: 100%;
+            height: 1rem;
+            background-color: #fff3bf;
+            color: #fe4040;
+            font-size: 12px;
+            line-height: 1rem;
+            word-break: break-all;
+            padding-left: 1%;
+            margin-right: 1%;
+            margin-bottom: 2px;
+            border-bottom: 1px solid #d5d5d5;
+        }
+
+        .aui-list {
+            margin-top: 0.5rem;
+        }
+
+        .aui-list:before {
+            background-color: #e4e4e8;
+        }
+
+        .aui-list:after {
+            background-color: #e4e4e8;
+        }
+
+        .button-btn:active {
+            background: #4bc7c7;
+            color: #fff;
+        }
+
+        .aui-list-item-inner.aui-list-item-arrow {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 2.5rem;
+            padding-left: 45px;
+            padding-top: 15px;
+        }
+
+
+        .zy {
+            position: relative;
+            color: #666;
+            padding-left: 20px;
+        }
+
+        .zy a {
+            position: absolute
+        }
+
+        .aui-list-item-arrow:before {
+            position: absolute
+        }
+
+
+        .linecontent {
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+            display: inline-block;
+        }
+
+        .tigan {
+            height: 50px;
+            width: calc(100% - 40px);
+            line-height: 50px;
+            font-size: 16px;
+            color: #333;
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 10px;
+        }
+
+        .tlbtImg {
+            height: 30px;
+            position: absolute;
+            top: 8px
+        }
+
+        .tgImg {
+            width: 30px;
+            position: absolute;
+            right: 5px;
+            margin-top: 10px;
+        }
+
+        .xiaoti {
+            position: absolute;
+            right: 5px;
+            font-size: 14px;
+            color: #47D178;
+        }
+
+
+        [v-cloak] {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <p class="tishiP">温馨提示：分组学习由组长提交答案，如果您所在小组没有组长，请联系老师设置组长，组长设置后，请组长刷新本页面</p>
+    <ul class="aui-list">
+        <li class="aui-list-item" @click="myClickItem">
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14 zy">
+                <b style="font-weight: normal; color: #333; position: absolute;left: 0px; top: 15px">组员:</b>{{studentName}}
+                <a style="right: 40px; padding-left: 10px;display: inline-block;color: black; white-space:nowrap; width: 37px;top: 27%;">全部</a>
+            </div>
+        </li>
+    </ul>
+    <div class="aui-content">
+        <img style="margin-top: 12%; width: 30%;margin-left: 35%;" src="../../../../image/stuHomePad/noGroupTask.png"/>
+        <p style="font-size: 1rem">老师还没发布小组任务</p>
+    </div>
+    <div v-for="item, indexs of items" style="margin-right: 0.5rem;margin-left: 0.5rem;background: #fff; padding-bottom: 20px;">
+        <p style="width: 100%;height: 0.5rem;background-color: #f2f2f2"></p>
+        <div class="renwu-title">
+            <div class="renwu" v-text="">任务{{items.length-indexs}}</div>
+            <img class="renwu-statusImage" src="../../../../image/groupStudyImage/finished.png" v-if="item.status==1">
+            <img class="renwu-statusImage" src="../../../../image/groupStudyImage/going.png" v-else>
+        </div>
+
+        <ul class="aui-list aui-list-in" v-for="tginfo, index of item.res_list">
+            <li class="linecontent" @click="openTaskDetailFrame(index, indexs)">
+                <span class="tigan" v-html="getTg(tginfo, index)"></span>
+                <img v-if="tginfo.answered==1 && tginfo.is_auto == 1" class="tgImg" :src="tginfo.accuracy==0 ? '../../../../image/newhomework/cuowu.png' : tginfo.accuracy==1 ? '../../../../image/newhomework/zhengque.png' : '../../../../image/newhomework/bandui.png'">
+                <span v-if="tginfo.answered==1 && tginfo.is_auto == 0" style="position: absolute; right: 5px; color: #4bc7c7; font-size: 16px" v-text="'已答'"></span>
+                <span class="xiaoti" v-if="tginfo.answered!=1 && tginfo.xts>0" v-text="tginfo.tx_code != 2 ? '('+tginfo.xts + '小题)' : '('+tginfo.xts + '填空)'"></span>
+            </li>
+        </ul>
+    </div>
+
+    <!--<div v-for="item, indexs of items" style="margin-right: 0.5rem;margin-left: 0.5rem;background: #fff">-->
+        <!--<p style="width: 100%;height: 0.5rem;background-color: #f2f2f2"></p>-->
+        <!--<div class="renwu-title">-->
+            <!--<div class="renwu" v-text="">任务1</div>-->
+            <!--<img class="renwu-statusImage" src="../../../../image/groupStudyImage/going.png">-->
+        <!--</div>-->
+        <!--<ul class="aui-list aui-list-in">-->
+            <!--<li class="linecontent">-->
+                <!--<span class="tigan">1.哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈</span>-->
+                <!--<img class="tgImg" src="../../../../image/newhomework/zhengque.png">-->
+            <!--</li>-->
+            <!--<li class="linecontent">-->
+                <!--<span class="tigan">1.哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈</span>-->
+                <!--<span style="position: absolute; right: 5px; color: #333; font-size: 16px">已答</span>-->
+            <!--</li>-->
+        <!--</ul>-->
+    <!--</div>-->
+
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    var classObj, classObjForCloud;
+    var res_list = [];//任务数组
+    var schoolid;
+    var leaderid;
+    var memberArr;
+    var groupId;
+    var db;
+    apiready = function () {
+        classObj = new GridOpenApi('http://' + $api.getStorage('ip'), source, version);
+        classObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+
+        $api.setStorage('groupClassId', api.pageParam.groupInfo.classid);
+        $api.setStorage('groupId', api.pageParam.groupInfo.id);
+        groupId = api.pageParam.groupInfo.id;
+        //创建打开数据库
+        db = api.require('db');
+        db.openDatabaseSync({
+            name: dbName,
+            path: 'fs://student_12xue.db'
+        });
+        //先删除表中的数据
+        db.executeSqlSync({
+            name: dbName,
+            sql:'DROP TABLE IF EXISTS groupAnsweredEx'
+        });
+
+        db.executeSqlSync({
+            name: dbName,
+            sql: 'CREATE TABLE IF NOT EXISTS groupAnsweredEx(id INTEGER PRIMARY KEY AUTOINCREMENT,xtid varchar(255),sxda text,myuid varchar(255),kcid varchar(255),xsdaobj longtext)'
+        });
+
+        api.addEventListener({
+            name: 'reloadGrouptasklistframe'
+        }, function (ret, err) {
+            getGroupInfo();
+            getGroupTaskList();
+        });
+
+        initVue();
+
+        memberArr = api.pageParam.groupInfo.member;
+        var memberStr = '';
+        var leaderStr = '';
+        for (var i = 0; i < memberArr.length; i++) {
+            if (memberArr[i].is_leader == 1) {
+                leaderStr = memberArr[i].realname + '(组长)' + '、';
+                leaderid = memberArr[i].uid;
+                $api.setStorage('is_leader', leaderid);
+            } else {
+                if (i == memberArr.length - 1) {
+                    memberStr = memberStr + '  ' + memberArr[i].realname;
+                } else {
+                    memberStr = memberStr + '  ' + memberArr[i].realname + '、';
+                }
+            }
+        }
+        vm.studentName = leaderStr + memberStr;
+        getGroupTaskList();
+    };
+
+
+    function initVue() {
+        vm = new Vue({
+            el: '#app',
+            data: {
+                laderName: '',
+                studentName: '',
+                seen: '',
+                items: '',
+                txArr: '',
+                haveItems: ''
+            },
+            computed: {//计算属性
+
+            },
+            methods: {
+                myClickItem: function () {//进入小组成员列表
+                    api.openWin({
+                        name: 'win-groupStudy-member-pad',
+                        url: 'win-groupStudy-member-pad.html',
+                        pageParam: {memberArr: memberArr}
+                    });
+                },
+                openTaskDetailFrame: function (index, indexs) {//进入任务详情
+                    api.openWin({
+                        name: 'win-groupStudy-taskDetail-pad',
+                        url: 'win-groupStudy-taskDetail-pad.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            homeworkName: '任务' + (this.items.length - indexs),
+                            list: vm.items[indexs],
+                            clickIndex: index,
+                            memberData: api.pageParam.groupInfo,
+                            leaderid: leaderid
+                        }
+
+                    });
+                },
+                getTg: function (item, index) {
+                    if (item.zyqf && item.zyqf == 1) {
+                        return (index + 1) + '.' + item.title + item.filetype;
+                    } else {
+                        if (item.tx == 'tdjh' || item.tx == 'tdh' || item.tx == 'tdb' || item.tx == 'ttt') {
+                            return (index + 1) + '.' + '【'+ item.txstr +'】'  + '<img class="tlbtImg" src="../../../../image/tlbt.png">';
+                        } else {
+                            return (index + 1) + '.'  + item.title;
+                        }
+                    }
+                },
+            }
+        });
+    }
+
+
+
+    /*
+     * 获取小组信息
+     * */
+    function getGroupInfo() {
+
+        if ($api.getStorage('connectType') == 'Lan') {
+            classObj.Get(UrlRouter.GetGroup, {
+                values: {
+                    cmd: 'info',
+                    classid: api.pageParam.groupInfo.classid,
+                    uid: $api.getStorage('uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    ProcessRet1(ret);
+                } else {
+                    api.toast({
+                        msg: 'PC客户端连接出现错误',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    setTimeout(function () {
+                        api.closeWin();
+                    }, 1000);
+                }
+            });
+        } else {
+            api.addEventListener({
+                name: 'ReceiveMessage_21'
+            }, function (ret, err) {
+                ProcessRet1(ret.value.receive);
+            });
+            classObjForCloud.Get(UrlRouter.GetGroup, {
+                values: {
+                    cmd: 'info',
+                    classid: api.pageParam.groupInfo.classid,
+                    uid: $api.getStorage('uid'),
+                    from: 'ReceiveMessage_21',
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+                if (ret && ret.status == 1) {
+                } else {
+                    api.toast({
+                        msg: ret.info,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+    }
+
+
+
+    /*
+     * 获取小组任务列表
+     * */
+    function getGroupTaskList() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+
+        if ($api.getStorage('connectType') == 'Lan') {
+            classObj.Get(UrlRouter.GetGroup, {
+                values: {
+                    cmd: 'task_get',
+                    classid: api.pageParam.groupInfo.classid,
+                    group_id: groupId
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    ProcessRet2(ret);
+                } else {
+                    api.toast({
+                        msg: 'PC客户端连接出现错误',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        } else {
+            api.addEventListener({
+                name: 'ReceiveMessage_23'
+            }, function (ret, err) {
+                ProcessRet2(ret.value.receive);
+            });
+            classObjForCloud.Get(UrlRouter.GetGroup, {
+                values: {
+                    cmd: 'task_get',
+                    classid: api.pageParam.groupInfo.classid,
+                    group_id: groupId,
+                    uid: $api.getStorage('uid'),
+                    from: 'ReceiveMessage_23',
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+                if (ret && ret.status == 1) {
+                } else {
+                    api.toast({
+                        msg: ret.info,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+    }
+
+
+    function ProcessRet1(ret) {
+        if (ret) {
+            if (ret.status == 1) {
+                vm.studentName = '';
+                if (ret.default != null) {
+                    memberArr = ret.default[0].member;
+                    var leaderStr = '';
+                    var memberStr = '';
+                    for (var i = 0; i < memberArr.length; i++) {
+                        if (memberArr[i].is_leader == 1) {
+                            leaderStr = memberArr[i].realname + '(组长)、';
+                            leaderid = memberArr[i].uid;
+                            $api.setStorage('is_leader', leaderid);
+                        } else {
+                            if (i == memberArr.length - 1) {
+                                memberStr = memberStr + '  ' + memberArr[i].realname;
+                            } else {
+                                memberStr = memberStr + '  ' + memberArr[i].realname + '、';
+                            }
+                        }
+                    }
+                    groupId = memberArr[0].group_id;
+                    $api.setStorage('groupId', groupId);
+                    vm.studentName = leaderStr + memberStr;
+                }
+                if (ret.custom != null) {
+                    memberArr = ret.custom[0].member;
+                    var memberStr = '';
+                    var leaderStr = '';
+                    for (var i = 0; i < memberArr.length; i++) {
+                        if (memberArr[i].is_leader == 1) {
+                            leaderStr = memberArr[i].realname + '(组长)、';
+                            leaderid = memberArr[i].uid;
+                            $api.setStorage('is_leader', leaderid);
+                        } else {
+                            if (i == memberArr.length - 1) {
+                                memberStr = memberStr + '  ' + memberArr[i].realname;
+                            } else {
+                                memberStr = memberStr + '  ' + memberArr[i].realname + '、';
+                            }
+                        }
+                    }
+                    groupId = memberArr[0].group_id;
+                    $api.setStorage('groupId', groupId);
+                    vm.studentName = leaderStr + memberStr;
+                }
+            } else {
+                api.toast({
+                    msg: ret.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        } else {
+            api.toast({
+                msg: 'PC客户端连接出现错误',
+                duration: 2000,
+                location: 'bottom'
+            });
+            setTimeout(function () {
+                api.closeWin();
+            }, 1000);
+        }
+    }
+
+    function ProcessRet2(ret) {
+        api.hideProgress();
+        if (ret) {
+            if (ret.status == 1) {
+                vm.items = ret.data.reverse();
+                if (ret.data.length == 0) {
+                    var divEl = $api.dom('.aui-content');
+                    $api.css(divEl, 'display: block;');
+                } else {
+                    var divEl = $api.dom('.aui-content');
+                    $api.css(divEl, 'display: none;');
+                }
+                for (var i = 0; i < ret.data.length; i++) {
+                    if (ret.data[i].status == 1) {
+                        for (var j = 0; j < ret.data[i].res_list.length; j++) {
+                            if (ret.data[i].res_list[j].zyqf == '2') {
+                                var deleteSqll = 'DELETE FROM groupAnsweredEx WHERE xtid = ' + ret.data[i].res_list[j].id;
+                                db.executeSqlSync({
+                                    name: dbName,
+                                    sql: deleteSqll
+                                });
+                                var xsdaobj = btoa(encodeURIComponent(ret.data[i].res_list[j].return_data));
+                                var insertSqll = 'INSERT INTO groupAnsweredEx(xtid,sxda,myuid,kcid,xsdaobj) VALUES(\'' + ret.data[i].res_list[j].id + '\',\'' + ret.data[i].res_list[j].sxda + '\',\'' + $api.getStorage('uid') + '\',\'' + ret.data[i].kcid + '\',\'' + xsdaobj +'\')';
+                                db.executeSqlSync({
+                                    name: dbName,
+                                    sql: insertSqll
+                                });
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (ret.msg == '分组学习未开始') {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    setTimeout(function () {
+                        api.closeWin();
+                    }, 1000);
+                } else {
+                    vm.items = '';
+                    var divEl = $api.dom('.aui-content');
+                    $api.css(divEl, 'display: block;');
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            }
+        } else {
+            api.toast({
+                msg: 'PC客户端连接出现错误',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+
+</script>
+</html>

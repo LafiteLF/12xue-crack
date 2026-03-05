@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body{
+
+        }
+        /*自定义title*/
+        .aui-bar-nav .aui-12xue-title {
+            min-height: 2.25rem;
+            position: absolute;
+            margin: 0;
+            text-align: left;
+            white-space: nowrap;
+            right: 10rem;
+            left: 2rem;
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 2;
+
+        }
+        .aui-12xue-title{ color: #333}
+        .nav-spanBtn {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background:url("../../../image/stuHomePad/xuefenico.png") no-repeat  11px 6px #fff;
+            padding: 6px 10px;
+            margin-right: 10px;
+            background-size: 20px;
+            padding-left: 38px;
+        }
+        .nav-spanBtn:active{
+            background:url("../../../image/stuHomePad/xuefenicoactive.png") no-repeat  11px 6px #4bc7c7;
+            background-size: 20px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="api.closeWin();"></span>学分乐园
+    </a>
+    <div style="float: right" tapmode onclick="pushToScoreRecord();">
+        <span class="nav-spanBtn"
+              style="font-size: 0.7rem">学分记录</span>
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var stuSchoolId;
+    apiready = function(){
+        apiObj.SetAuthToken($api.getStorage('token'));
+        var header = $api.dom('header');
+        //$api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        getStuSchoolInfo();
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.openFrame({
+            name: 'frame-myscorezoo',
+            url: 'frame-myscorezoo.html',
+            bounces: false,
+            vScrollBarEnabled: false,
+            rect: {
+                x: 0,
+                y: headerH ,
+                w: 'auto',
+                h: frameH
+            }
+        });
+    };
+    function pushToScoreRecord() {
+        api.openWin({
+            name: 'win-score-record',
+            url: 'win-score-record.html',
+            pageParam: {schoolid: stuSchoolId}
+        });
+    }
+    function getStuSchoolInfo() {
+        apiObj.Get(UrlRouter.GetUserSchoolInfo,{
+            values:{
+                uid:$api.getStorage('uid')
+            }
+        },function (ret, err) {
+            stuSchoolId = ret.data[0].id;
+        })
+    }
+</script>
+</html>

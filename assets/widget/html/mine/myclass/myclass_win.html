@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>我的班级</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        body {
+            background-color: #f2f2f2
+        }
+
+        .aui-content {
+            margin-top: 0px;
+        }
+
+        img {
+            height: 30px;
+            width: 30px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .aui-tab-nav li.active {
+            color: #4bc7c7;
+            border-bottom: 2px #4bc7c7 solid;
+        }
+
+        .active {
+            color: #fff !important;
+            background: #4bc7c7;
+        }
+
+        .qr:active {
+            background: #4bc7c7;
+            color: #fff;
+        }
+
+        .qr {
+            border: 1px solid #00c8c8;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            font-size: 0.7rem !important;
+            margin-right: 10px;
+        }
+
+        .aui-bar-nav .aui-iconfont {
+            line-height: 1.25rem
+        }
+
+        .aui-icon-check:before {
+            margin-right: 5px;
+        }
+
+        ul {
+            width: 40%;
+            margin: 0 auto;
+            height: 2rem;
+            line-height: 2rem;
+            margin-top: 10px;
+        }
+
+        ul li {
+            width: 50%;
+            float: left;
+            text-align: center;
+            background: #fff;
+            color: #00c8c8;
+            border-radius: 1px;
+            border: 1px #4bc7c7 solid;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()'></span>我的班级
+    </a>
+    <span class="aui-iconfont aui-icon-add aui-pull-right qr" tapmode onclick="commitOpinion()"> 添加班级</span>
+</header>
+<ul class="aui-tab-nav">
+    <li id="joinedclass" tapmode class="active" onclick="joinedClass()">已加入的班级</li>
+    <li id="auditclass" tapmode onclick="auditClass()">待审核的班级</li>
+</ul>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/myclass/myclass.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+//        apiObj.SetAuthToken($api.getStorage('token'));
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        loadMyJoinClass();
+
+        api.addEventListener({
+            name: 'refreshMyClass'
+        }, function (ret, err) {
+            joinedClass();
+        });
+
+        api.addEventListener({
+            name: 'refreshMyClass2'
+        }, function (ret, err) {
+            loadMyAuditClass();
+        });
+
+    };
+
+    function commitOpinion() {
+        api.openWin({
+            name: 'joinByCode_win',
+            url: 'joinByCode_win.html',
+            pageParam: {name: 'pageparamname'}
+        });
+    }
+</script>
+</html>

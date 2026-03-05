@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="@android:color/black" android:layout_width="match_parent" android:layout_height="60.0dp" android:alpha="0.6">
+        <LinearLayout android:id="@id/back" android:layout_width="60.0dp" android:layout_height="60.0dp" android:layout_alignParentLeft="true">
+            <ImageView android:layout_gravity="center" android:layout_width="25.0dp" android:layout_height="25.0dp" android:layout_marginLeft="17.0dp" android:src="@drawable/mo_uimediascanner_back" />
+        </LinearLayout>
+        <TextView android:textSize="18.0sp" android:textColor="@android:color/holo_green_dark" android:gravity="center" android:id="@id/confirm" android:padding="5.0dp" android:layout_width="wrap_content" android:layout_height="60.0dp" android:layout_marginRight="10.0dp" android:text="完成" android:layout_alignParentRight="true" />
+    </RelativeLayout>
+    <com.uzmap.pkg.uzmodules.UIMediaScanner.HackyViewPager android:id="@id/browserPager" android:layout_width="match_parent" android:layout_height="match_parent" />
+</LinearLayout>

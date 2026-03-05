@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>学科列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content {
+            padding: 10px 10px 50px 10px;
+        }
+
+        .content ul li {
+            width: 25%;
+            float: left;
+            padding: 8px;
+            position: relative;
+            height: 200px;;
+        }
+
+        .content ul li .item {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 6px;
+            background: #fff;
+            /*border: 1px solid #e4e4e8;*/
+            text-align: center;
+            background-size: 35% !important;
+        }
+
+        .content ul li .item h2 {
+            font-size: 0.8rem;
+            padding-top: 14%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 90%;
+            margin: 0 auto;
+            margin-bottom: 8px;
+            color: #333333;
+        }
+
+        .content ul li .item h2 span {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            margin-right: 5px;
+            font-size: 0.6rem;
+            background: #4bc7c7;
+            color: #fff;
+            border-radius: 3px;
+            vertical-align: top
+        }
+
+        .item p {
+            /*color: #666666;*/
+            font-size: 12px;
+            width: 90%;
+            margin: 0 auto;
+            height: 1rem;
+            line-height: 1rem
+        }
+
+        .item p b {
+            font-weight: normal;
+            color: #4bc7c7;
+            padding: 0 3px;
+        }
+
+        .accuracy {
+            background: #ff778c;
+            padding: 4% 0;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            font-size: 0.6rem;
+            position: absolute;
+            bottom: 0px;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        .submit {
+            width: 100px;
+            height: 30px;
+            line-height: 31px;
+            color: #fff;
+            position: absolute;
+            top: 1px;
+            right: 0px;
+            text-align: center;
+            font-size: 0.6rem
+        }
+
+        .weikaoshi {
+            background: url("../../../image/stuHomePad/weikaoshi.png") no-repeat center top;
+            background-size: 100% auto;
+        }
+
+        .daipiyue {
+            background: url("../../../image/stuHomePad/weikaishi.png") no-repeat center top;
+            background-size: 100% auto;
+        }
+
+        @media only screen and (min-width: 901px) and (max-width: 980px) {
+            .content ul li .item h2 {
+                font-size: 0.7rem;
+            }
+
+            .content ul li .item h2 span {
+                font-size: 0.55rem;
+            }
+
+            .item p {
+                font-size: 0.55rem;
+            }
+        }
+
+        @media only screen and (min-width: 800px) and (max-width: 900px) {
+            .content ul li .item h2 {
+                font-size: 0.6rem;
+            }
+
+            .content ul li .item h2 span {
+                font-size: 0.45rem;
+            }
+
+            .item p {
+                font-size: 0.45rem;
+            }
+        }
+
+        .score {
+            display: inline-block;
+            margin-left: 2px;
+            vertical-align: bottom;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background-color: #0c938c;
+            border-radius: 12px;
+            height: 22px;
+            font-size: 12px;
+            color: #ffffff;
+            line-height: 23px;
+            padding-left: 15px;
+            padding-right: 10px;
+
+        }
+
+        .tch-name {
+            margin-top: 10px;
+            display: inline-block;
+            margin-left: 2px;
+            vertical-align: bottom;
+            width: 90%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #333333;
+        }
+
+        .suo {
+            width: 100%;
+            position: absolute;
+            height: 100%;
+            background: url("../../../image/suo.png") no-repeat center center rgba(0, 0, 0, 0.4);
+            right: 0;
+            top: 0;
+            z-index: 20;
+            background-size: 30%;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="content" v-cloak>
+        <div class="kong" v-if="homeworkLists.length==0&&isNull"
+             style="width: 30%; margin: 0 auto;   padding-top: 12%; text-align: center">
+            <img src="../../../image/exam/nokaoshi.png" style="width: 100%; max-width: 243px;">
+        </div>
+        <ul v-else class="clearfix">
+            <li v-for="(homeworkList,index) in homeworkLists" @click="openHomeworkDetail(homeworkList)">
+                <div class="item" :style="{background:subjectImg(xkname)}">
+                    <div class="suo" v-if="homeworkList.is_lock == 1"></div>
+                    <h2 >
+                        <b style="font-weight: normal" v-html="homeworkList.title"></b>
+                    </h2>
+                    <p v-if="homeworkList.status==2 && homeworkList.review_complete==1 && homeworkList.showanswer==1">
+                        <span class="score"  >成绩<b style="display: inline-block;width: 11px"></b>{{OneDecimalPlace(homeworkList.score)}} / {{OneDecimalPlace(homeworkList.full_marks)}}</span>
+                    </p>
+                    <p>
+                        <span class="tch-name"
+                              v-text="homeworkList.bjmc+'(' +homeworkList.fbrxm+'老师)'"></span>
+                    </p>
+                    <div class="accuracy" style="background:#4bc7c7" v-text="gettime(homeworkList.start_time)"></div>
+                    <span class="submit"
+                          :class="homeworkList.status!=2 ?'weikaoshi':homeworkList.status==2 && homeworkList.review_complete==1?'':'daipiyue'"
+                          v-text="homeworkList.status!=2 ?'缺考':homeworkList.status==2 && homeworkList.review_complete==1?' ':'阅卷中'"></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var homeworkListData = [];//作业列表的数据
+    var vm;
+    var isshangla=true;
+    var p=1;
+    var pullRefresh;
+    apiready = function () {
+        vue();
+        vm.subject = api.pageParam.subject;
+        vm.xkname=api.pageParam.subject.name;
+        vm.GetPaperLists(api.pageParam.subject);
+        api.addEventListener({// 选择状态
+            name: 'selectStatus'
+        }, function (ret, err) {
+            p = 1;
+            isshangla=true;
+            vm.status = ret.value.status;
+            homeworkListData=[];
+            vm.GetPaperLists(api.pageParam.subject);
+        });
+        api.addEventListener({// 选择状态
+            name: 'selectTime'
+        }, function (ret, err) {
+            p = 1;
+            isshangla=true;
+            vm.sendtime = ret.value.sendtime;
+            homeworkListData=[];
+            vm.GetPaperLists(api.pageParam.subject);
+        });
+        api.addEventListener({// 刷新
+            name: 'shuaxinExamList'
+        }, function (ret, err) {
+            p = 1;
+            vm.homeworkLists=[];
+            homeworkListData=[];
+            vm.GetPaperLists(api.pageParam.subject);
+        });
+        //下拉刷新
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isshangla=true;
+                vm.homeworkLists=[];
+                homeworkListData=[];
+                vm.GetPaperLists(api.pageParam.subject);
+            }
+        });
+
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: -100           //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            p++;
+            if (!isshangla) {
+                api.toast({
+                    msg: '已经到底啦，没有更多考试了',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                vm.GetPaperLists(api.pageParam.subject);
+            }
+        });
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                subject:[],
+                nowTime: new Date().getTime(),
+                homeworkLists: [],
+                isNull: true,
+                xkname: '',
+                status:0,
+                sendtime:0
+            },
+            methods: {
+                OneDecimalPlace:function(num){
+                    return parseInt((num)*10)/10;
+                },
+                GetPaperStuinfo: function (list) {// 学生获取有考试的科目
+                    // api.showProgress({
+                    //     title: '加载中',
+                    //     text: '请稍后...',
+                    //     modal: false
+                    // });
+                    apiObj.Get(UrlRouter.GetPaperStuinfo, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            classid:list.bjid,
+                            paperid:list.id
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                var db = api.require('db');
+                                var retDatabaseSync = db.openDatabaseSync({
+                                    name: dbName,
+                                    path: 'fs://student_12xue.db'
+                                });
+                                //查询作业答案
+                                var returnData = db.selectSqlSync({
+                                    name: dbName,
+                                    sql: 'SELECT * FROM NewExamAnswer where uid=' + $api.getStorage('uid') + ' and ksid=' + ret.data.id +' and xsbjid=' + ret.data.bjid
+                                });
+                                // alert(JSON.stringify(returnData.data));
+                                if (JSON.stringify(returnData.data) != '[]' && JSON.stringify(returnData.data) != undefined ) {
+                                    api.openWin({
+                                        name: 'win_detail',
+                                        url: 'win_detail.html',
+                                        pageParam: {
+                                            examtitle:ret.data.title,
+                                            examid:ret.data.id,
+                                            exambjid:ret.data.bjid,
+                                            examMateriallist:ret.data.materiallist,
+                                            examzts:ret.data.zts,
+                                            index:0,
+                                            complete:ret.data.is_complete,
+                                            zyyq:ret.data.content
+                                        }
+                                    });
+                                }else{
+                                    if(list.status!=2&&list.make_up==1){//缺考允许补考
+                                        api.openWin({
+                                            name: 'win_detail',
+                                            url: 'win_detail.html',
+                                            pageParam: {
+                                                examtitle:ret.data.title,
+                                                examid:ret.data.id,
+                                                exambjid:ret.data.bjid,
+                                                examMateriallist:ret.data.materiallist,
+                                                examzts:ret.data.zts,
+                                                index:0,
+                                                complete:ret.data.is_complete,
+                                                zyyq:ret.data.content,
+                                            }
+                                        });
+                                    }else{
+                                        api.openWin({
+                                            name: 'win_exercises_list',
+                                            url: 'win_exercises_list.html',
+                                            pageParam: {
+                                                examtitle:ret.data.title,
+                                                examid:ret.data.id,
+                                                exambjid:ret.data.bjid,
+                                                complete:ret.data.is_complete,
+                                            }
+                                        });
+                                    }
+                                }
+
+
+
+                            }
+                            else{
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret .msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        }else{
+                            api.hideProgress();
+                            api.toast({
+                                msg: err .msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } ,'','',false);
+                },
+                openHomeworkDetail:function(list){
+                    if(list.is_lock==1){
+                        api.openFrame({
+                            name: 'buy',
+                            url: 'buy.html',
+                            rect: {
+                                x: 0,
+                                y: 0,
+                                w: api.winWidth,
+                                h: api.winHeight
+                            },
+                            pageParam: {
+
+                            },
+//            bounces: true
+                        });
+                    }else{
+                        vm.GetPaperStuinfo(list);
+                    }
+
+
+                },
+                gettime: function (updateTime) {
+                    // var date = new Date();
+                    // date.setTime(updateTime*1000);
+                    // var y = date.getFullYear();
+                    // var m = date.getMonth() + 1;
+                    // m = m < 10 ? ('0' + m) : m;
+                    // var d = date.getDate();
+                    // d = d < 10 ? ('0' + d) : d;
+                    // return y + '-' + m + '-' + d;
+                    var date = new Date(updateTime * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                    var Y = date.getFullYear() + '-';
+                    var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                    var D = date.getDate();
+                    D = D < 10 ? ('0' + D) + ' ' : D + ' ';
+                    var h = date.getHours();
+                    h = h < 10 ? ('0' + h) + ':' : h + ':';
+                    var m = date.getMinutes();
+                    m = m < 10 ? ('0' + m) : m;
+                    return '时间：' + Y + M + D + h + m;
+
+
+                },
+                fsgettime: function (updateTime) {
+                    var date = new Date();
+                    date.setTime(updateTime * 1000);
+                    var y = date.getFullYear();
+                    var m = date.getMonth() + 1;
+                    m = m < 10 ? ('0' + m) : m;
+                    var d = date.getDate();
+                    d = d < 10 ? ('0' + d) : d;
+                    var h = date.getHours();
+                    h = h < 10 ? ('0' + h) : h;
+                    var minute = date.getMinutes();
+                    var second = date.getSeconds();
+                    minute = minute < 10 ? ('0' + minute) : minute;
+                    second = second < 10 ? ('0' + second) : second;
+                    return y + '-' + m + '-' + d + ' ' + h + ':' + minute;
+                },
+
+
+                GetPaperLists: function (subject) {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetPaperLists, {
+                        values: {
+                            bjid: api.pageParam.classids.join(","),
+                            xkid:subject.xkid,
+                            time:vm.sendtime,
+                            finishstatus:vm.status,
+                            num:12,
+                            page:p
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                pullRefresh.cancelLoading();
+                                if (ret.data.length > 0) {
+                                    homeworkListData = homeworkListData.concat(ret.data);
+                                    vm.homeworkLists = homeworkListData;
+                                    vm.isNull = false;
+                                } else {
+                                    if( p>1){
+                                        isshangla=false;
+                                    }else{
+                                        vm.isNull = true;
+                                        vm.homeworkLists=[];
+                                    }
+
+
+                                }
+
+                                api.hideProgress();
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    },'','',false);
+                },
+                subjectImg: function (kmmc) {
+                    switch (kmmc) {
+                        case '数学':
+                            return "url('../../../image/shuxue.png') no-repeat #fff";
+                            break;
+                        case '语文':
+                            return "url('../../../image/yuwen.png') no-repeat #fff";
+                            break;
+                        case '物理':
+                            return "url('../../../image/wuli.png') no-repeat #fff";
+                            break;
+                        case '化学':
+                            return "url('../../../image/huaxue.png') no-repeat #fff";
+                            break;
+                        case '生物':
+                            return "url('../../../image/shengwu.png') no-repeat #fff";
+                            break;
+                        case '英语':
+                            return "url('../../../image/yingyu.png') no-repeat #fff";
+                            break;
+                        case '地理':
+                            return "url('../../../image/dili.png') no-repeat #fff";
+                            break;
+                        case '历史':
+                            return "url('../../../image/lishi.png') no-repeat #fff";
+                            break;
+                        case '政治':
+                            return "url('../../../image/zhengzhi.png') no-repeat #fff";
+                            break;
+                        default:
+                            return "url('../../../image/qita.png') no-repeat #fff";
+                            break;
+                    }
+                },
+            }
+        });
+    }
+</script>
+</html>

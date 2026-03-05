@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.apicloud.devlop.FNImageClip.ClipLayout android:background="#000000" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:layout_gravity="center" android:id="@id/imgView" android:layout_width="match_parent" android:layout_height="match_parent" />
+    <com.apicloud.devlop.FNImageClip.ClipView android:id="@id/imgClipView" android:layout_width="match_parent" android:layout_height="match_parent" />
+</com.apicloud.devlop.FNImageClip.ClipLayout>

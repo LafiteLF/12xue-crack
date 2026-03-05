@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            position: relative;
+            width: 100%;
+            background-color: #f2f2f2;
+
+        }
+
+        .head {
+            position: fixed;
+            top: 0px;
+            z-index: 100
+        }
+
+        .head-tip {
+            /*position: fixed;*/
+            /*top: -35px;*/
+            padding-top: 40px;
+            /*z-index: 100;*/
+            width: 100%;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+
+        .aui-card-list-user-avatar {
+            width: 3rem;
+            height: 3rem;
+            position: relative;
+        }
+        .sex {
+            color: dodgerblue;
+            top: 60px;
+            position: absolute;
+            right: 10px;
+            text-align: right;
+            font-size: 1.1rem;width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 60px;
+            position: absolute;
+            right: 10px;
+            text-align: right;
+            font-size: 1.1rem;width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .followAvatar {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        .identitytype {
+            font-size: 0.7rem;
+            color: #a9a9a9;
+        }
+
+        .aui-label {
+            padding: 0.1rem 0.25rem;
+            vertical-align: middle;
+            margin-bottom: 0.2rem;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .aui-card-list {
+            margin-bottom: 0;
+            min-height: 5rem;
+            margin-top: 10px;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-card-list-user-avatar img {
+            height: 3rem;
+            width: 3rem;
+            max-height: 3rem;
+        }
+
+        .btn-follow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .btn-unfollow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+
+        .aui-card-list-content-padded .content-text img, .aui-card-list-content-padded .forward-content-text img {
+            width: 24px;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .aui-card-list-content-padded .content-exercise img, .aui-card-list-content-padded .forward-content-exercise img {
+            width: auto;
+            max-width: 100%;
+            display: inline-block;
+        }
+
+        .aui-label-info {
+            background-color: #6b8fec;
+        }
+
+        .username {
+            max-width: 6rem;
+            float: left;
+            display: block;
+        }
+
+        .content-text .content-exercise {
+            word-break: break-all;
+        }
+
+        .aui-refresh-content {
+            width: 100%;
+        }
+
+        .aui-border::after {
+            border-radius: 3px;
+        }
+
+        .aui-border:after {
+            border: none
+        }
+
+        .item {
+            width: auto;
+            float: left;
+            margin-left: 20px;
+        }
+
+        .aui-border-l:before, .aui-border-r:after {
+            width: 0px
+        }
+
+        .aui-grid .aui-iconfont {
+            position: relative;
+            z-index: 20;
+            top: 0;
+            height: 1.4rem;
+            font-size: 0.7rem;
+            color: #666;
+            line-height: 1.4rem;
+            padding-left: 5px;
+        }
+
+        .aui-grid .aui-grid-label {
+            display: block;
+            font-size: 0.7rem;
+            position: relative;
+            margin-bottom: 0.25rem;
+            margin-top: 0px;
+            color: #666;
+        }
+
+        .card-list-content-padded {
+            /*position: relative;*/
+            padding: 2px 0.7rem;
+            width: 80%;
+            height: 0.8rem;
+            line-height: 0.8rem;
+            color: #666;
+            font-size: 0.6rem !important;
+            margin: 0 auto;
+            border-left: 4px solid #f0ac0c;
+            margin-top: 0.5rem;
+        }
+
+        .aui-border-t:before, .aui-border-b:after {
+            height: 0px;
+        }
+    </style>
+</head>
+<body>
+<div class="head" style="border-bottom: 1px solid #d5d5d5">
+    <section class="aui-grid">
+        <div class="aui-row">
+            <div class="item  aui-border-r is-request type-area" tapmode onclick="choose('area');">
+                <div class="aui-grid-label aui-ellipsis-1 type ">区域范围<span class="aui-iconfont aui-icon-unfold"></span>
+                </div>
+            </div>
+            <div class="item  aui-border-r subject type-identitytype" tapmode onclick="choose('identitytype');">
+                <div class="aui-grid-label aui-ellipsis-1 type ">老师<span class="aui-iconfont aui-icon-unfold"></span>
+                </div>
+            </div>
+            <div class=" item grade type-sex" tapmode onclick="choose('sex');">
+                <div class="aui-grid-label aui-ellipsis-1 type ">性别<span class="aui-iconfont aui-icon-unfold"></span>
+                </div>
+            </div>
+        </div>
+        <!--<div class="tip aui-font-size-14">-->
+        <!--为了更准确的为您推荐，请<span style="color: #4bc7c7;">设置任课信息</span>。-->
+        <!--</div>-->
+    </section>
+</div>
+<div class="head-tip">
+    <div class="tips card-list-content-padded aui-font-size-14"
+         style="">
+        推荐关注
+    </div>
+</div>
+<div class="aui-refresh-content " style="    width: 80%;
+    margin: 0 auto;
+    height: 100%;
+    padding-top: 0.3rem">
+    <div class="aui-content">
+        <ul class="aui-list">
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+
+    var realname = '';
+    var provinceCode;
+    var cityCode;
+    var areaCode;
+    var schoolid;
+    var identitytype = '2';
+    var p = 1;
+    var sex;
+    var isClean = true;  //是否清除列表
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        // 选择区域的回调
+        api.addEventListener({
+            name: 'chooseArea'
+        }, function (ret, err) {
+            provinceCode = ret.value.province;
+            cityCode = ret.value.city;
+            areaCode = ret.value.district;
+            schoolid = ret.value.schoolid;
+            $api.html($api.dom($api.dom('.type-area'), '.type'), ret.value.areaName + '<span class="aui-iconfont aui-icon-unfold">');
+            changCondition();
+        });
+        // 搜索栏搜索时的回调
+        api.addEventListener({
+            name: 'searchBegin'
+        }, function (ret, err) {
+            changCondition();
+        });
+        // 实时刷新搜索内容
+        api.addEventListener({
+            name: 'refreshRealname'
+        }, function (ret, err) {
+            realname = ret.value.searchContent;
+        });
+        getRecommendUsers();
+    };
+
+    /**
+     * 获取推荐人列表
+     */
+    function getRecommendUsers() {
+        apiObj.Get(UrlRouter.GetRecommendUsers, {
+            values: {
+                num: 10
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (isClean) {
+                    $api.html($api.dom('.aui-list'), '');
+                }
+                if (ret.ret == 0 && ret.data.length > 0) {
+                    $api.html($api.dom('.aui-list'), '');
+                    for (var i = 0; i < ret.data.length; i++) {
+                        var identitytype = ret.data[i].identitytype == 2 ? '老师' : ret.data[i].identitytype == 3 ? '学生' : '家长';
+                        var followHtml = ret.data[i].uid != $api.getStorage('uid') ? ret.data[i].follow ? '<div class="aui-btn btn-follow aui-btn-warning aui-btn-outlined" tapmode onclick="btnFollow(this)">取消关注</div> </div> </li>' : '<div class="aui-btn btn-follow aui-btn-warning" tapmode onclick="btnFollow(this)"><span class="aui-iconfont aui-icon-add"></span>关注</div> </div> </li>' : '';
+                        if (ret.data[i].sex == 1) {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                        } else if(ret.data[i].sex == 2) {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                        }else{
+                            var sexhtml='';
+                        }
+                        $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b" uid="' + ret.data[i].uid + '">' +
+                                ' <div class="aui-card-list-header aui-card-list-user"> ' +
+                                '<div class="aui-card-list-user-avatar followAvatar"> ' +
+                               sexhtml+ '<img src="' + ret.data[i].face + '" class="aui-img-round aui-margin-t-10 aui-margin-l-10"/> </div> ' +
+                                '<div class="aui-card-list-user-name aui-font-size-16"> ' +
+                                '<div class="aui-text-primary aui-text-primaryDiv">' +
+                                '<span class="username aui-ellipsis-1">' + ret.data[i].realname + ' </span>' +
+                                '<span class="aui-label aui-label-info">' + ret.data[i].rank + '</span>' +
+                                '<span class="identitytype">（' + identitytype + '）</span></div> </div>' +
+                                ' <div class="aui-card-list-content aui-text-default">' + ret.data[i].xd + ' ' + ret.data[i].kmmc + '</div> ' +
+                                '<div class="aui-card-list-content aui-text-default">' + ret.data[i].xxmc + '</div> ' +
+                                '<div class="aui-card-list-content aui-text-default">关注' + ret.data[i].statistics.follownum + ' 粉丝' + ret.data[i].statistics.fansnum + '</div>' +
+                                followHtml);
+                    }
+                } else if (ret.ret == 0) {
+                    alert('暂无推荐关注人信息');
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+            api.hideProgress();
+        })
+    }
+
+    /**
+     * 关注 取消关注 按钮
+     * @param context   上下文
+     */
+    function btnFollow(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        var uid = $api.attr($api.closest(context, '.aui-card-list'), 'uid');
+        if ($api.hasCls(context, 'aui-btn-outlined')) {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 0,
+                    followuid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.removeCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '<span class="aui-iconfont aui-icon-add"></span>关注');
+                            }
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            });
+        } else {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 1,
+                    followuid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.addCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '取消关注');
+                            }
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            })
+        }
+    }
+    /**
+     * 条件筛选列表
+     * @param type  area：区域范围   identitytype：身份  sex：性别
+     */
+    function choose(type) {
+//        alert(type);
+        switch (type) {
+            case 'area':
+                api.openWin({
+                    name: 'win-school-lists',
+                    url: 'win-school-lists.html'
+                });
+                break;
+            case 'identitytype':
+                openFrame(['老师', '学生', '家长'], 'type-identitytype');
+                break;
+            case 'sex':
+                openFrame(['全部', '男', '女'], 'type-sex');
+                break;
+        }
+    }
+
+    /**
+     * 打开选择列表
+     * @param array  可选项
+     * @param item   frame的class
+     */
+    function openFrame(array, item) {
+        api.openFrame({
+            name: 'frame-tab-search',
+            url: 'frame-tab-search.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: $api.getStorage('padHeight')
+            },
+            pageParam: {array: array, item: item, frameName: api.frameName},
+            bounces: false,
+            reload: true
+        });
+    }
+    /**
+     * 搜索用户
+     */
+    function searchUser() {
+        apiObj.Get(UrlRouter.GetSearchUsers, {
+            values: {
+                realname: $api.trim(realname),
+                identitytype: identitytype,
+                province: provinceCode,
+                city: cityCode,
+                district: areaCode,
+                schoolid: schoolid,
+                sex: sex,
+                p: p,
+                num: '10'
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (isClean) {
+                    $api.html($api.dom('.aui-list'), '');
+                }
+                if (ret.ret == 0 && ret.data.length > 0) {
+                    for (var i = 0; i < ret.data.length; i++) {
+                        var identitytype = ret.data[i].identitytype == 2 ? '老师' : ret.data[i].identitytype == 3 ? '学生' : '家长';
+                        var followHtml = ret.data[i].uid != $api.getStorage('uid') ? ret.data[i].follow ? '<div class="aui-btn btn-follow aui-btn-warning aui-btn-outlined" tapmode onclick="btnFollow(this)">取消关注</div> </div> </li>' : '<div class="aui-btn btn-follow aui-btn-warning" tapmode onclick="btnFollow(this)"><span class="aui-iconfont aui-icon-add"></span>关注</div> </div> </li>' : '';
+                        if (ret.data[i].sex == 1) {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                        } else if(ret.data[i].sex == 2) {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                        }else{
+                            var sexhtml='';
+                        }
+                        $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b" uid="' + ret.data[i].uid + '">' +
+                                ' <div class="aui-card-list-header aui-card-list-user"> ' +
+                                '<div class="aui-card-list-user-avatar followAvatar"> ' +
+                              sexhtml + '<img src="' + ret.data[i].face + '" class="aui-img-round aui-margin-t-10 aui-margin-l-10"/> </div> ' +
+                                '<div class="aui-card-list-user-name aui-font-size-16"> ' +
+                                '<div class="aui-text-primary aui-text-primaryDiv">' +
+                                '<span class="username aui-ellipsis-1">' + ret.data[i].realname + ' </span>' +
+                                '<span class="aui-label aui-label-info">' + ret.data[i].rank + '</span>' +
+                                '<span class="identitytype">（' + identitytype + '）</span></div> </div>' +
+                                ' <div class="aui-card-list-content aui-text-default">' + unique(ret.data[i].xdmc) + ' ' + ret.data[i].kmmc + '</div> ' +
+                                '<div class="aui-card-list-content aui-text-default">' + ret.data[i].xxmc + '</div> ' +
+                                '<div class="aui-card-list-content aui-text-default">关注' + ret.data[i].statistics.follownum + ' 粉丝' + ret.data[i].statistics.fansnum + '</div>' +
+                                followHtml);
+                    }
+                    //添加上拉加载监听
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100           //设置距离底部多少距离时触发，默认值为0，数字类型
+                        }
+                    }, function (ret, err) {
+                        p++;
+                        isClean = false;
+                        searchUser();
+                    });
+                } else if (ret.ret == 0) {
+                    alert('无更多用户');
+                    //取消上拉加载监听
+                    api.removeEventListener({
+                        name: 'scrolltobottom'
+                    });
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+        })
+    }
+
+    /**
+     * 改变条件时 搜索用户的回调
+     */
+    function changCondition() {
+        isClean = true;
+        p = 1;
+        if (!$api.hasCls($api.dom('.tips'), 'aui-hide')) {
+            $api.addCls($api.dom('.tips'), 'aui-hide');
+        }
+        searchUser();
+    }
+
+    /**
+     * 数组去重
+     * @param arr 需要去重的数组
+     * @returns {Array} 处理后的数组
+     */
+    function unique(arr) {
+        var result = [], hash = {};
+        for (var i = 0, elem; (elem = arr[i]) != null; i++) {
+            if (!hash[elem]) {
+                result.push(elem);
+                hash[elem] = true;
+            }
+        }
+        return result;
+    }
+</script>
+</html>

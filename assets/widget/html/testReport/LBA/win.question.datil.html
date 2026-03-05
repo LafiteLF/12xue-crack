@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>错题详情</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/ErrorBookLeftBtn.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css" />
+
+    <style>
+        .winTitle {
+            width: calc(100% - 165px);
+        }
+
+        .impdisable {
+            pointer-events: none;
+        }
+
+        .correctbtn {
+            position: absolute;
+            bottom: 20px;
+            right: 5px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .checkbtn {
+            position: absolute;
+            bottom: 20px;
+            right: 5px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .winTitle {
+            width: 200px;
+        }
+
+        .countDiv {
+            position: absolute;
+            color: #4bc7c7;
+            text-align: center;
+            font-size: 1.6rem;
+            left: 19vw;
+            line-height: 50px;
+        }
+
+        .remainDIv {
+            font-size: 1.6rem;
+            text-align: center;
+        }
+
+        .bstNum {
+            font-size: 1.6rem;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .AIjxNum {
+            font-size: 1.6rem;
+            color: rgba(0, 0, 0, 0.5);
+        }
+         
+        [v-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="clearfix" v-cloak>
+        <div style="position: relative">
+            <div style="position: absolute" topmode onclick="api.closeWin();" class="winTitle pull_left">
+                {{ courseType }}
+            </div>
+            <div class="countDiv">
+                <span style="font-size: 2rem" v-text="index"></span><span v-text="'/'+totalCount"></span>
+            </div>
+            <div
+                style="line-height:50px;display: grid;grid-template-columns: auto auto auto;position: absolute;left: 50%;transform: translateX(-50%);column-gap: 2vw;">
+                <div class="remainDIv">
+                    本月剩余
+                </div>
+                <div class="AIjxNum">
+                    AI解析次数:&nbsp;<span style="font-weight: bold;"
+                        :style="{'color': aiAnalysis.count > 0 ? '#4BC7C7': '#F82A1A'}"
+                        v-text="aiAnalysis.count">0</span>
+                </div>
+            </div>
+        </div>
+        <ul class="right_btn">
+            <li tapmode onclick="vm.onPageUpClick(this);"><img src="../../../image/up1.png"></li>
+            <li tapmode onclick="vm.onPageDownClick(this);"><img src="../../../image/down1.png"></li>
+        </ul>
+
+    </header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var picArr = [];
+    var pImageList = [];//图片地址
+    var imageFilter;// 压缩图片
+    var compressListener = {
+        allCount: 0,
+        successCount: 0
+    };
+    var uiMediaScanner;// 选择图片
+    var maxsort;
+    var vm;
+    var url;
+    var currentImgAccountMax = 6;
+    var reloadflag = '0';
+    //用于记录删除错题的逻辑标志
+    //语言无法表达我的逻辑，看看代码吧
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+
+        vue();
+        vm.topIndex = (vm.index + 1) + "/" + vm.totalCount;
+
+        if (api.pageParam.online == 2) {
+            $api.css($api.dom('.pull_right'), 'display: none');
+        }
+        vm.getaipushUserInfo();
+        vm.getAIjxcsUserInfo();
+        vm.getInfo(vm.index);
+
+        api.addEventListener({
+            name: 'onTopIndexChange'
+        }, function (ret, err) {
+            var sendIndex = ret.value.index;
+            vm.totalCount--;
+            if (sendIndex > vm.totalCount) {
+                vm.index = vm.totalCount;
+            } else {
+                vm.index = sendIndex;
+            }
+
+            vm.getInfo(vm.index);
+        });
+
+        api.addEventListener({
+            
+            
+            name:'aiAnalysisReduce'
+        },function(ret,err){
+            console.log('次数应减少');
+            vm.getAIjxcsUserInfo()
+        });
+
+        //打开数据库
+        var db = api.require('db');
+        var retDatabaseSync = db.openDatabaseSync({
+            name: dbName,
+            path: 'fs://student_12xue.db'
+        });
+        //先删除表中的数据
+        var deleteTable = db.executeSqlSync({
+            name: dbName,
+            sql: 'DROP TABLE IF EXISTS NewErrorBooKData'
+        });
+        //创建作业答案表格
+        var creatRet = db.executeSqlSync({
+            name: dbName,
+            sql: 'CREATE TABLE IF NOT EXISTS NewErrorBooKData(id INTEGER PRIMARY KEY AUTOINCREMENT,uid varchar(20), sys_id varchar(20),is_true INTEGER,answerStr text,viewAnswer INTEGER)'
+        });
+
+
+        api.addEventListener({//打开相册
+            name: 'openCorrectionAlbum'
+        }, function (ret, err) {
+            maxsort = ret.value.maxsort;
+            vm.currentImgNums = ret.value.currentImgNums;
+            picArr = [];
+            pImageList = [];
+            openCorrectionAlbum();
+        });
+
+        api.addEventListener({
+            name: 'refreshvmCurrentImgNums'
+        }, function (ret, err) {
+            vm.currentImgNums = ret.value.currentImgNums;
+
+            picArr = [];
+            pImageList = [];
+        });
+
+        api.addEventListener({
+            name: 'aiAnalysisMinusOne'
+        }, function () {
+            if (vm.aiAnalysis.count > 0) {
+                vm.aiAnalysis.count--;
+            }
+        });
+
+        api.addEventListener({
+            name: 'refreshCurrentIcon'
+        }, function (ret, err) {
+            vm.currentImgNums = ret.value.currentImgNums;
+        });
+        //
+        api.addEventListener({
+            name: 'setCorrectionBtn'
+        }, function (ret, err) {
+            vm.setCorrectionBtn = ret.value.online;
+        });
+        settingGetSchoolset();
+        //        api.addEventListener({
+        //            name : 'keyback'
+        //        }, function(ret, err) {
+        ////            api.closeFrame({
+        ////                name: 'frame_chooseImg'
+        ////            });
+        //        });
+    };
+
+    function vue() {
+
+        vm = new Vue({
+            el: '.clearfix',
+            data: {
+
+                nowContent: api.pageParam.csContent[api.pageParam.index - 1],
+
+
+
+                index: api.pageParam.index,//当前题的index 从1开始
+                totalCount: api.pageParam.total,//总题数
+                csContent: api.pageParam.csContent,
+                courseType: api.pageParam.courseType,
+                topIndex: "0/0",//导航栏的index+1/totalCount
+                currentPage: '',//当前index属于哪一页
+                exercisesData: {},
+
+                xkmc: api.pageParam.xkmc,
+                current_sys_id: api.pageParam.sys_id,
+                currentImgNums: '',//当前小题已上传的纠错图数量
+                currentImgData: [],
+                setCorrectionBtn: '1',
+                correction: false,//错题本纠错功能是否开启
+                xtid: '',
+
+                aiAnalysis: { count: 0 }, //AI解析
+                zsdmc: '无', //知识点名称
+            },
+            mounted: function () {
+                console.log(JSON.stringify(api.pageParam.csContent[api.pageParam.index - 1]))
+
+                this.$watch('aiAnalysis', () => {
+                    $api.setStorage('aiAnalysis', this.aiAnalysis);
+                }, { deep: true })
+            },
+
+            computed: {
+                courseType: function () {
+                    return api.pageParam.csContent[this.index - 1].type_text;
+                }
+            },
+
+
+            methods: {
+                getInfo: function (page) {
+
+
+                    this.nowContent = api.pageParam.csContent[page - 1];
+                    vm.exercisesData = {};
+                    vm.exercisesData = this.nowContent;
+
+                    vm.current_sys_id = vm.exercisesData.id;
+                    vm.xtid = this.nowContent.xtid;
+                    vm.zsdmc = this.nowContent.zsdmc; //知识点名称
+                    //请求当前小题的纠错图数量
+                    GetCorrectionImageList(vm.current_sys_id, 0);
+
+                    api.closeFrame({
+                        name: 'frame_displayImg'
+                    });
+                    vm.openFrame();
+
+
+
+                },
+                getaipushUserInfo: function () {
+                    apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                        values: {
+                            uid: $api.getStorage("uid"),
+                            type: 'ai_push',
+                            schoolid: $api.getStorage("schoolid"),
+                        }
+                    }, (ret, err) => {
+                        if (ret && ret.ret === 0) {
+                            this.aiPush = ret.data;
+                        } else {
+                            this.aiPush = { count: 0 };
+                            console.log("获取用户付费信息失败");
+                        }
+                    })
+                },
+                getAIjxcsUserInfo: function () {
+                    apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                        values: {
+                            uid: $api.getStorage("uid"),
+                            type: 'ai_analysis',
+                            schoolid: $api.getStorage("schoolid"),
+                        }
+                    }, (ret, err) => {
+                        if (ret && ret.ret === 0) {
+                            vm.aiAnalysis = ret.data;
+                        } else {
+                            vm.aiAnalysis = { count: 0 };
+                            console.log("获取用户付费信息失败");
+                        }
+                    })
+                },
+                openFrame: function () {
+                    var header = document.querySelector('header');
+                    var headerH = $api.offset(header).h;
+                    var frameAry = [];
+                    var frameObj = {};
+                    if (api.pageParam.online == 1) {
+                        vm.setCorrectionBtn = '1';
+                        switch (vm.exercisesData.tx_code) {
+                            case '1'://单选 多选 判断 听单句话 单项选择
+                                url = './xzt.html';
+                                break;
+                            case '2':// 填空题 名著导读
+                                url = './tkt.html';
+                                break;
+                            case '3'://问答题 语言表达 默写 翻译 作文 朗读 证明 书面表达 朗读 解答 辨析 简答 计算
+                                url = "./wdt.html";
+                                break;
+                            case '4'://复合题带选项
+                                if (vm.exercisesData.tx == 'tdh' || vm.exercisesData.tx == 'tdb' || vm.exercisesData.tx == 'ttt') {//听对话 听对白
+                                    url = "./listen.html";
+                                } else {//完型填空 阅读理解 材料选择题
+                                    url = "./wxtk.html";
+                                }
+                                break;
+                            case '5'://复合题不带选项 ：材料分析 解答 现代文阅读 综合探究 实验与探究 诗歌鉴赏 文言文批阅
+                                url = "./sytj.html";
+                                break
+                        }
+                        api.openFrame({
+                            name: url,
+                            url: url,
+                            rect: {
+                                x: 0,
+                                y: headerH + 10,
+                                w: api.winWidth - 64,
+                                h: $api.getStorage('padHeight') - headerH - 10 - 10
+                            },
+                            pageParam: {
+                                csContent: api.pageParam.csContent,
+
+
+
+
+                                index: vm.index,
+                                type: api.pageParam.type,
+                                xkid: api.pageParam.xkid,
+                                dyid: api.pageParam.dyid,
+                                jieid: api.pageParam.jieid,
+                                njid: api.pageParam.njid,
+                                tx: api.pageParam.tx_type,
+                                tx_type: api.pageParam.tx_type,
+                                online: api.pageParam.online,
+                                totalCount: vm.totalCount,
+                                isImportant: api.pageParam.isImportant,//win中的筛选条件是否是重点
+                                is_important: api.pageParam.is_important,
+                                start_time: api.pageParam.start_time,
+                                end_time: api.pageParam.end_time,
+                            },
+                            bounces: false,
+                            reload: true
+                        });
+                    } else {
+                        vm.setCorrectionBtn = '2';
+                        api.openFrame({
+                            name: 'frame_offline',
+                            url: 'frame_offline.html',
+                            rect: {
+                                x: 0,
+                                y: headerH,
+                                w: api.winWidth - 64,
+                                h: $api.getStorage('padHeight') - headerH - 10
+                            },
+                            pageParam: {
+                                xkid: api.pageParam.xkid,
+                                dyid: api.pageParam.dyid,
+                                jieid: api.pageParam.jieid,
+                                tx: api.pageParam.tx,
+                                is_important: api.pageParam.is_important,
+                                sys_id: api.pageParam.sys_id,
+                                kc_type: api.pageParam.kc_type,
+                                index: vm.index,
+                                njid: api.pageParam.njid,
+                                data: vm.exercisesData,
+                                isImportant: api.pageParam.isImportant,
+                                totalCount: vm.totalCount,
+                            },
+                            bounces: false,
+                            reload: true
+                        });
+
+                    }
+                },
+                //上一题
+                onPageUpClick: function (content) {
+                    if (vm.index == 1) {
+                        api.toast({
+                            msg: '已经是第一个了',
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    } else {
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+                        api.closeFrame({
+                            name: url
+                        });
+                        vm.index--;
+                        vm.topIndex = (vm.index + 1) + "/" + vm.totalCount;
+                        vm.getInfo(vm.index);
+                        reloadflag = '1';
+                    }
+                    $(content).addClass('impdisable');
+                    setTimeout(function () {
+                        $(content).removeClass('impdisable');
+                    }, 1000);
+                },
+                //下一题
+                onPageDownClick: function (content) {
+                    if (vm.index == vm.totalCount) {
+                        api.toast({
+                            msg: '已经是最后一个了',
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    } else {
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+                        api.closeFrame({
+                            name: url
+                        });
+                        vm.index++;
+                        vm.topIndex = (vm.index + 1) + "/" + vm.totalCount;
+                        vm.getInfo(vm.index);
+                        reloadflag = '1';
+                    }
+                    $(content).addClass('impdisable');
+                    setTimeout(function () {
+                        $(content).removeClass('impdisable');
+                    }, 1000);
+                },
+            }
+        });
+    }
+
+    function GetCorrectionImageList(id, flag) {
+        api.showProgress();
+        apiObj.Get(UrlRouter.GetCorrectionImageList, {
+            values: {
+                uid: $api.getStorage('uid'),
+                sys_id: id
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.currentImgNums = ret.data.length;
+                    var data = [];
+                    //data = ret.data.reverse();
+                    data = ret.data;
+                    vm.currentImgData = [];
+                    vm.currentImgData = data;
+
+                    if (flag == 1) {
+                        api.closeFrame({
+                            name: 'frame_chooseImg'
+                        });
+                        api.openFrame({
+                            name: 'frame_displayImg',
+                            url: 'correction/frame_displayImg.html',
+                            rect: {
+                                x: 0,
+                                y: 0,
+                                w: api.winWidth,
+                                h: api.winHeight
+                            },
+                            pageParam: {
+                                currentImgNums: vm.currentImgNums,
+                                currentImgData: vm.currentImgData,
+                                current_sys_id: vm.current_sys_id
+                            },
+                            bounces: false
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+
+    function checkCorrectionImg() {
+        api.closeFrame({
+            name: 'frame_chooseImg'
+        });
+        var reload = false;
+        if (reloadflag == '1') {
+            reload = true;
+        } else {
+            reload = false;
+        }
+        api.openFrame({
+            name: 'frame_displayImg',
+            url: 'correction/frame_displayImg.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight
+            },
+            pageParam: {
+                currentImgNums: vm.currentImgNums,
+                currentImgData: vm.currentImgData,
+                current_sys_id: vm.current_sys_id
+            },
+            bounces: false,
+            reload: reload
+        });
+
+        reloadflag = '0';
+    }
+
+    function settingGetSchoolset() {
+        apiObj.Get(UrlRouter.settingGetSchoolset, {
+            values: {
+                schoolid: $api.getStorage('schoolid'),
+                type: 'error_correction'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') {
+                    if (ret.status == 1) {
+                        vm.correction = true;
+                    } else {
+                        vm.correction = false;
+                    }
+                }
+            } else {
+
+            }
+        });
+    }
+
+
+
+    function openCorrectionAlbum() {
+        if (!checkPermission(['storage'])) {
+            return;
+        }
+        if (!checkImageCompress()) {
+            return;
+        }
+        if (vm.currentImgNums >= 6) {
+            api.toast({
+                msg: '最多只能选择6张图片上传',
+                duration: 2000,
+                location: 'middle'
+            });
+            return;
+        }
+
+        if (!checkPermission(['storage'])) {
+            return;
+        }
+        var imgAccountMax = currentImgAccountMax - vm.currentImgNums;//还可以选图片的数量最大值
+        openMediaScanner(imgAccountMax);
+    }
+
+    function openMediaScanner(max) {
+        if (!uiMediaScanner) {
+            uiMediaScanner = api.require('UIMediaScanner');
+        }
+        uiMediaScanner.open({
+            type: 'picture',
+            column: 4,
+            classify: true,
+            max: max ? max : 6,
+            sort: {
+                key: 'time',
+                order: 'desc'
+            }, rotation: true,
+            texts: {
+                stateText: '已选*项',
+                selectedMaxText: '最多上传*张图片',  //默认：'最多显示*个资源'
+                cancelText: '取消',
+                finishText: '完成'
+            },
+            styles: {
+                bg: '#fff',
+                mark: {
+                    icon: '',
+                    position: 'bottom_left',
+                    size: 20
+                },
+                nav: {
+                    bg: '#4bc7c7',
+                    stateColor: '#fff',
+                    stateSize: 18,
+                    cancelBg: 'rgba(0,0,0,0)',
+                    cancelColor: '#fff',
+                    cancelSize: 18,
+                    finishBg: 'rgba(0,0,0,0)',
+                    finishColor: '#fff',
+                    finishSize: 18
+                }
+            }
+        }, function (ret) {
+            if (ret) {
+                if (ret.list) {
+                    compressListener.allCount = ret.list.length;
+                    compressListener.successCount = 0;
+                    for (var i = 0; i < ret.list.length; i++) {
+                        var selectImg = ret.list[i];
+                        //获取图片路径
+                        var selectimgPath = selectImg.path;
+                        if (api.systemType == "ios") {
+                            uiMediaScanner.transPath({
+                                path: selectimgPath
+                            }, function (ret, err) {
+                                if (ret) {
+                                    compressImage(ret.path);
+                                } else {
+                                    alert("ios地址转换失败：" + JSON.stringify(err));
+                                }
+                            });
+                        } else {
+                            //compressImage(selectimgPath);
+                        }
+                    }
+                    if (api.systemType == "android") {
+                        api.showProgress();
+                        compressImage(0, ret.list);
+                    }
+                    console.log(JSON.stringify(ret));
+                }
+            }
+        })
+    }
+
+    function compressImage(index, list) {
+        var imageFilter = api.require('imageFilter');
+        var imgName = getUrlName(list[index].path);
+        var quality;
+        if (api.systemType == 'ios') {
+            quality = 0.2;
+        } else {
+            quality = 0.3;
+        }
+        imageFilter.compress({
+            img: list[index].path,
+            quality: quality,
+            save: {
+                imgPath: "fs://img_compress/",
+                imgName: imgName
+            }
+        }, function (ret, err) {
+            if (ret.status) {
+                compressListener.successCount++;
+                picArr.push(api.fsDir + "/img_compress/" + imgName);
+
+                if (index < list.length - 1) {
+                    compressImage(++index, list);
+                }
+
+                if (compressListener.allCount == compressListener.successCount) {
+                    //api.showProgress();
+                    qiniuUpfile(0);
+                }
+            } else {
+                alert(JSON.stringify(err));
+            }
+            imageFilter = '';
+        })
+    }
+
+    // 图片压缩处理
+    //    function compressImage(url) {
+    //        var imageFilter = api.require('imageFilter');
+    //        var imgName = getUrlName(url);
+    //        var quality;
+    //        if (api.systemType == 'ios') {
+    //            quality = 0.2;
+    //        } else {
+    //            quality = 0.3;
+    //        }
+    //        imageFilter.compress({
+    //            img: url,
+    //            quality: quality,
+    //            save: {
+    //                imgPath: "fs://img_compress/",
+    //                imgName: imgName
+    //            }
+    //        }, function (ret, err) {
+    //            if (ret.status) {
+    //                compressListener.successCount++;
+    //                picArr.push(api.fsDir + "/img_compress/" + imgName);
+    //                if(compressListener.allCount == compressListener.successCount){
+    //                    //alert(JSON.stringify(picArr));;
+    //                    api.showProgress();
+    //                    qiniuUpfile(0);
+    //                }
+    //            } else {
+    //                alert(JSON.stringify(err));
+    //            }
+    //            imageFilter = '';
+    //        })
+    //    }
+
+    function qiniuUpfile(index) {
+        var fileKey = (new Date()).valueOf() + picArr[index];
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            var qiniuStorage = api.require("qiniuStorage");
+            qiniuStorage.configUploader({
+                params: {},
+                checkCrc: false,
+                mimeType: ''
+            });
+            qiniuStorage.start({
+                token: ret.data.token,
+                path: picArr[index],
+                key: fileKey
+            });
+            qiniuStorage.addEventListener(function (ret) {
+                var code;
+                if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                    pImageList.push(QINIU_DOMAIN + ret.key);
+                    if (index < picArr.length - 1) {
+                        qiniuUpfile(++index);
+                    } else {
+                        //上传七牛完毕
+                        postCorrectionImgs();
+                    }
+
+                }
+            });
+        })
+    }
+
+    function postCorrectionImgs() {
+        //api.showProgress();
+        var params = {};
+        params['uid'] = $api.getStorage('uid');
+        params['sys_id'] = vm.current_sys_id;
+        var data = [];
+        for (var i = 0; i < pImageList.length; i++) {
+            data.push({
+                'url': pImageList[i],
+                'sort': parseInt(maxsort) + i + 1,
+            })
+        }
+        params['data'] = data;
+        apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.UploadCorrectionImage, {
+            body: params
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.toast({
+                        msg: '操作成功',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                    picArr = [];
+                    pImageList = [];
+                    GetCorrectionImageList(vm.current_sys_id, 1);
+                    api.sendEvent({
+                        name: 'refreshimglist',
+                        extra: {}
+                    });
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+
+    /**
+     * 检查图片压缩进度
+     * @returns {boolean} true 压缩完成
+     */
+    function checkImageCompress() {
+        if (compressListener.allCount != 0 && compressListener.allCount != compressListener.successCount) {
+            api.toast({
+                msg: '正在压缩图片，请稍后操作',
+                duration: 2000,
+                location: 'middle'
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function getUrlName(url) {
+        var index = url.lastIndexOf("/");
+        var imgName;
+        if (api.systemType == 'ios') {
+            var idIndex = url.indexOf("id=");
+            if (idIndex != -1) {
+                var andIndex = url.indexOf("&");
+                imgName = url.substring(idIndex + 3, andIndex);
+            } else {
+                imgName = url.substring(index + 1);
+            }
+        } else {
+            imgName = url.substring(index + 1);
+        }
+        return imgName;
+    }
+
+    async function getAIbstAndSetNum() {
+        if (vm.zsdmc === '无') {
+            api.toast({
+                msg: '该题暂无AI变式题',
+            })
+            return;
+        }
+        const ret = await new Promise((resolve, reject) => {
+            apiObj.SetAuthToken($api.getStorage('token'));
+            apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostPayfeeOperationLog, {
+                body: $api.jsonToStr({
+                    uid: $api.getStorage("uid"),
+                    schoolid: $api.getStorage("schoolid"),
+                    type: 'ai_push',
+                    resource_id: vm.xtid,  //本题的id
+                    count: vm.aiPush['count'],
+                    card_type: vm.aiPush['card_type'] !== undefined ? vm.aiPush['card_type'] : null,
+                    ...(vm.aiPush['card_id'] !== undefined && { card_id: vm.aiPush['card_id'] }),
+                })
+            }, function (ret, err) {
+                if (ret) {
+                    resolve(ret);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+        if ((vm.aiPush.count <= 0 && ret.ret === 0 && ret.data === 'nonumber') || ret.ret === -1) {
+            if ($api.getStorage('upgradeQRCode') === '1') {
+                api.toast({
+                    msg: '本月剩余变式题推送次数已耗尽',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.openFrame({
+                    name: 'number-exhausted',
+                    url: '../frame-number-exhausted.html',
+                })
+            }
+            return
+        }
+        if (ret.ret === 0 && ret.data === '') {
+            vm.aiPush.count -= 1;
+            api.execScript({
+                name: 'win_error_list_pad',
+                script: 'postAiPush();'
+            });
+        }
+        getAIbst();
+    }
+
+    function postAIjxNum() {
+        if (vm.aiAnalysis.count > 0) {
+            vm.aiAnalysis.count -= 1;
+        }
+    }
+
+
+    function getAIbst() {
+        api.openWin({
+            name: 'win_bst.html',
+            url: 'AIbst/win_bst.html',
+            pageParam: {
+                xtid: vm.xtid,
+            },
+            bounces: false
+        });
+    }
+
+
+</script>
+
+</html>

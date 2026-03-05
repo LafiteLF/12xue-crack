@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>入口</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: transparent;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.3s, visibility 0.3s;
+            padding: 20px;
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+
+        .dialog {
+
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+
+
+        }
+
+
+
+
+        .dialog-content {
+            display: flex;
+            flex-direction: column;
+            padding: 50px 50px;
+            overflow-y: auto;
+            flex: 1;
+            color: #374151;
+            line-height: 1.6;
+
+        }
+
+        .card {
+            border: 1px solid #C5D7FF;
+            border-radius: 10px;
+            background-color: #e6f3ff;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+
+        }
+
+        #learn {
+            margin-bottom: 40px;
+        }
+
+
+
+        img {
+            width: 23%;
+        }
+
+        .card-content {
+
+            margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-content h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .card-content p {
+            font-size: 14px;
+            color: #848484;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <!-- Dialog 遮罩层 -->
+    <div id="app" >
+        <div v-if="show" class="dialog-overlay show"  id="dialogOverlay" @click.self="closeSelf" >
+            <div class="dialog">
+    
+                <!-- 内容 -->
+                <div class="dialog-content">
+                    <div id="learn" class="card" @click="gotoReport()">
+    
+    
+                        <img src="../../../image/testReport/LBA/xueqingbaogao.png" alt="图片未显示">
+    
+                        <div class="card-content">
+                            <h3>学情诊断报告</h3>
+                            <p>全面剖析学习数据，输出专属学情诊断报告。</p>
+                        </div>
+                    </div>
+    
+                    <!-- 靶向错题提升卡片 -->
+                    <div id="error" class="card" @click="gotoWrong()">
+    
+                        <img src="../../../image/testReport/LBA/baxiangcuoti.png" alt="">
+    
+                        <div class="card-content">
+                            <h3>靶向错题提升</h3>
+                            <p>智能锁定错题根源，靶向突破知识漏洞。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+        </div>
+    </div>
+   
+
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../../script/vue.global.prod-3.5.18.js"></script>
+    <script type="text/javascript">
+        const { createApp, ref } = Vue;
+
+
+        apiready = function () {
+            api.setScreenOrientation({
+                orientation: 'landscape_left' // 或 landscape_right / landscape
+            });
+
+            createApp({
+                setup() {
+                    const show = ref(true);
+                    const gotoReport = () => {
+                        api.openWin({
+                            name: 'first_start',
+                            url: '../win_testReport.html',
+                            pageParam: {
+                                reportType: 'learn'
+                            },
+                            Animation: {
+                                type: 'fade'
+                            }
+                        });
+                    }
+
+                    const closeSelf = () => {
+                        api.sendEvent({
+                            name: 'close_testReport_frame'
+                        });
+                    };
+
+                    const gotoWrong = () => {
+                       
+                        api.openWin({
+                            name: 'first_start',
+                            url: '../LBA/first_start.html',
+                            pageParam: {
+                                reportType: 'error'
+                            },
+                            Animation: {
+                                type: 'fade'
+                            }
+                        });
+                        api.sendEvent({
+                            name: 'close_testReport_frame'
+                        });
+                    }
+
+
+                    return {
+                        closeSelf,
+                        show,
+                        gotoReport,
+                        gotoWrong
+                    }
+
+                }
+
+            }).mount('#app')
+
+
+
+        }
+
+
+    </script>
+</body>
+
+</html>

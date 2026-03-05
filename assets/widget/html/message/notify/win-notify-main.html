@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        .tab-bar {
+            height: 45px;
+            background: #fff;
+            margin-top: 12px;
+        }
+
+        .tab-item {
+            width: 48%;
+            text-align: center;
+            height: 45px;
+        }
+
+        .divide-line {
+            width: 4%;
+            color: #d9d9d9;
+            padding-top: 10px;
+        }
+
+        .type {
+            max-width: 68%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-top: 10px;
+        }
+
+        .aui-icon-unfold {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        header {
+            border-bottom: 1px solid #e4e4e8;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin();'></span>通知
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var frameY = '';
+    var frameH = '';
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        //测试 id  token
+        apiObj.SetAuthToken($api.getStorage("token"));
+        var headerH = $api.offset(header).h;
+        frameH = padWinHeight - headerH;
+        frameY = headerH;
+        api.openFrame({
+            name: 'frame-notify-main',
+            url: 'frame-notify-main.html',
+            vScrollBarEnabled: false,
+            reload: true,
+            rect: {
+                x: 0,
+                y: frameY,
+                w: 'auto',
+                h: frameH
+            }
+        });
+    };
+
+    function openFrame(array, item) {
+        api.openFrame({
+            name: 'frame-tab-notify',
+            url: 'frame-tab-notify.html',
+            bounces: false,
+            reload: true,
+            rect: {
+                x: 0,
+                y: frameY,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: {array: array, item: item}
+        });
+    }
+
+</script>
+</html>

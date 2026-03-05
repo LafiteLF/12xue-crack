@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            position: absolute;
+        }
+
+        .aui-content {
+            height: 80%;
+            /*position: absolute;*/
+        }
+
+        .titleDiv {
+            width: 100%;
+            height: 1rem;
+            background-color: #4bc7c7;
+        }
+
+        .closeFrameDiv {
+            color: #4bc7c7;
+            margin-top: 0.5rem;
+            height: 1rem;
+            width: 4rem;
+            text-align: center;
+        }
+
+        .imageDiv {
+            margin-top: 100px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .myImage {
+            width: 40%;
+        }
+
+        .bottomDiv {
+            margin-bottom: 0;
+            height: 20%;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <div class="titleDiv"></div>
+    <div class="closeFrameDiv" onclick="closeThisFrame()">关闭</div>
+    <div class="imageDiv">
+        <img class="myImage" src="../../../image/scanner/scannersuccess.png" alt=""/>
+
+        <div style="margin-top: 10px">12xue客户端登录确认</div>
+    </div>
+</div>
+<div class="bottomDiv">
+    <div class="aui-btn aui-btn-primary aui-btn-block aui-btn-outlined aui-btn-sm">登录</div>
+    <div class="aui-btn aui-btn-primary aui-btn-block aui-btn-outlined aui-btn-sm">取消登录</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript">
+    var h = 0;
+    apiready = function () {
+
+    };
+    function closeThisFrame() {
+
+    }
+</script>
+</html>

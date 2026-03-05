@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <title>日常操行</title>
+    <style>
+        body{
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav  ">
+    <a class="aui-pull-left aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></a>
+    <div class="aui-title">消息</div>
+    <!--<a tapmode class="aui-pull-right aui-btn aui-btn-outlined">-->
+        <!--<span id="txt_sign" class="aui-iconfont1 " onclick="sign()">审核</span>-->
+    <!--</a>-->
+</header>
+<footer class="aui-bar aui-bar-tab" id="footer">
+    <div class="aui-bar-tab-item aui-active" tapmode>
+        <div id="dot_dt" class="aui-dot"></div>
+
+        <!--<i class="aui-iconfont aui-icon-home"></i>-->
+        <div class="aui-bar-tab-label">消息</div>
+    </div>
+    <div class="aui-bar-tab-item" tapmode>
+        <!--<div id="dot_dt" class="aui-dot"></div>-->
+        <!--<i class="aui-iconfont aui-icon-xinlv"></i>-->
+        <div class="aui-bar-tab-label">日常</div>
+    </div>
+    <div class="aui-bar-tab-item" tapmode>
+        <!--<div id="badge_xx" class="aui-badge"></div>-->
+        <!--<i class="aui-iconfont aui-icon-message"></i>-->
+        <div class="aui-bar-tab-label">学生</div>
+    </div>
+    <div class="aui-bar-tab-item" tapmode>
+        <!--<i class="aui-iconfont aui-icon-my"></i>-->
+        <div class="aui-bar-tab-label">设置</div>
+    </div>
+</footer>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript">
+    apiready=function () {
+        var header = $api.dom('header');
+//        $api.fixStatusBar(header);
+        var headerPos = $api.offset(header);
+        var body_h = padWinHeight;
+        var footer_h = $api.offset($api.byId('footer')).h;
+        var title = '';
+        var tab;
+
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+
+        api.openFrame({
+            name: 'frame-daily-message-home',
+            url: 'frame-daily-message-home.html',
+            rect: {
+                x: 0,
+                y: headerPos.h,
+                w: 'auto',
+                h: body_h - headerPos.h - footer_h
+            },
+            pageParam: {x: 0, y: headerPos.h},
+            bounces: false
+        });
+
+        tab=new auiTab({
+            element:document.getElementById("footer"),
+            index:1,
+            repeatClick:false
+        },function (ret) {
+            switch(ret.index){
+                case 1:
+                    title='<a class="aui-pull-left aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></a> ' +
+                            '<div class="aui-title">消息</div> '
+//                            '<a tapmode class="aui-pull-left aui-btn">  </a> ' +
+//                            '<a tapmode class="aui-pull-right aui-btn aui-btn-outlined"> ' +
+//                            '<span class="aui-iconfont1 " onclick="sign()">审核</span> ' +
+//                            '</a>';
+                    api.openFrame({
+                        name: 'frame-daily-message-home',
+                        url: 'frame-daily-message-home.html',
+                        rect: {
+                            x: 0,
+                            y: headerPos.h,
+                            w: 'auto',
+                            h: body_h - headerPos.h - footer_h
+                        },
+                        pageParam: {x: 0, y: headerPos.h},
+                        bounces: false
+                    });
+                    break;
+                case 2:
+                    title='<a class="aui-pull-left aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></a> ' +
+                            '<div class="aui-title">日常操行</div>  ';
+                    api.openFrame({
+                        name: 'frame-daily-conduct-home',
+                        url: 'frame-daily-conduct-home.html',
+                        rect: {
+                            x: 0,
+                            y: headerPos.h,
+                            w: 'auto',
+                            h: body_h - headerPos.h - footer_h
+                        },
+                        pageParam: {x: 0, y: headerPos.h},
+                        bounces: false
+                    });
+                    break;
+                case 3:
+                    title='<a class="aui-pull-left aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></a>' +
+                            ' <div class="aui-title">得分请况</div>' +
+                            ' <span class="aui-pull-right" onclick="more()">本周<span class="aui-iconfont aui-icon-unfold"></span></span> ';
+                    api.openFrame({
+                        name: 'frame-daily-stu-home',
+                        url: 'frame-daily-stu-home.html',
+                        rect: {
+                            x: 0,
+                            y: headerPos.h,
+                            w: 'auto',
+                            h: body_h - headerPos.h - footer_h
+                        },
+                        pageParam: {x: 0, y: headerPos.h},
+                        bounces: false
+                    });
+                    break;
+                case 4:
+                    title='<a class="aui-pull-left aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></a>' +
+                            ' <div class="aui-title">设置</div>  ';
+                    api.openFrame({
+                        name: 'frame-daily-setting-home',
+                        url: 'frame-daily-setting-home.html',
+                        rect: {
+                            x: 0,
+                            y: headerPos.h,
+                            w: 'auto',
+                            h: body_h - headerPos.h - footer_h
+                        },
+                        pageParam: {x: 0, y: headerPos.h},
+                        bounces: false
+                    });
+                    break;
+            }
+            $api.html($api.dom('header'), title);
+
+        })
+        api.addEventListener({
+            name: 'reload'
+        }, function (ret, err) {
+            var jsfun = 'showItems();';
+            api.execScript({
+                frameName: 'frame-daily-conduct-home',
+                script: jsfun
+            });
+        });
+
+//        api.addEventListener({
+//            name: 'viewappear'
+//        }, function (ret, err) {
+//            //在当前window中找到
+//            //名为frmName的frame，并在该frame中执行jsfun脚本
+//            var jsfun = 'showItems();';
+//            api.execScript({
+//                frameName: 'frame-daily-conduct-home',
+//                script: jsfun
+//            });
+//        });
+    }
+    function more() {
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        api.openFrame({
+            name: 'moreTime_frame',
+            url: 'moreTime_frame.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: padWinHeight - headerH + 20
+            },
+            pageParam: {},
+            bounces: false
+        });
+    }
+</script>
+</html>

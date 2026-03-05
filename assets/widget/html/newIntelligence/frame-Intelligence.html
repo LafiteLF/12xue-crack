@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>智能导练</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #F2F2F2FF;
+            margin: 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+            height: 8.2vh;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+
+        [v-cloak] {
+            display: none
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .content {
+            padding-top: 1px;
+        }
+
+        .xueduan span {
+            color: #4bc7c7
+        }
+
+        .content ul {
+            padding: 10px;
+        }
+
+        .content ul li {
+            width: 25%;
+            float: left;
+            padding: 9px;
+            /* height: 215px; */
+        }
+
+        .content ul li .item {
+            width: 22.9vw;
+            height: 27.3vh;
+            position: relative;
+            border-radius: 3px
+        }
+
+        .classImg {
+            width: 50%;
+            max-width: 220px;
+            position: absolute;
+            left: 7%;
+            top: 12%
+        }
+
+        .content ul li .item h2 {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            width: 80%;
+            margin: 0 auto;
+            text-align: right;
+            padding-top: 50%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .shuaxin {
+            width: 150px;
+            height: 40px;
+            line-height: 40px;
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+            background: #4bc7c7;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+
+        .peimg{
+            width:25%;
+            max-width: 100px;
+            position: absolute;
+            right: 0;
+            top: 0
+        }
+    </style>
+</head>
+
+<body>
+<div style="display: flex; flex-direction: column; height: 100%;">
+    <div class="header">
+        <div class="header-left" onclick="api.closeWin()">
+            <img src="../../image/newhomework/return.png" style="width: 1vw;">
+            <span style="margin-left: 1vw; font-size: 22px;">学科课程</span>
+        </div>
+    </div>
+
+    <div class="content"  style="overflow-y: auto;">
+        <div style="width: 40%; margin: 0 auto; margin-top: 10%; text-align: center" v-if="subjects.length==0">
+            <img src="../../image/stuHomePad/noContent.png" style="width: 100%; max-width: 508px;">
+            <div class="shuaxin" onclick="vm.shuaxin()">点击刷新</div>
+        </div>
+
+        <ul v-else class="clearfix">
+            <li v-for="subject in subjects" :id="subject.xkid" :title="subject.name" :type="subject.status" tapmode
+                onclick="vm.openWin(this)">
+                <div class="item"
+                     :style="{background:subjectBackground(subject.name),border:'1px solid'+subjectBorder(subject.name)}">
+                    <img class="classImg" :src="'../../image/stuHomePad/'+subjectImg(subject)+'.png'">
+                    <img class="peimg" v-if="showPeImg && ['物理','化学','生物学','数学','地理'].indexOf(subject.name) !== -1" :src="'../../image/stuHomePad/'+peImg(subject)+'.png'" tapmode @click.stop="openExperiment(subject)">
+                    <h2 v-text="subject.name"></h2>
+                </div>
+            </li>
+        </ul>
+
+        <!-- <ul class="clearfix">
+            <li>
+                <div class="item"  style="background: #4bc7c7;border: 1px;">
+                    <img class="classImg" src='../../image/stuHomePad/chinese.png'>
+                    <img class="peimg" src="../../image/stuHomePad/wlpe.png" >
+                    <h2>语文</h2>
+                </div>
+            </li>
+        </ul> -->
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+    // 按钮点击切换功能
+    $(document).ready(function () {
+        $('.tab-buttons .button').on('click', function () {
+            // 如果点击的已经是选中的，则不做任何事
+            if ($(this).hasClass('active')) {
+                return;
+            }
+            // 移除所有按钮的 active 类
+            $('.tab-buttons .button').removeClass('active');
+            // 给当前点击的按钮加上 active 类
+            $(this).addClass('active');
+
+
+        });
+    });
+
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+
+        vm.GetPracticeSubject();
+        vm.GetSchoolConfig();
+        api.addEventListener({
+            name: 'shuaxin-frame-Intelligence'
+        }, function (ret, err) {
+            vm.GetPracticeSubject();
+        });
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            subjects: [],
+            showPeImg: false
+            //subjects:[{"name":"语文","xkid":"1071","count":"10"},{"name":"数学","xkid":"2099","count":"0"},{"name":"化学","xkid":"1","count":"2"},{"name":"生物","xkid":"3599","count":"0"}]
+        },
+        updated: function () {
+            $api.css($api.dom('body'), 'display:block');
+        },
+        methods: {
+            GetSchoolConfig: function () {
+                // 通过学校配置开关控制 peimg 是否展示
+                apiObj.Get(UrlRouter.GetSchoolConfig, {
+                    values: {
+                        schoolid: $api.getStorage("schoolid"),
+                        type: 'phet'
+                    }
+                }, function (ret, err) {
+                    if (ret && ret.ret == 0 && ret.data && ret.data[0]) { 
+                        if(ret.data[0].value == "1"){
+                            vm.showPeImg = false;
+                        }else{
+                            vm.showPeImg = true;
+                        }
+                    } 
+                });
+            },
+            shuaxin: function () {
+                vm.GetPracticeSubject();
+            },
+            GetPracticeSubject: function () {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetPracticeSubject, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        xd: $api.getStorage('stuXD')
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            vm.subjects = ret.data
+                        } else {
+                            if (ret.msg == '请先加入学校或等待老师审核~~') {
+                                api.confirm({
+                                    title: '',
+                                    msg: '目前未加入班级，是否前往加入班级',
+                                    buttons: ['取消', '确定']
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.buttonIndex == 2) {
+                                            openMyClassWin();
+                                        }
+                                    }
+                                });
+                            } else {
+                                api.toast(
+                                    {
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        }
+                    } else {
+                        api.toast(
+                            {
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                        )
+                    }
+
+                })
+            },
+            subjectBackground: function (subject) {//学科背景颜色
+                switch (subject) {
+                    case '数学':
+                        return '#00ce61';
+                    case '语文':
+                        return '#10d1b4';
+                    case '物理':
+                        return '#11c7d1';
+                    case '化学':
+                        return '#01b2ee';
+                    case '生物学':
+                        return '#FFB526';
+                    case '英语':
+                        return '#a08aff';
+                    case '地理':
+                        return '#ef768a';
+                    case '历史':
+                        return '#96c04c';
+                    case '政治':
+                        return '#cb72c8';
+                    case '思想政治':
+                        return '#cb72c8';
+                    case '道德与法治':
+                        return '#cb72c8';
+                    case '政治/道法':
+                        return '#cb72c8';
+                    default:
+                        return '#8f8ac3';
+                }
+            },
+            subjectBorder: function (subject) {//学科边框颜色
+                switch (subject) {
+                    case '数学':
+                        return '#00b554';
+                    case '语文':
+                        return '#0fb89e';
+                    case '物理':
+                        return '#10aab8';
+                    case '化学':
+                        return '#01a0d4';
+                    case '生物学':
+                        return '#f09e00';
+                    case '英语':
+                        return '#8b70ff';
+                    case '地理':
+                        return '#d66376';
+                    case '历史':
+                        return '#96c04c';
+                    case '政治':
+                        return '#ad66ab';
+                    case '思想政治':
+                        return '#ad66ab';
+                    case '道德与法治':
+                        return '#ad66ab';
+                    case '政治/道法':
+                        return '#ad66ab';
+                    default:
+                        return '#7b76aa';
+                }
+            },
+            subjectImg: function (subject) {//学科图片
+                switch (subject.name) {
+                    case '数学':
+                        return 'math';
+                    case '语文':
+                        return 'chinese';
+                    case '物理':
+                        return 'physics';
+                    case '化学':
+                        return 'chemistry';
+                    case '生物学':
+                        return 'biology';
+                    case '英语':
+                        return 'english';
+                    case '地理':
+                        return 'geography';
+                    case '历史':
+                        return 'history';
+                    case '政治':
+                        return 'politics';
+                    case '思想政治':
+                        return 'politics';
+                    case '日语':
+                        return 'riben';
+                    case '道德与法治':
+                        return 'politics';
+                    case '道德与法治&思想政治':
+                        return 'politics';
+                    case '政治/道法':
+                        return 'politics';
+                    case '艺术':
+                        return 'ys';
+                    case '社会':
+                        return 'shehui';
+                    case '探究性课程':
+                        return 'tjxkc';
+                    case '自然':
+                        return 'zr';
+                    case '生命科学':
+                        return 'smkx';
+                    case '信息技术':
+                    case '信息科技':
+                        return 'xxjs';
+                    default:
+                        if (subject.xkid == '7348') {
+                            return 'politics';
+                        } else {
+                            return 'other';
+                        }
+                }
+            },
+            peImg: function (subject) {//学科图片
+                switch (subject.name) {
+                    case '数学':
+                        return 'sxpe';
+                    case '物理':
+                        return 'wlpe';
+                    case '化学':
+                        return 'hxpe';
+                    case '生物学':
+                        return 'swpe';
+                    case '地理':
+                        return 'dlpe';
+                }
+            },
+            openWin: function (context) {
+                if ($api.getStorage('gzxd') == '34' && $api.getStorage('schoolid') == '1007140989450038416' && $api.getStorage('njmc') == '2020') {
+                    api.toast({
+                        msg: '暂时没有权限',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                    return;
+                }
+                api.openWin({
+                    name: 'win-Intelligence-course-list',
+                    url: 'win-Intelligence-course-list.html',
+                    pageParam: {
+                        kmmc: $(context).attr('title'),
+                        kmid: $(context).attr('id'),
+                        status: $(context).attr('type'),
+                    },
+                    reload: true,
+                    slidBackEnabled: false
+                });
+            },
+            openExperiment: function (subject) {
+                api.openWin({
+                    name: 'win_experiment_list',
+                    url: 'win_experiment_list.html',
+                    pageParam: {
+                        subject: subject.name
+                    },
+                    reload: true,
+                    slidBackEnabled: false
+                });
+            }
+        }
+    });
+
+    function openMyClassWin() {
+        api.openWin({
+            slidBackEnabled: false,
+            name: 'myclass_win',
+            url: '../../html/mine/myclass/myclass_win.html',
+            reload: true
+        });
+    }
+</script>
+
+</html>

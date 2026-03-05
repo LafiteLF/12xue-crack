@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>问题详情</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        body{
+            background-color:#f2f2f2;
+            padding-top: 60px;
+        }
+        header{ position: fixed!important; top: 0}
+        .myDiv{
+
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 5px;
+            width: 80%; margin: 0 auto;
+            margin-top: 10px;
+            background: #fff;
+            min-height: 560px;
+        }
+        p{
+            padding-top: 5px;
+            padding-bottom: 5px
+            /*text-indent: 2em;*/
+        }
+        h4{ font-size: 0.8rem;; height: 2.5rem; line-height: 2.5rem; border-bottom: 1px solid #e5e5e9 ; color:#40c3c5; position: relative}
+        h4:after{content: ''; display: block; width:4px;    height: 20px;
+            background: #ffce00; position: absolute; left: -20px; top: 22px;}
+        #content{
+            padding: 10px 0px; font-size: 0.8rem; line-height: 36px;;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()' ></span>问题详情
+    </a>
+</header>
+
+<div  class="myDiv">
+    <h4 id="title" > </h4>
+    <div id="content"> </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/question/questionDetail.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        getQuestionDetail();
+    }
+</script>
+</html>

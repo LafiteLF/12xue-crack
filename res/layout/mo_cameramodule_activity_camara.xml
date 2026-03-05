@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <k12.education.camaramodule.JCameraView android:id="@id/jcameraview" android:layout_width="match_parent" android:layout_height="match_parent" app:duration_max="10000" app:iconMargin="20.0dp" app:iconSize="30.0dp" app:iconSrc="@drawable/mo_cameramodule_enhance_black_24dp" />
+</LinearLayout>

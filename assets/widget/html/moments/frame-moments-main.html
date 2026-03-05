@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+
+        body {
+            background-color: white;
+        }
+
+        .aui-tab {
+            width: 45%;
+        }
+
+        .aui-tab-item {
+            color: #666;
+            background-color: transparent;
+            margin: 0 6%;
+            height: 1.6rem;
+            line-height: 1.8rem;
+        }
+
+        .aui-tab-item.aui-active {
+            border-bottom: 3px solid #66cece;
+            color: #333;
+        }
+
+        .tab-color {
+            background-color: white;
+            padding-bottom: 10px;
+        }
+
+        .aui-dot {
+            /*display: inline-block;*/
+            width: 0.4rem;
+            height: 0.4rem;
+            background: #ff2600;
+            border-radius: 0.5rem;
+            position: absolute;
+            top: 0.4rem;
+            right: 22%;
+            z-index: 99;
+            display: none;
+        }
+
+        .aui-tab::after {
+            height: 0px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="aui-tab tab-color" id="tab">
+    <!--<div class="aui-tab-item aui-active">-->
+        <!--<div id="dot_ms" class="aui-dot"></div>-->
+        <!--名师-->
+    <!--</div>-->
+    <!--<div class="aui-tab-item gzr-hide">-->
+        <!--<div id="dot_gzr" class="aui-dot"></div>-->
+        <!--关注人-->
+    <!--</div>-->
+    <!--<div class="aui-tab-item bx-hide">-->
+        <!--<div id="dot_bx" class="aui-dot"></div>-->
+        <!--班/校-->
+    <!--</div>-->
+    <!--<div class="aui-tab-item tlr-hide">-->
+        <!--<div id="dot_tlr" class="aui-dot aui-hide"></div>-->
+        <!--同龄人-->
+    <!--</div>-->
+</div>
+<div style="float: right;margin-right: 6%;margin-top: -45px">
+    <div tapmode onclick="openSearchUsers();"
+         style="float: left;width: 290px;height:36px;background-color: #f2f2f2;font-size: 0.6rem;color: #666666;padding-left: 0.5rem;border-radius: 10px;border: 1px solid #DDDDDD">
+        <span class="aui-iconfont aui-icon-search" style="font-size: 1rem"></span><span
+            style="display: inline-block;vertical-align: top;line-height: 36px;color: #CCCCCC">输入姓名找人</span>
+    </div>
+
+    <span class="aui-iconfont aui-icon-add"
+          style="color: #4bc7c7;padding-right: 20px;padding-left: 20px;font-size: 1.4rem;line-height: 1.6rem" tapmode
+          onclick="openMomentSend();"></span>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var header = document.getElementById("tab");
+    var index = 1;
+    var timerId;
+    apiready = function () {
+        var html = '';
+        if ($api.getStorage('teacherSwitch') == 1){
+            html = '<div class="aui-tab-item aui-active  ms-hide">'+
+                    '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                    '名师'+'</div>';
+        }
+
+        if ($api.getStorage('followSwitch') == 1){
+            if(html == ''){
+                html = html + '<div class="aui-tab-item  aui-active gzr-hide">'+
+                    '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                    '关注人'+'</div>';
+            }else {
+                html = html + '<div class="aui-tab-item   gzr-hide">'+
+                    '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                    '关注人'+'</div>';
+            }
+        }
+
+        if ($api.getStorage('classSwitch') == 1){
+            if(html == ''){
+                html = html + '<div class="aui-tab-item aui-active  bx-hide">'+
+                        '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                        '班/校'+'</div>';
+            }else {
+                html = html + '<div class="aui-tab-item  bx-hide">'+
+                        '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                        '班/校'+'</div>';
+            }
+
+        }
+
+
+        if ($api.getStorage('sameageSwitch') == 1){
+            if(html == ''){
+                html = html + '<div class="aui-tab-item  aui-active tlr-hide">'+
+                        '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                        '同龄人'+'</div>';
+            }else {
+                html = html + '<div class="aui-tab-item  tlr-hide">'+
+                        '<div id="dot_ms" class="aui-dot">'+'</div>'+
+                        '同龄人'+'</div>';
+            }
+        }
+        $api.html($api.dom('#tab'),html);
+        if ($api.getStorage('teacherSwitch') == 1)  {
+            api.openFrame({
+                name: 'frames-item-famous-teacher',
+                url: 'frames-item-famous-teacher.html',
+                rect: {
+                    x: 0,
+                    y: $api.offset(header).h + api.pageParam.y,
+                    w: 'auto',
+                    h: api.pageParam.h - $api.offset(header).h
+                },
+                pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+                bounces: false,
+                reload: true
+            });
+        }else if ($api.getStorage('followSwitch') == 1)  {
+            api.openFrame({
+                name: 'frames-item-follows',
+                url: 'frames-item-follows.html',
+                rect: {
+                    x: 0,
+                    y: $api.offset(header).h + api.pageParam.y,
+                    w: 'auto',
+                    h: api.pageParam.h - $api.offset(header).h
+                },
+                pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+                bounces: false,
+                reload: true
+            });
+        }else if ($api.getStorage('classSwitch') == 1)  {
+            api.openFrame({
+                name: 'frames-item-school',
+                url: 'frames-item-school.html',
+                rect: {
+                    x: 0,
+                    y: $api.offset(header).h + api.pageParam.y,
+                    w: 'auto',
+                    h: api.pageParam.h - $api.offset(header).h
+                },
+                pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+                bounces: false,
+                reload: true
+            });
+        }else if ($api.getStorage('sameageSwitch') == 1)  {
+            api.openFrame({
+                name: 'frames-item-peers',
+                url: 'frames-item-peers.html',
+                rect: {
+                    x: 0,
+                    y: $api.offset(header).h + api.pageParam.y,
+                    w: 'auto',
+                    h: api.pageParam.h - $api.offset(header).h
+                },
+                pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+                bounces: false,
+                reload: true
+            });
+        }
+
+        var tab = new auiTab({
+            element: document.getElementById("tab"),
+            index: 1,
+//            disabled: [a, b, c,d],
+            repeatClick: false
+        }, function (ret) {
+            index = ret.index;
+            var isReload = checkReload();
+            openFrame(isReload);
+        });
+        //轮询查询动态消息提醒
+        apiObj.SetAuthToken($api.getStorage('token'));
+        getMomentsPull();
+        setMomentsInterval();
+        api.addEventListener({
+            name: 'init_user'
+        }, function (ret, err) {
+            apiObj.SetAuthToken($api.getStorage('token'));
+            restartMomentsInterval();
+        });
+        addWinListener();
+    };
+
+    function restartMomentsInterval() {
+        if (timerId) {
+            clearMomentsInterval();
+        }
+        setMomentsInterval();
+    }
+
+    function setMomentsInterval() {
+        if (!timerId) {
+            timerId = setInterval("getMomentsPull()", 30000);
+        }
+    }
+
+    function clearMomentsInterval() {
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = 0;
+        }
+    }
+
+    function addWinListener() {
+        api.addEventListener({
+            name: 'viewappear'
+        }, function (ret, err) {
+            setMomentsInterval();
+        });
+        api.addEventListener({
+            name: 'viewdisappear'
+        }, function (ret, err) {
+            clearMomentsInterval();
+        });
+        api.addEventListener({
+            name: 'pause'
+        }, function (ret, err) {
+            clearMomentsInterval();
+        });
+        api.addEventListener({
+            name: 'resume'
+        }, function (ret, err) {
+            restartMomentsInterval();
+        });
+    }
+
+    var isMoment = false; //是否有提醒
+    //查询是否有最新的动态消息提醒
+    function getMomentsPull() {
+        //判断是否在动态页面下
+//        if ($api.getStorage('isMoments') == 1) {
+        apiObj.Get(UrlRouter.Getpullstudent, "", function (ret, err) {
+            if (ret.ret == 0) {
+                //名师动态是否有更新
+                if (ret.data.teacher_dynamic.bchange) {
+                    $api.css($api.byId("dot_ms"), 'display:inline-block;');
+                } else {
+                    $api.css($api.byId("dot_ms"), 'display:none;');
+                }
+                //班校动态是否有更新
+                if (ret.data.class_dynamic.bchange) {
+                    $api.css($api.byId("dot_bx"), 'display:inline-block;');
+                } else {
+                    $api.css($api.byId("dot_bx"), 'display:none;');
+                }
+                //关注人动态是否有更新
+                if (ret.data.follow_dynamic.bchange) {
+                    $api.css($api.byId("dot_gzr"), 'display:inline-block;');
+                } else {
+                    $api.css($api.byId("dot_gzr"), 'display:none;');
+                }
+                //同龄人动态
+                if (ret.data.sameage_dynamic.bchange) {
+                    $api.css($api.byId("dot_tlr"), 'display:inline-block;');
+                } else {
+                    $api.css($api.byId("dot_tlr"), 'display:none;');
+                }
+                if (ret.data.teacher_dynamic.bchange || ret.data.sameage_dynamic.bchange || ret.data.class_dynamic.bchange || ret.data.follow_dynamic.bchange) {
+                    isMoment = 1;
+                } else {
+                    isMoment = 0;
+                }
+                $api.setStorage('all_moment', isMoment);
+            }
+        });
+//        }
+    }
+
+
+    function openMomentSend() {
+        if ($api.getStorage('studentSwitch') != 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能发布动态，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }else {
+                api.toast({
+                    msg: '暂不允许进行发布动态，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            return;
+        }
+        api.openWin({
+            name: 'win-moments-publish',
+            url: 'win-moments-publish.html',
+        });
+    }
+
+    function openSearchUsers() {
+        api.openWin({
+            name: 'win-search-user.html',
+            url: 'win-search-user.html'
+        });
+    }
+
+
+    function openFrame(isReload) {
+        switch (index) {
+            case 1:
+                if ($api.getStorage('teacherSwitch') == 1) {
+                    openIn1(isReload);
+                    break;
+                }else if($api.getStorage('followSwitch') == 1){
+                    openIn2(isReload);
+                    break;
+                }else if($api.getStorage('classSwitch') == 1){
+                    openIn3(isReload);
+                    break;
+                }else if($api.getStorage('sameageSwitch') == 1){
+                    openIn4(isReload);
+                    break;
+                }
+            case 2:
+                if ($api.getStorage('teacherSwitch') == 1 && $api.getStorage('followSwitch') == 1) {
+                    openIn2(isReload);
+                    break;
+                }else if($api.getStorage('teacherSwitch') != 1 && $api.getStorage('followSwitch') == 1 && $api.getStorage('classSwitch') == 1){
+                    openIn3(isReload);
+                    break;
+                }else if($api.getStorage('teacherSwitch') != 1 && $api.getStorage('followSwitch') == 1 && $api.getStorage('classSwitch') != 1){
+                    openIn3(isReload);
+                    break;
+                }else{
+                    openIn4(isReload);
+                    break;
+                }
+            case 3:
+                if($api.getStorage('teacherSwitch') == 1 && $api.getStorage('followSwitch') == 1 && $api.getStorage('classSwitch') == 1){
+                    openIn3(isReload);
+                    break;
+                }else {
+                    openIn4(isReload);
+                    break;
+                }
+            case 4:
+                openIn4(isReload);
+        }
+    }
+
+    function openIn1(isReload){
+        api.openFrame({
+            name: 'frames-item-famous-teacher',
+            url: 'frames-item-famous-teacher.html',
+            rect: {
+                x: 0,
+                y: $api.offset(header).h + api.pageParam.y,
+                w: 'auto',
+                h: api.pageParam.h - $api.offset(header).h
+            },
+            pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+            bounces: false,
+            reload: isReload
+        });
+        $api.css($api.byId("dot_ms"), 'display:none');
+    }
+
+    function openIn2(isReload){
+        api.openFrame({
+            name: 'frames-item-follows',
+            url: 'frames-item-follows.html',
+            rect: {
+                x: 0,
+                y: $api.offset(header).h + api.pageParam.y,
+                w: 'auto',
+                h: api.pageParam.h - $api.offset(header).h
+            },
+            pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+            bounces: false,
+            reload: isReload
+        });
+        $api.css($api.byId("dot_gzr"), 'display:none');
+    }
+
+    function openIn3(isReload){
+        api.openFrame({
+            name: 'frames-item-school',
+            url: 'frames-item-school.html',
+            rect: {
+                x: 0,
+                y: $api.offset(header).h + api.pageParam.y,
+                w: 'auto',
+                h: api.pageParam.h - $api.offset(header).h
+            },
+            pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+            bounces: false,
+            reload: isReload
+        });
+        $api.css($api.byId("dot_bx"), 'display:none');
+    }
+
+    function openIn4(isReload){
+        api.openFrame({
+            name: 'frames-item-peers',
+            url: 'frames-item-peers.html',
+            rect: {
+                x: 0,
+                y: $api.offset(header).h + api.pageParam.y,
+                w: 'auto',
+                h: api.pageParam.h - $api.offset(header).h
+            },
+            pageParam: {y: $api.offset(header).h + api.pageParam.y, h: api.pageParam.h - $api.offset(header).h},
+            bounces: false,
+            reload: isReload
+        });
+        $api.css($api.byId("dot_tlr"), 'display:none');
+    }
+
+
+    // 判断openFrame需不需要重新加载
+    function checkReload() {
+        var id;
+        switch (index) {
+            case 1:
+                id = "dot_ms";
+                break;
+            case 2:
+                id = "dot_bx";
+                break;
+            case 3:
+                id = "dot_gzr";
+                break;
+            case 4:
+                id = "dot_tlr";
+                break;
+            default:
+                throw new Error("Invalid argument .... index");
+        }
+        console.log("display:" + $api.cssVal($api.byId(id), "display"));
+        var display = $api.cssVal($api.byId(id), "display");
+        return display == "inline-block" || display == "block" ? true : false;
+    }
+</script>
+</html>

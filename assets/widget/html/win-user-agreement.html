@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <style>
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+<!--    <a class="aui-pull-left aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></a>-->
+<!--    <div class="aui-12xue-title" tapmode onclick="api.closeWin();">12xue学生用户服务协议</div>-->
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin()">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()'></span>12xue学生用户服务协议
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+
+        var header = document.querySelector('header');
+        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset($api.dom("header")).h;
+        api.openFrame({
+            name: 'frame-user-agreement',
+            url: 'frame-user-agreement.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: api.winHeight-headerH
+            },
+            pageParam: {}
+        });
+    };
+
+
+
+</script>
+</html>

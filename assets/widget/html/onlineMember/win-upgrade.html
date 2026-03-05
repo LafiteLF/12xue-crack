@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Title</title>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+    <script src="../../script/jquery-3.7.1.min.js"></script>
+    <script src="../../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+        }
+
+        #main {
+            height: 100vh;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            background-color: #F6F8FA;
+        }
+
+        #header {
+            display: flex;
+            flex-direction: row;
+            margin: 2vw 0 0 2vw;
+            align-items: center;
+        }
+
+        #combo-table {
+            display: grid;
+            justify-items: center;
+            border: 0.05vw solid #EEEFF3;
+            margin: 1.5vw 2vw 0 2vw;
+        }
+
+        #combo-table.online {
+            grid-template-columns: repeat(6, 1fr);
+        }
+
+        #combo-table.offline {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        #combo-table > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-size: 1.1vw;
+            border-right: 0.05vw solid #EEEFF3;
+            border-bottom: 0.05vw solid #EEEFF3;
+        }
+
+        #combo-table.online > :nth-child(6n) {
+            border-right: none;
+        }
+
+        #combo-table.offline > :nth-child(5n) {
+            border-right: none;
+        }
+
+        #combo-table.online > :nth-last-child(-n+6) {
+            border-bottom: none;
+        }
+
+        #combo-table.offline > :nth-last-child(-n+5) {
+            border-bottom: none;
+        }
+
+        #combo-table > :nth-child(1) {
+            color: #999999;
+            height: 3.6458vw;
+        }
+
+        #combo-table.online > :nth-child(2) {
+            color: #666666;
+            background-image: url("../../image/onlineMember/upgrade/nomal.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.offline > :nth-child(2) {
+            background-image: url("../../image/onlineMember/upgrade/professional.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.online > :nth-child(3) {
+            background-image: url("../../image/onlineMember/upgrade/professional.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.offline > :nth-child(3) {
+            background-image: url("../../image/onlineMember/upgrade/plus.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.online > :nth-child(4) {
+            background-image: url("../../image/onlineMember/upgrade/plus.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.offline > :nth-child(4) {
+            background-image: url("../../image/onlineMember/upgrade/max.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.online > :nth-child(5) {
+            background-image: url("../../image/onlineMember/upgrade/max.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.offline > :nth-child(5) {
+            background-image: url("../../image/onlineMember/upgrade/flow.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table.online > :nth-child(6) {
+            background-image: url("../../image/onlineMember/upgrade/flow.png");
+            background-size: 100% 100%;
+        }
+
+        #combo-table > :nth-child(2),
+        #combo-table > :nth-child(3),
+        #combo-table > :nth-child(4),
+        #combo-table > :nth-child(5) {
+            height: 3.6458vw;
+            font-weight: bold;
+        }
+
+        #combo-table.online > :nth-child(6) {
+            height: 3.6458vw;
+            font-weight: bold;
+        }
+
+        #combo-table.online > :nth-child(n+7) {
+            height: 3vw;
+        }
+
+        #combo-table.offline > :nth-child(n+6) {
+            height: 3vw;
+        }
+
+        #combo-table.online > :nth-child(6n+7) {
+            color: #666666;
+        }
+
+        #combo-table.offline > :nth-child(5n+6) {
+            color: #666666;
+        }
+
+        #combo-table.online > :nth-child(6n+8) {
+            color: #333333;
+        }
+
+        #combo-table.offline > :nth-child(5n+2) {
+            color: #9C3100;
+        }
+
+        #combo-table.online > :nth-child(6n+3) {
+            color: #9C3100;
+        }
+
+        #combo-table.offline > :nth-child(5n+3) {
+            color: #5179ED;
+        }
+
+        #combo-table.online > :nth-child(6n+4) {
+            color: #5179ED;
+        }
+
+        #combo-table.offline > :nth-child(5n+4) {
+            color: #D27700;
+        }
+
+        #combo-table.online > :nth-child(6n+5) {
+            color: #D27700;
+        }
+
+        #combo-table.offline > :nth-child(5n+5) {
+            color: #00C176;
+        }
+
+        #combo-table.online > :nth-child(6n+6) {
+            color: #00C176;
+        }
+
+        #rule-container-content {
+            display: flex;
+            flex-direction: column;
+            margin: 2vw 0 0 0;
+        }
+
+        #rule-container-content > div {
+            display: flex;
+            flex-direction: row;
+            margin: 0 2vw 1vw 2vw;
+        }
+
+        #rule-container-content > :not(:first-child) {
+            margin-top: 0.5vw;
+        }
+
+        #rule-container-content > div > :first-child {
+            margin: 0.9375vw 1.56vw 0 0;
+            width: 2.6vw;
+            height: 2.6vw;
+            color: white;
+            font-size: 1.458vw;
+            background-color: #4BC7C7;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rule-container-content > div > :last-child {
+            background-color: #F8FAFB;
+            width: 47.7vw;
+            padding: 2vw 2vw 1vw;
+            display: flex;
+            flex-direction: column;
+            border-radius: 1.5vw;
+        }
+
+        #rule-container-content > div > :last-child > :first-child {
+            color: #333333;
+            font-size: 1.354vw;
+        }
+
+        #rule-container-content > div > :last-child > :last-child {
+            color: #666666;
+            font-size: 1.354vw;
+            margin-top: 1vw;
+        }
+
+        #activationCode-prompt-container {
+            display: block;
+            position: fixed;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #activationCode-prompt-container::before {
+            content: '';
+            position: absolute;
+            opacity: 0.5;
+            background-color: black;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #activationCode-prompt-container > div {
+            position: absolute;
+            background-color: white;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 4vh 3vw;
+            border-radius: 0.83vw;
+        }
+
+        #combo-container {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 1vw 10vw;
+            margin-top: 1vw;
+        }
+
+        #combo-container > div {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .button {
+            background-color: white;
+            outline: none;
+            color: #4BC7C7;
+            font-size: 1.458vw;
+            border: 0.1vw solid #4BC7C7;
+            border-radius: 1.7vw;
+            width: 11.979vw;
+            height: 5.4vh;
+        }
+
+        .button:hover, .button:active {
+            background-color: #4BC7C7;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+<div id="main">
+    <template v-if="isLoaded">
+        <div id="header">
+            <img @click.stop="close" style="width: 2vw;height: 2vw; margin-right: 0.9375vw"
+                 src="../../image/onlineMember/back.png" alt="back">
+            <div style="color:#333333; font-size: 2vw">去升级</div>
+        </div>
+        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; margin:2vw 0;min-height: 0">
+            <div style="display: flex; flex-direction: column; align-items: center; width: 36.458vw; height: 100%; background-color: white; margin: 0 2vw 0 0; border-radius: 1.2vw">
+                <div style="margin: 8.125vw 0 0 0; color:#333333;font-size: 1.458vw">输入套餐激活码</div>
+                <input name="activationCode" v-model="activationCode"
+                       style="text-align: center;font-size: 1.458vw;color: #333333; width: 29vw; height: 3.3854vw; margin: 2.6vw 0 0 0; border-radius: 0.83vw; border: 0.1vw solid #E4E4E8;">
+                <button @click.stop="activateNow"
+                        style="font-size: 1.354vw;margin: 2vw 0 0 0;width: 12vw; height: 3.3854vw; background: linear-gradient(to top, #EC6734 0%, #F3B55A 100%); border-radius: 0.7vw; outline: none; border: none; color: white;">
+                    立即激活
+                </button>
+                <img :src="QRCode" alt="12xue" style="margin: 8.3vw 0 0 0; width: 9.375vw; height: 9.375vw">
+                <div style="text-align: center;margin: 2vw 0 0 0; font-size: 1.458vw; color:#333333;line-height: 1.6">
+                    请家长使用微信/浏览器“扫一扫”查看使用说明<br>升级版本获取更多使用次数
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; width: 56vw;height: 100%; background-color: white; border-radius: 1.2vw;overflow-y: auto;">
+                <div>
+                    <div style="display: flex; flex-direction: row; margin: 2.55vw 0 0 0">
+                        <div style="background-color: #4BC7C7; width: 0.4vw;height: auto; margin: 0 1.5vw 0 0"></div>
+                        <div style="color:#333333; font-size: 1.67vw">套餐说明</div>
+                    </div>
+                    <div v-if="isOnlineVersion" id="combo-table" :class="{'online': isOnlineVersion}">
+                        <div>会员权益</div>
+                        <div>尊悦版</div>
+                        <div>尊荣版</div>
+                        <div>尊享版</div>
+                        <div>尊耀版</div>
+                        <div>专项流量包</div>
+
+                        <div>变式题推送</div>
+                        <div>30次/月</div>
+                        <div>80次/月</div>
+                        <div>150次/月</div>
+                        <div>300次/月</div>
+                        <div>100次/年</div>
+
+                        <div>AI解析</div>
+                        <div>30次/月</div>
+                        <div>80次/月</div>
+                        <div>150次/月</div>
+                        <div>300次/月</div>
+                        <div>100次/年</div>
+
+                        <div>语音播报</div>
+                        <div>30次/月</div>
+                        <div>80次/月</div>
+                        <div>150次/月</div>
+                        <div>300次/月</div>
+                        <div>100次/年</div>
+
+                        <div>AI伴学</div>
+                        <div>30次/月</div>
+                        <div>80次/月</div>
+                        <div>150次/月</div>
+                        <div>300次/月</div>
+                        <div>100次/年</div>
+
+                        <div>口语训练</div>
+                        <div>300次/月</div>
+                        <div>2000次/月</div>
+                        <div>4000次/月</div>
+                        <div>10000次/月</div>
+                        <div>1000次/年</div>
+
+                        <div>学情报告</div>
+                        <div>3次/月</div>
+                        <div>20次/月</div>
+                        <div>40次/月</div>
+                        <div>80次/月</div>
+                        <div>100次/年</div>
+
+                        <div>AI批阅</div>
+                        <div>3次/月</div>
+                        <div>10次/月</div>
+                        <div>30次/月</div>
+                        <div>80次/月</div>
+                        <div>100次/年</div>
+                    </div>
+                    <div v-else id="combo-table" :class="{'offline': !isOnlineVersion}">
+                        <div>会员权益</div>
+                        <div>优学版</div>
+                        <div>睿学版</div>
+                        <div>博学版</div>
+                        <div>专项流量包</div>
+
+                        <div>变式题推送</div>
+                        <div>100次/月</div>
+                        <div>200次/月</div>
+                        <div>400次/月</div>
+                        <div>100次/年</div>
+
+                        <div>AI解析</div>
+                        <div>100次/月</div>
+                        <div>200次/月</div>
+                        <div>400次/月</div>
+                        <div>100次/年</div>
+
+                        <div>语音播报</div>
+                        <div>100次/月</div>
+                        <div>200次/月</div>
+                        <div>400次/月</div>
+                        <div>100次/年</div>
+
+                        <div>AI伴学</div>
+                        <div>200次/月</div>
+                        <div>400次/月</div>
+                        <div>800次/月</div>
+                        <div>100次/年</div>
+
+                        <div>口语训练</div>
+                        <div>3000次/月</div>
+                        <div>5000次/月</div>
+                        <div>8000次/月</div>
+                        <div>1000次/年</div>
+
+                        <div>学情报告</div>
+                        <div>30次/月</div>
+                        <div>60次/月</div>
+                        <div>150次/月</div>
+                        <div>100次/年</div>
+
+                        <div>AI批阅</div>
+                        <div>30次/月</div>
+                        <div>60次/月</div>
+                        <div>150次/月</div>
+                        <div>100次/年</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; flex-direction: row; margin: 3vw 0 0 0">
+                        <div style="background-color: #4BC7C7; width: 0.4vw;height: auto; margin: 0 1.5vw 0 0"></div>
+                        <div style="color: #333333;font-size: 1.67vw">套餐有效期及使用规则</div>
+                    </div>
+                    <div id="rule-container-content">
+                        <div>
+                            <div>1</div>
+                            <div>
+                                <div>多套餐开通/兑换后的使用顺序</div>
+                                <div>
+                                    若您同时开通或兑换多个不同类型的新套餐，将按照以下规则依次使用会员权益：优先使用激活时间较早的套餐；当前套餐到期后，自动启用下一个激活的新套餐。
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div>2</div>
+                            <div>
+                                <div>套餐升级规则</div>
+                                <div>当您选择升级套餐时，帐号当前的套餐版本将立即更换为升级后的版本，且套餐到期时间保持不变。<br>举例：A用户于3月1日兑换1年尊荣版套餐（到期时间为次年3月1日），若5月1日选择升级为1年尊享版套餐，尊享版套餐将立即生效，到期时间仍为次年3月1日。
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div>3</div>
+                            <div>
+                                <div>主套餐与专项流量包的抵扣规则</div>
+                                <div>
+                                    若主套餐中某项功能的当月使用次数已耗尽，将自动开始抵扣专项流量包中该功能的次数；次月1日主套餐该功能的使用次数重置更新后，专项流量包的抵扣自动结束，恢复使用主套餐次数。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div v-if="isShowActivationCodePrompt" id="activationCode-prompt-container">
+            <div v-if="activationStatus === ''" style="display: flex; flex-direction: column; align-items: center;">
+                <div style="color:#333333;font-size: 1.458vw">您输入的激活码套餐为</div>
+                <div v-if="!isSpecialTrafficPackage"
+                     style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="color: #4BC7C7;font-weight: bold;font-size: 1.67vw; margin-top: 0.5vh;">
+                        {{ comboData['package_name'] }}({{ comboData['validity_period'] }})
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-top: 1.5vw">
+                        <div style="color:#999999;font-weight: bold;font-size: 1.1458vw">每月可用套餐次数</div>
+                        <div id="combo-container">
+                            <div v-for="item in comboData['monthly_usage']">
+                                <img style="height: 1.77vw; width: 1.77vw;margin-right: 0.5vw"
+                                     :src="`../../image/onlineMember/upgrade/${item.code}.png`" :alt="`${item.title}`">
+                                <div style="color:#333333;font-size: 1.1458vw; width: 7vw;">{{ item.title }}</div>
+                                <div style="color:#333333;font-size: 1.1458vw;font-weight: bold;">{{ item.num }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else style="margin: 0 3vw; display: flex; flex-direction: column; align-items: center;">
+                    <div style="display: flex;flex-direction: row;font-size: 1.67vw;color:#4BC7C7;font-weight: bold;margin-top:3.3vh">
+                        <span>{{ comboData['package_name'] }}专项流量包</span>
+                        <span style="margin-left: 1.5vw;">{{ comboData['monthly_usage'][0]['num'] }}次</span>
+                    </div>
+                    <div style="font-size: 1.458vw;color:#4BC7C7;font-weight: bold;">
+                        （{{ comboData['validity_period']}}）
+                    </div>
+                </div>
+                <div style="color:#333333;font-size: 1.458vw;margin-top: 2.5vw;">是否激活</div>
+                <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 2vw">
+                    <button class="button" @click.stop="isShowActivationCodePrompt = false" style="margin-right: 3vw">
+                        取消
+                    </button>
+                    <button class="button" @click.stop="confirmActivation">确认激活</button>
+                </div>
+            </div>
+            <div v-else-if="activationStatus === 'pass'" style="display: flex;flex-direction: column;">
+                <div style="margin-top: 1.5vw; font-size: 1.458vw;color:#333333">{{ activationInformation }}</div>
+                <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 2vw">
+                    <button class="button" @click.stop="isShowActivationCodePrompt = false; activationStatus = ''"
+                            style="margin-right: 3vw">
+                        取消
+                    </button>
+                    <button class="button" @click.stop="activationPass">确认激活</button>
+                </div>
+            </div>
+            <div v-else style="display: flex; flex-direction: column; align-items: center;padding-left: 5vw;padding-right: 5vw; max-width: 40vw" :style="activationStatus === 'success' ? {'width': '20vw'}: {}">
+                <div v-if="activationStatus === 'success'" style="margin-top: 1.5vw; font-size: 1.458vw;color:#333333">
+                    套餐激活成功
+                </div>
+                <div v-else-if="activationStatus === 'fail'" style="text-align: center;font-size:1.458vw">
+                    <div style="color:#333333">套餐激活失败，</div>
+                    <div style="color:#F82A1A">
+                        {{ activationInformation }}
+                    </div>
+                    <div style="color:#333333">请查看规则说明并联系客服：400-690-8887</div>
+                </div>
+                <button class="button" style="margin-top: 3vw"
+                        @click.stop="isShowActivationCodePrompt = false; activationStatus = ''">知道了
+                </button>
+            </div>
+        </div>
+    </template>
+</div>
+
+<script>
+    const {createApp, ref, computed} = Vue;
+    createApp({
+        setup() {
+            const activationCode = ref('');
+            const isShowActivationCodePrompt = ref(false);
+            const isSpecialTrafficPackage = ref(false);
+            const activationStatus = ref('');
+            const activationInformation = ref('');
+            const isLoaded = ref(false);
+            const comboData = ref({});
+            const QRCode = ref('');
+            const isOnlineVersion = computed(() => {
+                const level = JSON.parse($api.getStorage('comboData')).data.level;
+                return ['nomal', 'professional', 'plus', 'max'].includes(level);
+            });
+            let apiObj;
+
+            apiready = async () => {
+                apiObj = new GridOpenApi(UrlDomain, source, version);
+                apiObj.SetAuthToken($api.getStorage("token"));
+                const ret = await new Promise((resolve, reject) => {
+                    apiObj.Get(UrlRouter.GetMaterialMaterialServer, {
+                        values: {
+                            type: 'AI_DISPLAY_0'
+                        }
+                    }, function (res, err) {
+                        if (res) {
+                            resolve(res)
+                        } else {
+                            reject(err)
+                        }
+                    });
+                });
+                QRCode.value = ret.url;
+                $(document).ready(() => {
+                    $('#main').css('height', window.innerHeight + 'px');
+                })
+                isLoaded.value = true;
+            }
+
+            function close() {
+                api.closeWin();
+            }
+
+            async function activateNow() {
+                const ret = await new Promise((resolve, reject) => {
+                    apiObj.Get(UrlRouter.GetPayfeeActivateCodeInfo, {
+                        values: {
+                            code: activationCode.value.trim(),
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            resolve(ret);
+                        } else {
+                            reject(err);
+                        }
+                    });
+                })
+                if (ret.ret === -1) {
+                    alert(ret.msg);
+                    return;
+                }
+                comboData.value = ret.data;
+                isSpecialTrafficPackage.value = ret.data['monthly_usage'].length === 1;
+                isShowActivationCodePrompt.value = true;
+            }
+
+            async function confirmActivation() {
+                const ret = await new Promise((resolve, reject) => {
+                    apiObj.Post(UrlRouter.PostPayfeeActivatePackage, {
+                        values: {
+                            code: activationCode.value.trim(),
+                            schoolid: $api.getStorage("schoolid"),
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            resolve(ret);
+                        } else {
+                            reject(err);
+                        }
+                    });
+                });
+                if (ret.ret === -1) {
+                    alert('参数错误或未定义');
+                    return;
+                }
+                switch (ret.data.success) {
+                    case -1:
+                        activationInformation.value = ret.data.message;
+                        activationStatus.value = 'fail';
+                        break;
+                    case 0:
+                        activationInformation.value = ret.data.message;
+                        activationStatus.value = 'pass';
+                        break;
+                    case 1:
+                        apiObj.Get(UrlRouter.GetPayfeeUserInfo, {
+                            values: {
+                                uid: $api.getStorage("uid"),
+                                schoolid: $api.getStorage("schoolid"),
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                $api.setStorage('comboData', JSON.stringify(ret));
+                                api.sendEvent({
+                                    name: 'upgrade-updateComboData'
+                                });
+                            }
+                        });
+                        activationStatus.value = 'success';
+                        break;
+                }
+            }
+
+            async function activationPass() {
+                const ret = await new Promise((resolve, reject) => {
+                    apiObj.Post(UrlRouter.PostPayfeeActivatePackage, {
+                        values: {
+                            code: activationCode.value.trim(),
+                            schoolid: $api.getStorage("schoolid"),
+                            pass: 1,
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            resolve(ret);
+                        } else {
+                            reject(err);
+                        }
+                    });
+                });
+                if (ret.ret === -1) {
+                    alert('参数错误或未定义');
+                    return;
+                }
+                switch (ret.data.success) {
+                    case -1:
+                        activationInformation.value = ret.data.message;
+                        activationStatus.value = 'fail';
+                        break;
+                    case 1:
+                        apiObj.Get(UrlRouter.GetPayfeeUserInfo, {
+                            values: {
+                                uid: $api.getStorage("uid"),
+                                schoolid: $api.getStorage("schoolid"),
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                $api.setStorage('comboData', JSON.stringify(ret));
+                                api.sendEvent({
+                                    name: 'upgrade-updateComboData'
+                                });
+                            }
+                        });
+                        activationStatus.value = 'success';
+                        break;
+                }
+            }
+
+            return {
+                activationCode,
+                isShowActivationCodePrompt,
+                isSpecialTrafficPackage,
+                activationStatus,
+                activationInformation,
+                isLoaded,
+                comboData,
+                isOnlineVersion,
+                close,
+                QRCode,
+                activateNow,
+                confirmActivation,
+                activationPass,
+            }
+        }
+    }).mount('#main')
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:http="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: #000;
+            height: 100%;
+        }
+        .image{
+            max-width: 100%;
+            max-height:100%;
+            height: auto;
+            overflow: auto; margin: auto;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+        }
+    </style>
+</head>
+<body tapmode onclick="api.closeFrameGroup({
+    name: 'imageBrowser'
+});">
+<div  style="position:relative;height: 100%;width: 100%;text-align: center;">
+    <img class="image" src="../../../image/loading_more.gif">
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        $api.dom('.image').src = api.pageParam.img;
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.closeFrameGroup({
+                name: 'imageBrowser'
+            });
+        });
+    };
+
+</script>
+</html>

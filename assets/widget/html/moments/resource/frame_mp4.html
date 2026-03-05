@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            font-size: 0.7rem;
+            /*padding-top: 0.5rem;*/
+        }
+
+        .zymc {
+            padding-left: 0.5rem;
+            padding-top: 0.85rem;
+            padding-bottom: 0.5rem;
+        }
+        .zymc_hid {
+            display: none;
+        }
+        .containter{
+            width: 100%;
+            height: 80%;
+        }
+        .swfDiv{
+            text-align: center;
+            width: 100%;
+            padding-top: 20%;
+            display: block;
+            color: #666666;
+        }
+        .videoDic {
+            width: calc(100% - 40px);
+            height: 85%;
+            /*background: #000;*/
+            text-align: center;
+            margin-left: 20px;
+            display: none;
+        }
+        .videoDic video {
+            width: 96%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+            margin: 0 auto;
+            display: block;
+        }
+
+    </style>
+</head>
+<body id="body">
+
+<div  id="zymc" class="zymc"></div>
+<div class="containter"></div>
+<div class="videoDic">
+    <video controls id="my-video" src="" autoplay  data-origin-x="20" data-origin-y="40" poster="../../../image/video_bg.png"></video>
+</div>
+<div class="audioDic">
+    <audio controls  src="" autoplay   style="width: 96%; display:block;height: 30px;padding-top: 25%; margin: 0 auto" poster="../../../image/video_bg.png"></audio>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        $api.html($api.dom('.zymc'), api.pageParam.zymc);
+        var convert_status = api.pageParam.convertStatus;
+        var filetype = api.pageParam.filetype;
+
+        if(convert_status == 0){
+            $api.html($api.dom(".containter"), '<div class="swfDiv">资源正在转码,请三分钟后回来</div>');
+            $api.css($api.dom(".videoDic"), 'display:none');
+            return;
+        }else if(convert_status == 2){
+            $api.html($api.dom(".containter"), '<div class="swfDiv">资源转码失败</div>');
+            $api.css($api.dom(".videoDic"), 'display:none');
+            return;
+        }else {
+            $api.css($api.dom(".containter"), 'display:none');
+            $api.css($api.dom(".videoDic"), 'display:block');
+        }
+
+        if (filetype == '.mp3'|| filetype == '.wma'){
+
+            if(api.systemType == 'ios'){
+                $api.css($api.dom(".audioDic"), 'display:none');
+                $api.attr($api.dom('video'), 'src', decodeURIComponent(api.pageParam.url));
+            }else {
+                $api.css($api.dom(".videoDic"), 'display:none');
+                $api.attr($api.dom('audio'), 'src', decodeURIComponent(api.pageParam.url));
+            }
+        }else{
+            $api.css($api.dom(".audioDic"), 'display:none');
+            $api.attr($api.dom('video'), 'src', decodeURIComponent(api.pageParam.url));
+        }
+
+        api.addEventListener({
+            name: 'pause'
+        }, function (ret, err) {
+                $api.dom('video').pause();
+                $api.dom('audio').pause();
+        });
+        api.addEventListener({
+            name: 'stopVideo'
+        }, function (ret, err) {
+            $api.dom( 'video').pause();
+            $api.dom( 'audio').pause();
+        });
+    };
+
+    function shu() {
+        api.setFullScreen({
+            fullScreen: true
+        });
+        api.setFrameGroupAttr({
+            name: 'materiallist',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            scrollEnabled: false
+        });
+        $api.addCls($api.byId('zymc'), 'zymc_hid');
+        $api.css($api.dom('body'), "background: black;");
+        $api.css($api.dom('video'), "min-height: 100%;  min-width: 100%;  position: absolute;");
+    }
+
+    function heng() {
+        api.setFrameGroupAttr({
+            name: 'materiallist',
+            hidden: false,
+            rect: {
+                x: 0,
+                y: parseInt(api.pageParam.headerH) + 50,
+                w: 'auto',
+                h: api.pageParam.frameH
+            },
+            scrollEnabled: true
+        });
+        //转过来的时候 需要在设置一下，否则会消失
+        $api.removeCls($api.byId('zymc'), "zymc_hid");
+        $api.html($api.dom('.zymc'), api.pageParam.zymc);
+        $api.css($api.dom('body'), "background: transparent;");
+        $api.css($api.dom('video'), "min-height: 90%;  min-width: 75%;  position: absolute;");
+        api.setFullScreen({
+            fullScreen: false
+        });
+    }
+
+    function Padshu() {
+        api.setFullScreen({
+            fullScreen: true
+        });
+        api.setFrameGroupAttr({
+            name: 'materiallist',
+            rect: {
+                x: 0,
+                y: 0,
+                w: parseInt(padWinHeight) + 50,
+                h: api.winWidth - 40
+            },
+            scrollEnabled: false
+        });
+        $api.addCls($api.byId('zymc'), 'zymc_hid');
+        $api.css($api.dom('body'), "background: black;");
+        $api.css($api.dom('video'), "min-height: 100%;  min-width: 100%;  position: absolute;");
+    }
+
+    function Padheng() {
+        api.setFrameGroupAttr({
+            name: 'materiallist',
+            hidden: false,
+            rect: {
+                x: 0,
+                y: parseInt(api.pageParam.headerH) + 50,
+                w: 'auto',
+                h: api.pageParam.frameH
+            },
+            scrollEnabled: true
+        });
+        //转过来的时候 需要在设置一下，否则会消失
+        $api.removeCls($api.byId('zymc'), "zymc_hid");
+        $api.html($api.dom('.zymc'), api.pageParam.zymc);
+        $api.css($api.dom('body'), "background: transparent;");
+        $api.css($api.dom('video'), "min-height: 90%;  min-width: 75%;  position: absolute;");
+        api.setFullScreen({
+            fullScreen: false
+        });
+    }
+
+
+</script>
+</html>

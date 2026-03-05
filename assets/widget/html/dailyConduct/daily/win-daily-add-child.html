@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #fff;
+        }
+
+        .aui-pull-left {
+            height: 50px;
+            line-height: 56px;
+
+        }
+
+        .aui-pull-right {
+            height: 50px;
+            line-height: 56px;
+        }
+    </style>
+    <title>Title</title>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav  ">
+    <a class="aui-pull-left aui-btn">
+        <span class="aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></span>
+    </a>
+    <div class="aui-12xue-title" tapmode onclick="api.closeWin();">添加学生</div>
+    <a tapmode class="aui-pull-right aui-btn ">
+        <span id="txt_sign" class="aui-iconfont aui-icon-check " onclick="sign()"></span>
+    </a>
+</header>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.openFrame({
+            name: 'frame-daily-add-child',
+            url: 'frame-daily-add-child.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: api.pageParam,
+        });
+    }
+
+    function sign() {//点击右上角保存
+        //在当前window中找到
+        //名为frmName的frame，并在该frame中执行jsfun脚本
+        var jsfun = 'save();';
+        api.execScript({
+            frameName: 'frame-daily-conduct-add-stu',
+            script: jsfun
+        });
+    }
+</script>
+</html>

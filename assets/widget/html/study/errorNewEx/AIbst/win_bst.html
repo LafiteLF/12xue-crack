@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>错题详情win</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/winDetailCss.css"/>
+
+    <style>
+        .winTitle {
+            width: calc(100% - 165px);
+        }
+
+        .impdisable {
+            pointer-events: none;
+        }
+
+        .correctbtn {
+            position: absolute;
+            bottom: 20px;
+            right: 5px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .checkbtn {
+            position: absolute;
+            bottom: 20px;
+            right: 5px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .winTitle {
+            width: calc(100% - 165px);
+        }
+    </style>
+</head>
+<body>
+<header class="clearfix">
+    <div style="position: relative">
+        <div style="position: absolute" topmode onclick="api.closeWin();" class="winTitle pull_left">
+            AI变式题
+        </div>
+        <div style="position: absolute;height: 50px;color: #4bc7c7;line-height:50px;text-align: center;font-size:1.6rem;left: 19.1vw">
+            <span style="font-size: 2rem" v-text="index"></span><span v-text="'/'+totalCount"></span></div>
+        <div style="position: absolute;display: grid; grid-template-columns: repeat(3,auto);column-gap: 2.6vw;top:15px;left: 50%;transform: translateX(-50%);font-size: 1.6rem">
+            <div style="color:#787A79;font-weight: bold;">本月剩余</div>
+            <div style="color:#999999">变式题推送次数:&nbsp;<span style="font-weight: bold;"
+                                                                  :style="{'color': aiPush.count > 0 ? '#6FC4C6' : '#F82A1A'}">
+                {{ aiPush.count }}</span></div>
+            <div style="color:#999999">AI解析次数:&nbsp;<span style="font-weight: bold;"
+                                                              :style="{'color': aiAnalysis.count > 0 ? '#6FC4C6' : '#F82A1A'}">
+                {{ aiAnalysis.count }}</span></div>
+        </div>
+    </div>
+    <ul class="right_btn">
+        <li tapmode onclick="vm.onPageUpClick(this);"><img src="../../../../image/up1.png"></li>
+        <li tapmode onclick="vm.onPageDownClick(this);"><img src="../../../../image/down1.png"></li>
+    </ul>
+</header>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        vue();
+        vm.getInfo();
+    };
+
+    function vue() {
+
+        vm = new Vue({
+            el: '.clearfix',
+            data: {
+                index: 0,// 当前的index
+                totalCount: 0,//错题总数
+                currentPage: '',//当前index属于哪一页
+                exercisesData: {},
+                xkmc: api.pageParam.xkmc,
+                current_sys_id: api.pageParam.sys_id,
+                xtid: '',
+                AIbstData: [],
+                allData: {},
+                aiPush: {count: 0},
+                aiAnalysis: {count: 0},
+            },
+            mounted() {
+                this.$watch('aiAnalysis', () => {
+                    $api.setStorage('aiAnalysis', this.aiAnalysis);
+                },{deep: true})
+
+                apiObj.SetAuthToken($api.getStorage('token'));
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        uid: $api.getStorage("uid"),
+                        type: 'ai_analysis',
+                        schoolid: $api.getStorage("schoolid"),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        this.aiAnalysis = ret.data;
+                    } else {
+                        this.aiAnalysis = {count: 0};
+                        console.log("获取用户付费信息失败");
+                    }
+                })
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        uid: $api.getStorage("uid"),
+                        type: 'ai_push',
+                        schoolid: $api.getStorage("schoolid"),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        this.aiPush = ret.data;
+                    } else {
+                        this.aiPush = {count: 0};
+                        console.log("获取用户付费信息失败");
+                    }
+                })
+            },
+            methods: {
+                getInfo: function () {
+
+                    if (vm.AIbstData.length != 0) {
+                        var currentindex = vm.index - 1;
+                        vm.AIbstData = vm.allData[currentindex];
+                        vm.openFrame2();
+                    } else {
+                        apiObj.Get(UrlRouter.GetDeepSeekExerciseVariant, {
+                            values: {
+                                xtid: api.pageParam.xtid,
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                if (ret.ret == 0) {
+                                    vm.allData = ret.data;
+                                    vm.AIbstData = ret.data[0];
+                                    vm.totalCount = ret.data.length;
+                                    vm.index = 1;
+                                    vm.openFrame2();
+                                } else {
+                                    api.toast({
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                    setTimeout(() => {
+                                        api.closeWin();
+                                    }, 1000);
+                                }
+                            } else {
+                                api.toast({
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        })
+                    }
+                },
+                //上一题
+                onPageUpClick: function (content) {
+                    if (vm.index == 1) {
+                        api.toast({
+                            msg: '已经是第一个了',
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    } else {
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+                        // api.closeFrame({
+                        //     name: url
+                        // });
+                        vm.index--;
+                        vm.getInfo();
+                    }
+                    $(content).addClass('impdisable');
+                    setTimeout(function () {
+                        $(content).removeClass('impdisable');
+                    }, 1000);
+                },
+                //下一题
+                onPageDownClick: function (content) {
+                    if (vm.index == vm.totalCount) {
+                        api.toast({
+                            msg: '已经是最后一个了',
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    } else {
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+                        // api.closeFrame({
+                        //     name: url
+                        // });
+                        vm.index++;
+                        vm.getInfo();
+                    }
+                    $(content).addClass('impdisable');
+                    setTimeout(function () {
+                        $(content).removeClass('impdisable');
+                    }, 1000);
+                },
+                openFrame2: function () {
+                    var header = document.querySelector('header');
+                    var headerH = $api.offset(header).h;
+                    var frameAry = [];
+                    var frameObj = {};
+                    vm.setCorrectionBtn = '1';
+                    var curUrl = '';
+                    switch (vm.AIbstData.tx_code) {
+                        case '1'://单选 多选 判断 听单句话 单项选择
+                            curUrl = 'frame_xzt.html';
+                            break;
+                        case '2':// 填空题 名著导读
+                            curUrl = 'frame_tkt.html';
+                            break;
+                        case '3'://问答题 语言表达 默写 翻译 作文 朗读 证明 书面表达 朗读 解答 辨析 简答 计算
+                            curUrl = "frame_wdt.html";
+                            break;
+                        case '4'://复合题带选项
+                            if (vm.AIbstData.tx == 'tdh' || vm.AIbstData.tx == 'tdb' || vm.AIbstData.tx == 'ttt') {//听对话 听对白
+                                curUrl = "frame_listen.html";
+                            } else {//完型填空 阅读理解 材料选择题
+                                curUrl = "frame_wxtk.html";
+                            }
+                            break;
+                        case '5'://复合题不带选项 ：材料分析 解答 现代文阅读 综合探究 实验与探究 诗歌鉴赏 文言文批阅
+                            curUrl = "frame_sytj.html";
+                            break;
+                    }
+                    api.openFrame({
+                        name: curUrl,
+                        url: curUrl,
+                        rect: {
+                            x: 0,
+                            y: headerH + 10,
+                            w: api.winWidth - 64,
+                            h: $api.getStorage('padHeight') - headerH - 10 - 10
+                        },
+                        pageParam: {
+                            index: vm.index,
+                            material: vm.AIbstData,
+                            type: api.pageParam.type,
+                            xkid: api.pageParam.xkid,
+                            dyid: api.pageParam.dyid,
+                            jieid: api.pageParam.jieid,
+                            njid: api.pageParam.njid,
+                            tx: api.pageParam.tx_type,
+                            totalCount: vm.totalCount,
+                            isImportant: api.pageParam.isImportant,//win中的筛选条件是否是重点
+                        },
+                        bounces: false,
+                        reload: true
+                    });
+                },
+            }
+        });
+    }
+
+    function postAiAnalysis() {
+        if (vm.aiAnalysis.count > 0) {
+            vm.aiAnalysis.count -= 1;
+        }
+        api.execScript({
+            name: 'win_error_detail_new',
+            script: 'postAIjxNum();'
+        });
+    }
+</script>
+</html>

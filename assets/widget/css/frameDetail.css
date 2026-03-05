@@ -1,0 +1,1657 @@
+/*题干*/
+strong{  color: #000; font-weight: bold}
+.content {
+    width: calc(100% - 2px);
+    border: 1px solid #e4e4e8;
+}
+
+.stem {
+    background: #fff;
+    padding: 25px;
+    padding-left: 10px;
+    padding-top: 55px;
+
+}
+.zsd img{
+    height: 18px;
+    vertical-align: top;
+    margin-top: 2px;
+}
+.listen_zsd img{
+    height: 18px;
+    vertical-align: top;
+    margin-top: 0px;
+}
+.stem ul {
+    position: fixed;
+    top: 0;
+    left: 1px;
+    background: -webkit-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Safari 5.1 - 6.0 */
+    background: -o-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Opera 11.1 - 12.0 */
+    background: -moz-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Firefox 3.6 - 15 */
+    background: linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* 标准的语法 */
+    height: 40px;
+    line-height: 30px;
+    width: calc(100% - 12px);
+    border-top: 1px solid #e4e4e8;
+    padding-top: 25px;
+    z-index: 100;
+    padding-left: 10px;
+}
+
+.tixing {
+    font-size: 1.8rem;
+    text-align: right;
+    display: inline-block;
+    padding-right: 9px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.tihao {
+    width: 36px;
+    float: left;
+    text-align: right
+}
+
+.tixingzi {
+    display: inline-block;
+    float: right;
+    text-align: left
+}
+
+.zsd {
+    font-size: 1.4rem;
+    color: #4bc7c7;
+    display: inline-block;
+    width: calc(100% - 200px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 27px;
+    line-height: 27px;
+    vertical-align: top
+}
+
+.zsd span:nth-of-type(2) {
+    margin-left: 5px;
+}
+
+.zsd span {
+    color: #989898
+}
+
+.tg_content {
+    width: calc(100% - 44px);
+    padding-left: 44px;
+    font-size: 1.6rem;
+    line-height: 30px;
+    padding-top: 7px;
+    word-wrap:break-word;
+}
+
+/*选择题答题部分*/
+.bhz {
+    display: inline-block;
+    width: 89px;
+    height: 37px;
+    line-height: 37px;
+    border: 1px dashed #4BC7C7;
+    border-radius: 3px;
+    font-size: 1.3rem;
+    text-align: left;
+}
+
+.bhz span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 1px solid #4BC7C7;
+    border-radius: 3px;
+    margin-bottom: 9px;
+    vertical-align: bottom;
+    margin-left: 12px;
+    margin-right: 8px;
+}
+
+.option {
+    text-align: center;
+    padding: 23px 0 46px 0px
+}
+
+.option li {
+    display: inline-block;
+    margin: 36px 31px 0 31px
+}
+
+.danxoption {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #4BC7C7;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 206px;
+    background: #fff;
+    font-size: 1.8rem;
+    color: #4BC7C7;
+}
+
+.inputCheckactive {
+    background: url("../image/checked.png") no-repeat center center #fff;
+    background-size: 100%;
+}
+
+.xxactive {
+    background: #4BC7C7 !important;
+    color: #fff !important;
+}
+
+.duoxoption {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #4BC7C7;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 1.8rem;
+    color: #4BC7C7;
+}
+
+/*问答题答题部分*/
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+    left: 56px;
+    top: 70px;
+    background: -webkit-linear-gradient(#9CE9E9, #9CE9E9) no-repeat;
+    background-size: 0% 100%;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 15px;
+    border-radius: 15px; /*将轨道设为圆角的*/
+    box-shadow: 0 1px 1px #ededed, inset 0 1px 1px #ededed; /*轨道内置阴影效果*/
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 15px;
+    width: 15px;
+    /*margin-top: -2px; !*使滑块超出轨道部分的偏移量相等*!*/
+    background: #4bc7c7;
+    border-radius: 50%; /*外观设置为圆形*/
+    border: 1px solid #fff;
+}
+
+.wdAnswerType {
+    text-align: center
+}
+.sytjAnswerType{
+    text-align: center
+}
+.wdAnswerTypeActive {
+    text-align: right
+}
+.sytjAnswerType ul{
+    width: 100px;
+    padding: 25px 0;
+    text-align: center;
+    display: inline-block
+}
+.wdAnswerType ul, .wdAnswerTypeActive ul {
+    width: 100px;
+    padding: 25px 0;
+    text-align: center;
+    display: inline-block
+}
+
+.wxtk_content .wdAnswerType ul {
+    padding: 0px !important;
+    padding-top: 20px!important;
+}
+
+.wxtk_content .openAnserType {
+    margin-bottom: 20px !important;
+    margin-top: 0px!important;
+}
+
+.openAnserType {
+    width: 65px;
+    height: 65px;
+    background: url("../image/stuHomePad/dianji.png") no-repeat;
+    background-size: 65px 65px;
+    margin: 25px auto;
+    margin-bottom: 35px
+}
+
+.da_content {
+    padding-top: 25px
+}
+
+.da_content dl {
+    width: 100%;
+}
+
+.da_content dl dd {
+    width: calc(32% - 2px);
+    height: 150px;
+    float: left;
+    background: #fff;
+    position: relative
+}
+
+.chacha {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 23px;
+    height: 23px;
+    text-align: right;
+    padding-top: 2px;
+    padding-right: 2px
+}
+
+.chacha img {
+    width: 23px !important;
+    height: 23px !important;
+    border-radius: 100px;
+}
+
+.wdtzi {
+    height: 150px;
+    border: 1px solid #e4e4e8;
+    width: calc(100% - 100px);
+    font-size: 1.4rem;
+    padding: 10px;
+}
+
+.wdtzi::-webkit-input-placeholder {
+    color: #d5d5d5;
+    font-size: 1.4rem;
+}
+
+.wenda_answer {
+    padding: 25px;
+    margin-top: 3px;
+    position: relative;
+}
+
+.wendah2 {
+    font-size: 1.6rem;
+    padding-bottom: 14px;
+    padding-left: 22px;
+    font-weight: normal;
+}
+
+.wendazi {
+    font-size: 1.6rem;
+    color: #666;
+    line-height: 30px;
+}
+
+.wenda_answer ul {
+    padding-left: 29px;
+    padding-bottom: 14px;
+}
+
+.wendatu, .wendashipin, .wendayuyin {
+    float: left;
+    width: calc(32% - 2px);
+    position: relative;
+    height: 150px;
+    margin: 10px 0;
+    border-radius: 6px;
+    overflow: hidden
+}
+
+.wendatu img {
+    width: 100%;
+    height: 100%;
+    min-height: 100%; min-width: 100%;
+}
+
+/*.wendawdda li:nth-of-type(3n-1), .da_content dl dd:nth-of-type(3n-1) {*/
+/*margin-right: 2%;*/
+/*margin-left: 2%*/
+/*}*/
+
+.wendashipin {
+    background: url("../image/newhomework/logo.png") no-repeat center  #867d77 !important; background-size: 50% auto !important;
+    /*#867d77 !important;*/
+}
+.wendayuyin {
+    background: url("../image/newhomework/yipinimg.png") no-repeat center  #867d77 !important; background-size: 80% auto !important;
+    /*#867d77 !important;*/
+}
+.wendashipin img ,.wendayuyin img{
+width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 52px;
+    left: calc(50% - 25px);
+}
+.wendashipin p ,.wendayuyin p{
+    width: 100%;
+    height: 100%;
+}
+.wendayuyin {
+    background: #fff;
+    box-shadow: 0px 0px 10px #dedbdb;
+}
+
+.stop {
+    width: 34px;
+    height: 34px;
+    position: absolute;
+    left: 12px;
+    top: 58px;
+}
+
+.fileTimeP {
+    width: 42px;
+    height: 34px;
+    line-height: 34px;
+    color: #999;
+    font-size: 1.2rem;
+    position: absolute;
+    right: 0;
+    top: 56px;
+}
+
+.teacher_liuyan {
+    width: 100px;
+    height: 30px;
+    border: 1px solid #4BC7C7;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin-right: 18px;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.teacher_liuyan_zi {
+    width: 100%;
+}
+
+.teacher_liuyan_zi span {
+    display: inline-block;
+    width: auto !important;
+    max-width: calc(80% - 20px);
+    height: auto;
+    padding: 6px 10px;
+    border: 1px solid #4BC7C7;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin-right: 18px;
+    position: relative;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 24px;
+    color: #6b6b6b;
+    word-wrap:break-word;
+}
+
+.teacher_liuyan_zi p {
+    display: inline-block;
+    width: auto !important;
+    max-width: calc(100% - 20px);
+    height: auto;
+    padding: 6px 10px;
+    border: 1px solid #4BC7C7;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin-right: 18px;
+    position: relative;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 24px;
+    color: #6b6b6b;
+    word-wrap:break-word;
+}
+
+.teacher_liuyan img {
+    position: absolute;
+    width: 12px;
+    height: 17px;
+    left: 12px;
+    top: 7px;
+}
+
+.teacher_liuyan span {
+    font-size: 1.6rem;
+    color: #4BC7C7;
+    position: absolute;
+    right: 8px;
+    top: 0px;
+    height: 30px;
+    line-height: 30px;
+}
+
+.defen {
+    display: inline-block;
+    height: 25px;
+    position: absolute;
+    right: 23px;
+    top: 25px;
+    line-height: 24px;
+    font-size: 1.4rem;
+    color: #999
+}
+.defen em{ font-style: normal; color: #4BC7C7}
+.defen img {
+    width: 25px;
+    height: 25px;
+    vertical-align: bottom;
+    margin-right: 5px;
+
+}
+
+.defen b {
+    font-weight: normal;
+    padding-left: 23px;
+}
+
+/*问答题答案部分结束*/
+/*录音部分开始 朗读题*/
+.reading_main {
+    width: 80%;
+    height: calc(100% - 60px);
+    position: fixed;
+    left: 10%;
+    top: 30px;
+    box-shadow: 0px 0px 10px #dedbdb;
+    background: #f3fffd
+}
+
+.reading_top {
+    width: 100%;
+    height: 112px;
+}
+
+.reading_top h1 {
+    height: 25px;
+    line-height: 25px;
+    font-size: 1.8rem;
+    text-align: center;
+    font-weight: normal;
+    padding-top: 17px;
+}
+
+.reading_top p {
+    height: 72px;
+    line-height: 72px;
+    font-size: 3.9rem;
+    color: #4fc8c8;
+    text-align: center
+}
+
+.reading_center {
+    width: calc(100% - 40px);
+    height: calc(100% - 269px);
+    padding-right: 7px;
+    margin: 0 20px;
+    font-size: 1.6rem;
+    color: #1d9898;
+    line-height: 30px;
+    overflow-y: scroll;
+    margin-bottom: 12px;
+}
+
+.reading_bottom {
+    height: 150px;
+    width: 100%;
+    background: #fff;
+    position: relative
+}
+
+.reading_bottom .reading_button {
+    width: 112px;
+    height: 98px;
+    position: absolute;
+    top: 26px;
+    left: calc(50% - 56px);
+}
+
+.reading_bottom p {
+    font-size: 1.2rem;
+    color: rgba(75, 199, 199, 0.76);
+    padding-top: 123px;
+    text-align: center;
+}
+
+/*滚动条样式*/
+*::-webkit-scrollbar { /*滚动条整体样式*/
+    width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+    /*height: 100%;*/
+}
+
+*::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+    border-radius: 10px;
+    -webkit-box-shadow: none;
+    background: #83dad9;
+}
+
+*::-webkit-scrollbar-track { /*滚动条里面轨道*/
+    -webkit-box-shadow: none;
+    border-radius: 10px;
+    background: #d8f6f4;
+}
+
+progress {
+    width: 100%;
+    height: 5px;
+    border: none;
+    background: #e2f6f6;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+progress::-webkit-progress-bar {
+    background-color: #E0FAF9;
+}
+
+progress::-webkit-progress-value {
+    background-color: #87dada;
+    border-radius: 20px;
+}
+
+.reading_again, .reading_use {
+    width: 40px;
+    height: 80px;
+    position: absolute;
+    top: 56px;
+}
+
+.reading_again b, .reading_use b {
+    font-size: 1.2rem;
+    color: #999;
+    text-align: center;
+    font-weight: normal;
+    display: block;
+    line-height: 24px;
+}
+
+.reading_again {
+    left: calc(50% - 125px);
+}
+
+.reading_use {
+    right: calc(50% - 125px);
+}
+
+.reading_again span {
+
+    background: url("../image/newhomework/chonglu.png") no-repeat center center #fff;
+    background-size: 20px 18px;;
+}
+
+.reading_use span {
+    background: url("../image/newhomework/shiyong.png") no-repeat center center #fff;
+    background-size: 20px 18px;;
+}
+
+.reading_again span, .reading_use span {
+    box-shadow: 0px 2px 8px #dedbdb;
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
+    border: 1px solid #ddd;
+
+}
+
+.reading_again:active span {
+    background: url("../image/newhomework/chongluaction.png") no-repeat center center #c8fafa;
+    border: 1px solid #4BC7C7;
+    background-size: 20px 18px;;
+}
+
+.reading_again:active b {
+    color: #4BC7C7;
+}
+
+.reading_use:active span {
+    background: url("../image/newhomework/shiyongaction.png") no-repeat center center #c8fafa;
+    border: 1px solid #4BC7C7;
+    background-size: 20px 18px;;
+}
+
+.reading_use:active b {
+    color: #4BC7C7;
+}
+
+/*录音部分结束 朗读题*/
+/*听单句话开始*/
+.listen_content {
+    width: calc(100% - 2px);
+    height: 100%;
+    background: #fff;
+
+}
+
+.listen_stem {
+    background: #fff;
+    padding: 25px;
+    top: 0;
+    z-index: 200;
+    padding-top: 0px;
+    padding-left: 10px;
+    height: 209px;
+    box-shadow: 0px 0px 23px #dedbdb;
+    padding-bottom: 8px;
+    width: calc(100% - 13px);
+    position: fixed;
+}
+
+.listen_bottom {
+    position: fixed;
+    top: 218px;
+    padding-top: 12px;
+    height: calc(100% - 230px);
+    width: 100%;
+    overflow-y: scroll;
+    z-index: 10;
+
+}
+.listenda_content .option li {
+    display: inline-block;
+    margin: 26px 31px 10px 31px;
+}
+.listen_stem ul {
+    background: -webkit-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Safari 5.1 - 6.0 */
+    background: -o-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Opera 11.1 - 12.0 */
+    background: -moz-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Firefox 3.6 - 15 */
+    background: linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* 标准的语法 */
+    padding-bottom: 7px;
+    width: calc(100% - 36px);
+    padding-top: 25px;
+    z-index: 100;
+    position: absolute;
+
+}
+
+.listen_tixing {
+    font-size: 1.8rem;
+    text-align: right;
+    display: inline-block;
+    width: 145px;
+    padding-right: 9px;
+
+}
+
+.listen_zsd {
+    font-size: 1.4rem;
+    color: #4bc7c7;
+    display: inline-block;
+    width: calc(100% - 160px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+    padding-top: 4px;
+}
+
+.listen_zsd span:nth-of-type(2) {
+    margin-left: 5px;
+}
+
+.listen_zsd span {
+    color: #989898
+}
+
+.listen_tigan {
+    height: 152px;
+    overflow-y: auto;
+    width: calc(100% - 65px);
+    padding-left: 44px;
+    font-size: 1.6rem;
+    line-height: 30px;
+    padding-right: 25px;
+    padding-top: 60px;
+
+}
+
+.listen_tigan .ypRange {
+    padding-top: 15px !important;
+}
+
+.listen_xtxx img {
+    display: block;
+    max-width: 40%
+}
+
+.listenda_content {
+    padding: 25px;
+    background: #fff;
+    padding-bottom: 0;
+}
+
+.listen_xtxx {
+    font-size: 1.6rem;
+    color: #666;
+    line-height: 30px;
+    padding-left: 33px;
+}
+
+.listenda_content .option {
+    padding-top: 0px !important;
+    padding-bottom:0px!important; ;
+}
+
+.listen_answer {
+    padding: 0 25px 25px 25px;
+    background: #fff;
+    position: relative;
+    border-bottom: 3px solid #f6f6f6;
+}
+
+.listen_answer dd:nth-of-type(1) {
+    padding-top: 35px;
+    background: url("../image/newhomework/xuxian.jpg") repeat-x top;
+    background-size: auto 1px;
+}
+
+.listen_answer ul {
+    padding-left: 29px;
+    padding-bottom: 14px;
+}
+
+.listen_xiaoti {
+    font-size: 1.4rem;
+    color: #4bc7c7;
+    position: absolute;
+    right: 10px;
+    top: 22px;
+}
+
+/*听单句话结束*/
+/*填空题开始*/
+.tkt_content {
+    width: calc(100% - 2px);
+    height: calc(100% - 10px);
+    background: #fff;
+    border: 1px solid #e4e4e8;
+    position: relative;
+}
+
+.tkt_left {
+    height: calc(100% - 55px);
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding-top: 55px;
+    z-index: 1;
+    padding-left: 10px;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding-right: 6px;
+}
+
+.tkt_right {
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: url("../image/newhomework/tkthk.png") no-repeat left top;
+    background-size: 37px 100%;
+    z-index: 10;
+    overflow-y: auto;
+}
+
+.huakuai {
+    width: 50px;
+    height: 100%;
+    position: absolute;
+    left: -25px;
+
+}
+
+.tkt_top {
+    width: calc(60% - 25px);
+    padding: 25px;
+    padding-left: 10px;
+    padding-bottom: 0px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 40px;
+    z-index: 8;
+    background: -webkit-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Safari 5.1 - 6.0 */
+    background: -o-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Opera 11.1 - 12.0 */
+    background: -moz-linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)); /* Firefox 3.6 - 15 */
+    background: linear-gradient(#ffffff, rgba(255, 255, 255, 0.8)) !important; /* 标准的语法 */
+}
+
+.tkt_right_content {
+    width: calc(100% - 37px);
+    min-height: calc(100% - 20px);
+    float: right;
+    background: #fff;
+    line-height: 30px;
+    padding-bottom: 20px;
+    position: relative;
+}
+
+.tkt_answer {
+    padding: 15px 0 15px 0;
+    width: calc(100% - 50px);
+    margin-left: 25px;
+    position: relative;
+    background: url("../image/newhomework/xuxian.jpg") repeat-x bottom;
+    background-size: auto 1px
+}
+
+.tkth2 {
+    font-size: 1.6rem;
+    /*padding-bottom: 14px;*/
+
+    font-weight: normal;
+    padding-left: 30px;
+}
+
+.tkt_answer dt {
+    font-size: 1.8rem;
+    color: #666;
+    position: absolute;
+    left: -4px;
+    top: 15px;
+}
+
+.tkt_answer dd {
+}
+
+.tktzi {
+    font-size: 1.6rem;
+    color: #666;
+    line-height: 30px;
+}
+
+.tkt_dajx ul {
+    padding: 0 25px;
+}
+
+.tkt_dajx dd {
+    padding: 10px 0 0 0
+}
+
+.tktjxh2 {
+    font-size: 1.6rem;
+    /*padding-bottom: 14px;*/
+
+    font-weight: normal;
+    padding-left: 18px;
+    padding-bottom: 10px;
+}
+
+.tktdefen {
+    display: inline-block;
+    height: 22px;
+    position: absolute;
+    right: -10px;
+    top: 15px;
+    line-height: 22px;
+    font-size: 1.4rem;
+    color: #999
+}
+.tktdefen em{ font-style: normal; color: #4BC7C7}
+.tktdefen img {
+    width: 22px;
+    height: 22px;
+    vertical-align: bottom;
+    margin-right: 3px;
+}
+
+.tktdefen b {
+    font-weight: normal;
+    padding-left: 6px;
+}
+
+.tktda_content {
+    padding: 15px;
+    width: calc(100% - 30px)
+}
+
+.tktda_content dd {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    position: relative
+}
+
+.kong_list {
+    font-size: 1.8rem;
+    color: #666;
+    text-align: right;
+    display: block;
+    position: absolute;
+    width: 60px;
+}
+
+.tktbhz {
+    display: block;
+    width: 90px;
+    height: 28px;
+    line-height: 32px;
+    border: 1px dashed #4BC7C7;
+    border-radius: 3px;
+    font-size: 1.3rem;
+    text-align: left;
+    margin-left: 15px;
+    position: absolute;
+    right: 0;
+}
+
+.tkt_auto .tktbhz {
+    top: 10px;
+}
+
+.tkt_noauto .tktbhz {
+    top: 23px;
+}
+
+.tktbhz span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 1px solid #4BC7C7;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    vertical-align: bottom;
+    margin-left: 12px;
+    margin-right: 8px;
+}
+
+.tkt_auto input {
+    width: calc(100% - 177px);
+    float: left;
+    margin-left: 60px;
+    height: 28px;
+    border: 1px solid #d6d6d6;
+    padding: 0 5px;
+}
+
+.tkt_kongimg {
+    width: calc(100% - 167px);
+    float: left;
+    margin-left: 60px;
+}
+
+
+.tkt_kongimg li {
+    width: 109px;
+    height: 82px;
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+    position: relative
+}
+.tkt_img , .tktanswer_img{ border: 1px solid #eee!important;}
+
+.wxtk_myanswer .sytj_kongimg {
+    width: calc(100% - 15px);
+    float: left;
+    margin-left: 9px;
+}
+
+.sytj_kongimg {
+    width: calc(100% - 60px);
+    float: none;
+    margin-left: 40px;
+}
+
+.sytjdazi {
+    width: 100% !important;
+    text-align: left !important;
+    float: none !important;
+    border: none !important;
+    font-size: 1.6rem;
+    color: #666;
+    line-height: 30px;
+    height: auto !important;
+}
+
+.sytj_kongimg li {
+    width: 109px;
+    height: 82px;
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+    border: 1px solid #eee
+}
+
+.tkt_img img {
+    width: 100%;
+    height: 82px
+}
+
+.tkt_addimg img {
+    width: 50px;
+    height: auto;
+    margin-top: 14px;
+}
+
+.tktanswer_img {
+    width: 109px;
+    height: 82px;
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.tktanswer_img img {
+    width: 100%;
+    height: 100%
+}
+
+.tkt_answer_left {
+    padding-left: 40px
+}
+
+.tktextarea {
+    width: calc(100% - 177px);
+    float: left;
+    margin-left: 60px;
+    height: 88px;
+    border: 1px solid #d6d6d6;
+    padding: 5px;
+}
+
+.sytjextarea {
+    width: calc(100% - 75px);
+    float: left;
+    margin-left: 40px;
+    height: 88px;
+    border: 1px solid #d6d6d6;
+    padding: 5px;
+}
+
+/*填空题结束*/
+/*完型填空开始*/
+.wxtk_tg {
+    width: calc(100% - 80px);
+    padding: 30px 40px 20px 40px;
+    font-size: 1.6rem;
+    line-height: 30px;
+    color: #666;
+    word-wrap: break-word;
+}
+
+.xiaotifenge {
+    margin-top: 25px;
+    border-top: 3px solid #f6f6f6
+}
+
+.wxtk_content li:nth-of-type(1) .xiaotifenge {
+    border: none;
+    margin-top: 0px;
+
+}
+.wxtk_content{ padding-bottom: 20px}
+.wxtk_option {
+    text-align: center;
+}
+
+.wxtk_option li {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 1px solid #4BC7C7;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 106px;
+    background: #fff;
+    font-size: 1.8rem;
+    color: #4BC7C7;
+    margin: 7px 14px;
+    overflow: hidden
+}
+
+.wxtk_answer {
+    padding: 0 5px;
+    margin: 0 25px;
+    background: url("../image/newhomework/xuxian.jpg") repeat-x top;
+    background-size: auto 1px;
+    padding-top: 20px;
+}
+
+.wxtk_answer h2 {
+    font-size: 1.6rem;
+    /*padding-bottom: 14px;*/
+
+    font-weight: normal;
+
+}
+
+.wxtkzi {
+    font-size: 1.6rem;
+    color: #666;
+    line-height: 30px;
+    padding-left: 10px;
+}
+
+.wxtk_dajx ul {
+    padding: 0 25px;
+}
+
+.wxtk_dajx dd {
+    padding: 10px 0 0 0
+}
+
+.wxtk_dajx {
+    padding: 0 10px;
+}
+
+.wxtk_myanswer {
+    position: relative
+}
+
+.wxtkdefen {
+    display: inline-block;
+    height: 22px;
+    position: absolute;
+    right: -10px;
+    top: 0px;
+    line-height: 22px;
+    font-size: 1.4rem;
+    color: #999
+}
+.wxtkdefen em{ font-style: normal; color: #4BC7C7}
+.wxtkdefen img {
+    width: 22px;
+    height: 22px;
+    vertical-align: bottom;
+    margin-right: 3px;
+}
+
+.wxtkdefen b {
+    font-weight: normal;
+    padding-left: 6px;
+}
+
+.wxtk_xiaoti {
+    font-size: 1.4rem;
+    color: #4bc7c7;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+}
+.tktZongfen{
+    font-size: 1.6rem;
+    color: #666;
+    /* position: absolute; */
+    /* left: 10px; */
+    /* top: 10px; */
+    display: block;
+    padding-top: 6px;
+    padding-left: 20px;
+    margin-bottom: -12px;
+}
+
+.zongfen{
+    font-size: 1.6rem;
+    color: #666;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+.tktZongfen em,.zongfen em{
+    font-style: normal; color: #4bc7c7
+}
+.listen_bottom .zongfen{
+    top: 12px; left: 50px;
+}
+.wxtkbhz {
+    display: block;
+    width: 89px;
+    height: 37px;
+    line-height: 37px;
+    border: 1px dashed #4BC7C7;
+    border-radius: 3px;
+    font-size: 1.3rem;
+    text-align: left;
+    margin: 15px auto;
+}
+
+.wxtkbhz span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 1px solid #4BC7C7;
+    border-radius: 3px;
+    margin-bottom: 9px;
+    vertical-align: bottom;
+    margin-left: 12px;
+    margin-right: 8px;
+}
+
+/*完型填空结束*/
+/*实验与探究*/
+.sytjda_content {
+    padding: 15px;
+    width: calc(100% - 43px);
+    padding-left: 28px;
+}
+
+.sytjda_content dd {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    position: relative
+}
+
+.zttimg {
+    width: calc(100% - 70px) !important;
+    padding-left: 40px;
+}
+
+.zttimg li img {
+    width: 167px;
+    height: 127px;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.zttimg li p {
+    font-size: 1.8rem;
+    text-align: center;
+    height: 25px;
+    width: 25px;
+    line-height: 27px;
+    border-radius: 100px;
+    border: 1px solid #383838;
+    color: #000;
+    display: block;
+    margin: 0 auto
+}
+
+.zttimg li {
+    width: 167px;
+    float: left;
+    margin: 0 7px 20px 0;
+    height: auto
+}
+
+.wxtk_tg img {
+    max-width: 100%;
+    vertical-align: middle;
+
+}
+
+/*素材*/
+.pdf {
+    padding-top: 20px;
+    text-align: center
+}
+
+.pdf span {
+    display: block;
+    width: 120px;
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid #4bc7c7;
+    color: #4bc7c7;
+    text-align: left;
+    line-height: 40px;
+    margin: 0 auto;
+    padding-left: 70px;
+    font-size: 1.6rem;
+    background: url(../image/newhomework/sucaichakan.png) no-repeat 31px 6px #e6f8f8;
+    background-size: 25px auto;
+}
+
+.pdf img {
+    width: 125px;
+}
+
+.pdf p {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #4BC7C7
+}
+
+.sctupian {
+    padding-left: 45px;
+    padding-top: 10px;
+}
+
+.sctupian img {
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.scshipin {
+    height: 300px;
+    width: 60%;
+    margin: 0 auto;
+    position: relative;
+    background: url('../image/newhomework/logo.png') no-repeat center rgba(0, 0, 0, 0.4);
+    background-size: 50% auto;
+    margin-top: 10px;
+}
+
+.scshipin img {
+    width: 76px;
+    height: 76px;
+    position: absolute;
+    left: calc(50% - 38px);
+    top: calc(50% - 38px)
+}
+
+.scyinpin {
+    width: 70%;
+    height: 58px;
+    position: relative;
+    margin-left: 15px;
+    padding-top: 10px;
+}
+
+.tdjhyinpin {
+    width: 70%;
+    height: 58px;
+    position: relative;
+    padding-top: 10px;
+    margin-left: -30px !important;
+    margin-bottom: 20px;
+}
+
+.ldyinpin {
+    width: 50%;
+    height: 58px;
+    position: relative;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0px 0px 10px #dedbdb;
+    border-radius: 6px;
+}
+
+.lddayinpin {
+    width: 50%;
+    height: 46px;
+    position: relative;
+    padding: 14px 17px;
+    background: #fff;
+    box-shadow: 0px 0px 10px #dedbdb;
+    border-radius: 6px;
+    margin-left: 33px;
+    margin-bottom: 15px;
+}
+.da_content .lddayinpin{margin-left: 0px!important;}
+.lddayinpin .chacha{    right: -10px!important;
+    top: -10px!important;}
+.lddayinpin .scyp2{
+    width: 46px!important; height: 46px!important;
+}
+.lddayinpin .ypTimeP{
+    width: 45px!important;
+    line-height: 46px!important;height: 46px!important;
+}
+.scyp1 {
+    width: 31px;
+    float: left;
+    margin-top: 8px;
+}
+
+.scyp2 {
+    width: 58px;
+    height: 58px;
+    margin-left: 5px;
+    margin-right: 14px;
+    float: left
+}
+
+.ypTimeP {
+    font-size: 1.4rem;
+    color: #999;
+    float: right;
+    display: block;
+    height: 58px;
+    line-height: 58px;
+    text-align: right;
+    width: 50px;
+}
+
+.ldTimeP {
+    font-size: 1.4rem;
+    color: #999;
+    float: right;
+    display: block;
+    height: 58px;
+    margin-right: 43px;
+    line-height: 58px;
+    text-align: right;
+    width: 50px;
+}
+
+.ldRange {
+    width: calc(100% - 174px);
+    float: left;
+    padding-top: 24px;
+}
+
+.lddaRange {
+    width: calc(100% - 110px);
+    float: left;
+    padding-top: 15px;
+}
+
+.ypRange {
+    width: calc(100% - 160px);
+    float: left;
+    padding-top: 21px;
+}
+
+/*标准模式选项变色*/
+.options-item-color {
+    color: #4bc7c7
+}
+
+textarea {
+    font-size: 16px !important;
+    color: #333 !important;
+    line-height: 30px !important;
+}
+
+.ldyinpin .chacha {
+    top: 21px !important;
+    right: 10px !important;
+}
+
+.imgborder {
+    border: 1px solid #eee
+}
+
+.tg_content img, .wxtk_tg img {
+
+    max-width: 100%;
+    display: inline-block;
+    vertical-align: middle;
+}
+.tijiao{width: 200px; height: 50px; background: #4bc7c7; text-align: center; line-height: 50px; border-radius: 50px; color: #fff; font-size: 1.6rem; margin: 0 auto; margin-bottom: 20px}
+.tktzqda{ margin-top: 15px;}
+.tishi{
+    height: 30px; line-height: 30px; background:#fef2ee ; color: #f9987d; padding: 0 20px;border-radius: 100px;
+    display: inline-block; margin-bottom: 20px; font-size: 1.4rem;
+}
+.tishi img{width: 16px; vertical-align: bottom; margin-bottom: 7px;margin-right: 9px; }
+.listen_bottom .tishi{
+    margin-bottom: -6px;
+    margin-top: 3px; margin-left: 40px;
+}
+.tishi2{font-size: 1.4rem;
+    height: 30px; line-height: 30px; background:#fef2ee ; color: #f9987d; padding: 0 20px;
+    margin-bottom: 20px;
+}
+.tishi2 img{width: 16px; vertical-align: bottom; margin-bottom: 7px;margin-right: 9px; }
+.ldcl{
+    width: calc(100% - 44px);
+    padding-left: 44px;
+    font-size: 1.6rem;
+    line-height: 30px;
+    padding-top: 7px;
+    color: #666;
+}
+.ldcl h3{ font-weight:normal}
+.sytj_auto_kong h4{
+    font-size: 1.6rem;
+    font-weight: normal;
+}
+.sytj_auto_kong p{
+    font-size: 1.6rem;
+    color: #666;
+    line-height: 30px;
+    padding-left: 10px;
+}
+.sytj_auto_kong{
+    margin-left: 46px;
+}
+.sytj_kong_list{
+    font-size: 1.8rem;
+    color: #666;
+    text-align: right;
+    display: block;
+    position: absolute;
+    width: 60px;
+    top: 35px;
+}
+.sytj_auto{      position: relative;
+    padding-top: 35px; margin-top: -25px}
+.sytj_kong_defen {
+    display: inline-block;
+    height: 22px;
+    position: absolute;
+    right: 0;
+    top: 37px;
+    line-height: 22px;
+    font-size: 1.4rem;
+    color: #999;
+}
+.sytj_kong_defen img {
+    width: 18px;
+    height: 18px;
+    vertical-align: bottom;
+    margin-right: 3px;
+}
+.tdjhxx{
+    width: calc(100% - 44px);
+    padding-left: 44px;
+    font-size: 1.6rem;
+    line-height: 30px;
+    padding-top: 7px;
+    word-wrap: break-word;
+    color: #666;
+}
+.tdjhxx span{ color: #4bc7c7}
+.tkt_noauto .tkt_addimg {
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 0px;
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+    position: relative;    width: 100px;
+    height: 64px;
+
+}
+
+.tkt_noauto .kong_list {
+    font-size: 1.8rem;
+    color: #666;
+    text-align: right;
+    display: block;
+    position: absolute;
+    width: 60px;
+    height: 100px;
+    line-height: 75px;
+}
+.tkt_noauto{ padding-top: 0px!important;}
+.jrctb{
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    right: 5px;
+    bottom: 40px;
+    z-index: 100;
+}
+.jrctbkong{
+    width: 100%; height: 110px;
+}
+.cxjz{width:320px; height: 180px; position:fixed; left: calc(50% - 160px);
+    top: calc(50% - 90px); }
+.cxjztop img{ float: left; width:100px; }
+.cxjztop p{    width: 193px;
+    float: right;
+    font-size: 1.2rem;
+    color: #363636;
+    line-height: 24px;
+    padding: 22px 0; }
+.kong_bg{width: 100%; height: 100%; background: #fff; display: none}
+.cxjz_button{width: 183px; height: 40px; line-height: 40px; border-radius: 200px; background: #4bc7c7; text-align: center; color: #fff; font-size:1.2rem ; margin: 0 auto; margin-top: 45px }
+
+/*
+填空题无序作答
+*/
+.color8b{
+    color: #8b8b8b;
+}
+
+
+.upBtn {
+    color:#fff;    width: 156px; padding: 0px;
+    height: 42px;
+    line-height: 42px; font-size: 18px;
+    border-radius: 1000px;
+    margin: 0 auto;
+    background: #4bc7c7;
+    text-align: center;
+}
+
+
+.Aipyicon {
+    width: 50px;
+    height: 50px;
+    position: fixed;
+    right: 10px;
+    bottom: 180px;
+    z-index: 100;
+}
+
+.aibtn {
+    width: 50px;
+    height: 50px;
+    position: fixed;
+    right: 10px;
+    bottom: 110px;
+    z-index: 100;
+}
+ /* 添加预览图片的样式 */
+ .preview-image {
+    background: #fff;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+}

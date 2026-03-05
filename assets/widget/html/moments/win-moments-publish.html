@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        .nav-spanBtn {
+            border: 1px solid #4bc7c7 !important;
+            border-radius:3px;
+            padding: 5px 10px;
+            margin-right: 10px;
+            font-size: 0.8rem
+        }
+        .nav-spanBtn:active {
+            color: #fff;
+            background-color:#4bc7c7 ;
+        }
+        .aui-bar-nav .aui-btn.aui-btn-outlined {
+            padding: 0 0.5rem;}
+        .aui-icon-check:before {
+            content: "\e619";
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .aui-bar-nav .aui-btn.aui-btn-outlined{
+            background:none;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav aui-bar-primary">
+    <a class="aui-toolbar-title aui-pull-left" tapmode onclick="api.closeWin();api.removeEventListener({name: 'tap'});">
+        <span class="aui-iconfont aui-icon-left" tapmode
+              onclick="api.closeWin();api.removeEventListener({name: 'tap'});"></span>说点什么
+    </a>
+    <!--<header class="aui-bar aui-bar-nav">-->
+        <!--<a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin();">-->
+            <!--<span class="aui-iconfont aui-icon-left" tapmode onclick='closeWin()'></span>数学作业-->
+        <!--</a>-->
+    <!--</header>-->
+    <div style="float: right" class="submit" tapmode onclick="publish();">
+        <span class="nav-spanBtn  aui-iconfont aui-icon-check"
+              style="font-size: 0.7rem" >确定</span>
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var isOpenPic = false;
+    var sendSuc = true;
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.openFrame({
+            name: 'frame-moments-publish',
+            url: 'frame-moments-publish.html',
+            rect: {
+                x: 0,
+                y: $api.offset($api.dom("header")).h,
+                w: "auto",
+                h: "auto"
+            },
+            pageParam: {name: 'pageparam'},
+            bounces: false
+        });
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            if (isOpenPic) {
+                api.execScript({
+                    frameName: 'frame-moments-publish',
+                    script: "photoBrowser.close();"
+                });
+                isOpenPic = false;
+            } else {
+                api.closeWin();
+            }
+        });
+    };
+
+    function publish() {
+        if(sendSuc){
+            api.execScript({
+                frameName: 'frame-moments-publish',
+                script: "publish();"
+            });
+            sendSuc = false;
+        }else {
+            setTimeout(function() {
+                api.execScript({
+                    frameName: 'frame-moments-publish',
+                    script: "publish();"
+                });
+                sendSuc = true;
+            }, 4000);//1秒后才能点击
+        }
+    }
+
+</script>
+</html>

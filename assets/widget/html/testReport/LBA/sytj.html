@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>实验与探究</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/ErrorBookLeftBtn.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .all_sytj_content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="all_sytj_content" style="height: 100%;width: 100%" v-cloak>
+
+        <ul class="leftedit_btn">
+            <li id="leftedit_btn_checkanswer" tapmode onclick="vm.onCheckAnswerClick();"><img class="noImgClick"
+                    id="leftedit_btn_checkanswer_src"
+                    :src="viewAnswer?'../../../image/check_answer_down.png':'../../../image/check_answer_up.png'">
+            </li>
+           
+
+
+            <li id="leftedit_btn_AI" v-if="complete||viewAnswer" tapmode @click="PostAIBtn();">
+                <img class="noImgClick" id="leftedit_btn_remove_src" src="../../../image/newhomework/aiBtn.png">
+            </li>
+        </ul>
+
+        <div class="tkt_content" id="tkt_content" style="margin-left: 89px;width: calc(100% - 91px)">
+            <div class="tkt_top">
+                <ul>
+                    <li class="tixing" v-text="'【'+txstr+'】'"></li>
+                    <li v-if="complete||viewAnswer" class="zsd" @click="alertzsd(csContent.zsdmc)">
+                        <span>难易度：</span><img class="noImgClick"
+                            :src="csContent.nyd==1?'../../../image/newhomework/1xing.png':csContent.nyd==2?'../../../image/newhomework/2xing.png':csContent.nyd==3?'../../../image/newhomework/3xing.png':''"><span>
+                            知识点：</span>{{
+                        csContent.zsdmc
+                        }}
+                    </li>
+                </ul>
+            </div>
+            <div class="tkt_left" id="left" style="width: calc(60% - 40px)">
+                <div style="padding-left: 14px;" class="tg_content font666" v-html="csContent.tg"></div>
+            </div>
+            <div class="tkt_right clearfix" id="right" style="width: calc(40% + 37px)">
+                <div class="tkt_right_content">
+                    <div class="huakuai" id="huakuai"></div>
+                    <span class="wxtk_xiaoti" style="top:10px" v-text="'共'+xiaotinum+'小题'"></span>
+                    <ul class="wxtk_content clearfix">
+                        <li v-for="(list,index) in data.children">
+                            <!--答题部分开始-->
+                            <div style="width: calc(100% - 115px)" :class="!viewAnswer?'wxtk_tg':'xiaotifenge wxtk_tg'"
+                                v-html="'('+(index+1)+')'+list.tg"></div>
+                            <!--作图题图片题干-->
+                            <ul v-if="list.is_auto==0 && list.datatype==2 " class="zttimg clearfix">
+                                <li v-for="(item ,index2) in list.attachments">
+                                    <img :src="item.serverpath+item.savename">
+                                    <p v-text="index2+1"></p>
+                                </li>
+                            </ul>
+                            <div class="wdAnswerType">
+                                <ul>
+                                    <li class="openAnserType" :id="index" :type="list.datatype" tapmode
+                                        v-if="isWrong !== '错题原题' && (!answer[index] || !answer[index].da || answer[index].da.length === 0)"
+                                        onclick="vm.choose(this)"></li>
+                                    <!-- <li class="bhz font4BC7C7" :id="index" tapmode onclick="vm.sdchecded(this)">
+                                        <span :class="answer[index].is_unable==1?'inputCheckactive':''"></span>不会做
+                                    </li> -->
+                                </ul>
+                            </div>
+                            <!--自动批阅答题方式-->
+                            <dl v-if="list.is_auto==1 && !viewAnswer" class="sytjda_content">
+                                <dd class="clearfix tkt_auto" v-for="(item,itemindex) in list.options">
+                                    <span class="kong_list" v-text="'空'+(itemindex+1)+'：'"></span>
+                                    <input type="text" :value="answer[index] && answer[index].da && answer[index].da[itemindex] ? answer[index].da[itemindex].descript : ''" 
+                                           :id="index" :itemid="itemindex" oninput="vm.shoudongpiyue(this);" 
+                                           placeholder="请输入答案">
+                                </dd>
+                            </dl>
+                            <!--答题图片展示区域-->
+                            <ul v-if="list.is_auto==0 && !viewAnswer" class="sytj_kongimg clearfix">
+                                <li class="tkt_img" v-for="(imglist,imgindex) in answer[index].da"
+                                    v-if="answer[index].da[imgindex]">
+                                    <img class="noImgClick" :id="imgindex" :topid="index" onclick="imgClick(this)"
+                                        v-if="imglist.is_txt==0"
+                                        :src="imglist.path">
+                                    <div tapmode onclick="vm.deletePic(this);" :id="imgindex" :topid="index"
+                                         class="chacha">
+                                        <img class="noImgClick" src="../../../image/newhomework/cha.png">
+                                    </div>
+                                </li>
+                            </ul>
+                            <!--答题部分结束-->
+                            <!--答案部分开始-->
+                            <dl v-if="viewAnswer" class="wxtk_answer bgFFF clearfix"
+                                :style="list.is_auto==1?'padding-top:0px' :'' ">
+                                <dd class="wxtk_myanswer clearfix">
+                                    <!--list.xsdaobj[0].is_auto != 1 非自动批阅显示此小题的正确率 自动批阅 只 显示每个空的正确率-->
+                                    <div v-if="viewAnswer && list.is_auto != 1" class="wxtkdefen">
+                                        <!-- <img v-if="list.is_true!=0" class="noImgClick"
+                                            :src="list.is_true==1?' ../../../image/newhomework/zhengque.png':list.is_true==2?'../../../image/newhomework/cuowu.png':list.is_true==3?'../../../image/newhomework/bandui.png':''"> -->
+                                        <span v-if="list.is_true!=0"
+                                            :style="list.is_true==1?'color: #4bc7c7':list.is_true==2?'color: #df7605':list.is_true==3?'color: #ffcd06':''"
+                                            v-text="list.is_true==1?'正确':list.is_true==2?'错误':list.is_true==3?'正确率'+list.accuracy+'%':''"></span>
+                                        <span v-if="list.is_true==0" style="color: #ff778c">待批</span>
+                                    </div>
+                                    <!--自动批阅正确答案-->
+                                    <div v-if="list.is_auto==1" class="sytj_auto"
+                                        :style="itemindex==0?'margin-top: 0px':''"
+                                        v-for="(item,itemindex) in list.options">
+                                        <div class="sytj_kong_list" v-text="'空'+(itemindex+1)+'：'"></div>
+                                        <div v-if="viewAnswer" class="sytj_kong_defen">
+                                         
+                                            <span v-if="item.is_true!=0"
+                                                :style="item.is_true==1?'color: #4bc7c7':item.is_true==2?'color: #df7605':list.is_true==3?'color: #ffcd06':''"
+                                                v-text="item.is_true==1?'正确':item.is_true==2?'错误':item.is_true==3?'正确率'+item.accuracy+'%':''"></span>
+                                            <span v-if="item.is_true==0" style="color: #ff778c">待批</span>
+                                        </div>
+                                        <div class="sytj_auto_kong">
+                                            <h4>【我的答案】</h4>
+                                            <div v-if="viewAnswer && answer[index] && answer[index].da && answer[index].da[itemindex] && answer[index].da[itemindex].descript && answer[index].da[itemindex].descript.trim() !== ''" class="sytj_kong_defen">
+                                                <img class="noImgClick"
+                                                     :src="answer[index].da[itemindex].is_true==1?'../../../image/newhomework/zhengque.png':answer[index].da[itemindex].is_true==2?'../../../image/newhomework/cuowu.png':''">
+                                            </div>
+                                            <p v-if="!answer[index] || !answer[index].da || !answer[index].da[itemindex] || !answer[index].da[itemindex].descript || answer[index].da[itemindex].descript.trim() === ''">无</p>
+                                            <p v-else v-text="answer[index].da[itemindex].descript"></p>
+                                            <h4 v-if="viewAnswer">【{{ data.tx_tip }}】</h4>
+                                            <p v-if="viewAnswer"
+                                                v-html="list.daoptions[itemindex].description_rep==''?'无':tihuan(list.daoptions[itemindex].description_rep)">
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <!--非自动批阅正确答案-->
+                                    <h2 v-if="list.is_auto==0">【我的答案】</h2>
+                                    <ul v-if="list.is_auto==0" class="sytj_kongimg clearfix">
+                                        <li v-if="!answer[index] || !answer[index].da || answer[index].da.length === 0" class="sytjdazi"> 
+                                            无
+                                        </li>
+                                        <li v-else class="tkt_img" v-for="(imglist,imgindex) in answer[index].da"
+                                            v-if="answer[index].da[imgindex]">
+                                            <img class="noImgClick" :id="imgindex" :topid="index" onclick="imgClick(this)"
+                                                v-if="imglist.is_txt==0"
+                                                :src="imglist.path">
+                                        </li>
+                                    </ul>
+                                </dd>
+                                <!--非自动批阅正确答案-->
+                                <dd v-if="list.is_auto==0" :style="viewAnswer?'display:block':'display:none'">
+                                    <h2>【{{ data.tx_tip }}】</h2>
+                                    <ul>
+                                        <li class="wxtkzi" v-html="list.dastr==''?'无':list.dastr"></li>
+                                    </ul>
+                                </dd>
+                                <dd :style="viewAnswer?'display:block':'display:none'" class="needpic">
+                                    <h2>【答案解析】</h2>
+                                    <ul>
+                                        <li class="wxtkzi" v-html="list.dajx==''?'无':list.dajx"></li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                            <!--答案部分开始-->
+                        </li>
+                    </ul>
+                    <!--答案部分结束-->
+                    <div v-if="!viewAnswer && isWrong !== '错题原题'" class="tijiao" tapmode onclick="vm.onSubmitClick()">提交</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var moduleDialog = null;//弹窗模块bhzparam
+    apiready = function () {
+        vue();
+        vm.isdt = api.pageParam.isdt;
+        vm.totalCount = api.pageParam.totalCount;
+        vm.index = api.pageParam.index;
+        vm.current_page = api.pageParam.index;//
+
+        document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchstart', function () {
+            document.getElementById('leftedit_btn_checkanswer_src').src = "../../../image/check_answer_down.png";
+        });
+        document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchend', function () {
+            document.getElementById('leftedit_btn_checkanswer_src').src = "../../../image/check_answer_up.png";
+        });
+        vm.getExInfo();
+        vm.huakuai();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.all_sytj_content',
+            data: {
+                csContent: api.pageParam.csContent[api.pageParam.index - 1],
+
+                current_page: 0,
+                isdt: 1,
+                important: 0,
+                index: 0,
+                totalCount: 0,
+                data: {},
+                tx_type: '',
+                complete: 0,
+                viewAnswer: 0,//查看答案
+                isSubmitted: false,//是否已提交
+                viewAnswerArr: [],//查看答案的数组 学生做错习题时的答案信息
+                answerStr: '',//答案字符串
+                dastr: '',//习题正确答案
+                is_true: '',//本次答题是否正确
+                xiaotinum: 0,//小题总数
+                selectAnswerArr: [],//学生在错题本选择的答案数组
+                txstr: '',
+                answer: [],//答题数组，存储每个小题的答案（图片等）
+                isWrong:api.pageParam.csContent[api.pageParam.index - 1].type_text,
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>确认移出错题本？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+            },
+
+            mounted() {
+                console.log(JSON.stringify(this.csContent));
+                
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+                for (var i = 0; i < $api.domAll('a').length; i++) {
+                    $api.css($api.domAll('a')[i], 'color: #666;');
+                    $api.domAll('a')[i].onclick = function () {
+                        return false;
+                    }
+                }
+            },
+            methods: {
+                videoZYPlay: function (context) {
+                    var url = $api.attr(context, 'url');
+                    var filetime = $api.attr(context, 'filetime');
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: '',
+                            isMp3: false,
+                            filetime: filetime
+                        }
+                    });
+                },
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                tihuan: function (content) {
+                    var reg = new RegExp('#', "g");
+                    return content.replace(/#/g, "<font color='#999'>或</font>");
+                },
+                shoudongpiyue: function (context) {//手动批阅题文字的状态
+                    var tkindex = $(context).attr('id');
+                    var answer = $(context).val().trim();
+                    if (vm.data.children[tkindex].is_auto == 1) {
+                        // 自动批阅题（填空题）
+                        var itemindex = $(context).attr('itemid');
+                        // 确保 answer[tkindex] 存在
+                        if (!vm.answer[tkindex]) {
+                            Vue.set(vm.answer, tkindex, {
+                                'is_unable': 0,
+                                'is_txt': 1,
+                                'da': []
+                            });
+                        }
+                        // 确保 da 数组有足够的长度
+                        if (!vm.answer[tkindex].da) {
+                            Vue.set(vm.answer[tkindex], 'da', []);
+                        }
+                        // 确保对应索引的答案存在
+                        if (!vm.answer[tkindex].da[itemindex]) {
+                            Vue.set(vm.answer[tkindex].da, itemindex, {'is_unable': 0, 'descript': '', 'is_txt': 1});
+                        }
+                        Vue.set(vm.answer[tkindex].da, itemindex, {'is_unable': 0, 'descript': answer, 'is_txt': 1});
+                    } else {
+                        // 非自动批阅题
+                        if (answer.length == 0) {
+                            if (vm.answer[tkindex]) {
+                                vm.answer[tkindex].da = [];
+                            }
+                        } else {
+                            if (!vm.answer[tkindex]) {
+                                Vue.set(vm.answer, tkindex, {
+                                    'is_unable': 0,
+                                    'is_txt': 1,
+                                    'da': []
+                                });
+                            }
+                            vm.answer[tkindex].da = [{'is_unable': 0, 'descript': answer, 'is_txt': 1}];
+                        }
+                    }
+                },
+                deletePic: function (context) {//删除图片答案
+                    var imgindex = parseInt($(context).attr('id'));
+                    var topindex = parseInt($(context).attr('topid'));
+                    // 删除指定索引的图片
+                    vm.answer[topindex].da.splice(imgindex, 1);
+                    // 如果删除后数组为空，清空答案数据，让拍照按钮重新显示
+                    if (vm.answer[topindex].da.length === 0) {
+                        vm.answer[topindex].da = [];
+                        vm.answer[topindex].is_txt = 0;
+                        vm.answer[topindex].is_unable = 0;
+                    }
+                },
+                choose: function (context) {//拍照并展示图片
+                    var tkindex = $(context).attr('id');
+                    // 直接调用拍照
+                    api.getPicture({
+                        sourceType: 'camera',
+                        encodingType: 'jpg',
+                        mediaValue: 'pic',
+                        destinationType: 'file',
+                        quality: 50
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.data && ret.data.length > 0) {
+                                // 确保 answer[tkindex] 存在
+                                if (!vm.answer[tkindex]) {
+                                    Vue.set(vm.answer, tkindex, {
+                                        'is_unable': 0,
+                                        'is_txt': 0,
+                                        'da': []
+                                    });
+                                }
+                                // 确保 da 数组存在
+                                if (!vm.answer[tkindex].da) {
+                                    Vue.set(vm.answer[tkindex], 'da', []);
+                                }
+                                // 将图片添加到答案数组中，直接使用返回的路径
+                                var imgItem = {
+                                    'is_txt': 0,
+                                    'path': ret.data
+                                };
+                                vm.answer[tkindex].da.push(imgItem);
+                                vm.answer[tkindex].is_txt = 0;
+                                vm.answer[tkindex].is_unable = 0;
+                            }
+                        }
+                    });
+                },
+                checkAnswer: function () {//对比答案并设置对错状态
+                    // 遍历所有自动批阅题，对比答案
+                    for (var i = 0; i < vm.data.children.length; i++) {
+                        if (vm.data.children[i].is_auto == 1 && vm.answer[i] && vm.answer[i].da) {
+                            // 遍历每个空
+                            for (var j = 0; j < vm.data.children[i].options.length; j++) {
+                                if (vm.answer[i].da[j] && vm.answer[i].da[j].descript && vm.answer[i].da[j].descript.trim() !== '') {
+                                    var userAnswer = vm.answer[i].da[j].descript.trim();
+                                    var correctAnswer = vm.data.children[i].daoptions[j].description_rep || '';
+                                    
+                                    // 正确答案可能包含多个答案，用#分隔
+                                    var correctAnswers = correctAnswer.split('#').map(function(item) {
+                                        return item.trim();
+                                    }).filter(function(item) {
+                                        return item !== '';
+                                    });
+                                    
+                                    // 对比答案（不区分大小写）
+                                    var isCorrect = false;
+                                    for (var k = 0; k < correctAnswers.length; k++) {
+                                        if (userAnswer.toLowerCase() === correctAnswers[k].toLowerCase()) {
+                                            isCorrect = true;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // 设置对错状态
+                                    Vue.set(vm.answer[i].da[j], 'is_true', isCorrect ? 1 : 2);
+                                }
+                            }
+                        }
+                    }
+                },
+                onSubmitClick: function () {//点击提交按钮
+                    // 检查所有小题是否都已答题
+                    var allAnswered = true;
+                    for (var i = 0; i < vm.data.children.length; i++) {
+                        if (vm.data.children[i].is_auto == 0) {
+                            // 非自动批阅题：检查是否有图片答案
+                            if (!vm.answer[i] || !vm.answer[i].da || vm.answer[i].da.length === 0) {
+                                allAnswered = false;
+                                break;
+                            }
+                        } else if (vm.data.children[i].is_auto == 1) {
+                            // 自动批阅题：检查所有空是否都已填写
+                            if (!vm.answer[i] || !vm.answer[i].da) {
+                                allAnswered = false;
+                                break;
+                            }
+                            // 检查每个空是否都有答案
+                            for (var j = 0; j < vm.data.children[i].options.length; j++) {
+                                if (!vm.answer[i].da[j] || !vm.answer[i].da[j].descript || vm.answer[i].da[j].descript.trim() === '') {
+                                    allAnswered = false;
+                                    break;
+                                }
+                            }
+                            if (!allAnswered) {
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!allAnswered) {
+                        // 如果还没答完题，提示用户
+                        api.toast({
+                            msg: '请提交答案',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return;
+                    }
+                    
+                    // 标记为已提交
+                    vm.isSubmitted = true;
+                    // 对比答案并显示
+                    vm.checkAnswer(); // 对比答案
+                    vm.viewAnswer = true; // 显示答案
+                },
+                onCheckAnswerClick: function () {//点击查看答案按钮
+                    // 如果是错题原题，可以直接查看答案
+                    if (vm.isWrong === '错题原题') {
+                        // 如果答案未显示，先对比答案再显示
+                        if (!vm.viewAnswer) {
+                            vm.checkAnswer(); // 对比答案
+                        }
+                        vm.viewAnswer = !vm.viewAnswer;
+                        return;
+                    }
+                    
+                    // 如果答案未显示（有提交按钮），提示请提交答案
+                    if (!vm.viewAnswer) {
+                        api.toast({
+                            msg: '请提交答案',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return;
+                    }
+                    
+                    // 如果答案已显示，可以切换查看答案状态
+                    vm.viewAnswer = !vm.viewAnswer;
+                },
+               
+                onRemoveFromErrNoteClick: function () {
+                    moduleDialog = api.require('moduleDialog');
+                    moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'ok') {
+                                apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                                    body: $api.jsonToStr({
+                                        uid: $api.getStorage('uid'),
+                                        type: 'outbook',
+                                        sys_id: vm.data.sys_id,
+                                        kc_type: vm.data.kc_type,
+                                    })
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.ret == 0) {
+                                            //在这处理删除第一题，最后一题以及总题数是否为0
+                                            vm.totalCount = vm.totalCount - 1;
+
+                                            if (vm.totalCount == 0) {
+                                                api.closeWin();
+                                            } else {
+                                                api.sendEvent({
+                                                    name: 'onTopIndexChange',
+                                                    extra: { index: vm.current_page },
+                                                });
+                                            }
+                                            api.sendEvent({
+                                                name: 'removeError',
+                                                extra: {}
+                                            });//刷新错题列表的frame数据
+
+                                        } else {
+                                            api.toast({
+                                                msg: ret.msg,
+                                                duration: 2000,
+                                                location: 'bottom'
+                                            });
+                                        }
+                                    } else {
+                                        api.toast({
+                                            msg: err.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                    }
+                                });
+                                dismissDialog();
+                            } else {
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+
+                    });
+                },
+                getExInfo: function () {
+                    vm.data = {
+                        sys_id: api.pageParam.id || this.csContent.id,
+                        kc_type: api.pageParam.kc_type || this.csContent.sys_type,
+                        xtid: api.pageParam.xtid || this.csContent.xtid,
+                        zsdmc: this.csContent.zsdmc,
+                        nyd: this.csContent.nyd,
+                        is_important: this.csContent.is_important,
+                        tg: this.csContent.tg,
+                        daoptions: this.csContent.daoptions,
+                        xsdaobj: this.csContent.xsdaobj,
+                        dajx: this.csContent.dajx,
+                        tx_tip: this.csContent.tx_tip,
+                        is_auto: this.csContent.is_auto,
+                        dastr: this.csContent.dastr,
+                        tx: this.csContent.tx,
+                        txstr: this.csContent.txstr,
+                        children: this.csContent.children
+                    };
+
+
+
+                    vm.tx_type = vm.data.tx;
+                    vm.txstr = vm.data.txstr;
+                    vm.important = vm.data.is_important;
+                    vm.dastr = vm.data.dastr;
+                    vm.xiaotinum = vm.data.children.length;
+                    for (var i = 0; i < vm.data.children.length; i++) {//给初始化的自动填空加个默认空答案 防止报错
+                        var sytjda = [];
+                        if (vm.data.children[i].is_auto == 1) {
+                            for (var j = 0; j < vm.data.children[i].options.length; j++) {
+                                var kongda = {
+                                    'is_unable': 0,
+                                    'is_txt': 1,
+                                    'descript': ''
+                                };
+                                Vue.set(sytjda, j, kongda);
+                            }
+                        } else {
+                            sytjda = []
+                        }
+                        var kongcontent = {
+                            'topid': vm.data.id,
+                            'is_unable': vm.data.children[i].is_unable,
+                            'is_txt': 0,
+                            'id': vm.data.children[i].id,
+                            'is_auto': vm.data.children[i].is_auto,
+                            'sort': vm.data.children[i].sort,
+                            'daoptions': vm.data.children[i].daoptions,
+                            'da': sytjda
+                        };
+                        Vue.set(vm.viewAnswerArr, i, kongcontent);
+                        // 初始化答题数组
+                        var answerItem = {
+                            'is_unable': 0,
+                            'is_txt': vm.data.children[i].is_auto == 1 ? 1 : 0,
+                            'da': []
+                        };
+                        // 如果是自动批阅题，初始化每个空的答案
+                        if (vm.data.children[i].is_auto == 1) {
+                            var autoDa = [];
+                            for (var k = 0; k < vm.data.children[i].options.length; k++) {
+                                Vue.set(autoDa, k, {
+                                    'is_unable': 0,
+                                    'is_txt': 1,
+                                    'descript': ''
+                                });
+                            }
+                            answerItem.da = autoDa;
+                        }
+                        Vue.set(vm.answer, i, answerItem);
+                    }
+                    $('.all_sytj_content').css('display', 'block');
+
+
+                },
+                huakuai: function () {
+                    var tktcontent = document.getElementById('tkt_content'); //长线条
+                    var right = document.getElementById('right'); //小方块
+                    var left = document.getElementById('left');
+                    var huakuai = document.getElementById('huakuai');
+                    var ifBool = false; //判断鼠标是否按下
+                    //鼠标按下方块
+                    huakuai.addEventListener("touchstart", function (e) {
+                        e.stopPropagation();
+                        ifBool = true;
+                    });
+                    //拖动
+                    window.addEventListener("touchmove", function (e) {
+                        if (ifBool) {
+                            var x = e.touches[0].pageX || e.touches[0].clientX; //鼠标横坐标var x
+                            var lineDiv_left = getPosition(tktcontent).left; //长线条的横坐标
+                            var minDiv_left = x - lineDiv_left; //小方块相对于父元素（长线条）的left值
+                            if (minDiv_left >= tktcontent.offsetWidth - 15) {
+                                minDiv_left = tktcontent.offsetWidth - 15;
+                            }
+                            //设置拖动后小方块的left值
+                            var rightwidth;
+                            var leftwidth;
+
+                            var realWith = $(window).width() - 89;
+                            if ((realWith - minDiv_left) > (realWith * 0.7 + 37)) {
+                                rightwidth = realWith * 0.7 + 37;
+                                leftwidth = realWith * 0.3 - 40;
+                            } else if ((realWith - minDiv_left) < (realWith * 0.4 + 37)) {
+                                rightwidth = realWith * 0.4 + 37;
+                                leftwidth = realWith * 0.6 - 40;
+                            } else {
+                                rightwidth = realWith - minDiv_left;
+                                leftwidth = minDiv_left
+                            }
+
+                            right.style.width = rightwidth + "px";
+                            left.style.width = leftwidth + "px";
+                        }
+                    });
+                    //鼠标松开
+                    window.addEventListener("touchend", function (e) {
+                        ifBool = false;
+                    });
+
+                    //获取元素的绝对位置
+                    function getPosition(node) {
+                        var left = node.offsetLeft; //获取元素相对于其父元素的left值var left
+                        var top = node.offsetTop;
+                        current = node.offsetParent; // 取得元素的offsetParent
+                        // 一直循环直到根元素
+                        while (current != null) {
+                            left += current.offsetLeft;
+                            top += current.offsetTop;
+                            current = current.offsetParent;
+                        }
+                        return {
+                            "left": left,
+                            "top": top
+                        };
+                    }
+                },
+                PostAIBtn: async function () {
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostPayfeeOperationLog, {
+                            body: $api.jsonToStr({
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_analysis',
+                                resource_id: vm.data.xtid,
+                                count: aiAnalysis.count,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                ...(aiAnalysis.card_id !== undefined && { card_id: aiAnalysis.card_id }),
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                api.sendEvent({
+                                        name: 'aiAnalysisReduce'
+                                });
+                                resolve(ret);
+                            } else {
+                                reject(err);
+                            }
+                        })
+                    });
+                    if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber') || ret.ret === -1) {
+                        if ($api.getStorage('upgradeQRCode') === '1') {
+                            api.toast({
+                                msg: '本月剩余AI解析次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../../study/frame-number-exhausted.html',
+                            })
+                        }
+                        return
+                    }
+
+                    if (ret.ret === 0 && ret.data === '') {
+                        api.execScript({
+                            name: 'win_error_detail_new',
+                            script: 'postAIjxNum();'
+                        });
+                    }
+
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const tgContent = document.querySelector('.tg_content');
+                    const wxtk_tgs = document.querySelectorAll('.wxtk_tg');
+                    const needpics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...wxtk_tgs, ...needpics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            // 保存图片到相册    
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            // 当所有图片都处理完成时
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../../study/newHomework/frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.data.xtid,
+                                        imagePaths: imageUrls
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                },
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+</script>
+
+</html>

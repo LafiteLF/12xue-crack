@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择学科考试列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle {
+            width: calc(100% - 300px);
+        }
+        .button-normal{
+            color: #d6d6d6;
+            font-size: 1.2rem;
+            height: 27px;
+            line-height: 28px;
+            width: 90px;
+            overflow: hidden;
+            border: 1px solid #d6d6d6;
+            border-radius: 3px;
+            display: inline-block;
+            text-align: center;
+        }
+        .button-norma2{
+            color: #fff;
+            font-size: 1.2rem;
+            height: 27px;
+            line-height: 14px;
+            width: 90px;
+            /*overflow: hidden;*/
+            border: 1px solid #4bc7c7;
+            border-radius: 3px;
+            display: inline-block;
+            text-align: center;
+            background: #4bc7c7;
+
+        }
+        .button-norma2 span{ display: inline;text-align: center}
+        .button-norma2 img{ width:15px;display: inline-block; float: left;margin-top: 5px;margin-left: 5px }
+        .button-norma2 span b{ font-weight: normal}
+    </style>
+</head>
+<body>
+<header class="clearfix main">
+    <div onclick=" api.closeWin();" class="winTitle pull_left">
+        考试
+    </div>
+    <ul class="pull_right clearfix winIcon" @click="openexaminaation()">
+        <li  v-if="is_soon==0" class="button-normal font666 pull_right" ><p>暂无考试</p></li>
+        <li  style="line-height: 28px;" v-if="is_soon==2" class="button-norma2 font666 pull_right clearfix" @click="openexaminaation()" ><img src="../../../image/exam/ksdjs.png"><span  >待考试{{examNum}}</span></li>
+        <!--<li  v-if="is_soon==1" class="button-normal font666 pull_right" ><p>考试倒计时</p></li>-->
+        <li  style="display: none"    class="button-norma2 font666 pull_right clearfix ksdjs" > <img src="../../../image/exam/ksdjs.png"><span  >考试倒计时<Br>(<b v-text="showtime(time)"></b>)</span></li>
+        <li  v-if="is_soon==3" class="button-norma2 font666 pull_right clearfix" id="ksz" style="line-height: 28px; "> <img src="../../../image/exam/ksdjs.png"><span  >考试中</span></li>
+
+    </ul>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/countdown.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/DateUtil.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var headerH;
+    var newtimejs;
+    var shuaxinTime=0;
+    var newtimejs2;
+    apiready = function () {
+        api.setKeepScreenOn({
+            keepOn: true
+        });
+        var header = document.querySelector('header');
+        headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        // api.addEventListener({
+        //     name:'resume'
+        // }, function(ret, err){
+        //     alert('应用回到后台');
+        // });
+        vm.GetPaperSoonexam();
+        api.addEventListener({
+            name: 'reloadSubjectList'
+        }, function (ret, err) {
+            vm.GetPaperSoonexam();
+        });
+        api.addEventListener({
+            name:'shuaxinkssj'
+        },function(ret,err){
+            // clearInterval(newtimejs);
+            vm.GetPaperSoonexam();
+        });
+        api.addEventListener({
+            name:'resume'
+        }, function(ret, err){
+            vm.GetPaperSoonexam();
+        });
+        api.addEventListener({
+            name:'online'
+        }, function(ret, err){
+            vm.GetPaperSoonexam();
+        });
+        newtimejs2 = setInterval(function () {
+            shuaxinTime++;
+            if(shuaxinTime % 60===0){
+                // clearInterval(newtimejs);
+                vm.GetPaperSoonexam();
+                api.sendEvent({
+                    name: 'shuaxinkssj2'
+                });
+            }else if(shuaxinTime==300){
+                // clearInterval(newtimejs);
+                vm.GetPaperSoonexam();
+                api.sendEvent({
+                    name: 'shuaxinkssj2'
+                });
+            }
+        }, 1000);
+
+
+        api.openFrame({
+            name: 'frame_exam_subject_list',
+            url: 'frame_exam_subject_list.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: frameH
+            },
+            pageParam: {classids: api.pageParam.classid},
+//            bounces: true
+        });
+
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name:'keyback'
+        },function(ret,err){
+            api.closeWin();
+        });
+
+
+    };
+    var vm = new Vue({
+        el: '.main',
+        data: {
+            data:[],
+            is_soon:'',
+            time:0,
+            examNum:0
+        },
+        methods: {
+            showtime:function(time){
+                return DateUtil.formatTimeToFriendly(time)
+            },
+            openexaminaation:function(){
+                api.sendEvent({
+                    name: 'shuaxinkssj'
+                });
+                if(vm.is_soon!=0){
+                    var header = document.querySelector('header');
+                    var frameH = padWinHeight - headerH;
+                    api.openFrame({
+                        name: 'frame_exam_subject_examination_list',
+                        url: 'frame_exam_subject_examination_list.html',
+                        rect: {
+                            x: 0,
+                            y: headerH,
+                            w: api.winWidth,
+                            h: frameH
+                        },
+                        pageParam: {
+                            classids:api.pageParam.classid
+                        },
+//            bounces: true
+                    });
+                }
+            },
+            GetPaperSoonexam: function () {//
+                // api.showProgress({
+                //     title: '加载中',
+                //     text: '请稍后...',
+                //     modal: false
+                // });
+                apiObj.Get(UrlRouter.GetPaperSoonexam, {
+                    values: {
+                        bjid: api.pageParam.classid.join(",")
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            vm.is_soon = ret.data.is_soon;
+                            if(vm.is_soon!=1){
+                                $('.ksdjs').hide();
+                            }
+                                if(ret.data.data) {
+                                    // vm.examNum=ret.data.data
+                                    vm.data = ret.data.data;
+                                    vm.time = ret.data.time;
+                                    vm.examNum = ret.data.data.length;
+                                    if (vm.is_soon == 1) {
+                                        $('.ksdjs').show();
+                                        clearInterval(newtimejs);
+                                        newtimejs = setInterval(function () {
+                                            vm.time--;
+                                            if (vm.time == 0) {
+                                                clearInterval(newtimejs);
+                                                $('.ksdjs').hide();
+                                                vm.is_soon = 3
+                                            }
+                                        }, 1000);
+
+                                    } else {
+                                        $('.ksdjs').hide();
+                                    }
+                                }
+
+
+
+                        }
+                        else{
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret .msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    }else{
+                        api.hideProgress();
+                        api.toast({
+                            msg: err .msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } ,'','',false);
+            },
+        }
+    });
+    // 倒计时 秒
+    function dao (time){
+        var o = {
+            el : 'time',
+            st : 0,
+            ed : time*1000,
+            // hh: 'hh',
+            mm: 'mm',
+            ss: 'ss',
+            ms: 'ms'
+        };
+        var d = new countdown(o);
+        d.downsElement();
+
+    }
+</script>
+</html>

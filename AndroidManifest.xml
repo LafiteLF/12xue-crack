@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="32" android:compileSdkVersionCodename="12" package="cn.com.k12.os" platformBuildVersionCode="32" platformBuildVersionName="12">
+    <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:resizeable="true" android:smallScreens="true" android:xlargeScreens="true"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" android:protectionLevel="signature"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="true"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
+    <uses-feature android:name="android.hardware.camera.front"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <application android:allowBackup="false" android:extractNativeLibs="false" android:hardwareAccelerated="true" android:icon="@drawable/uz_icon" android:label="@string/app_name" android:largeHeap="true" android:name="com.uzmap.pkg.uzapp.UZApplication" android:requestLegacyExternalStorage="true" android:resizeableActivity="true" android:supportsRtl="true" android:usesCleartextTraffic="true">
+        <meta-data android:name="uz_version" android:value="3.1.23"/>
+        <meta-data android:name="android.max_aspect" android:value="2.4"/>
+        <meta-data android:name="android.min_aspect" android:value="1.0"/>
+        <meta-data android:name="notch.config" android:value="portrait|landscape"/>
+        <meta-data android:name="android.notch_support" android:value="true"/>
+        <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true"/>
+        <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing" android:value="false"/>
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <activity android:configChanges="locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:exported="true" android:label="@string/app_name" android:launchMode="singleTop" android:name="com.uzmap.pkg.LauncherUI" android:theme="@style/AppTheme" android:windowSoftInputMode="adjustNothing|stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:configChanges="locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" android:label="@string/app_name" android:launchMode="singleTask" android:name="com.uzmap.pkg.EntranceActivity" android:screenOrientation="landscape" android:theme="@style/AppTheme" android:windowSoftInputMode="adjustUnspecified|stateUnspecified"/>
+        <activity android:label="@string/app_name" android:name="com.deepe.sdk.LoloAppActivity" android:taskAffinity="" android:theme="@style/AppTheme" android:windowSoftInputMode="adjustNothing|stateHidden"/>
+        <provider android:authorities="cn.com.k12.os.ups" android:exported="false" android:label="udmg" android:name="com.uzmap.pkg.uzapp.UProvider"/>
+        <provider android:authorities="cn.com.k12.os.upms" android:exported="false" android:grantUriPermissions="true" android:name="com.uzmap.pkg.uzapp.DataProvider"/>
+        <receiver android:enabled="true" android:exported="false" android:label="upns" android:name="com.uzmap.pkg.uzapp.UPExtraBridge" android:process=":remote">
+            <intent-filter>
+                <action android:name="android.intent.appclock.notification"/>
+            </intent-filter>
+        </receiver>
+        <activity android:name="com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.CaptureActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateHidden|adjustResize"/>
+        <activity android:name="com.uzmap.pkg.uzmodules.UIMediaScanner.UzImgsActivity" android:theme="@style/AppTheme"/>
+        <activity android:name="com.uzmap.pkg.uzmodules.UIMediaScanner.UzImgFileListActivity" android:theme="@style/AppTheme"/>
+        <activity android:name="com.uzmap.pkg.uzmodules.UIMediaScanner.PhotoBrowser" android:theme="@style/AppTheme"/>
+        <activity android:name="k12.education.camaramodule.NewCameraActivity" android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:exported="true" android:label="@string/app_name" android:name="com.artifex.mupdf.MuPDFActivity" android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file"/>
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.xps"/>
+                <data android:host="*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file"/>
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.pdf"/>
+                <data android:host="*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="file"/>
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.cbz"/>
+                <data android:host="*"/>
+            </intent-filter>
+        </activity>
+        <activity android:exported="false" android:label="@string/outline_title" android:name="com.artifex.mupdf.OutlineActivity"/>
+        <meta-data android:name="android.support.VERSION" android:value="26.0.0"/>
+        <provider android:authorities="cn.com.k12.os.uz_downloads" android:exported="false" android:label="udmg" android:name="com.uzmap.pkg.uzmodules.uzdownloadmanager.DownloadProvider" android:process=":remote"/>
+        <service android:label="udmg" android:name="com.uzmap.pkg.uzmodules.uzdownloadmanager.DownloadService" android:process=":remote"/>
+        <receiver android:exported="false" android:label="udmg" android:name="com.uzmap.pkg.uzmodules.uzdownloadmanager.DownloadReceiver" android:process=":remote"/>
+        <activity android:label="udmg" android:name="com.uzmap.pkg.uzmodules.uzdownloadmanager.ui.DownloadList" android:process=":remote"/>
+        <activity android:name="com.apicloud.FNPhotograph.CameraActivity" android:screenOrientation="portrait" android:theme="@style/cameraViewTheme"/>
+        <activity android:name="com.apicloud.ijkplayer.TestActivity" android:screenOrientation="portrait"/>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:exported="true" android:hardwareAccelerated="false" android:label="MuPDF mini" android:name="com.artifex.mupdf.mini.DocumentActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="application/pdf"/>
+                <data android:mimeType="application/vnd.ms-xpsdocument"/>
+                <data android:mimeType="application/oxps"/>
+                <data android:mimeType="application/x-cbz"/>
+                <data android:mimeType="application/epub+zip"/>
+                <data android:mimeType="text/xml"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:pathPattern=".*\\.pdf"/>
+                <data android:pathPattern=".*\\.xps"/>
+                <data android:pathPattern=".*\\.oxps"/>
+                <data android:pathPattern=".*\\.cbz"/>
+                <data android:pathPattern=".*\\.epub"/>
+                <data android:pathPattern=".*\\.fb2"/>
+            </intent-filter>
+        </activity>
+        <activity android:configChanges="keyboardHidden|orientation|screenSize" android:exported="false" android:name="com.artifex.mupdf.mini.OutlineActivity"/>
+    </application>
+</manifest>

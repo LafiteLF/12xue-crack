@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>组内评分</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/score_1.css"/>
+    <style>
+        html {
+            background-color: #f2f2f2;
+        }
+
+        .content {
+            width: calc(100% - 20px);
+            min-height: calc(100% - 20px);
+            margin: 10px;
+            background: white;
+            padding: 10px  0 0 20px;
+        }
+
+        .item {
+            width: 6.5rem;
+            position: absolute;
+            margin: 0 auto;
+            float: left;
+            margin-right: 3%;
+            margin-left: 1%;
+        }
+
+        .item img {
+            width: 6.5rem;
+            height: 6.4rem;
+            border-radius: 4rem;
+
+        }
+
+        .txbg {
+            position: absolute;
+            width: 6.7rem;
+            height: 7rem;
+            background: url("../../../image/stuHomePad/xftx.png") no-repeat;
+            background-size: 100% auto;
+            left: -1px;
+            top: -1px;
+        }
+
+        .xsmc {
+            width: 4rem;
+            color: #fff;
+            position: absolute;
+            top: 5.25rem;
+            z-index: 1;
+            font-size: 1rem;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            left: 1rem;
+            text-align: center;
+        }
+
+        .xsDiv{
+            position: relative;
+            width: calc(7rem + 36px);
+            height: calc(10rem + 36px);
+            display: inline-block;
+            clear: both;
+            padding: 18px 18px;
+            background-color: #EAFFFF;
+        }
+
+        .xfDiv{
+            position: absolute;top: calc(7.2rem + 20px);color: grey;text-align: center;width: 110px;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dfDiv{
+            position: absolute;top: calc(9rem + 20px);color: #4bc7c7;width: 50%;border: solid #4bc7c7 1px;border-radius:3px;text-align: center;margin-left: calc(25% - 20px)
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="content">
+    <div id="views"></div>
+    <div class="indexBox">
+        <ul class="items" id="startMark"></ul>
+        <ul id="mainWord">
+            <li class="ulli" v-for="item in data" v-text="item.chart" :style="item.chart == chart?'background-color: #EAFFFF':'background-color:white'"   @click="chageBg(item.chart)"></li>
+        </ul>
+        <ul class="items"></ul>
+    </div>
+    <div class="xsDiv" :style="list.firstchart == chart?'background-color: #EAFFFF':'background-color:white'" v-for="list in alls">
+        <div class="item">
+            <div class="txbg"></div>
+            <img :src="list.face">
+            <div class="xsmc" v-text="list.realname"></div>
+        </div>
+        <div class="xfDiv"  v-text="'合计:'+list.score+'学分'"></div>
+        <div class="dfDiv" @click="openDfPage(list);">打分</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+
+    apiready = function () {
+        vm.GetGrouptechStulists();
+        api.addEventListener({
+            name: 'gengxindafen'
+        }, function (ret, err) {
+            api.openFrame({
+                name: 'submitOk',
+                url: 'submitOk.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: $api.getStorage('padHeight')
+                }
+            });
+            vm.GetGrouptechStulists();
+        });
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            alls: [],
+            data:[],
+            chart:''
+        },
+        methods: {
+            GetGrouptechStulists: function () {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetGrouptechStulists, {
+                    values: {
+                        classid: api.pageParam.bjid,
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            var allMembe = [];
+                            for(var i = 0;i< ret.data.data.length;i++){
+                                allMembe =  allMembe.concat(ret.data.data[i].member);
+                            }
+                            vm.data = ret.data.data;
+                            vm.alls = allMembe;
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            },
+            openDfPage:function (list) {
+                api.openFrame({
+                    name: 'popStudentDf',
+                    url: 'popStudentDf.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: api.winWidth,
+                        h: api.winHeight
+                    },
+                    pageParam: {xsData: list,evaluate:api.pageParam.evaluate,bjid: api.pageParam.bjid,xsuid:list.uid},
+                    bounces: false
+                });
+            },
+            chageBg:function (chart) {
+                if(chart){
+                    vm.chart = chart;
+                }
+
+            }
+        }
+    });
+
+    function dafen(context) {
+        var index = $(context).parent().parent().attr('id');
+        var face = vm.alls[index].face;
+        var uid = vm.alls[index].uid;
+        var realname = vm.alls[index].realname;
+        api.openWin({
+            name: 'win-group-dafen-Evaluations',
+            url: 'win-group-dafen-Evaluations.html',
+            pageParam: {
+                face: face,
+                realname: realname,
+                groupid: groupid,
+                taskid: taskid,
+                uid: uid,
+                classid: classid
+            }
+        })
+    }
+
+</script>
+</html>

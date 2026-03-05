@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+
+        textarea {
+            border: 0px solid transparent;
+            padding: 12px;
+            min-height: 97%;
+            height: auto;
+            margin: 0px;;
+        }
+
+        .bottom-container {
+            height: calc(98% - 250px) !important;
+            /*position: absolute;*/
+            /*bottom: 0px;*/
+            width: 100%;
+            background-color: #f2f2f2;
+            /*margin-top: 5px;*/
+        }
+
+        .bottom-container i {
+            font-size: 30px;
+            padding-left: 15px;
+            padding-right: 15px;
+            color: #999999;
+        }
+
+        .border-top {
+            /*border-top: 1px solid #E5E5E5;*/
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .display-pic {
+            height: auto;
+            width: 100%;
+            overflow-x: scroll;
+            padding-bottom: 30px;
+        }
+
+        .display-pic li {
+            float: left;
+        }
+
+        .display-pic li img {
+            height: 100%;
+            width: 100%;
+
+        }
+
+        .word-count {
+            /*margin-top: 13px;*/
+            /*margin-bottom: 13px;*/
+            color: #5f646e;
+            margin-right: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .aui-list-view-cell {
+            height: auto;
+        }
+        .aui-content {
+            position: absolute;
+            /*top: 50%;*/
+            left: 0;
+            height: calc(96% - 250px);!important;
+            overflow-y: auto;margin-bottom: 0px!important;
+        }
+        .aui-content > .aui-list-view:last-child {
+            margin-bottom: 0;
+        }
+        .aui-list-view {
+            margin-bottom: 0;
+        }
+
+        .comment-content {
+            height: 250px;
+            width: 100%;
+            position: relative;
+        }
+
+        .aui-col-xs-1 {
+            width: 9%;
+        }
+        .display-pic li {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+        .aui-list-view.aui-grid-view {
+            display: table;
+            width: 94%;
+            left: 3%;
+            padding: 0 10px 10px 0;
+            font-size: 0;
+            white-space: normal;
+        }
+
+        .display-pic li img.chacha {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 40px;
+            height: 40px;
+            padding: 0 0 0 0;
+        }
+
+        .report-check {
+            position: absolute;
+            bottom: 45px;
+            right: 10px;
+        }
+
+        .comment-text {
+            border: 0px solid transparent;
+            padding: 12px;
+            margin: 0;
+            width: 100%;
+            -webkit-appearance: none;
+            line-height: 21px;
+            background-color: #fff;
+            border-radius: 3px;
+            outline: none;
+            height: calc(100% - 45px) !important;
+            min-height: calc(100% - 45px) !important;
+
+        }
+        .iconfont-publish {
+            font-size: 28px;
+            padding-left: 10px;
+            padding-right: 10px;
+            color: #999999;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container" style="height: 98%; width: 94%; overflow-y:hidden; overflow-x:auto;margin: 0 auto;padding-top: 2%">
+    <div class="comment-content">
+        <!--<div id="content-text" class="comment-text" contenteditable="true"></div>-->
+        <textarea class="comment-text" id="content-text" maxlength="140" oninput="onTextChangeListener();"></textarea>
+        <div class="report-check"><span class="word-count aui-pull-right">0/140</span></div>
+
+        <div style="border-bottom: 1px solid #E5E5E5;position: absolute;width: 100%;bottom: 0px">
+            <i class="aui-iconfont aui-icon-pic iconfont-publish" tapmode onclick="selectPic();"></i>
+            <i class="aui-iconfont aui-icon-emoji iconfont-publish" tapmode onclick="selectEmoji();"></i>
+            <i class="aui-iconfont aui-icon-at iconfont-publish" tapmode onclick="openAt();"></i>
+        </div>
+    </div>
+    <div class="bottom-container border-top">
+
+        <div style="position: relative">
+            <div class="display-pic border-bottom" style="background-color: white; display: none ">
+                <ul style="width: 200%;">
+                    <!--<li>-->
+                    <!--<img src="./../../image/default_portrait.png" tapmode onclick="openPic(this);">-->
+                    <!--<img class="chacha" src="../../image/chacha.png">-->
+                    <!--</li>-->
+                </ul>
+                <div style="clear: both;font-size: 14px; padding-top:10px;margin: 0 0 4px 10px;position: absolute;bottom: 0px;">
+                    最多只能选择9张图片
+                </div>
+            </div>
+        </div>
+        <div class="aui-content emoji-icon aui-hide">
+            <ul class="aui-list-view aui-grid-view">
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/anquan.gif" tapmode
+                         onclick="emojiClick(0);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/baobao.gif" tapmode
+                         onclick="emojiClick(1);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/dengdeng.gif" tapmode
+                         onclick="emojiClick(2);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/enen.gif" tapmode onclick="emojiClick(3);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/guan.gif" tapmode onclick="emojiClick(4);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hhh.gif" tapmode
+                         onclick="emojiClick(5);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/heihei.gif" tapmode
+                         onclick="emojiClick(6);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hongbao.gif" tapmode
+                         onclick="emojiClick(7);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/jiayou.gif" tapmode
+                         onclick="emojiClick(8);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/koubi.gif" tapmode
+                         onclick="emojiClick(9);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/ku.gif" tapmode onclick="emojiClick(10);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/lihai.gif" tapmode
+                         onclick="emojiClick(11);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/mei.gif" tapmode onclick="emojiClick(12);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/qinqin.gif" tapmode
+                         onclick="emojiClick(13);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/shengqi.gif" tapmode
+                         onclick="emojiClick(14);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/shuai.gif" tapmode
+                         onclick="emojiClick(15);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/tan.gif" tapmode onclick="emojiClick(16);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/wan.gif" tapmode onclick="emojiClick(17);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/wanan.gif" tapmode
+                         onclick="emojiClick(18);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/xiaxia.gif" tapmode
+                         onclick="emojiClick(19);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/xiexie.gif" tapmode
+                         onclick="emojiClick(20);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/xin.gif" tapmode onclick="emojiClick(21);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/yiwen.gif" tapmode
+                         onclick="emojiClick(22);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/zan.gif" tapmode onclick="emojiClick(23);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/3q.gif" tapmode onclick="emojiClick(24);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/beat.gif" tapmode
+                         onclick="emojiClick(25);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/bye.gif" tapmode onclick="emojiClick(26);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/comeon.gif" tapmode
+                         onclick="emojiClick(27);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/cry.gif" tapmode onclick="emojiClick(28);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/cuole.gif" tapmode
+                         onclick="emojiClick(29);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/dance.gif" tapmode
+                         onclick="emojiClick(30);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/dance1.gif" tapmode
+                         onclick="emojiClick(31);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/goodnight.gif" tapmode
+                         onclick="emojiClick(33);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/haha.gif" tapmode
+                         onclick="emojiClick(34);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/happy.gif" tapmode
+                         onclick="emojiClick(35);">
+                </li>
+
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hot.gif" tapmode onclick="emojiClick(37);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hug.gif" tapmode onclick="emojiClick(38);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/memeda.gif" tapmode
+                         onclick="emojiClick(40);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/miao.gif" tapmode
+                         onclick="emojiClick(41);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/missyou.gif" tapmode
+                         onclick="emojiClick(42);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/morning.gif" tapmode
+                         onclick="emojiClick(43);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/naonao.gif" tapmode
+                         onclick="emojiClick(44);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/no.gif" tapmode onclick="emojiClick(45);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/wash.gif" tapmode
+                         onclick="emojiClick(46);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/watermelon.gif" tapmode
+                         onclick="emojiClick(47);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/ishere.gif" tapmode
+                         onclick="emojiClick(39);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/heng.gif" tapmode
+                         onclick="emojiClick(36);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/en.gif" tapmode onclick="emojiClick(32);">
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/textarea-delete.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj;
+    var picArr = [];
+    var content = '';
+    var pImageList = [];
+    var photoBrowser;// 浏览图片
+    var uiMediaScanner;// 选择图片
+    var imageFilter;// 压缩图片
+    var QINIU_DOMIN = 'http://vod-qiniu.12xue.com/';// 七牛地址
+    // 记录上传七牛的状态
+    var qiniuListener = {
+        uploadAccount: 0,
+        successAccount: 0,
+        failIndex: []
+    };
+    var compressListener = {
+        allCount: 0,
+        successCount: 0
+    };
+    var vm = new Vue({
+        el: '.bottom-container',
+        data: {
+            daArr: [],//图片内容
+            yuyinArr: [],//语音内容
+            hasAudio: false,//是否有音频
+            seconds: '',//音频的长度
+        },
+        methods: {
+            deleteImage: function (index) {
+                vm.daArr.splice(index, 1);//删除数据指定索引位置的url
+            }
+
+        }
+    });
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.addEventListener({
+            name: 'selectPublish-pad'
+        }, function (ret, err) {
+            var type = ret.value.type;
+            selectAnswerPad(type)
+        });
+        photoBrowser = api.require('photoBrowser');
+        var realSource = 'student_12xueos';
+        if(api.systemType== 'ios'){
+            realSource = '12xueoshd';
+        }
+        apiObj = new GridOpenApi(UrlDomain, realSource, version);
+        apiObj.SetAuthToken($api.getStorage("token"));
+        //删除图片的回调
+        api.addEventListener({
+            name: 'deletePic'
+        }, function (ret, err) {
+            deletePic(ret.value.url);
+        });
+        //@人的回调
+        api.addEventListener({
+            name: 'at'
+        }, function (ret, err) {
+            // ret> realname  uid
+            var content = $api.val($api.dom(".container textarea"));
+            //@规则  拼接字符串  @+用户名+一个空格
+            content = "@" + ret.value.realname + " " + content;
+            $api.val($api.dom(".container textarea"), content);
+        });
+        initTextarea();
+    };
+
+    //点击对号
+    function publish() {
+        qiniuListener = {
+            uploadAccount: 0,
+            successAccount: 0,
+            failIndex: []
+        };
+        var content = $api.val($api.dom(".container textarea"));
+        content = $api.trim(content);
+        if (textLength(content) > 140) {
+            api.toast({
+                msg: '字数超过限制，请控制在140字内！',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        content = finalContent(content);
+        if ((content == "" || content == null) && picArr.length == 0) {
+            api.toast({
+                msg: '请先输入内容',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else {
+            api.showProgress({
+                title: '发送中',
+                text: '请稍后...',
+                modal: true
+            });
+            if (picArr && picArr.length > 0) {
+              //  for (var i = 0; i < picArr.length; i++) {
+                    qiniuUpfile(0);
+                //}
+            } else {
+                postPublish();
+            }
+        }
+    }
+
+    //发送网络请求   若不传参数pImageList=undefined
+    function postPublish(pImageList) {
+        var content = $api.val($api.dom(".container textarea"));
+        content = $api.trim(content);
+        content = finalContent(content);
+        var params = {};
+        if (pImageList && pImageList != undefined && pImageList.length > 0) {
+            for (var i = 0; i < pImageList.length; i++) {
+                params["imagelist[" + i + "]"] = pImageList[i];
+            }
+        }
+        params["contenttype"] = "user";
+        params["content"] = content;
+        console.log(pImageList + "-----params=" + JSON.stringify(params));
+        apiObj.Post(UrlRouter.PostDynamicPublish, {
+            values: params
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret && ret.ret == 0) {
+                //发布成功 关掉win  刷新首页动态
+                api.closeWin();
+                api.sendEvent({
+                    name: 'refreshDynamic',
+                });
+            } else {
+                var msg = '';
+                if (ret) {
+                    msg = ret.msg;
+                } else {
+                    msg = err.msg;
+                }
+                api.toast({
+                    msg: msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+    // 上传图片到七牛
+    function qiniuUpfile(index) {
+        var fileKey = (new Date()).valueOf()+picArr[index];
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key:fileKey
+            }
+        }, function (ret, err) {
+            var qiniuStorage = api.require("qiniuStorage");
+            qiniuListener.uploadAccount++;
+            qiniuStorage.configUploader({
+                params:{},
+                checkCrc: false,
+                mimeType: '',
+                zone: $api.getStorage('qiniuZone')
+            });
+            qiniuStorage.start({
+                token: ret.data.token,
+                path: picArr[index],
+                key:fileKey
+            });
+            qiniuStorage.addEventListener(function (ret) {
+                if(ret.eventType == 'complete'&&(api.systemType=='ios'?ret.info.statusCode:ret.statusCode) == 200){
+                    qiniuListener.successAccount++;
+                    pImageList.push(QINIU_DOMAIN + ret.key);
+                    if(index < picArr.length){
+                        qiniuUpfile(index+1);
+                    }
+                }else {
+                    qiniuListener.failIndex.push(index);
+                    api.hideProgress();
+                }
+
+                // 是否上传完毕的检测
+                if (qiniuListener.uploadAccount == picArr.length) {
+                    // 所有的图片都上传了
+                    if (qiniuListener.successAccount == picArr.length) {
+                        // 所有图片都上传成功
+                        console.log("所有图片上传成功");
+                        postPublish(pImageList);
+                    }
+                }
+
+            });
+        });
+    }
+    //选择答题方式
+    function selectAnswerPad(type) {
+
+        if (!checkPermission(['camera', 'storage'])) {
+            return;
+        }
+
+        if (vm.daArr.length >= 9) {
+            api.toast({
+                msg: "最多只能选择9张图片",
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        if (type == 'camera') {
+            api.getPicture({
+                sourceType: 'camera',
+                encodingType: 'jpg',
+                mediaValue: 'pic',
+                destinationType: 'url',
+                allowEdit: true,
+                quality: 50
+            }, function (ret, err) {
+                if (ret.data.length > 5) {
+                    displayPic(ret.data);
+                }
+            });
+        } else if (type == 'photo') {
+            // 换成多选的
+            var imgAccountMax = 9 - picArr.length;// 还可以选择图片数量的最大值
+            openMediaScanner(imgAccountMax);
+        }
+    }
+    function selectPic() {
+        if (!checkPermission(['camera', 'storage'])) {
+            return;
+        }
+        $api.addCls($api.dom('.emoji-icon'), 'aui-hide');
+        if (!checkImageCompress()) {
+            return;
+        }
+        if (picArr.length >= 9) {
+            api.toast({
+                msg: '最多只能选择9张图片上传',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        api.openFrame({
+            name: 'frame-publish-select-pad',
+            url: 'frame-publish-select-pad.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: $api.getStorage('padHeight')
+            },
+            pageParam: {name: 'pageparam'},
+            bounces: false
+        });
+
+    }
+
+    // 选择相册图片 可多选
+    function openMediaScanner(max) {
+        if (!uiMediaScanner) {
+            uiMediaScanner = api.require('UIMediaScanner');
+        }
+        uiMediaScanner.open({
+            type: 'picture',
+            column: 4,
+            classify: true,
+            max: max ? max : 9,
+            sort: {
+                key: 'time',
+                order: 'desc'
+            },
+            texts: {
+                stateText: '已选*项',
+                cancelText: '取消',
+                finishText: '完成'
+            },
+            rotation: true,
+            styles: {
+                bg: '#fff',
+                mark: {
+                    icon: '',
+                    position: 'bottom_left',
+                    size: 20
+                },
+                nav: {
+                    bg: '#4bc7c7',
+                    stateColor: '#fff',
+                    stateSize: 18,
+                    cancelBg: 'rgba(0,0,0,0)',
+                    cancelColor: '#fff',
+                    cancelSize: 18,
+                    finishBg: 'rgba(0,0,0,0)',
+                    finishColor: '#fff',
+                    finishSize: 18
+                }
+            }
+        }, function (ret) {
+            if (ret) {
+                if (ret.eventType == 'confirm') {
+                    compressListener.allCount = ret.list.length;
+                    compressListener.successCount = 0;
+                    for (var i = 0; i < ret.list.length; i++) {
+                        var selectImg = ret.list[i];
+                        // 获取图片的路径
+                        var selectimgPath = selectImg.path;
+                        var selectimgThumbPath = selectImg.thumbPath;
+                        if (api.systemType == "ios") {
+                            uiMediaScanner.transPath({
+                                path: selectimgPath
+                            }, function (ret, err) {
+                                if (ret) {
+                                    compressImage(ret.path);
+                                } else {
+                                    alert("ios地址转换失败：" + JSON.stringify(err));
+                                }
+                            });
+                        } else {
+                            compressImage(selectimgPath);
+                        }
+                    }
+                    console.log(JSON.stringify(ret));
+                }
+            }
+        });
+    }
+    // 图片压缩处理
+    function compressImage(url) {
+        var imageFilter = api.require('imageFilter');
+        var imgName = getUrlName(url);
+        var quality;
+        if (api.systemType == 'ios') {
+            quality = 0.2;
+        } else {
+            quality = 0.3;
+        }
+        imageFilter.compress({
+            img: url,
+            quality: quality,
+            save: {
+                imgPath: "fs://img_compress/",
+                imgName: imgName + ".jpg"
+            }
+        }, function (ret, err) {
+            console.log("compress result : ret=" + JSON.stringify(ret) + "  err:" + JSON.stringify(err));
+            if (ret.status) {
+                compressListener.successCount++;
+                displayPic(api.fsDir + "/img_compress/" + imgName + ".jpg");
+                console.log("compress url:" + api.fsDir + "/" + imgName + ".jpg");
+            } else {
+                alert(JSON.stringify(err));
+            }
+            imageFilter = '';
+        });
+    }
+
+    function getUrlName(url) {
+        var index = url.lastIndexOf("/");
+        var imgName;
+        if (api.systemType == 'ios') {
+            var idIndex = url.indexOf("id=");
+            if (idIndex != -1) {
+                var idStr = url.substr(idIndex);
+                var andIndex = url.indexOf("&");
+                imgName = url.substring(idIndex + 3, andIndex);
+            } else {
+                imgName = url.substring(index + 1);
+            }
+        } else {
+            imgName = url.substring(index + 1);
+        }
+        return imgName;
+    }
+    function openAt() {
+        api.openWin({
+            name: 'win-choose-@people',
+            url: 'win-choose-@people.html',
+            pageParam: {name: 'pageparamname'},
+            slidBackEnabled: false
+        });
+    }
+
+    function displayPic(url) {
+        console.log("display url:" + url);
+        $api.css($api.dom(".display-pic"), 'display:block;');
+        var index = $api.domAll("li").length;
+        var html = '<li id="' + index + '"><img class="img" src="' + url + '" alt="图片加载失败" tapmode onclick="openPic(this);"><img class="chacha" src="../../image/chacha.png" onclick="deletePic(this)" ></li>';
+        $api.append($api.dom("ul"), html);
+        picArr.push(url);
+    }
+    function openPic(context) {
+        var index = -1;
+        var url = $api.attr(context, 'src');
+        //计算索引 不能用id作为索引
+        for (var i = 0; i < picArr.length; i++) {
+            if (url == picArr[i]) {
+                index = i;
+            }
+        }
+        api.execScript({
+            script: "isOpenPic=true;"
+        });
+        photoBrowser.open({
+            images: picArr,
+            placeholderImg: 'widget://image/loading_more.gif',
+            bgColor: '#000000',
+            activeIndex: index
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                api.execScript({
+                    script: "isOpenPic=true;"
+                });
+                photoBrowser.close();
+            }
+        });
+    }
+
+    //删除图片答案
+    function deletePic(context) {
+        var li = $api.closest(context, 'li');
+        var url = $api.attr($api.dom(li, ".img"), 'src');
+        var imgs = $api.domAll("li>.img");
+        var index = -1;
+        //匹配url  删除dom元素   不能根据id作为索引来删除
+        for (var i = 0; i < imgs.length; i++) {
+            var imgSrc = $api.attr(imgs[i], 'src');
+            if (imgSrc == url) {
+                index = i;
+                break;
+            }
+        }
+        $api.remove(li);
+        picArr.splice(index, 1);//删除数据指定索引位置的url
+        if (picArr.length == 0) {
+            $api.css($api.dom(".display-pic"), 'display:none;');
+        }
+    }
+    /**
+     * 检查图片压缩进度
+     * @returns {boolean} true 压缩完成
+     */
+    function checkImageCompress() {
+        if (compressListener.allCount != 0 && compressListener.allCount != compressListener.successCount) {
+            api.toast({
+                msg: '正在压缩图片，请稍后操作',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return false;
+        }
+        return true;
+    }
+</script>
+</html>

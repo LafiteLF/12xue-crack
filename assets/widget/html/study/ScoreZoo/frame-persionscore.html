@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>乐园</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <style>
+        body{
+            padding-top: 40px;
+        }
+
+        .name-content {
+            width: 80%;
+            font-size: 20px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 3px;
+            position:relative;
+        }
+
+        table {  width: 100%;
+
+            /*防止表格变形*/
+            table-layout: fixed;
+            word-wrap: break-word;
+
+            /*是将表格边框的间隙去掉*/
+            border-collapse: collapse;
+            /*color: #E5E5E5;*/
+            background-color: #fff;
+
+        }
+.main{
+    width: 100%;
+    border: solid thin #E5E5E5;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 0px 27px;
+}
+        td, th {
+            padding: 4px;;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        tr{ height: 40px; line-height: 40px;background: #fff}
+        tr, th {
+
+        }
+        th{ border-right: 0px;
+            border-left:0px; color: #999; font-size: 0.7rem;}
+        tr, td {
+
+            text-align: center;
+            color: #72d36d;
+            font-size: 0.7rem;
+        }
+        tr+tr{ border-top: 1px dashed #d5d5d5}
+        tr td:nth-of-type(1){ color: #4bc7c7; }
+        tr td:nth-of-type(5){
+            color: #ff778c;
+        }
+        td,th{ height: 80%; margin-top: 10%}
+        td+td{  background: url("../../../image/stuHomePad/xian.jpg") no-repeat left center;
+            background-size: 1px 60%;
+
+        }
+        th+th{ border-left: 0px solid #fff}
+        .titletd {
+            color: #4bc7c7;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .left-q{     display: block;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: solid thin #eaeaea;
+            border-radius: 30px;
+            left: 3px;
+            top: 55px;
+            position: absolute;}
+        .left-b{ display: block; width: 17px; height: 30px; background: #fff; position: absolute;left: 3px;
+            top: 55px;z-index: 10}
+        .right-q{     display: block;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: solid thin #eaeaea;
+            border-radius: 30px;
+            right: 3px;
+            top: 55px;
+            position: absolute;}
+        .right-b{ display: block; width: 17px; height: 30px; background: #fff; position: absolute;right: 3px;
+            top: 55px;z-index: 10}
+        #app{ display: none}
+    </style>
+</head>
+
+<body >
+<div id="app" v-cloak>
+<div v-if="data.length==0 && data==''"  style="width: 30%; margin: 0 auto; padding-top: 12%;text-align: center" class="aui-content">
+    <img src="../../../image/stuHomePad/noContent.png" style="width: 100%; max-width: 508px; margin: 0px;">
+</div>
+<div class="name-content"   v-else >
+    <div class="main">
+        <b class="left-b"></b>
+        <span class="left-q"></span>
+        <b class="right-b"></b>
+        <span class="right-q"></span>
+        <table  >
+            <tr >
+                <th class="titleth"></th>
+                <th class="titleth">我的</th>
+                <th class="titleth">班级最高</th>
+                <th class="titleth">班级平均</th>
+                <th class="titleth">班级最低</th>
+            </tr>
+            <tr  >
+                <td class="titletd">总分</td>
+                <td>{{score.user}}学分</td>
+                <td>{{score.first}}学分</td>
+                <td>{{score.average}}学分</td>
+                <td>{{score.last}}学分</td>
+            </tr>
+            <tr   v-for="item in eval">
+                <td class="titletd">{{item.title}}</td>
+                <td>{{item.user}}学分</td>
+                <td>{{item.first}}学分</td>
+                <td>{{item.average}}学分</td>
+                <td>{{item.last}}学分</td>
+            </tr>
+        </table>
+    </div>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var vm = null;
+    var classid = '';
+    var schoolid = '';
+    apiready = function () {
+        classid = api.pageParam.bjid;
+        schoolid = api.pageParam.schoolid;
+        apiObj.SetAuthToken($api.getStorage('token'));
+        vm = new Vue({
+            el: '#app',
+            data: {
+                score: '',
+                eval: '',
+                data:'',
+            }
+        });
+
+        loadStuPersionScoreData();
+
+    };
+    function loadStuPersionScoreData() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetGrouptechStuScore, {
+            values: {
+                classid: classid,
+                schoolid: schoolid
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    $('#app').show();
+                    vm.score = ret.data.score;
+                    vm.eval = ret.data.eval;
+                    vm.data=ret.data;
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+</script>
+</html>

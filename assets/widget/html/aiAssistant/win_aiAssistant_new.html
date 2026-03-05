@@ -1,0 +1,1366 @@
+<!-- 重构的AI伴学，采用整页显示，不使用frame -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../script/aiAssistant/markdown/katex-0.16.9.min.css">
+    <style>
+        :root {
+            --hrem: 100vh / 1000;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: calc(1000 * var(--hrem));
+            margin: 0;
+            padding: 0;
+            background-color: #F2F2F2;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        a {
+            pointer-events: none;
+            color: inherit;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .header {
+            height: calc(80 * var(--hrem));
+            display: flex;
+            position: relative;
+            box-sizing: border-box;
+            background-color: white;
+            border-bottom: 1px solid #D5D5D5;
+        }
+
+        .header-left {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: 50vw
+        }
+
+        .header-center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 50vw;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+        }
+
+        .content-left {
+            width: 50vw;
+            height: 100%;
+        }
+
+        .robot-image {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: calc(30 * var(--hrem)) 2vw calc(30 * var(--hrem)) 2vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .question-image {
+            width: 100%;
+            background-color: white;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: calc(790 * var(--hrem));
+        }
+
+        .content-right {
+            width: 50vw;
+            box-sizing: border-box;
+            padding: calc(70 * var(--hrem)) 3vw calc(30 * var(--hrem)) 3vw;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: calc(790 * var(--hrem));
+            max-height: calc(790 * var(--hrem));
+            min-height: calc(790 * var(--hrem));
+            position: relative;
+        }
+
+        .content-right>div:not(:first-child) {
+            margin-top: calc(37 * var(--hrem));
+        }
+
+        .agent-message {
+            display: flex;
+        }
+
+        .agent-message-left {
+            width: 4.6vw;
+        }
+
+        .agent-message-right {
+            flex: 1;
+            box-sizing: border-box;
+            padding-left: 1vw;
+        }
+
+        .agent-message-right-title {
+            display: flex;
+            align-items: center;
+            height: 4vw;
+        }
+
+        .agent-message-right-content {
+            width: 38.5vw;
+            /* 以下的样式用于抵消Markdown处理后内容与顶部的距离，同时移除此样式和markdown距离基本一致 */
+            margin-top: calc(-20 * var(--hrem));
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .user-message {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .user-message-head {
+            display: flex;
+            justify-content: flex-end;
+            height: calc(76 * var(--hrem));
+        }
+
+        .user-message-content {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: calc(5 * var(--hrem));
+            width: 38.5vw;
+        }
+
+        .user-message-images {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: calc(5 * var(--hrem));
+        }
+
+        .agent-message-right-images {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: calc(5 * var(--hrem));
+        }
+
+        .footer {
+            height: calc(120 * var(--hrem));
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            padding-bottom: calc(40 * var(--hrem));
+        }
+
+        .footer-left {
+            display: flex;
+            justify-content: center;
+            width: 11.75vw;
+            align-items: center;
+        }
+
+        .footer-center {
+            flex: 1;
+            height: 100%;
+        }
+
+        .footer-right {
+            display: flex;
+            justify-content: center;
+            width: 7vw;
+            align-items: center;
+        }
+
+        /* markdown公式格式样式 */
+        .katex-display {
+            text-align: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .history-chat-select {
+            border: 0.117vw solid #4BC7C7;
+            border-radius: 0.3vw;
+            box-sizing: border-box;
+            font-size: 1.2vw;
+            height: calc(40 * var(--hrem));
+            width: 7.5vw;
+            color: #4BC7C7;
+            margin-right: 2vw;
+            background-color: white;
+            outline: none;
+        }
+
+        .current-images {
+            position: absolute;
+            left: 0;
+            top: calc(750 * var(--hrem));
+            width: 50vw;
+            height: calc(120 * var(--hrem));
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 1.75vw;
+        }
+
+        .current-images-div {
+            width: calc(120 * var(--hrem));
+            height: calc(120 * var(--hrem));
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            margin-left: 0.5vw;
+            padding: 0.75vw;
+            background-color: white;
+            border-radius: 2vw;
+            position: relative;
+        }
+
+        .current-image {
+            width: 100%;
+            height: 100%;
+            border-radius: 1vw;
+        }
+
+        .pic-remove {
+            position: absolute;
+            right: calc(5 * var(--hrem));
+            top: calc(5 * var(--hrem));
+            color: white;
+            background-color: red;
+            font-size: 2vw;
+            font-weight: bold;
+            border-radius: 50%;
+            width: calc(40 * var(--hrem));
+            height: calc(40 * var(--hrem));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img src="../../image/newhomework/return.png" alt="" @click="closeWin"
+                    style="height: calc(33 * var(--hrem));margin-left: 2vw;">
+                <span style="font-size: 2.2vw;margin-left: 2vw;" @click="closeWin">AI伴学</span>
+                <span style="color: #999999;font-size: 1.3vw;margin-left: 2vw;" id="ai_content_from_ai">内容由AI生成</span>
+            </div>
+            <div class="header-center">
+                <span style="color: #999999;font-size: 1.3vw;" @click="checkSecretString();">本月剩余问答次数：<span
+                        :style="{'font-weight': 'bold', color: remainingTimes > 0 ? '#4BC7C7' : 'red'}">{{remainingTimes}}</span></span>
+            </div>
+            <div class="header-right">
+                <img src="../../image/aiAssistant/xdh.png" alt=""
+                    style="height: calc(40 * var(--hrem));margin-right: 1.25vw;" @click="setCurrentChat(0)"
+                    v-if="!isFollowUp">
+                <img :src="isDetail ? '../../image/aiAssistant/sdmson.png' : '../../image/aiAssistant/sdmsoff.png'"
+                    alt="" style="height: calc(40 * var(--hrem));margin-right: 1.25vw;"
+                    @click="isDetail = !isDetail;secretString += '0';">
+                <div>
+                    <select name="" id="chatSelector" class="history-chat-select" v-if="!isFollowUp"
+                        @change="setCurrentChat($event.target.value)">
+                        <option value="-1" selected>历史对话</option>
+                        <option :value="chat.id" v-for="chat in chats" :key="chat.id" v-if="chat.id!=currentChatId">
+                            {{JSON.parse(chat.subject).length > 10 ?
+                            JSON.parse(chat.subject).substring(0,10)+'......' : JSON.parse(chat.subject)}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="content-left">
+                <div class="robot-image" v-if="leftImages.length == 0">
+                    <img src="../../image/aiAssistant/robot.png" alt=""
+                        style="max-width: 100%; max-height: 80vh; width: auto; height: auto;">
+                </div>
+                <div class="question-image" v-if="leftImages.length > 0">
+                    <img :src="image" alt="" v-for="(image,index) in leftImages" style="width: 100%;"
+                        @click="openPicture(leftImages,index)">
+                </div>
+            </div>
+            <div class="content-right">
+                <div class="message-box" v-for="(message, index) in messages">
+                    <!-- 机器人消息 -->
+                    <div class="agent-message" v-if="message.role === 'assistant'">
+                        <div class="agent-message-left">
+                            <img src="../../image/aiAssistant/_03.png" alt="" style="width: 100%;"
+                                @click="logData(index)">
+                        </div>
+                        <div class="agent-message-right">
+                            <div class="agent-message-right-title">
+                                <span style="color: #999999;font-size: 1.54vw;">AI伴学小助手</span>
+                            </div>
+                            <div class="agent-message-right-content">
+                                <span style="font-size: 1.54vw;" v-html="marked(message.content[0].text)"
+                                    @click="report(message.content[0].text)"></span>
+                            </div>
+                            <div class="agent-message-right-images" v-if="message.content.length > 1"
+                                style="display: none;">
+                                <img :src="image.image_url.url" alt="" v-for="image in message.content.slice(1)"
+                                    style="height: 9vw;width: 9vw;margin-right: 0.5vw;border-radius: 1vw;">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 用户消息 -->
+                    <div class="user-message" v-if="message.role === 'user'">
+                        <div class="user-message-head" style="display: none;">
+                            <img src="../../image/about.png" alt="" style="height: 100%;">
+                        </div>
+                        <div class="user-message-content">
+                            <span style="font-size: 1.54vw;" v-html="marked(message.content[0].text)"></span>
+                        </div>
+                        <div class="user-message-images"
+                            v-if="message.content.length > 1 && !(isFollowUp && index == 1)">
+                            <img :src="image.image_url.url" alt="" v-for="(image,index) in message.content.slice(1)"
+                                style="height: 9vw;width: 9vw;margin-left: 0.5vw;border-radius: 1vw;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="current-images">
+            <div class="current-images-div" v-for="(image, index) in currentImages" :key="index">
+                <img :src="image" alt="" class="current-image" @click="openPicture(currentImages,index)">
+                <div class="pic-remove" @click="currentImages.splice(index, 1);">×</div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-left" id="footer-left">
+                <img src="../../image/aiAssistant/_takePhoto10.png" alt=""
+                    style="height: calc(50 * var(--hrem));margin-left: 0.75vw;" @click="addPicture()">
+                <img :src="!isSpeaking ? '../../image/aiAssistant/_10.png' : '../../image/aiAssistant/z_10.png'" alt=""
+                    style="height: calc(50 * var(--hrem));margin-left: 1.5vw;" @touchstart="startSpeaking()"
+                    @touchend="endSpeaking()" id="speak-btn">
+            </div>
+            <div class="footer-center">
+                <input type="text" placeholder="发消息或按住说话" id="input-box" v-model="currentMessage.content[0].text"
+                    @keyup.enter="uploadImages()" style="width: 100%;height: 100%;border: none;outline: none;border-radius: 1vh;box-sizing: border-box;
+                    padding-left: 2vw;padding-right: 2vw;font-size: 1.45vw;" maxlength="500" @input="inputChange()">
+            </div>
+            <div class="footer-right">
+                <img :src="isFetching||currentMessage.content[0].text.trim()==''||remainingTimes==0 ? '../../image/aiAssistant/_13.png' : '../../image/aiAssistant/z_13.png'"
+                    alt="" style="height: calc(50 * var(--hrem));" @click="uploadImages()">
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/ThridJS/qiniu.min.js"></script>
+<script type="text/javascript" src="../../script/12xueUpload.js"></script>
+<script type="text/javascript" src="./crypto-js.js"></script>
+<script type="text/javascript" src="./iat.js"></script>
+<script type="text/javascript" src="./dist/index.umd.js"></script>
+<script type="text/javascript" src="../../script/aiAssistant/markdown/marked-4.3.0.min.js"></script>
+<script type="text/javascript" src="../../script/aiAssistant/markdown/katex-0.16.9.min.js"></script>
+<script type="text/javascript">
+    document.documentElement.style.setProperty('--hrem', `${window.innerHeight / 1000}px`);
+    let vm = null;
+    let db = null;
+    let apiObj = null;
+    let stuInfo = {
+        uid: $api.getStorage('uid'),
+        schoolid: $api.getStorage('schoolid'),
+        token: $api.getStorage('token'),
+        upgradeQRCode: $api.getStorage('upgradeQRCode'),
+        padType: $api.getStorage('padType'),
+    };
+    //以下为全局控制变量
+    const IS_IN_TEST_MODE = false;//测试模式，为true时，不扣次数，不使用系统提示词
+    const IS_OPEN_SECOND_PROCESS = false;//是否开启二次处理，为true时，会在最新消息包含图片的情况下对ai回复进行二次处理
+    const MAX_MESSAGES_LENGTH = 5;//调用ai时，取的最后消息的个数(非轮数)，因为要包括刚发送的消息，所以应是奇数
+    const MAX_IMAGES_NUM = 5;//最多5张图片
+    const IMAGE_DETAIL = "low";//high,low,auto，决定了ai理解图片的质量,关乎token消耗
+    const BASIC_MODEL_NAME = "ep-m-20260105224903-gp2t7";//使用的低级模型名称（不带图片时使用）
+    const ADVANCED_MODEL_NAME = "ep-m-20260105224903-gp2t7";//使用的高级模型名称（带图片时使用）
+    const INIT_MESSAGE = IS_IN_TEST_MODE ? `` : `你好同学，我是AI伴学小助手，可以帮你回答学科知识 问题哦，请你发送相关的问题，我会帮你进行解答～`;
+    const SYSTEM_CONTENT_FORMAT = `
+【数学公式格式要求 - 必须严格遵守】
+
+1. 公式格式：
+   行内：$公式$ 或 \\(公式\\)，示例：$f(x)$、$\\frac{a}{b}$、$\\sqrt{x}$、$\\text{H}_2\\text{O}$
+   块级：$$公式$$ 或 \\[公式\\]，示例：$$f(x) = x^2 + 2x + 1$$
+   禁止：未用$、$$、\\(或\\[包围的数学表达式
+
+2. 特殊字符（必须使用LaTeX语法）：
+   分数：$\\frac{分子}{分母}$，根号：$\\sqrt{x}$，指数：$x^2$，下标：$x_1$
+   希腊字母：$\\alpha$、$\\pi$，化学分子：$\\text{H}_2\\text{O}$，百分号：$50\\%$
+
+3. 禁止行为：
+   禁止LaTeX代码块、禁止公式外数学符号、禁止未转义表达式、禁止HTML标签、禁止图片替代公式
+
+4. 验证规则：
+   所有数学表达式、函数名、变量、常数、运算符、化学分子式必须用$、$$、\\(或\\[包围
+   所有分数、根号、指数、下标、希腊字母必须使用LaTeX语法
+
+输出前确认无裸露数学表达式，宁可过度使用$符号也不能遗漏！
+`;//格式提示词，总是使用
+    const SYSTEM_CONTENT = IS_IN_TEST_MODE ? SYSTEM_CONTENT_FORMAT : SYSTEM_CONTENT_FORMAT + `
+【AI伴学助手核心规则】
+
+你是专业学习助手，为小学、初中、高中学生提供学科知识解答。
+
+核心职责：
+1. 使用简明易懂、亲切自然的语言交流
+2. 禁止给出解题步骤和答案，只能提供思路和原理
+3. 严格遵循Markdown格式，数学公式使用LaTeX
+4. 支持基础外语学习（词汇、语法、发音、文化）
+
+答案输出禁令（最高优先级）：
+- 严禁输出任何形式的答案、计算结果、具体数值、解题步骤
+- 严禁给出选择题、填空题、判断题答案
+- 严禁提供作业、考试、练习册答案
+- 只能提供：解题思路、原理、知识点解释、方法指导
+- 必须引导学生自己思考、计算、得出答案
+- 严禁使用"答案是..."、"结果是..."、"计算得..."等表达
+- 必须使用"你可以这样思考..."、"建议你从...开始"等引导性语言
+
+禁止内容（违反立即终止）：
+游戏、暴力、色情、政治、宗教、娱乐闲聊、作弊内容、成人内容、危险行为、隐私信息、商业推广
+
+范围限制：
+仅限小学、初中、高中学科问题和基础外语学习，超出范围需明确提示，不得提供超出学段水平的专业内容
+
+安全处理：
+- 违规内容 → "【安全提醒】你的提问涉及禁止内容，请重新提问。"
+- 超出范围 → "【范围提醒】此问题超出当前学段范围，请咨询相关专业老师。"
+- 无法回答 → "【能力限制】抱歉，我无法回答此问题，请咨询专业老师。"
+- 要求答案 → "【学习提醒】我不能直接给出答案，但我可以帮你分析解题思路和方法，请告诉我你遇到了什么困难？"
+- 要求步骤 → "【引导提醒】我不能提供完整的解题步骤，但我可以指导你如何思考这个问题，你想从哪个方面开始分析？"
+
+质量要求：
+准确专业、友好耐心、符合教育规范、引导学生思考、避免直接给答案的表达方式
+
+最终警告：无论任何情况，都绝对不能输出任何形式的答案！职责是引导学生思考，不是直接给答案！
+`;//系统提示词，根据常量决定是否使用
+    const SYSTEM_CONTENT_DETAIL = `
+【深度模式激活 - 超级详细解答模式】
+无论问题多简单，都必须提供极其详尽、全面、深入的解答。答案禁令依然有效，绝对不能输出任何形式的答案、计算结果或解题步骤。
+
+详细程度要求：
+1. 历史背景：概念发展、重要人物、关键事件
+2. 理论基础：科学原理、数学推导、逻辑关系
+3. 实际应用：大量现实应用场景和实例
+4. 概念扩展：从知识点扩展到所有相关内容
+5. 细节探讨：深入探讨每个概念
+6. 类比说明：生动形象的类比和比喻
+
+解答标准（教授级别）：
+深度：大学教授学术深度；广度：涵盖所有相关知识点；详细：宁可过度详细也不简单回答；全面：多角度、多层面解析；系统：构建完整知识体系。
+
+内容要求：
+基础概念定义、相关定理公式规律说明、解题思路分析（不提供步骤和答案）、常见错误提醒、知识拓展延伸、实际应用举例、学习建议。
+
+重要提醒：
+以"知识百科全书"姿态回答，确保学生获得最大化学习价值，回答不少于500字（除非问题非常简单），使用丰富例子和类比，但绝不输出任何形式的答案。
+
+最终警告：深度模式不等于可以输出答案！详细解释和直接给答案是两回事！
+`;//额外要求，根据选框决定是否使用
+    const urlPatterns = [
+        // 匹配被Markdown格式包围的链接
+        /(\*{1,2}(https?:\/\/[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(ftp:\/\/[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(www\.[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s<>"'`*]*)\*{1,2})/g,
+        /(\*{1,2}([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\*{1,2})/g,
+        /(\*{1,2}(tel:[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(mailto:[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(file:\/\/[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(data:[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(javascript:[^\s<>"'`*]+)\*{1,2})/g,
+        /(\*{1,2}(vbscript:[^\s<>"'`*]+)\*{1,2})/g,
+        // 匹配被下划线包围的链接
+        /(_{1,2}(https?:\/\/[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(ftp:\/\/[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(www\.[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s<>"'`_]*)_{1,2})/g,
+        /(_{1,2}([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})_{1,2})/g,
+        /(_{1,2}(tel:[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(mailto:[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(file:\/\/[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(data:[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(javascript:[^\s<>"'`_]+)_{1,2})/g,
+        /(_{1,2}(vbscript:[^\s<>"'`_]+)_{1,2})/g,
+        // 匹配被删除线包围的链接
+        /(~{1,2}(https?:\/\/[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(ftp:\/\/[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(www\.[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s<>"'`~]*)~{1,2})/g,
+        /(~{1,2}([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})~{1,2})/g,
+        /(~{1,2}(tel:[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(mailto:[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(file:\/\/[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(data:[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(javascript:[^\s<>"'`~]+)~{1,2})/g,
+        /(~{1,2}(vbscript:[^\s<>"'`~]+)~{1,2})/g,
+        // 匹配被反引号包围的链接
+        /(`(https?:\/\/[^\s<>"'`]+)`)/g,
+        /(`(ftp:\/\/[^\s<>"'`]+)`)/g,
+        /(`(www\.[^\s<>"'`]+)`)/g,
+        /(`([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s<>"'`]*)`)/g,
+        /(`([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})`)/g,
+        /(`(tel:[^\s<>"'`]+)`)/g,
+        /(`(mailto:[^\s<>"'`]+)`)/g,
+        /(`(file:\/\/[^\s<>"'`]+)`)/g,
+        /(`(data:[^\s<>"'`]+)`)/g,
+        /(`(javascript:[^\s<>"'`]+)`)/g,
+        /(`(vbscript:[^\s<>"'`]+)`)/g,
+        // 匹配普通链接（无格式包围）
+        /(https?:\/\/[^\s<>"'`]+)/g,
+        /(ftp:\/\/[^\s<>"'`]+)/g,
+        /(www\.[^\s<>"'`]+)/g,
+        /([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}[^\s<>"'`]*)/g,
+        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+        /(tel:[^\s<>"'`]+)/g,
+        /(mailto:[^\s<>"'`]+)/g,
+        /(file:\/\/[^\s<>"'`]+)/g,
+        /(data:[^\s<>"'`]+)/g,
+        /(javascript:[^\s<>"'`]+)/g,
+        /(vbscript:[^\s<>"'`]+)/g
+    ];
+    const mathCache = new Map();
+    const renderMath = (text, displayMode) => {
+        const cacheKey = `${text}-${displayMode}`;
+        if (mathCache.has(cacheKey)) {
+            return mathCache.get(cacheKey);
+        }
+        try {
+            const result = katex.renderToString(text, {
+                displayMode,
+                throwOnError: false,
+                strict: 'ignore'
+            });
+            mathCache.set(cacheKey, result);
+            return result;
+        } catch (err) {
+            console.error('KaTeX 渲染错误:', err);
+            return text;
+        }
+    };
+    const createMathExtension = (name, level, patterns, displayMode) => {
+        return {
+            name,
+            level,
+            start(src) {
+                const indices = patterns.map(pattern => src.indexOf(pattern.start));
+                const validIndices = indices.filter(index => index !== -1);
+                return validIndices.length > 0 ? Math.min(...validIndices) : -1;
+            },
+            tokenizer(src) {
+                for (const pattern of patterns) {
+                    // 跳过转义的开始标记
+                    if (src.startsWith(pattern.escape)) continue;
+
+                    const match = pattern.regex.exec(src);
+                    if (match) {
+                        return {
+                            type: name,
+                            raw: match[0],
+                            text: match[1].trim(),
+                        };
+                    }
+                }
+            },
+            renderer(token) {
+                return renderMath(token.text, displayMode);
+            }
+        };
+    };
+    const blockPatterns = [
+        { start: '$$', escape: '\\$$', regex: /^\$\$(.*?)\$\$/s },
+        { start: '\\[', escape: '\\\\\\[', regex: /^\\\[(.*?)\\\]/s }
+    ];
+    const inlinePatterns = [
+        { start: '$', escape: '\\$', regex: /^\$(.*?)\$/ },
+        { start: '\\(', escape: '\\\\\\(', regex: /^\\\((.*?)\\\)/ }
+    ];
+    marked.use({
+        extensions: [
+            createMathExtension('mathBlock', 'block', blockPatterns, true),
+            createMathExtension('mathInline', 'inline', inlinePatterns, false)
+        ]
+    });
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);//请求器对象，而非api对象
+        db = api.require('db');
+        initVue();
+    }
+    function initVue() {
+        vm = new Vue({
+            el: '.container',
+            data: {
+                secretString: '',//后门字符串，用于测试
+                isFollowUp: false,//是否是继续问模式,只在页面加载时设置一次，决不改变
+                isFetching: false,//是否正在请求
+                isSpeaking: false,//是否正在说话
+                isDetail: false,//是否是详情模式
+                iatObj: null,//语音转文字对象
+                remainingTimes: 0,
+                currentChatId: 0,//当前对话id，0：新对话，其他：历史对话id
+                messages: [//注意，对于每个message，文本必须位于content的第一个位置，否则页面渲染会出错
+                    {
+                        content: [
+                            {
+                                text: INIT_MESSAGE,
+                                type: "text"
+                            },
+                        ],
+                        role: "assistant"
+                    },
+                ],
+                leftImages: [],//存放content左侧区域图片（继续问模式）
+                currentMessage: {
+                    content: [
+                        {
+                            text: "",
+                            type: "text"
+                        }
+                    ],
+                    role: "user"
+                },
+                currentImages: [],//存放当前待发送区域的base64的图片
+                chats: [],//历史对话列表
+            },
+            mounted() {
+                if (api.systemType == 'ios') {
+                    document.getElementById('speak-btn').style.display = 'none';
+                    document.getElementById('footer-left').style.width = '6vw';
+                }
+                api.addEventListener({
+                    name: 'keyback'
+                }, (ret, err) => {
+                    this.closeWin();
+                });
+                if (api.pageParam.answer) {
+                    this.setFollowUp(api.pageParam);
+                }
+                db.openDatabaseSync({
+                    name: 'aiAssistant',
+                });
+                // db.executeSqlSync({//删除旧表,测试用,同步方法
+                //     name: 'aiAssistant',
+                //     sql: 'drop  table if exists chats'
+                // });
+                // db.executeSqlSync({//删除旧表,测试用,同步方法
+                //     name: 'aiAssistant',
+                //     sql: 'drop  table if exists followUp_images'
+                // });
+                db.executeSql({//创建继续问模式图片缓存表
+                    name: 'aiAssistant',
+                    sql: 'CREATE TABLE IF NOT EXISTS followup_images(id INTEGER PRIMARY KEY AUTOINCREMENT, xtid TEXT not null,images TEXT not null)'
+                }, (ret, err) => {
+                    if (ret.status) {
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+                db.executeSql({//创建历史对话表
+                    name: 'aiAssistant',
+                    sql: 'CREATE TABLE IF NOT EXISTS chats(id INTEGER PRIMARY KEY AUTOINCREMENT, subject TEXT not null,messages TEXT not null,update_time TEXT not null)'
+                }, (ret, err) => {
+                    if (ret.status) {
+                        this.getChatsList();
+                    } else {
+                        console.log(JSON.stringify(err));
+                    }
+                });
+                if ($api.getStorage('padType') != '2') {
+                    document.getElementById('ai_content_from_ai').style.display = 'none';
+                }
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        type: 'ai_study',
+                        schoolid: $api.getStorage('schoolid'),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        stuInfo.card_type = ret.data.card_type;
+                        stuInfo.taocan = ret.data.taocan;
+                        stuInfo.card_id = ret.data.card_id;
+                        stuInfo.count = ret.data.count;
+                        this.remainingTimes = ret.data.count;
+                    } else {
+                        this.remainingTimes = 0;
+                    }
+                })
+            },
+            methods: {
+                report: function (message) {
+                    if ($api.getStorage('padType') != '2' || message == '你好同学，我是AI伴学小助手，可以帮你回答学科知识 问题哦，请你发送相关的问题，我会帮你进行解答～') {//如果不是应用商店的包
+                        return;
+                    }
+                    api.openFrame({//打开一个应付检查的举报页面
+                        name: 'frame_report_ai_content',
+                        url: '../frame_report_ai_content.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winWidth,
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            block: 'AI伴学',
+                            content: message
+                        }
+                    });
+                },
+                checkSecretString() {
+                    console.log(this.secretString);
+                    if (this.secretString == '10011') {
+                        alert('Version: 25.09.17\n减小学习范围限制');
+                    }
+                    this.secretString = '';
+                },
+                alert(data) {
+                    if (typeof data == 'string') {
+                        alert(data);
+                    } else {
+                        alert(JSON.stringify(data));
+                    }
+                },
+                logData(index) {
+                    console.log('原始消息：' + this.messages[index].content[0].text);
+                    console.log('渲染后消息：' + marked.parse(this.messages[index].content[0].text));
+                },
+                closeWin() {
+                    this.saveCurrentChat();
+                    api.closeWin();
+                },
+                async setFollowUp(pageParam) {
+                    //模拟一轮对话
+                    api.showProgress();
+                    this.isFollowUp = true;
+                    let imagesUrl = [];//图片url链接
+                    const ret = db.selectSqlSync({
+                        name: 'aiAssistant',
+                        sql: 'SELECT images FROM followup_images where xtid = \'' + pageParam.xtid + '\''
+                    });
+                    if (ret.data == undefined) {
+                        api.toast({
+                            msg: '数据异常，请重新打开页面',
+                            duration: 2000,
+                            location: 'bottom',
+                            global: true
+                        });
+                        api.closeWin();
+                        return;
+                    }
+                    if (ret.data.length == 1) {
+                        imagesUrl = JSON.parse(ret.data[0].images);//这个是url
+                    } else {
+                        const uploadPromises = pageParam.pictures.map(image => this.qiniuUpfile(image));
+                        imagesUrl = await Promise.all(uploadPromises);
+                        db.executeSqlSync({
+                            name: 'aiAssistant',
+                            sql: 'INSERT INTO followup_images(xtid,images) VALUES(\'' + pageParam.xtid + '\',\'' + JSON.stringify(imagesUrl) + '\')'
+                        });
+                    }
+                    this.leftImages = pageParam.pictures;
+                    this.messages.push({
+                        content: [
+                            {
+                                text: '请帮我解析一下这道题目',
+                                type: "text"
+                            },
+                        ],
+                        role: "user"
+                    })
+                    imagesUrl.forEach(image => {
+                        this.messages[this.messages.length - 1].content.push({
+                            type: "image_url",
+                            image_url: {
+                                url: image,
+                                detail: IMAGE_DETAIL
+                            }
+                        });
+                    });
+                    this.messages.push({
+                        content: [
+                            {
+                                text: pageParam.answer,
+                                type: "text"
+                            },
+                        ],
+                        role: "assistant"
+                    })
+                    api.hideProgress();
+                },
+                getChatsList() {
+                    db.selectSql({
+                        name: 'aiAssistant',
+                        sql: 'select id,subject,update_time from chats order by update_time desc',
+                    }, (ret, err) => {
+                        if (ret.status) {
+                            this.chats = ret.data;
+                        } else {
+                            console.log(JSON.stringify(err));
+                        }
+                    });
+                },
+                saveCurrentChat() {
+                    if (this.isFollowUp) return;
+                    if (this.currentChatId == 0 && this.messages.length > 1) {//新对话
+                        var ret = db.executeSqlSync({
+                            name: 'aiAssistant',
+                            sql: 'insert into chats(subject,messages,update_time) values(\'' + JSON.stringify(this.messages[1].content[0].text).replace(/'/g, "''") + '\',\'' + JSON.stringify(this.messages).replace(/'/g, "''") + '\',\'' + new Date().getTime() + '\')'
+                        });
+                        if (!ret.status) {
+                            console.log(JSON.stringify(ret));
+                        }
+                    } else if (this.currentChatId != 0) {//历史对话
+                        var ret = db.executeSqlSync({
+                            name: 'aiAssistant',
+                            sql: 'update chats set messages = \'' + JSON.stringify(this.messages).replace(/'/g, "''") + '\',update_time = \'' + new Date().getTime() + '\' where id = ' + this.currentChatId
+                        });
+                        if (!ret.status) {
+                            console.log(JSON.stringify(ret));
+                        }
+                    }
+                },
+                setCurrentChat(id) {
+                    document.getElementById('chatSelector').selectedIndex = 0;
+                    this.saveCurrentChat();
+                    this.getChatsList();
+                    this.currentChatId = id;
+                    if (id == 0) {//新对话
+                        this.secretString += '1';
+                        this.messages = [
+                            {
+                                content: [
+                                    {
+                                        text: INIT_MESSAGE,
+                                        type: "text"
+                                    },
+                                ],
+                                role: "assistant"
+                            },
+                        ]
+                        this.currentMessage.content[0].text = "";
+                        this.currentImages = [];
+                    } else {
+                        db.selectSql({
+                            name: 'aiAssistant',
+                            sql: 'select messages from chats where id = ' + id
+                        }, (ret, err) => {
+                            if (ret.status) {
+                                this.messages = JSON.parse(ret.data[0].messages);
+                                this.currentMessage.content[0].text = "";
+                                this.currentImages = [];
+                                this.$nextTick(() => {
+                                    document.querySelector('.content-right').scrollTop = document.querySelector('.content-right').scrollHeight;
+                                    window.scrollTo(0, 0);
+                                });
+                            } else {
+                                console.log(JSON.stringify(err));
+                            }
+                        });
+                    }
+                },
+                addPicture() {
+                    if (this.currentImages.length >= MAX_IMAGES_NUM) {
+                        api.toast({
+                            msg: '最多只能添加' + MAX_IMAGES_NUM + '张图片',
+                            duration: 2000,
+                            location: 'bottom',
+                            global: false
+                        });
+                        return;
+                    }
+                    api.getPicture({
+                        sourceType: 'camera',
+                        encodingType: 'jpg',
+                        destinationType: 'base64',
+                        quality: 50
+                    }, (ret, err) => {
+                        if (ret.base64Data.length > 0) {
+                            api.addEventListener({
+                                name: 'aiAssistant_cutPicture'
+                            }, (ret, err) => {
+                                let base64 = ret.value;
+                                if (!base64.startsWith('data:image')) {
+                                    base64 = 'data:image/jpeg;base64,' + base64;
+                                }
+                                this.currentImages.push(base64);
+                            });
+                            api.openWin({
+                                name: 'win_aiAssistant_cutPicture',
+                                url: './win_aiAssistant_cutPicture.html',
+                                pageParam: {
+                                    src: ret.data
+                                }
+                            });
+                        }
+                    });
+                },
+                openPicture(images, index) {
+                    if (stuInfo.padType == '1') return;
+                    let photoBrowser = api.require('photoBrowser');
+                    photoBrowser.open({
+                        images: images,
+                        activeIndex: index,
+                        placeholderImg: 'widget://../image/loading_more.gif',
+                        bgColor: '#000'
+                    }, function (ret, err) {
+                        if (ret.eventType == 'click') {
+                            photoBrowser.close();
+                        }
+                    });
+                },
+                startSpeaking() {
+                    if (stuInfo.padType == '1') {
+                        api.toast({
+                            msg: '当前设备暂不支持语音转文字功能',
+                            location: 'bottom',
+                            global: false
+                        });
+                        return;
+                    }
+                    if (this.isSpeaking || this.remainingTimes <= 0) return;
+                    api.toast({
+                        msg: '开始录音',
+                        location: 'middle',
+                        global: true
+                    });
+                    this.isSpeaking = true;
+                    this.iatObj = new Iat()
+                    this.iatObj.start((result) => {
+                        this.currentMessage.content[0].text = result;
+                    })
+                },
+                endSpeaking() {
+                    api.toast({
+                        msg: '结束录音',
+                        location: 'middle',
+                        global: true
+                    });
+                    this.iatObj.over()
+                    setTimeout(() => {
+                        this.isSpeaking = false;
+                    }, 500);
+                },
+                qiniuUpfile: function (base64Img) {
+                    return new Promise((resolve, reject) => {
+                        var fileKey = (new Date()).valueOf() + 'aiAssistantImg_uid' + stuInfo.uid;
+                        apiObj.Get(UrlRouter.GetQiNiuToken, {
+                            values: {
+                                uid: stuInfo.uid,
+                                bucket: 'vodresource',
+                                key: fileKey
+                            }
+                        }, (ret, err) => {
+                            let that = this;
+                            if (ret && ret.ret == 0) {
+                                var token = ret.data.token;
+                                var file = b64ImgToBlob(base64Img);
+                                // var observable = qiniu.upload(file, fileKey, token, qiniuPutExtra, qiniuConfig);
+                                var observable = qiniu.upload(file, fileKey, token);
+                                observable.subscribe({
+                                    next(res) {
+                                        //进度
+                                    },
+                                    error(err) {
+                                        // 失败报错信息
+                                        api.toast({
+                                            msg: '图片上传失败' + err.message + err.code,
+                                            duration: 2000,
+                                            location: 'bottom',
+                                            global: false
+                                        });
+                                        reject(err);
+                                        that.isFetching = false;
+                                        api.hideProgress();
+                                    },
+                                    complete(res) {
+                                        resolve(QINIU_DOMAIN + res.key);
+                                    }
+                                })
+                            } else {
+                                api.toast({
+                                    msg: '图片上传失败,请稍后重试',
+                                    duration: 2000,
+                                    location: 'bottom',
+                                    global: false
+                                });
+                                reject(err);
+                                that.isFetching = false;
+                                api.hideProgress();
+                            }
+                        });
+                    });
+                },
+                async uploadImages() {
+                    if (this.remainingTimes <= 0) {
+                        if (stuInfo.upgradeQRCode && stuInfo.upgradeQRCode === '1') {
+                            api.toast({
+                                msg: '本月剩余问答次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom',
+                                global: false
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../study/frame-number-exhausted.html',
+                            })
+                        }
+                        return;
+                    }
+                    if (this.isFetching || this.currentMessage.content[0].text.trim() == '') return;
+                    this.isFetching = true;
+                    if (this.currentImages.length == 0) {
+                        api.showProgress();
+                        this.preSendMessage()
+                    }
+                    else {
+                        if (IS_OPEN_SECOND_PROCESS) {
+                            api.showProgress({
+                                title: '图像解析中...',
+                            });
+                            api.toast({
+                                msg: '图像解析耗时较长，请耐心等待',
+                                duration: 5000,
+                                location: 'bottom',
+                                global: true
+                            });
+                        } else {
+                            api.showProgress();
+                        }
+                        const uploadPromises = this.currentImages.map(image => this.qiniuUpfile(image));
+                        const imagesUrl = await Promise.all(uploadPromises);
+                        this.currentImages = [];//清空当前待发送区域的图片
+                        this.preSendMessage(imagesUrl);
+                    }
+                },
+                preSendMessage(images = []) {//预发送消息
+                    let message = JSON.parse(JSON.stringify(this.currentMessage));//深拷贝当前消息
+                    if (images.length > 0) {
+                        for (let i = 0; i < images.length; i++) {
+                            message.content.push({
+                                type: "image_url",
+                                image_url: {
+                                    url: images[i],
+                                    detail: IMAGE_DETAIL
+                                }
+                            });
+                        }
+                    }
+                    this.messages.push(message);//将消息添加到消息列表
+                    this.currentMessage.content[0].text = "";//清空当前输入框
+                    this.$nextTick(() => {
+                        document.querySelector('.content-right').scrollTop = document.querySelector('.content-right').scrollHeight;
+                        window.scrollTo(0, 0);
+                    });
+                    this.sendMessage(images.length);//发送消息，先不扣次数，等请求回来再扣
+                },
+                async sendMessage(imagesLength) {
+                    let firstResult = '';
+                    if (imagesLength == 0 || !IS_OPEN_SECOND_PROCESS) {//如果没有图片，说明不需要二次处理，可以结束加载状态
+                        api.hideProgress();
+                    }
+                    let messages = JSON.parse(JSON.stringify(this.messages));//深拷贝消息列表
+                    if (!this.isFollowUp) {
+                        if (messages.length > MAX_MESSAGES_LENGTH) {
+                            messages = messages.slice(-MAX_MESSAGES_LENGTH);
+                        }
+                    } else {
+                        if (messages.length > MAX_MESSAGES_LENGTH + 2) {//加上模拟问答的两条消息数量
+                            const question = messages[1];
+                            const answer = messages[2];
+                            messages = messages.slice(-MAX_MESSAGES_LENGTH);
+                            messages.unshift(answer);
+                            messages.unshift(question);
+                        }
+                    }
+                    let promptText = !this.isDetail ? SYSTEM_CONTENT : SYSTEM_CONTENT + SYSTEM_CONTENT_DETAIL;
+                    messages.unshift({
+                        content: [
+                            {
+                                text: promptText,
+                                type: "text"
+                            }
+                        ],
+                        role: "system"
+                    })
+                    let modelName = BASIC_MODEL_NAME;
+                    if (!this.isFollowUp) {//追问模式肯定有图片
+                        for (let i = 0; i < messages.length; i++) {
+                            if (messages[i].content.length > 1) {//文本固定为1，所以如果大于1，则说明有图片
+                                modelName = ADVANCED_MODEL_NAME;
+                                break;
+                            }
+                        }
+                    } else {
+                        modelName = ADVANCED_MODEL_NAME;
+                    }
+                    console.log('发送消息:', JSON.stringify(messages));
+                    try {
+                        const response = await fetch(UrlDomain + UrlRouter.PostsendAiMessage, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'token': stuInfo.token,
+                            },
+                            body: JSON.stringify({
+                                message: messages,
+                                type: 'Ai_liushi',
+                                options: {
+                                    model: modelName,
+                                    thinking: {
+                                        type: "disabled"
+                                    },
+                                    frequency_penalty: 2.0
+                                }
+                            })
+                        });
+                        this.messages.push({//添加一个空消息，用于显示ai的回复
+                            content: [
+                                {
+                                    text: "",
+                                    type: "text"
+                                }
+                            ],
+                            role: "assistant"
+                        })
+                        this.$nextTick(() => {
+                            document.querySelector('.content-right').scrollTop = document.querySelector('.content-right').scrollHeight;
+                            window.scrollTo(0, 0);
+                        });
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+                        let result = '';
+                        let buffer = ''; // 添加缓冲区处理不完整的数据
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            const chunk = decoder.decode(value);
+                            buffer += chunk; // 将新数据添加到缓冲区
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop() || ''; // 保留最后一个可能不完整的行
+                            for (const line of lines) {
+                                if (line.trim() === '') continue;
+                                if (line.startsWith('data: ')) {
+                                    if (result == '') {
+                                        apiObj.Post(UrlRouter.PostPayfeeOperationLog, {//扣次数,异步
+                                            values: {
+                                                uid: stuInfo.uid,
+                                                type: 'ai_study',
+                                                schoolid: stuInfo.schoolid,
+                                                card_type: stuInfo.card_type,
+                                                card_id: stuInfo.card_id,
+                                                count: IS_IN_TEST_MODE ? 0 : stuInfo.count,//IS_IN_TEST_MODE为true时，应该是在测试，不扣次数
+                                                data: messages[messages.length - 1].content[0].text
+                                            }
+                                        }, (ret, err) => {
+                                            if (ret && ret.ret === 0) {
+                                                if (!IS_IN_TEST_MODE) {//不是测试模式，扣次数
+                                                    stuInfo.count -= 1;
+                                                    this.remainingTimes -= 1;//更新剩余次数
+                                                }
+                                            } else {
+                                            }
+                                        });
+                                    }
+                                    const jsonStr = line.slice(6);
+                                    if (jsonStr.trim() === '[DONE]') {
+                                        continue;
+                                    }
+                                    const data = JSON.parse(jsonStr);
+                                    const content = (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) || '';
+                                    result += content;
+                                    firstResult = result;
+                                    if (imagesLength == 0 || !IS_OPEN_SECOND_PROCESS) {//如果没有图片，说明不需要二次处理，可以直接更新数据
+                                        this.messages[this.messages.length - 1].content[0].text = result;
+                                        this.$nextTick(() => {
+                                            const contentRight = document.querySelector('.content-right');
+                                            if (contentRight && (contentRight.scrollHeight - contentRight.scrollTop - contentRight.clientHeight < 100)) {
+                                                contentRight.scrollTop = contentRight.scrollHeight;
+                                                window.scrollTo(0, 0);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        // 处理缓冲区中剩余的数据
+                        if (buffer.trim() !== '') {
+                            if (buffer.startsWith('data: ')) {
+                                const jsonStr = buffer.slice(6);
+                                if (jsonStr.trim() !== '[DONE]') {
+                                    const data = JSON.parse(jsonStr);
+                                    const content = (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) || '';
+                                    result += content;
+                                    firstResult = result;
+                                    if (imagesLength == 0 || !IS_OPEN_SECOND_PROCESS) {
+                                        this.messages[this.messages.length - 1].content[0].text = result;
+                                    }
+                                }
+                            }
+                        }
+                        console.log('AI原始输出1:', result);
+                        if (imagesLength == 0 || !IS_OPEN_SECOND_PROCESS) {
+                            console.log('HTML展示1:', marked.parse(this.messages[this.messages.length - 1].content[0].text));
+                        }
+                    } catch (error) {
+                        console.log('请求错误:', error);
+                        if (imagesLength == 0 || !IS_OPEN_SECOND_PROCESS) {
+                            this.messages[this.messages.length - 1].content[0].text = firstResult + '\n\n[网络不稳定或内容长度超出限制]';
+                        }
+                    }
+                    if (imagesLength == 0 || !IS_OPEN_SECOND_PROCESS) {//如果没图片，或第一次请求为空，说明不需要二次处理，可以结束加载状态
+                        this.isFetching = false;
+                        if (firstResult.length == 0) {
+                            // this.messages[this.messages.length - 1].content[0].text = '[网络不稳定]';
+                            this.messages.pop();
+                            api.toast({
+                                msg: '请求频率超限，请稍后再试',
+                                duration: 2000,
+                                location: 'bottom',
+                                global: false
+                            });
+                        }
+                    } else {//如果有图片，说明需要二次处理，需要再次发送消息
+                        //以下是预留的提示词无法阻止ai生成答案的解决方案，由全局变量控制开关
+                        api.hideProgress();
+                        try {
+                            const response = await fetch(UrlDomain + UrlRouter.PostsendAiMessage, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'token': stuInfo.token,
+                                },
+                                body: JSON.stringify({
+                                    message: [{
+                                        role: 'user',
+                                        content: [{
+                                            type: 'text',
+                                            text: '绝对禁止输出任何形式的答案！\n\n请整合以下文字，如果是题目解析，必须遵循：\n1. 禁止输出解题步骤和答案\n2. 只能提供思路和原理\n3. 引导学生思考，不能直接给答案\n4. 严禁"答案是..."、"结果是..."等表达\n5. 使用"你可以这样思考..."等引导性语言\n\n如果不是题目解析，原封不动输出。（不要输出这句话）\n\n' + firstResult
+                                        }]
+                                    }],
+                                    type: 'Ai_liushi',
+                                    options: {
+                                        model: BASIC_MODEL_NAME,//不可能有图片，所以用低级模型
+                                        thinking: {
+                                            type: "disabled"
+                                        },
+                                    }
+                                })
+                            });
+                            const reader = response.body.getReader();
+                            const decoder = new TextDecoder();
+                            let result = '';
+                            while (true) {
+                                const { done, value } = await reader.read();
+                                if (done) break;
+                                const chunk = decoder.decode(value);
+                                const lines = chunk.split('\n');
+                                for (const line of lines) {
+                                    if (line.trim() === '') continue;
+                                    if (line.startsWith('data: ')) {
+                                        const jsonStr = line.slice(6);
+                                        if (jsonStr.trim() === '[DONE]') {
+                                            continue;
+                                        }
+                                        const data = JSON.parse(jsonStr);
+                                        const content = (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) || '';
+                                        result += content;
+                                        this.messages[this.messages.length - 1].content[0].text = result;
+                                        this.$nextTick(() => {
+                                            const contentRight = document.querySelector('.content-right');
+                                            if (contentRight && (contentRight.scrollHeight - contentRight.scrollTop - contentRight.clientHeight < 100)) {
+                                                contentRight.scrollTop = contentRight.scrollHeight;
+                                                window.scrollTo(0, 0);
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                            console.log('AI原始输出2:', result);
+                            console.log('HTML展示2:', marked.parse(this.messages[this.messages.length - 1].content[0].text));
+                        } catch (error) {
+                            console.log('请求错误2:', error);
+                            this.messages[this.messages.length - 1].content[0].text = firstResult + '\n\n[网络不稳定或内容长度超出限制]';
+                            this.messages[this.messages.length - 1].content[0].text = '\n\n[网络不稳定]';
+                        }
+                        this.isFetching = false;
+                    }
+                },
+                inputChange() {
+                    for (const pattern of urlPatterns) {
+                        this.currentMessage.content[0].text = this.currentMessage.content[0].text.replace(pattern, '');
+                    }
+                },
+                marked(text) {
+                    // return marked.parse(text);
+                    const customLinkRenderer = new marked.Renderer();
+                    customLinkRenderer.link = function (href, title, text) {
+                        // 场景1：完全禁用链接（推荐）——仅显示文本，无任何跳转标签
+                        return '[链接]';
+                        // 场景2：保留"链接文本样式"但禁用跳转（可选）——用 span 替代 a 标签
+                        // return `<span class="disabled-link">${text}</span>`;
+                    };
+
+                    // 第零步：先处理反斜杠转义的链接（在Markdown解析之前）
+                    let processedText = text.replace(/(\\\[[^\]]*\\\]\\\([^)]*\\\))/g, '***');
+
+                    // 第一步：再处理Markdown链接语法
+                    processedText = marked.parse(processedText, {
+                        renderer: customLinkRenderer,
+                        sanitize: false,
+                    });
+
+                    //第二步：应用所有URL过滤模式
+                    for (const pattern of urlPatterns) {
+                        processedText = processedText.replace(pattern, '***');
+                    }
+
+                    return processedText;
+                },
+            }
+        });
+    }
+</script>
+
+</html>

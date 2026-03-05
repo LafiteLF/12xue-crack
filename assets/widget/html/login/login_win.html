@@ -1,0 +1,404 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+<!--    <script type="text/javascript" src="https://wsctl.12xue.com/debug.js"></script>-->
+    <style>
+        /*.bt{ text-align: left;display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width: 100%}*/
+        header {
+            border-bottom: 0px;
+        }
+
+        .titleleft {
+            height: 100%;
+            width: 100px;
+            font-size: 0.8rem;
+            font-weight: 400;
+            font-style: normal;
+            left: 0px;
+            top: 0px;
+            position: absolute;
+            color: #666;
+            padding-top: 10px;
+        }
+
+        .titleleft2 {
+            height: 100%;
+            width: 100px;
+            font-size: 0.8rem;
+            font-weight: 400;
+            font-style: normal;
+            left: 0px;
+            top: 0px;
+            position: absolute;
+            color: #666;
+            padding-top: 10px;
+        }
+
+        .titleleft3 {
+            height: 100%;
+            width: 120px;
+            font-size: 0.8rem;
+            font-weight: 400;
+            font-style: normal;
+            right: 100px;
+            top: 0px;
+            position: absolute;
+            color: #666;
+            padding-top: 10px;
+        }
+
+        .titleleft4 {
+            height: 100%;
+            width: 100px;
+            font-size: 0.8rem;
+            font-weight: 400;
+            font-style: normal;
+            right: 0px;
+            top: 0px;
+            position: absolute;
+            color: #666;
+            padding-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <span class="titleleft" tapmode onclick='openSetting()'>检查网络</span>
+    <!-- <span class="titleleft2 aui-hide" tapmode onclick='openSetting2()'>网络认证</span> -->
+    <span class="titleleft3 aui-hide" tapmode onclick='openSetting3()'>切换输入法</span>
+    <span class="titleleft4" tapmode onclick='openSetting4()'>切换线路</span>
+</header>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script>
+    apiready = function () {
+        // $api.clearStorage();
+        api.setFullScreen({
+            fullScreen: true
+        });
+
+        api.setScreenOrientation({
+            orientation: 'landscape_left'
+        });
+
+        //设置平板类型 区分老山寨机器0、领创1、公版2、杭智3
+        $api.setStorage('padType', '2');  
+        if ($api.getStorage('padType') == 2) {
+            // $api.removeCls($api.dom('.titleleft2'), 'aui-hide');
+            $api.setStorage('deviceModel', 0);
+        } else {
+            getDeviceModel();
+        }
+
+        $api.setStorage('padHeight', api.winHeight);
+
+        if ($api.getStorage('padType') != '1' && !$api.getStorage('isFirst_12xuePad')) {
+//        if (false) {
+            api.openFrame({
+                name: 'frame-user-notice',
+                url: '../frame-user-notice.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth,
+                    h: api.winHeight
+                },
+                pageParam: {},
+                bounces: false
+            });
+        } else {
+            openLoginFrame();
+        }
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            //
+        });
+
+        api.addEventListener({
+            name: 'init_user'
+        }, function (ret, err) {
+            getUiaConfig();
+        });
+
+    };
+
+    function openLoginFrame() {
+        // if (api.systemType == 'android' && !$api.getStorage('isFirst_12xuePad')) {
+        //     checkPermission();
+        // }
+        $api.setStorage('isFirst_12xuePad', true);
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = api.winHeight - headerH;
+        api.openFrame({
+            name: 'login_frame',
+            url: 'login_frame.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: api.pageParam,
+            reload: true,
+            allowEdit: true,
+            bounces: false
+        });
+    }
+
+    /**
+     * 检测权限、请求权限
+     */
+    function checkPermission() {
+        var list = ['camera', 'microphone', 'storage'];
+        var unList = [];
+        var resultList = api.hasPermission({
+            list: list
+        });
+        for (var i = 0; i < resultList.length; i++) {
+            if (!resultList[i].granted) {
+                unList.push(resultList[i].name);
+            }
+        }
+        api.requestPermission({
+            list: unList,
+            code: 1
+        }, function (ret, err) {
+        });
+    }
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+
+    function getUiaConfig() {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.GetUiaConfig, {
+            values: {
+                config_name: 'close_screen_time'
+            }
+        }, function (ret, err) {
+            if (ret.ret == 0) {
+                $api.setStorage('stopTime', ret.data.value);
+            }
+        });
+    }
+
+
+    function register() {
+        api.openWin({
+            name: 'win-register',
+            url: 'win-register.html',
+            pageParam: {winname: api.winName}
+        });
+    }
+
+    function openSetting() {
+        if ($api.getStorage('padType') == '3') {
+            return;
+        }
+        api.sendEvent({
+            name: 'openApps',
+            extra: {packageName: 'com.android.settings'}
+        });
+    }
+
+    function openSetting2() {
+//        if ($api.getStorage('padType') == '3') {
+//            return;
+//        }
+        api.sendEvent({
+            name: 'openLoginNet'
+        });
+    }
+
+    function openSetting3() { //杭智管控，切换输入法
+        api.sendEvent({
+            name: 'inputSetting'
+        });
+    }
+
+    function openSetting4() {
+        api.actionSheet({
+            title: '切换线路',
+            cancelTitle: '取消',
+            destructiveTitle: '当前线路:' + apititleArr[apiUrlIndex],
+            buttons: apititleArr,
+            style: {
+                // fontNormalColor:'',
+                fontPressColor: '#4bc7c7'
+            }
+        }, function (ret, err) {
+            if (ret.buttonIndex < apititleArr.length + 2 && ret.buttonIndex != 1) {
+                $api.setStorage('apiUrlIndex', ret.buttonIndex - 2);
+                apiUrlIndex = ret.buttonIndex - 2;
+                api.sendEvent({
+                    name: 'resetLoginUrl',
+                    extra: {index: ret.buttonIndex - 2}
+                });
+            }
+
+        });
+    }
+
+
+    function getDeviceModel() {
+        switch (api.deviceModel) {  //区分领创设备
+            case 'Lenovo TB-8X04F':
+            case 'Lenovo TB-8703N':
+            case 'BZT-W09':
+            case 'KOB-W09':
+            case 'AGS2-W09HN':
+            case 'AGS2-W09':
+            case 'JDN2-AL00HN':
+            case 'JDN2-W09HN':
+            case 'MON-W19':
+            case 'MON-AL19B':
+            case 'BZD-W00':
+            case 'Lenovo TB-X605FC':
+            case 'Lenovo TB-8505F':
+            case 'Lenovo TB-X6E6F':
+            case 'AGR-W09HN':
+            case 'AGM-W09HN':
+            case 'AGM3-W09HN':
+            case 'KOB2-W09HN':
+            case 'AGS3-W09HN':
+            case 'BZC-W00':
+            case 'BZT3-W59D':
+            case 'BZT3-W59':
+            case 'BZI-W00':
+            case 'BZH-W00':
+            case 'BZH-W30':
+            case 'BZI-W20':
+            case 'BXE3-W00':
+            case 'BJS5-W00':
+            case 'ELN-W09':      
+                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+                $api.setStorage('deviceModel', 1);
+                break;
+            case 'BZK-W00': //区分杭智系统
+                if ($api.getStorage('padType') != '3') {
+                    $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+                    $api.setStorage('deviceModel', 1);
+                } else {
+                    $api.removeCls($api.dom('.titleleft3'), 'aui-hide');
+                    $api.removeCls($api.dom('.titleleft2'), 'aui-hide');
+                    $api.setStorage('deviceModel', 0);
+                }
+                break;
+            default: //非领创设备
+                $api.removeCls($api.dom('.titleleft2'), 'aui-hide');
+                $api.setStorage('deviceModel', 0);
+                break;
+        }
+    }
+
+
+    //    function getDeviceModel() {
+    //        switch (api.deviceModel) {  //区分领创设备
+    //            case 'Lenovo TB-8X04F':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'Lenovo TB-8703N':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'BZT-W09':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'KOB-W09':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'AGS2-W09HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'AGS2-W09':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'JDN2-AL00HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'JDN2-W09HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'BZK-W00': //区分杭智系统
+    //                if ($api.getStorage('padType') != '3') {
+    //                    $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                    $api.setStorage('deviceModel', 1);
+    //                } else {
+    //                    $api.removeCls($api.dom('.titleleft3'), 'aui-hide');
+    //                    $api.removeCls($api.dom('.titleleft2'), 'aui-hide');
+    //                    $api.setStorage('deviceModel', 0);
+    //                }
+    //                break;
+    //            case 'MON-W19':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'MON-AL19B':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'BZD-W00':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'Lenovo TB-X605FC':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'AGR-W09HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'AGM3-W09HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'KOB2-W09HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'AGS3-W09HN':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'BZC-W00':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'BZT3-W59D':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //            case 'BZI-W00':
+    //                $api.removeCls($api.dom('.titleleft'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 1);
+    //                break;
+    //
+    //            default: //非领创设备
+    //                $api.removeCls($api.dom('.titleleft2'), 'aui-hide');
+    //                $api.setStorage('deviceModel', 0);
+    //                break;
+    //        }
+    //    }
+</script>
+
+
+</html>

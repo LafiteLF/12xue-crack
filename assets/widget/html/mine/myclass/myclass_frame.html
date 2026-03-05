@@ -1,0 +1,145 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>常见问题</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style type="text/css">
+        body {
+            background-color: #f2f2f2
+        }
+
+        .aui-list-view:after {
+            border-bottom: none;
+            border-top: none
+        }
+
+        .aui-content {
+            padding-top: 35px;
+        }
+
+        ul {
+            width: 85%;
+            margin: auto
+        }
+
+        ul li {
+            width: 29.33%;
+            margin: 0 2%;
+            float: left;
+            height: 180px;
+            margin-bottom: 25px;
+            position: relative;
+            background: url("../../../image/stuHomePad/bjtx.png") no-repeat 20px 20px #fff;
+            background-size: 25% auto;
+
+        }
+
+        .classname {
+            width: 90%;
+            margin: 0 auto;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #4bc7c7;
+            margin-top: 90px;
+            display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        .realname {
+            width: 90%;
+            margin: 0 auto;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #727272;
+            margin-top: 15px;
+            display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        .exit {
+            position: absolute;
+            background: url("../../../image/stuHomePad/exit.png") no-repeat center top;
+            width: 90px;
+            height: 50px;
+            background-size: 100%;
+            color: #fff;
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 28px;
+            right: -9px;
+            top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <ul class="aui-list-view">
+        <!--<li >-->
+        <!--<p class="classname">data[i].njmc 级</p>-->
+        <!--<p class=" realname">realname</p>-->
+        <!--<p class="exit" onclick="quitClass(this)" >撤销</p>-->
+        <!--</li>-->
+    </ul>
+</div>
+</body>
+
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/underscore-min.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/myclass/myclass.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var data = api.pageParam.dataA;
+        var dataB = api.pageParam.dataB;
+        if (data) {
+            for (var i = 0; i < data.length; i++) {
+                var realname = '';
+                if (data[i].realname == null || data[i].realname == '') {
+                    realname = '班主任';
+                } else {
+                    realname = data[i].realname;
+                }
+                var html = '<li >' +
+                        '<p class="classname aui-ellipsis-1">' + data[i].njmc + '级' + data[i].classname + '</p>' +
+                        '<p class=" realname aui-ellipsis-1">' + realname + '</p>' +
+                        '<p class="exit" onclick="quitClass(this)" code="' + data[i].code + '" id="' + data[i].id + '" gradeid="' + data[i].gradeid + '">撤销</p>' +
+                        '</li>';
+                var ul = $api.dom('.aui-list-view');
+                $api.append(ul, html);
+
+            }
+        }
+
+        if (dataB) {
+            for (var i = 0; i < dataB.length; i++) {
+                var realname = '';
+                if (dataB[i].realname == null || dataB[i].realname == '') {
+                    realname = '班主任';
+                } else {
+                    realname = dataB[i].realname;
+                }
+                var html = '<li>' +
+                        '<p class="classname aui-ellipsis-1">' + dataB[i].njmc + '级' + dataB[i].classname + '</p>' +
+                        '<p class=" realname aui-ellipsis-1">' + realname + '</p>' +
+                        '<p class="exit"onclick="quitClass(this)" code="' + dataB[i].code + '" id="' + dataB[i].id + '" gradeid="' + dataB[i].gradeid + '">撤销</p>' +
+                        '</li>';
+                var ul = $api.dom('.aui-list-view');
+                $api.append(ul, html);
+
+            }
+        }
+//        alert('目前总共有'+$api.domAll('.aui-list-view .aui-list-view-cell').length+'审核中的');
+
+    }
+</script>
+
+</html>

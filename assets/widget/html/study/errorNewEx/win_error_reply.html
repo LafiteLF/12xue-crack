@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav aui-bar-primary">
+    <div>
+        <a class="aui-toolbar-title aui-pull-left" tapmode onclick="closeWin();"></a>
+    </div>
+    <!--<i class="aui-iconfont aui-icon-check aui-pull-right" style="font-size: 27px" tapmode onclick="reply();"></i>-->
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript">
+    var isOpenPic = false;
+    var title
+    apiready = function () {
+
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        if(api.pageParam.editct==1){
+            title = '编辑错题';
+        }else{
+            title = '上传错题';
+        }
+        $api.html($api.dom('.aui-toolbar-title'), '<span class="aui-iconfont aui-icon-left " style="font-size: 18px" tapmode onclick="closeWin()"></span>' + title + '');
+        api.openFrame({
+            name: 'frame_error_reply',
+            url: 'frame_error_reply.html',
+            rect: {
+                x: 0,
+                y: $api.offset($api.dom("header")).h,
+                w: "auto",
+                h: "auto"
+            },
+            pageParam: {
+                xkid: api.pageParam.xkid,
+                errorData:api.pageParam.errorData,
+                editct:api.pageParam.editct,
+                important:api.pageParam.important
+            },
+            bounces: false
+        });
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            if (isOpenPic) {
+                api.execScript({
+                    frameName: 'frame_error_reply',
+                    script: "photoBrowser.close();"
+                });
+                isOpenPic = false;
+            } else {
+                api.closeWin();
+            }
+        });
+    };
+    function reply() {
+        api.execScript({
+            frameName: 'frame_error_reply',
+            script: "reply();"
+        });
+    }
+    function closeWin() {
+        api.closeWin();
+    }
+</script>
+</html>

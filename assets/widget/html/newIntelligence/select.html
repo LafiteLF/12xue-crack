@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>选择班级</title>
+    <link rel="stylesheet" href="../../css/sm.min.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+
+        .main {
+            width: 80%;
+            height: 70%;
+            position: absolute;
+            top: 15%;
+            left: 10%;
+            background: #fff;
+            border-radius: 6px;
+            overflow: hidden;
+            z-index: 2;
+            display: none;
+        }
+
+        .top {
+            height: 45px;
+            line-height: 45px;
+            width: 100%;
+            background: #f2f2f2;
+            position: relative;
+            border-bottom: 1px solid #e4e4e8;
+            z-index: 10;
+        }
+
+        .queding {
+            width: 60px;
+            height: 26px;
+            line-height: 26px;
+            font-size: 0.6rem;
+            color: #fff;
+            text-align: center;
+            border-radius: 3px;
+            background: #4bc7c7;
+            position: absolute;
+            right: 7px;
+            top: 9px;
+        }
+
+        .top ul {
+            width: calc(100% - 74px);
+            height: 100%;
+            padding-left: 2%
+        }
+
+        .top ul li {
+            max-width: 10%;
+            float: left;
+            height: 100%;
+            overflow: hidden;
+            font-size: 0.6rem;
+            line-height: 45px;
+            text-align: left;
+            color: #999;
+            padding-left: 8px;
+            padding-right: 8px;
+            text-overflow: ellipsis;
+            position: relative;
+            white-space: nowrap;
+        }
+        .top ul li:nth-of-type(1), .top ul li:nth-of-type(5), .top ul li:nth-of-type(6){
+            max-width: 19%;
+        }
+        .top ul li + li:after {
+            content: '';
+            display: block;
+            width: 3px;
+            height: 3px;
+            border-radius: 10px;
+            background: #4bc7c7;
+            position: absolute;
+            left: 0;
+            top: 22px;
+        }
+
+        .content {
+            width: 100%;
+            height: 100%
+        }
+
+        .content ul {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding-top: 50px;
+            display: none
+        }
+
+        .content ul li {
+            width: 100%;
+            height: 45px;
+            padding: 0 20px;
+            line-height: 45px;
+            text-align: left;
+            font-size: 0.6rem;
+            border-bottom: 1px solid #e4e4e8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .active {
+            color: #4bc7c7;
+            border-bottom: 3px solid #4bc7c7;
+        }
+    </style>
+</head>
+<body>
+<div class="close" ></div>
+<div class="main">
+    <div class="top">
+        <div class="queding" onclick="vm.sure()">确定</div>
+        <ul>
+            <li :class="active==0?'active':''" v-text="recommend.schoolmc" onclick="vm.tab(this)"></li>
+            <li :class="active==1?'active':''" v-text="recommend.njmc" onclick="vm.tab(this)"></li>
+            <li :class="active==2?'active':''" v-text="recommend.bbmc" onclick="vm.tab(this)"></li>
+            <li :class="active==3?'active':''" v-text="recommend.sxcmc" onclick="vm.tab(this)"></li>
+            <li :class="active==4?'active':''" v-text="recommend.dyid==0?'全部':recommend.dymc" onclick="vm.tab(this)"></li>
+            <li :class="active==5?'active':''" v-text="recommend.jieid==0?'全部':recommend.jiemc" onclick="vm.tab(this)"></li>
+        </ul>
+    </div>
+    <div class="content">
+        <ul class="item1" :style="active==0?'display:block':'display:none'">
+            <li v-for="item in chaptlist.school" id="school.id" v-text="item.name" :id="item.id"
+                :style="recommend.schoolid==item.id?'color:#4bc7c7':'color:#666'" type="school"
+                onclick="vm.choose(this)"></li>
+        </ul>
+        <ul class="item1" :style="active==1?'display:block':'display:none'">
+            <li v-for="item in allGrade" v-text="item.name" :id="item.id" type="Grade" onclick="vm.choose(this)"
+                :style="recommend.njid==item.id?'color:#4bc7c7':'color:#666'"></li>
+        </ul>
+        <ul class="item1" :style="active==2?'display:block':'display:none'">
+            <li v-for="item in allPublisher" v-text="item.name" :id="item.id" type="Publisher" onclick="vm.choose(this)"
+                :style="recommend.bbid==item.id?'color:#4bc7c7':'color:#666'"></li>
+        </ul>
+        <ul class="item1" :style="active==3?'display:block':'display:none'">
+            <li v-for="item in allVolume" v-text="item.name" :id="item.id" type="Volume" onclick="vm.choose(this)"
+                :style="recommend.sxcid==item.id?'color:#4bc7c7':'color:#666'"></li>
+        </ul>
+        <ul class="item1" :style="active==4?'display:block':'display:none'">
+            <li :id="0" type="Section" onclick="vm.choose(this)"
+                :style="recommend.dyid=='0'?'color:#4bc7c7':'color:#666'">全部
+            </li>
+            <li v-for="item in allSection" v-text="item.name" :id="item.id" type="Section" onclick="vm.choose(this)"
+                :style="recommend.dyid==item.id ?'color:#4bc7c7':'color:#666'"></li>
+        </ul>
+
+        <ul class="item1" :style="active==5?'display:block':'display:none'">
+            <li :id="0" type="Jie" onclick="vm.choose(this)"
+                :style="recommend.jieid=='0'?'color:#4bc7c7':'color:#666'">全部
+            </li>
+            <li v-for="item in allJie" v-html="item.name" :id="item.id" type="Jie" onclick="vm.choose(this)"
+                :style="recommend.jieid==item.id ?'color:#4bc7c7':'color:#666'"></li>
+        </ul>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        vm.chaptlist = api.pageParam.chaptlist;
+        vm.recommend = api.pageParam.recommend;
+        vm.nowstatus = api.pageParam.nowstatus;
+        vm.allschool = api.pageParam.chaptlist.school;
+        vm.allGrade = vm.chaptlist.Grade[vm.recommend.schoolid];
+        vm.allPublisher = vm.chaptlist.Publisher[vm.recommend.schoolid][vm.recommend.njid];
+        vm.allVolume = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid];
+        vm.allSection = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid];
+        vm.allJie = vm.chaptlist.Cell[vm.recommend.schoolid][vm.recommend.dyid];
+        $api.attr($api.dom('.close'), 'onclick', 'api.closeFrame();');
+    };
+    var vm = new Vue({
+        el: '.main',
+        data: {
+            chaptlist: '',
+            recommend: '',
+            allschool: '',
+            allGrade: '',
+            allPublisher: '',
+            allVolume: '',
+            allSection: '',
+            allJie: '',
+            nowstatus: '',
+            active: 0,
+        },
+        updated:function(){
+            $api.css($api.dom('.main'),'display:block');
+        },
+        methods: {
+            tab: function (context) {
+                vm.active = parseInt($(context).index());
+            },
+            choose: function (context) {
+                var type = $(context).attr('type');
+                vm.nowstatus = {'id': '5', 'name': '全部'};
+                switch (type) {
+                    case 'school':
+                        vm.recommend.schoolid = $(context).attr('id');
+                        vm.recommend.schoolmc = $(context).html();
+                        vm.recommend.njid = vm.chaptlist.Grade[vm.recommend.schoolid][0].id;
+                        vm.recommend.njmc = vm.chaptlist.Grade[vm.recommend.schoolid][0].name;
+                        vm.recommend.bbid = vm.chaptlist.Publisher[vm.recommend.schoolid][vm.recommend.njid][0].id;
+                        vm.recommend.bbmc = vm.chaptlist.Publisher[vm.recommend.schoolid][vm.recommend.njid][0].name;
+                        vm.recommend.sxcid = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid][0].id;
+                        vm.recommend.sxcmc = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid][0].name;
+                        vm.recommend.dyid = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].id;
+                        vm.recommend.dymc = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].name;
+                        vm.recommend.jieid =0;
+                        vm.recommend.jiemc = '全部';
+                        vm.active = 1;
+                        break;
+                    case 'Grade':
+                        vm.recommend.njid = $(context).attr('id');
+                        vm.recommend.njmc = $(context).html();
+                        vm.recommend.bbid = vm.chaptlist.Publisher[vm.recommend.schoolid][vm.recommend.njid][0].id;
+                        vm.recommend.bbmc = vm.chaptlist.Publisher[vm.recommend.schoolid][vm.recommend.njid][0].name;
+                        vm.recommend.sxcid = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid][0].id;
+                        vm.recommend.sxcmc = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid][0].name;
+                        vm.recommend.dyid = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].id;
+                        vm.recommend.dymc = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].name;
+                        vm.recommend.jieid =0;
+                        vm.recommend.jiemc = '全部';
+                        vm.active = 2;
+                        break;
+                    case 'Publisher':
+                        vm.recommend.bbid = $(context).attr('id');
+                        vm.recommend.bbmc = $(context).html();
+                        vm.recommend.sxcid = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid][0].id;
+                        vm.recommend.sxcmc = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid][0].name;
+                        vm.recommend.dyid = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].id;
+                        vm.recommend.dymc = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].name;
+                        vm.recommend.jieid =0;
+                        vm.recommend.jiemc = '全部';
+                        vm.active = 3;
+                        break;
+                    case 'Volume':
+                        vm.recommend.sxcid = $(context).attr('id');
+                        vm.recommend.sxcmc = $(context).html();
+                        vm.recommend.dyid = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].id;
+                        vm.recommend.dymc = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid][0].name;
+                        vm.recommend.jieid =0;
+                        vm.recommend.jiemc = '全部';
+                        vm.active = 4;
+                        break;
+                    case 'Section':
+                        vm.recommend.dyid= $(context).attr('id');
+                        vm.recommend.dymc = $(context).html();
+                        // if(vm.recommend.dyid==0){
+                            vm.recommend.jieid =0;
+                            vm.recommend.jiemc = '全部';
+                        // }else{
+                        //     vm.recommend.jieid = vm.chaptlist.Cell[vm.recommend.schoolid][vm.recommend.dyid][0].id;
+                        //     vm.recommend.jiemc = vm.chaptlist.Cell[vm.recommend.schoolid][vm.recommend.dyid][0].name;
+                        // }
+
+                        vm.active = 5;
+                        break;
+                    case 'Jie':
+                        vm.recommend.jieid= $(context).attr('id');
+                        vm.recommend.jiemc = $(context).html();
+                        vm.active = 6;
+                        break;
+                }
+                vm.allschool = api.pageParam.chaptlist.school;
+                vm.allGrade = vm.chaptlist.Grade[vm.recommend.schoolid];
+                vm.allPublisher = vm.chaptlist.Publisher[vm.recommend.schoolid][vm.recommend.njid];
+                vm.allVolume = vm.chaptlist.Volume[vm.recommend.schoolid][vm.recommend.bbid];
+                vm.allSection = vm.chaptlist.Section[vm.recommend.schoolid][vm.recommend.sxcid];
+                vm.allJie = vm.chaptlist.Cell[vm.recommend.schoolid][vm.recommend.dyid];
+            },
+            sure: function () {
+                api.sendEvent({
+                    name: 'selectdata',
+                    extra: {
+                        recommend: vm.recommend,
+                        nowstatus: vm.nowstatus
+                    }
+                });
+                api.closeFrame();
+            }
+        }
+    });
+</script>
+</html>

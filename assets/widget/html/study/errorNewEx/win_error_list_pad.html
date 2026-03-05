@@ -1,0 +1,635 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>错题本列表win</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style type="text/css">
+        body {
+            background-color: #F2F2F2;
+            line-height: normal;
+        }
+
+        .aui-icon-unfold {
+            color: #8b8b8b;
+            font-size: 0.8rem;
+        }
+
+        .title-div {
+            width: 100%;
+            height: 62px;
+            background-color: #F2F2F2;
+            text-align: center;
+            color: #666;
+        }
+
+        .aui-row {
+            height: 50px;
+            width: 97%;
+            margin-left: 1.5%;
+            margin-top: 12px;
+            background-color: white;
+            text-align: center;
+            border-bottom: 1px solid #ececec;
+            padding-left: 5px;
+            padding-top: 10px;
+            /*padding-bottom: 6px;*/
+            vertical-align: middle;
+            border-radius: 5px;
+            font-size: 0.7rem;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid-label {
+            text-align: center;
+        }
+
+        .aui-iconfont {
+            margin-left: 0.45rem;
+            bottom: 1px;
+        }
+
+        .type {
+            font-size: 0.7rem !important;
+            color: #666;
+            display: inline-block;
+            position: relative;
+        }
+
+        .nav-spanBtn {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 20%;
+            font-size: 0.7rem
+        }
+
+        .nav-spanBtn:nth-of-type(1) {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background-image: url("../../../image/homework/shangchuan.png");
+            background-repeat: no-repeat;
+            background-position: 11px 5px;
+            background-color: #fff;
+            padding: 6px 10px;
+            margin-right: 10px;
+            background-size: 20px;
+            padding-left: 38px;
+            color: #4bc7c7;
+
+        }
+
+        .nav-spanBtn:nth-of-type(1):active {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background-image: url("../../../image/stuHomePad/ac_shangchuan.png");
+            background-repeat: no-repeat;
+            background-position: 11px 5px;
+            background-color: #4bc7c7;
+            padding: 6px 10px;
+            margin-right: 10px;
+            background-size: 20px;
+            padding-left: 38px;
+            color: white;
+
+        }
+
+        .nav-spanBtn:nth-of-type(2) {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            background: url("../../../image/stuHomePad/ycerror.png") no-repeat 4px 6px #fff;
+            padding: 6px 2px;
+            margin-right: 10px;
+            background-size: 20px;
+            padding-left: 30px;
+        }
+
+        .nav-spanBtn:nth-of-type(2):active {
+            background: url("../../../image/stuHomePad/ycerror.png") no-repeat 4px 6px #4bc7c7;
+            background-size: 20px;
+            color: #fff;
+        }
+
+        .impdisable {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<section class="content-body">
+    <header class="aui-bar aui-bar-nav">
+        <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin();">
+            <span class="aui-iconfont aui-icon-left" tapmode onclick='closeWin()'>
+
+            </span>
+            <span v-text="xkmc+'错题本'"></span>
+        </a>
+        <div style="position: absolute;left: 50%;top:0;transform: translateX(-50%);font-size: 0.6rem;color:#999999">
+            本月剩余变式题推送次数:&nbsp;
+            <span style="font-weight: bold;" :style="{'color': aiPush.count > 0 ? '#4BC7C7': '#F82A1A'}">
+            {{ aiPush.count }}</span>
+        </div>
+        <div style="float: right">
+        <span class="nav-spanBtn zhongdian  "
+              style="font-size: 0.7rem" tapmode onclick="replyClick()">上传错题</span>
+        </div>
+    </header>
+    <div class="title-div">
+        <div class="aui-row " id="aui-row">
+            <div class="aui-col-xs-3 is-request type-area-peers" tapmode onclick="chooses('is-request');"
+                 v-if="closeWrong">
+                <div class="aui-grid-label type">
+                    <span v-text="linename" class="aui-ellipsis-1"></span>
+                    <span class="aui-iconfont aui-icon-unfold"></span>
+                </div>
+            </div>
+            <div :class="!closeWrong?'aui-col-xs-4':'aui-col-xs-3'" class="  is-request type-area-peers" tapmode
+                 onclick="chooses('grade');">
+                <div class="aui-grid-label type">
+                    <span v-text="njname" class="aui-ellipsis-1"></span>
+                    <span class="aui-iconfont aui-icon-unfold"></span>
+                </div>
+            </div>
+            <div :class="!closeWrong?'aui-col-xs-4':'aui-col-xs-3'" class="  subject type-sex " tapmode
+                 onclick="chooses('type');">
+                <div class="aui-grid-label type">
+                    <span :style="online==2?'color: #b8b8b8':'color: #666'" v-text="txname"
+                          class="aui-ellipsis-1"></span>
+                    <span :style="online==2?'color: #b8b8b8':'color: #666'" class="aui-iconfont aui-icon-unfold"></span>
+                </div>
+            </div>
+            <div :class="!closeWrong?'aui-col-xs-4':'aui-col-xs-3'" class="  subject type-sex" tapmode
+                 onclick="openImp(this);">
+                <div class="aui-grid-label type">
+                    <div style="float: left;height: 100%;padding-top: 2px">重点</div>
+                    <img :src="is_important==0?'../../../image/error_switch_off.png':'../../../image/error_switch_on.png'"
+                         style="height: 1.1rem;padding-left: 10px">
+                    <!--<img src="../../../image/error_switch_off.png" style="height: 1rem;padding-left: 10px">-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<!--<script type="text/javascript" src="../../../script/ErrorHWJS/errorNoteBook_win.js"></script>-->
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var vm;
+    var headerH;
+    var courseR;
+    var courseRPos;
+    var frameH;
+    var chaptlist;
+    var txlist;
+    var online = 1;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var njid = '';
+    var dyid = '';
+    var paper_type = '';//考试错题类型
+    var tx = '';
+
+    function initVue() {
+        vm = new Vue({
+            el: '.content-body',
+            data: {
+                subjects: [],
+                units: [],
+                cells: [],
+                quanbu: '全部科目',
+                danyuan: '全部',
+                zhangjie: '全部章节',
+                njname: '本学期·同步错题',
+                linename: '线上错题',
+                txname: '全部题型',
+                dyname: '全部',
+                gradeData: {'name': '本学期', 'njid': '0', 'type': 'chapt'},
+                unitData: {'name': '全部', 'dyid': '0'},
+                is_important: '0',
+                xkmc: api.pageParam.xkmc,
+                online: 1,
+                txData: {'name': '全部题型', 'id': '0', 'tx': ''},
+                closeWrong: api.pageParam.closeWrong,
+                currentType: 'chapt',//当前所选择的错题类型
+                switchflag: 0,
+                selectDyId: '0',//上一次选中的单元id
+                selectedDyData: {},//上一次选中的单元
+                aiPush: {count: 0},
+            },
+            mounted() {
+                apiObj.SetAuthToken($api.getStorage('token'));
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        uid: $api.getStorage("uid"),
+                        type: 'ai_push',
+                        schoolid: $api.getStorage("schoolid"),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        this.aiPush = ret.data;
+                    } else {
+                        this.aiPush = {count: 0};
+                        console.log("获取用户付费信息失败");
+                    }
+                })
+            },
+            methods: {
+                initdata: function (type) {
+                    var params = {};
+                    params['online'] = vm.online;
+
+                    params['type'] = type;
+
+                    if (vm.currentType == 'paper') {//paper 中高考
+                        params['paper_type'] = paper_type;
+                        params['is_paper'] = 1;
+                    } else {//chapt 同步错题和考试错题
+                        params['njid'] = njid;
+                        if (vm.switchflag == 0) {//同步错题
+                            params['dyid'] = dyid;
+                        } else {//考试错题
+                            params['paper_type'] = paper_type;
+                        }
+                    }
+
+                    params['tx'] = tx;
+                    params['is_important'] = vm.is_important;
+                    params['xkid'] = api.pageParam.xkid;
+                    params['xkmc'] = api.pageParam.xkmc;
+                    api.openFrame({
+                        name: 'frame_error_list_pad',
+                        url: 'frame_error_list_pad.html',
+                        rect: {
+                            x: 0,
+                            y: headerH + 74,
+                            w: 'auto',
+                            h: frameH - 74
+                        },
+                        pageParam: params,
+                        bounces: false,
+                        reload: true
+                    });
+                }
+            }
+        });
+    }
+
+    apiready = function () {
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        apiObj.SetAuthToken($api.getStorage('token-stu'));
+        headerH = $api.offset(header).h;
+        courseR = $api.byId('aui-row');
+        courseRPos = $api.offset(courseR).h;
+        frameH = api.winHeight - headerH;
+        // if($api.getStorage('newSchoolId') == '1005140914742096168'||$api.getStorage('newSchoolId') == '1033144472591015736'||$api.getStorage('newSchoolId') == '1033144472405681455'||$api.getStorage('newSchoolId') == '1007140989450038416'){
+        //     $api.addCls($api.dom('.zhongdian'), 'aui-hide');
+        // }
+        if (!api.pageParam.closeWrong) {
+            $api.addCls($api.dom('.zhongdian'), 'aui-hide');
+        }
+        initVue();
+        vm.initdata(1);
+
+        api.addEventListener({
+            name: 'selectnjdata'
+        }, function (ret, err) {
+            vm.gradeData = ret.value.njdata;
+            vm.unitData = ret.value.unit;
+            vm.switchflag = ret.value.switchflag;
+
+            if (vm.gradeData.name.split('').length > 4) {
+                vm.njname = vm.gradeData.name.substr(0, 4) + '...';
+            } else {
+                vm.njname = vm.gradeData.name;
+            }
+
+
+            vm.currentType = ret.value.ctype;
+            var cname = '';
+            if (vm.online == 2) {
+                cname = vm.unitData.name;
+            } else {
+                if (vm.currentType == 'paper') {
+                    if (vm.unitData.paper_type == '0') {
+                        cname = '考试错题';
+                    } else {
+                        cname = vm.unitData.type_name;
+                    }
+                } else {
+                    if (vm.switchflag == 0) {
+                        if (vm.unitData.dyid == '0') {
+                            cname = '同步错题';
+                        } else {
+                            cname = vm.unitData.name;
+                        }
+                    } else {
+                        if (vm.unitData.paper_type == '0') {
+                            cname = '考试错题';
+                        } else {
+                            cname = vm.unitData.type_name;
+                        }
+                    }
+                }
+            }
+
+            vm.dyname = cname.split('').length > 4 ? cname.substr(0, 4) + '...' : cname;
+            vm.njname = vm.njname + '·' + vm.dyname;
+
+
+            njid = vm.gradeData.njid;
+            vm.selectedDyData = ret.value.unit;
+            vm.selectDyId = ret.value.selectDyId;
+            if (vm.currentType == 'paper') {//paper 中高考
+                paper_type = vm.unitData.paper_type;
+                vm.initdata(5);
+            } else {//chapt 同步错题和考试错题
+                if (vm.switchflag == 0) {//同步错题
+                    dyid = vm.unitData.dyid;
+                    vm.initdata(4);
+                } else {//考试错题
+                    paper_type = vm.unitData.paper_type;
+                    vm.initdata(6);
+                }
+            }
+        });
+        api.addEventListener({
+            name: 'selectlinedata'
+        }, function (ret, err) {
+            if (ret.value.njdata == '线上错题') {
+                vm.online = 1
+            } else {
+                vm.online = 2
+            }
+            vm.linename = ret.value.njdata;
+            njid = '';
+            dyid = '';
+            vm.txname = '全部题型';
+            vm.njname = vm.online == 1 ? '本学期·同步错题' : '本学期·全部单元';
+            vm.gradeData = {'name': '本学期', 'njid': '0', 'type': 'chapt'};
+            vm.unitData = {'name': '全部', 'dyid': '0'};
+
+            vm.currentType = 'chapt';
+            vm.initdata(4);
+
+
+            vm.gradeData = {'name': '本学期', 'njid': '0', 'type': 'chapt'};
+            vm.selectDyId = 0;
+            vm.switchflag = 0;
+            vm.selectedDyData = {};
+        });
+        api.addEventListener({//上传线下错题
+            name: 'finishErroeReply'
+        }, function (ret, err) {
+            if (ret.value.njdata == '线上错题') {
+                vm.online = 1
+            } else {
+                vm.online = 2
+            }
+            vm.online = 2;
+            vm.linename = '线下错题';
+            njid = '';
+            dyid = '';
+            vm.txname = '全部题型';
+            vm.njname = '本学期·全部';
+            vm.gradeData = {'name': '本学期', 'njid': '0', 'type': 'chapt'};
+            vm.unitData = {'name': '全部', 'dyid': '0'};
+
+            vm.currentType = 'chapt';
+            vm.initdata(4);
+        });
+        api.addEventListener({
+            name: 'selecttxdata'
+        }, function (ret, err) {
+
+            vm.txData = ret.value.txdata;
+            vm.txname = vm.txData.name;
+            tx = vm.txData.tx;
+
+            if (vm.currentType == 'paper') {//paper 中高考
+                paper_type = vm.unitData.paper_type;
+                vm.initdata(5);
+            } else {//chapt 同步错题和考试错题
+                if (vm.switchflag == 0) {//同步错题
+                    dyid = vm.unitData.dyid;
+                    vm.initdata(4);
+                } else {//考试错题
+                    paper_type = vm.unitData.paper_type;
+                    vm.initdata(6);
+                }
+            }
+        });
+    };
+
+    function closeWin() {
+//        api.sendEvent({
+//            name: 'removeError',
+//            extra: {}
+//        });//刷新错题列表的frame数据
+        api.closeWin();
+    }
+
+    function replyClick() {
+        var jsfun3 = 'replyClick();';
+        api.execScript({
+            frameName: 'frame_error_list_pad',
+            script: jsfun3
+        });
+    }
+
+    function openImp(content) {
+        if (vm.is_important == 0) {
+            vm.is_important = 1;
+
+            if (vm.currentType == 'paper') {//paper 中高考
+                paper_type = vm.unitData.paper_type;
+                vm.initdata(5);
+            } else {//chapt 同步错题和考试错题
+                if (vm.switchflag == 0) {//同步错题
+                    dyid = vm.unitData.dyid;
+                    vm.initdata(4);
+                } else {//考试错题
+                    paper_type = vm.unitData.paper_type;
+                    vm.initdata(6);
+                }
+            }
+
+            $(content).addClass('impdisable');
+            setTimeout(function () {
+                $(content).removeClass('impdisable');
+            }, 1000);
+        } else {
+            vm.is_important = 0;
+
+            if (vm.currentType == 'paper') {//paper 中高考
+                paper_type = vm.unitData.paper_type;
+                vm.initdata(5);
+            } else {//chapt 同步错题和考试错题
+                if (vm.switchflag == 0) {//同步错题
+                    dyid = vm.unitData.dyid;
+                    vm.initdata(4);
+                } else {//考试错题
+                    paper_type = vm.unitData.paper_type;
+                    vm.initdata(6);
+                }
+            }
+
+            $(content).addClass('impdisable');
+            setTimeout(function () {
+                $(content).removeClass('impdisable');
+            }, 1000);
+        }
+    }
+
+    function chooses(type) {
+        switch (type) {
+            case 'is-request':
+                // if($api.getStorage('newSchoolId') == '1005140914742096168'||$api.getStorage('newSchoolId') == '1033144472405681455'||$api.getStorage('newSchoolId') == '1007140989450038416'||$api.getStorage('newSchoolId') == '1033144472591015736'){
+                //     return;
+                // }
+                if (!api.pageParam.closeWrong) {
+                    return;
+                }
+                openFrame(['线上错题', '线下错题'], '', 'type-request');
+
+                break;
+            case 'type'://选择题型
+                if (vm.online == 2) {
+                    return;
+                }
+                apiObj.Get(UrlRouter.ExercisesWrongs, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        schoolid: $api.getStorage('newSchoolId'),
+                        xkid: api.pageParam.xkid,
+                        online: vm.online,
+                        type: 3,
+                        njid: njid,
+                        page: 1,
+                        num: 1,
+                        dyid: dyid
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+
+                            var owndata = [{'name': '全部题型', 'id': '0', 'tx': ''}];
+                            txlist = owndata.concat(ret.data.tx_library);
+                            api.openFrame({
+                                name: 'frame-tab-dy',
+                                url: 'frame-tab-dy.html',
+                                rect: {
+                                    x: 0,
+                                    y: 0,
+                                    w: 'auto',
+                                    h: $api.getStorage('padHeight')
+                                },
+                                pageParam: {array: txlist, id: vm.txData.id},
+                                bounces: false,
+                                reload: true
+                            });
+                        }
+                    }
+                });
+
+                break;
+            case 'grade'://选择年级和单元
+                apiObj.Get(UrlRouter.ExercisesWrongs, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        schoolid: $api.getStorage('newSchoolId'),
+                        xkid: api.pageParam.xkid,
+                        online: vm.online,
+                        type: 1,//学科
+                        is_important: vm.is_important,
+                        xd: $api.getStorage('stuXD'),
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            var owndata = [{
+                                'name': '本学期',
+                                'njid': '0',
+                                'type': 'chapt'
+                            }
+                            ];
+                            chaptlist = owndata.concat(ret.data.chapt);
+                            var url = '';
+                            if (vm.online == 1) {
+                                url = 'frame-tab-nj.html';
+                            } else {
+                                url = 'frame-tab-nj-offline.html';
+                            }
+                            api.openFrame({
+                                name: 'frame-tab-nj',
+                                url: url,
+                                rect: {
+                                    x: 0,
+                                    y: 0,
+                                    w: 'auto',
+                                    h: $api.getStorage('padHeight')
+                                },
+                                pageParam: {
+                                    array: chaptlist,
+                                    gradeData: vm.gradeData,
+                                    xkid: api.pageParam.xkid,
+                                    online: vm.online,
+                                    is_important: vm.is_important,
+                                    selectDyId: vm.selectDyId,
+                                    switchflag: vm.switchflag,
+                                    selectedDyData: vm.selectedDyData,
+                                    currentType: vm.currentType
+                                },
+                                bounces: false,
+                                reload: true
+                            });
+                        }
+                    }
+                });
+
+                break;
+
+        }
+    }
+
+    function openFrame(xkmc, xkid, item) {
+        api.openFrame({
+            name: 'frame-tab-line',
+            url: 'frame-tab-line.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: $api.getStorage('padHeight')
+            },
+            pageParam: {array: xkmc, arrayId: xkid, item: item, frameName: 'frame-homework-answer-list'},
+            bounces: false,
+            reload: true
+        });
+    }
+
+    function postAiPush() {
+        if (vm.aiPush.count > 0) {
+            vm.aiPush.count -= 1;
+        }
+    }
+</script>
+</html>

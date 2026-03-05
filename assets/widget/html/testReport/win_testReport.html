@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>学习报告</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #e8d5f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            background: transparent;
+            color: #333;
+            position: relative;
+            border-bottom: none;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            color: #333;
+            position: absolute;
+            left: 12px;
+            padding-top: 8px;
+        }
+
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+
+        .title {
+            margin-left: 40px;
+            padding-top: 8px;
+            font-size: 18px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .header-right {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #999;
+            padding-top: 8px;
+        }
+
+        .remaining-count {
+            color: #999;
+        }
+
+        .remaining-count .count-text {
+            font-weight: bold;
+        }
+
+        .remaining-count .count-text.has-count {
+            color: #4BC7C7;
+        }
+
+        .remaining-count .count-text.no-count {
+            color: #F82A1A;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            padding: 12px 12px 0 0;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .left-list {
+            width: 30%;
+            background: #F9FAFB;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0 20px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-list-header {
+            padding: 10px 12px;
+            border-bottom: none;
+            background: #fff;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .generate-report-btn {
+            width: auto;
+            min-width: 200px;
+            padding: 8px 20px;
+            background: #F9FAFB;
+            color: #1759EA;
+            border: 1px solid #AAC5FF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s;
+            box-shadow: none;
+            margin: 0 auto;
+        }
+
+        .generate-report-btn span {
+            color: #1759EA;
+        }
+
+        .generate-report-btn:hover {
+            background: #f0f7fa;
+            border-color: #AAC5FF;
+            color: #1759EA;
+        }
+
+        .generate-report-btn:hover span {
+            color: #1759EA;
+        }
+
+        .generate-report-btn.active {
+            background: #AAC5FF;
+            color: #1759EA;
+            border-color: #AAC5FF;
+        }
+
+        .generate-report-btn.active span {
+            color: #1759EA;
+        }
+
+        .generate-report-btn.active:hover {
+            background: #AAC5FF;
+            border-color: #AAC5FF;
+            color: #1759EA;
+        }
+
+        .generate-report-btn.active:hover span {
+            color: #1759EA;
+        }
+
+        .generate-report-btn:active {
+            transform: scale(0.98);
+        }
+
+        .generate-report-btn-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            transition: all 0.3s;
+            object-fit: contain;
+        }
+
+        .generate-report-btn.active .generate-report-btn-icon {
+            opacity: 0.8;
+        }
+
+        .list-container {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 180px 20px 40px;
+            text-align: center;
+        }
+
+        .empty-state-img {
+            width: 160px;
+            height: auto;
+            margin-bottom: 0;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            color: #999;
+            line-height: 1.5;
+            max-width: 200px;
+            margin: 0 auto;
+            word-wrap: break-word;
+        }
+
+        .list-item {
+            padding: 6px 12px;
+            border-bottom: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .list-item-content {
+            padding: 8px 14px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            background: #e8f4f8;
+        }
+
+        .list-item:hover .list-item-content {
+            background-color: #d4e8f0;
+        }
+
+        .list-item.active .list-item-content {
+            background-color: #b8d9e8;
+        }
+
+        .list-item-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .list-item-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .list-item-time-range {
+            font-size: 13px;
+            color: #666;
+            margin-top: 3px;
+            font-weight: 400;
+        }
+
+        .right-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #F9FAFB;
+            position: relative;
+            border-radius: 20px 20px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .select-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 40px 20px;
+            gap: 20px;
+        }
+
+        .select-panel.hidden {
+            display: none;
+        }
+
+        .select-panel > img:first-child {
+            width: 200px;
+            height: auto;
+            max-width: 80%;
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            background: transparent;
+            box-sizing: border-box;
+        }
+
+        .select-panel > div:nth-child(2) {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            line-height: 1.6;
+            padding: 0 20px;
+            max-width: 500px;
+        }
+
+        .time-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 20px;
+            font-size: 14px;
+            color: #1759EA;
+            background: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 0;
+            user-select: none;
+            width: auto;
+            min-width: 200px;
+            max-width: 320px;
+            box-shadow: none;
+            position: relative;
+        }
+
+        .time-display img {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .time-display p {
+            flex: 1;
+            margin: 0;
+            text-align: center;
+            color: #1759EA;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time-display::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 8px solid #B2C1CE;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .time-display:hover {
+            background: #fafafa;
+            border-color: #4BC7C7;
+        }
+
+        .time-display:active {
+            background: #f5f5f5;
+        }
+
+        .generate-btn {
+            padding: 12px 50px;
+            font-size: 16px;
+            color: #fff;
+            background: #1759EA;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(23, 89, 234, 0.3);
+            font-weight: 500;
+            min-width: 200px;
+        }
+
+        .generate-btn:hover {
+            background: #1448c0;
+            box-shadow: 0 4px 12px rgba(23, 89, 234, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .generate-btn:active {
+            background: #1138a6;
+            transform: translateY(0);
+        }
+
+        .report-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .report-container.show {
+            display: block;
+        }
+
+        /* 确认对话框样式 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .confirm-modal-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px 24px 20px;
+            width: 85%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .confirm-modal-text {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .confirm-modal-title {
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .confirm-modal-title span {
+            color: #1759EA;
+        }
+
+        .confirm-modal-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .confirm-modal-desc span {
+            color: #1759EA;
+            font-weight: 500;
+        }
+
+        .confirm-modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .confirm-btn-cancel,
+        .confirm-btn-ok {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .confirm-btn-cancel {
+            background: #fff;
+            color: #1759EA;
+            border: 1px solid #1759EA;
+        }
+
+        .confirm-btn-cancel:hover {
+            background: #f5f5f5;
+        }
+
+        .confirm-btn-cancel:active {
+            background: #e8e8e8;
+        }
+
+        .confirm-btn-ok {
+            background: #1759EA;
+            color: #fff;
+        }
+
+        .confirm-btn-ok:hover {
+            background: #1448c0;
+        }
+
+        .confirm-btn-ok:active {
+            background: #1138a6;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="back-btn" onclick="api.closeWin()">
+            <span class="aui-iconfont aui-icon-left" style="color:#333;font-size:1rem;"></span>
+        </div>
+        <div class="title">学情诊断报告</div>
+        <div class="header-right">
+            <div class="remaining-count">
+                剩余使用次数：<span class="count-text" id="remainingCount">--</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="left-list">
+            <div class="left-list-header">
+                <button class="generate-report-btn" onclick="showGeneratePanel()">
+                    <img class="generate-report-btn-icon" src="../../image/testReport/bgbtnImg.png" alt="">
+                    <span>生成学情诊断报告</span>
+                </button>
+            </div>
+            <div class="list-container" id="reportList" v-cloak>
+                <div 
+                    v-for="(item, index) in reportListData" 
+                    :key="index"
+                    class="list-item"
+                    :class="{ active: selectedIndex === index }"
+                    @click="selectItem(index)">
+                    <div class="list-item-content">
+                        <div class="list-item-time">统计时间</div>
+                        <div class="list-item-time-range">{{ item.data }}</div>
+                    </div>
+                </div>
+                <div v-if="reportListData.length === 0" class="empty-state">
+                    <img src="../../image/testReport/kongXS.png" alt="" class="empty-state-img">
+                    <div class="empty-state-text">当前暂无学情诊断报告，请生成一份吧～</div>
+                </div>
+            </div>
+        </div>
+        <div class="right-content">
+            <div class="select-panel" id="selectPanel">
+                <img src="../../image/testReport/aisctu.png" alt="">
+                <div>AI将根据您选择的时间段，智能分析学习数据，生成个性化学情诊断报告和提升建议～</div>
+                <div class="time-display" id="timeDisplay" onclick="selectTimeRange()">
+                    <img src="../../image/testReport/rilizuo.png" alt="">
+                    <p>选择生成报告时间</p>  
+                </div>
+                <button class="generate-btn" onclick="generateReport()">立即生成</button>
+            </div>
+            <div class="report-container" id="reportContainer"></div>
+        </div>
+    </div>
+
+    <!-- 确认生成对话框 -->
+    <div class="confirm-modal" id="confirmModal" style="display: none;">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-text">
+                <div class="confirm-modal-title">生成 <span id="confirmTimeRange"></span> 学情诊断报告</div>
+                <div class="confirm-modal-desc">将消耗 1 次生成次数,</div>
+                <div class="confirm-modal-desc">您还有 <span id="confirmRemainingCount"></span> 次生成次数, 是否生成?</div>
+            </div>
+            <div class="confirm-modal-buttons">
+                <button class="confirm-btn-cancel" onclick="closeConfirmModal()">否</button>
+                <button class="confirm-btn-ok" onclick="confirmGenerate()">是</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../script/vue.js"></script>
+    <script type="text/javascript">
+        // 存储选中的时间周期
+        var selectedTmPeriod = '';
+        // 存储剩余使用次数
+        var remainingCount = 0;
+        var card_type = '';
+        var card_id;
+        // API对象
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        var vm;
+
+        // 更新时间显示文本的辅助函数（保留图片）
+        function updateTimeDisplayText(text) {
+            var timeDisplay = document.getElementById('timeDisplay');
+            if (!timeDisplay) return;
+            var pTag = timeDisplay.querySelector('p');
+            if (pTag) {
+                pTag.textContent = text;
+            } else {
+                timeDisplay.textContent = text;
+            }
+        }
+
+        // 获取时间显示文本的辅助函数
+        function getTimeDisplayText() {
+            var timeDisplay = document.getElementById('timeDisplay');
+            if (!timeDisplay) return '';
+            var pTag = timeDisplay.querySelector('p');
+            return pTag ? pTag.textContent : timeDisplay.textContent;
+        }
+        apiready = function () {
+            vue();
+            // 进入界面先请求GetpayfeeUseLog接口
+            vm.getPayfeeUseLog();
+            // 获取剩余使用次数
+            getRemainingCount();
+            // 设置左侧按钮默认点击态
+            setTimeout(function() {
+                var generateBtn = document.querySelector('.generate-report-btn');
+                if (generateBtn) {
+                    generateBtn.classList.add('active');
+                }
+            }, 100);
+            // 监听日期选择器返回结果
+            api.addEventListener({
+                name: 'datePickerResult'
+            }, function (ret, err) {
+                if (ret && ret.value) {
+                    if (!ret.value.cancelled && ret.value.displayRange) {
+                        // 更新显示的时间范围（只更新p标签内容，保留图片）
+                        updateTimeDisplayText(ret.value.displayRange);
+                        // 保存tmPeriod参数
+                        if (ret.value.tmPeriod) {
+                            selectedTmPeriod = ret.value.tmPeriod;
+                        }
+                    }
+                }
+            });
+        };
+
+        function vue() {
+            vm = new Vue({
+                el: '#reportList',
+                data: {
+                    reportListData: [],
+                    selectedIndex: -1
+                },
+                methods: {
+                    formatTimeRange: function(timeStr) {
+                        // 如果时间字符串已经是范围格式，直接返回
+                        if (timeStr && timeStr.indexOf('—') > -1) {
+                            return timeStr;
+                        }
+                        // 如果格式是 "2025.11.25-2025.11.31"，转换为 "2025.11.25 — 2025.11.31"
+                        if (timeStr && timeStr.indexOf('-') > -1) {
+                            return timeStr.replace('-', ' — ');
+                        }
+                        // 否则，根据当前选择的时间范围显示，或者显示默认值
+                        var displayText = getTimeDisplayText();
+                        if (displayText) {
+                            // 将 "MM.DD~MM.DD" 格式转换为 "YYYY.MM.DD — YYYY.MM.DD"
+                            var currentYear = new Date().getFullYear();
+                            if (displayText && displayText.indexOf('~') > -1) {
+                                var parts = displayText.split('~');
+                                if (parts.length === 2) {
+                                    return currentYear + '.' + parts[0] + ' — ' + currentYear + '.' + parts[1];
+                                }
+                            }
+                        }
+                        // 默认返回原始时间或格式化后的时间
+                        return timeStr || '2025.11.24 — 2025.11.30';
+                    },
+
+                    selectItem: function(index) {
+                        this.selectedIndex = index;
+                        // 移除按钮的active类（点击列表时按钮变成非点击态）
+                        var generateBtn = document.querySelector('.generate-report-btn');
+                        if (generateBtn) {
+                            generateBtn.classList.remove('active');
+                        }
+                        
+                        // 获取当前点击的item
+                        var item = this.reportListData[index];
+                        if (!item || !item.data) {
+                            console.log('列表项数据不完整');
+                            return;
+                        }
+                        
+                        // 从storage获取参数
+                        var schoolId = $api.getStorage('schoolid');
+                        var studentUid = $api.getStorage('uid');
+                        var token = $api.getStorage('token');
+                        
+                        // 检查必要参数
+                        if (!schoolId || !studentUid || !token) {
+                            api.toast({
+                                msg: '缺少必要参数，请重新登录',
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                            return;
+                        }
+                        
+                        // 拼接链接，使用item.data作为tmPeriod
+                        var reportUrl = 'https://data-report.12xue.com/report/#schoolId=' + schoolId +
+                            '&tmPeriod=' + item.data +
+                            '&studentUid=' + studentUid +
+                            '&token=' + token;
+                        
+                        // 调用openReport方法（点击列表切换，不需要减次数和延时）
+                        openReport(reportUrl, item.data, false);
+                    },
+                    // 获取功能使用记录
+                    getPayfeeUseLog: function() {
+                        apiObj.SetAuthToken($api.getStorage('token'));
+                        var schoolId = $api.getStorage('schoolid');
+                        var uid = $api.getStorage('uid');
+                        if (!schoolId || !uid) {
+                            console.log('缺少必要参数，无法获取使用记录');
+                            return;
+                        }
+                        var self = this;
+                        apiObj.Get(UrlRouter.GetpayfeeUseLog, {
+                            values: {
+                                schoolid: schoolId,
+                                uid: uid,
+                                type: 'test_report' // 根据实际业务需求修改type值
+                            }
+                        }, function (ret, err) {
+                            if (ret && ret.ret === 0) {
+                                console.log('GetpayfeeUseLog 接口返回数据:', ret);
+                                console.log('使用记录数据:', ret.data);
+                                self.reportListData = ret.data;
+                            } else {
+                                console.log('GetpayfeeUseLog 接口调用失败:', err);
+                                console.log('返回结果:', ret);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        // 获取剩余使用次数
+        function getRemainingCount() {
+            apiObj.SetAuthToken($api.getStorage('token'));
+            var schoolId = $api.getStorage('schoolid');
+
+            if (!schoolId) {
+                return;
+            }
+
+            apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                values: {
+                    type: 'test_report', // 根据实际业务需求修改type值
+                    schoolid: schoolId
+                }
+            }, function (ret, err) {
+                if (ret && ret.ret === 0) {
+                    remainingCount = ret.data.count || 0;
+                    card_id = ret.data.card_id;
+                    card_type = ret.data.card_type;
+                    updateRemainingCountDisplay();
+                } else {
+                    remainingCount = 0;
+                    updateRemainingCountDisplay();
+                }
+            });
+        }
+
+        // 更新剩余次数显示
+        function updateRemainingCountDisplay() {
+            var countElement = document.getElementById('remainingCount');
+            if (countElement) {
+                countElement.textContent = remainingCount;
+                // 根据剩余次数设置颜色
+                if (remainingCount > 0) {
+                    countElement.className = 'count-text has-count';
+                } else {
+                    countElement.className = 'count-text no-count';
+                }
+            }
+        }
+
+
+        function selectTimeRange() {
+            // 打开日期选择器
+            api.openFrame({
+                name: 'date-picker',
+                url: 'date-picker.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth,
+                    h: api.winHeight
+                },
+                bounces: false,
+                reload: true
+            });
+        }
+
+        // 左侧按钮：显示生成面板
+        function showGeneratePanel() {
+            // 关闭打开的frame
+            api.closeFrame({
+                name: 'report-frame'
+            });
+            // 显示selectPanel
+            var selectPanel = document.getElementById('selectPanel');
+            var reportContainer = document.getElementById('reportContainer');
+            if (selectPanel) {
+                selectPanel.classList.remove('hidden');
+            }
+            if (reportContainer) {
+                reportContainer.classList.remove('show');
+            }
+            // 清除列表的点击态
+            if (vm) {
+                vm.selectedIndex = -1;
+            }
+            // 添加按钮的active类（点击态）
+            var generateBtn = document.querySelector('.generate-report-btn');
+            if (generateBtn) {
+                generateBtn.classList.add('active');
+            }
+        }
+
+        // 存储待生成的tmPeriod，用于确认后使用
+        var pendingTmPeriod = '';
+
+        // 右侧按钮：生成报告
+        function generateReport() {
+            // 检查剩余次数
+            if (remainingCount <= 0) {
+                api.toast({
+                    msg: '无剩余次数',
+                    duration: 2000,
+                    location: 'middle'
+                });
+                return;
+            }
+            
+            // 检查是否选择了时间范围
+            var timeDisplayText = getTimeDisplayText();
+            if (!selectedTmPeriod || timeDisplayText === '选择生成报告时间') {
+                api.toast({
+                    msg: '请先选择时间范围',
+                    duration: 2000,
+                    location: 'middle'
+                });
+                return;
+            }
+
+            // 保存待生成的tmPeriod
+            pendingTmPeriod = selectedTmPeriod;
+
+            // 显示确认对话框
+            showConfirmModal(timeDisplayText);
+        }
+
+        // 显示确认对话框
+        function showConfirmModal(timeRange) {
+            var modal = document.getElementById('confirmModal');
+            var timeRangeSpan = document.getElementById('confirmTimeRange');
+            var remainingCountSpan = document.getElementById('confirmRemainingCount');
+            
+            if (modal && timeRangeSpan && remainingCountSpan) {
+                timeRangeSpan.textContent = timeRange;
+                remainingCountSpan.textContent = remainingCount;
+                modal.style.display = 'flex';
+            }
+        }
+
+        // 关闭确认对话框
+        function closeConfirmModal() {
+            var modal = document.getElementById('confirmModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            pendingTmPeriod = '';
+        }
+
+        // 确认生成
+        function confirmGenerate() {
+            // 先保存pendingTmPeriod，因为closeConfirmModal会清空它
+            var savedPendingTmPeriod = pendingTmPeriod;
+            
+            if (!savedPendingTmPeriod) {
+                closeConfirmModal();
+                return;
+            }
+            
+            // 关闭对话框
+            closeConfirmModal();
+            
+            // 继续执行生成报告的逻辑
+            doGenerateReport(savedPendingTmPeriod);
+        }
+
+        // 执行生成报告的实际操作
+        function doGenerateReport(tmPeriod) {
+            // 使用传入的tmPeriod参数
+            var currentTmPeriod = tmPeriod || pendingTmPeriod;
+            
+            if (!currentTmPeriod) {
+                return;
+            }
+            
+            // 检查是否已经生成过本周报告
+            if (vm && vm.reportListData && vm.reportListData.length > 0) {
+                var hasGenerated = vm.reportListData.some(function(item) {
+                    return item.data === currentTmPeriod;
+                });
+                if (hasGenerated) {
+                    api.toast({
+                        msg: '已经生成过本周报告',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                    return;
+                }
+            }
+            
+            // 从storage获取参数
+            var schoolId = $api.getStorage('schoolid');
+            var studentUid = $api.getStorage('uid');
+            var token = $api.getStorage('token');
+
+            // 检查必要参数
+            if (!schoolId || !studentUid || !token) {
+                api.toast({
+                    msg: '缺少必要参数，请重新登录',
+                    duration: 2000,
+                    location: 'middle'
+                });
+                return;
+            }
+
+            // 拼接链接
+            var reportUrl = 'https://data-report.12xue.com/report/#schoolId=' + schoolId +
+                '&tmPeriod=' + currentTmPeriod +
+                '&studentUid=' + studentUid +
+                '&token=' + token;
+
+            // 从storage获取其他参数
+            var uid = $api.getStorage('uid');
+            var type = 'test_report';
+            // 调用接口记录操作日志
+            apiObj.SetAuthToken(token);
+            apiObj.Post(UrlRouter.PostPayfeeOperationLog, {
+                values: {
+                    uid: uid,
+                    schoolid: schoolId,
+                    type: type,
+                    card_type: card_type,
+                    card_id: card_id,
+                    count: remainingCount,
+                    data: currentTmPeriod, 
+                }
+            }, function (ret, err) {
+                    if (ret && ret.ret === 0) {
+                        console.log(reportUrl);
+                        // 重置时间显示文字
+                        updateTimeDisplayText('选择生成报告时间');
+                        selectedTmPeriod = '';
+                        pendingTmPeriod = '';
+                        // 刷新左侧列表数据
+                        if (vm && vm.getPayfeeUseLog) {
+                            vm.getPayfeeUseLog();
+                        }
+                        // 延时2秒后打开报告（点击立即生成，需要减次数）
+                        setTimeout(function() {
+                            openReport(reportUrl, currentTmPeriod, true);
+                        }, 2000);
+                    } else {
+                        // 接口调用失败，仍然打开报告，但可以记录错误
+                        console.log(reportUrl);
+                        console.log('记录操作日志失败:', err);
+                        // 重置时间显示文字
+                        updateTimeDisplayText('选择生成报告时间');
+                        selectedTmPeriod = '';
+                        pendingTmPeriod = '';
+                        // 刷新左侧列表数据
+                        if (vm && vm.getPayfeeUseLog) {
+                            vm.getPayfeeUseLog();
+                        }
+                        // 延时2秒后打开报告（点击立即生成，需要减次数）
+                        setTimeout(function() {
+                            openReport(reportUrl, currentTmPeriod, true);
+                        }, 2000);
+                    }
+            });
+        }
+
+        // 打开报告的函数
+        function openReport(reportUrl, tmPeriod, shouldDecreaseCount) {
+            // 先关闭之前打开的frame（如果存在）
+            api.closeFrame({
+                name: 'report-frame'
+            });
+            
+            // 隐藏选择面板，显示报告容器
+            var selectPanel = document.getElementById('selectPanel');
+            var reportContainer = document.getElementById('reportContainer');
+            selectPanel.classList.add('hidden');
+            reportContainer.classList.add('show');
+
+            // 移除按钮的active状态
+            var generateBtn = document.querySelector('.generate-report-btn');
+            if (generateBtn) {
+                generateBtn.classList.remove('active');
+            }
+
+            // 只有点击立即生成按钮时才减次数
+            if (shouldDecreaseCount && remainingCount > 0) {
+                remainingCount--;
+                updateRemainingCountDisplay();
+            }
+
+            // 如果提供了tmPeriod，查找并设置匹配的列表项为点击态
+            // 使用setTimeout确保列表数据已刷新
+            if (tmPeriod && vm) {
+                setTimeout(function() {
+                    if (vm.reportListData) {
+                        var matchedIndex = -1;
+                        for (var i = 0; i < vm.reportListData.length; i++) {
+                            if (vm.reportListData[i].data === tmPeriod) {
+                                matchedIndex = i;
+                                break;
+                            }
+                        }
+                        if (matchedIndex !== -1) {
+                            vm.selectedIndex = matchedIndex;
+                        }
+                    }
+                }, 100);
+            }
+
+            // 计算右侧区域的rect（让frame完全在右侧卡片内部）
+            var headerHeight = 56;
+            var contentWrapperPaddingTop = 12;
+            var contentWrapperPaddingRight = 12;
+            var gap = 12;
+            
+            // 获取右侧卡片的实际DOM元素来计算宽度和位置
+            var rightContent = document.querySelector('.right-content');
+            var rightX, rightWidth, rightHeight;
+            
+            if (rightContent) {
+                // 使用实际DOM元素的宽度和位置，确保完全一致
+                var rect = rightContent.getBoundingClientRect();
+                rightX = Math.round(rect.left);
+                rightWidth = Math.round(rect.width);
+            } else {
+                // 备用计算方式
+                var leftWidth = Math.floor((api.winWidth - contentWrapperPaddingRight - gap) * 0.3);
+                rightX = leftWidth + gap;
+                rightWidth = api.winWidth - contentWrapperPaddingRight - gap - leftWidth;
+            }
+            
+            // 计算高度：和左侧列表高度一致（content-wrapper的高度）
+            var contentWrapperHeight = api.winHeight - headerHeight - contentWrapperPaddingTop;
+            rightHeight = contentWrapperHeight;
+
+            // 在右侧区域打开外部链接，frame完全在右侧卡片内部
+            api.openFrame({
+                name: 'report-frame',
+                url: reportUrl,
+                rect: {
+                    x: rightX,
+                    y: headerHeight + contentWrapperPaddingTop,
+                    w: rightWidth,
+                    h: rightHeight
+                },
+                bounces: false,
+                useWKWebView: true,
+                allowEdit: false,
+                vScrollBarEnabled: true,
+                hScrollBarEnabled: true
+            });
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>

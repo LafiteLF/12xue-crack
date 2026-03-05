@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e5e5
+        }
+
+        .titlea {
+            width: 100%;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea aui-ellipsis-1" tapmode onclick="api.closeWin();">
+        <!--<span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()'></span>-->
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<!--<script type="text/javascript" src="../../../script/homeworkJS/hw_detail_list.js"></script>-->
+<script type="text/javascript" >
+    apiready = function () {
+
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        var headerH = $api.offset(header).h;
+        //footer高度为css样式中声明的30px
+        var frameH = padWinHeight - headerH;
+        $api.setStorage('classId', api.pageParam.classId);
+        var title = api.pageParam.homeworkName.replace(/<[^>]+>/g, "");
+        if (title.length >= 40) {
+            title = title.substring(0, 38) + '...';
+        }
+        $api.html($api.dom('.aui-toolbar-title'), '<span class="aui-iconfont aui-icon-left " style="font-size: 18px" tapmode onclick="api.closeWin();"></span>'+title+'');
+
+        api.openFrame({
+            name: 'item',
+            url: 'frame_hw_detail_list.html',
+            bounces: false,
+            vScrollBarEnabled: false,
+            reload: true,
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam:{homeworkName:api.pageParam.homeworkName}
+        });
+    }
+</script>
+</html>

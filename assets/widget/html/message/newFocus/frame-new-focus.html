@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>新关注</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+
+    <style>
+        body {
+            background: #f2f2f2
+        }
+
+        .aui-content {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .aui-card-list-user-avatar {
+            width: 3rem;
+            height: 3rem;
+            position: relative;
+        }
+        .sex {
+            color: dodgerblue;
+            top: 60px;
+            position: absolute;
+            right: 5px;
+            text-align: right;
+            font-size: 1.1rem;width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 60px;
+            position: absolute;
+            right: 5px;
+            text-align: right;
+            font-size: 1.1rem;width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+        .followAvatar {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        .aui-label {
+            padding: 0.1rem 0.25rem;
+            vertical-align: middle;
+            margin-bottom: 0.2rem;
+        }
+
+        .aui-card-list {
+            margin-bottom: 0;
+            min-height: 5rem;
+        }
+
+        .aui-card-list-user-avatar img {
+            height: 90%;
+            max-height: 90%;
+            width: 90%;
+            max-width: 90%;
+        }
+
+        .btn-follow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+
+        .aui-card-list-content-padded .content-text img, .aui-card-list-content-padded .forward-content-text img {
+            width: inherit;
+            display: inline-block;
+        }
+
+        .aui-label-info {
+            background-color: #6b8fec;
+        }
+
+        .aui-card-list-content {
+            padding: 0.1rem 0;
+        }
+
+        /*名字过长会与右侧关注重合 8-15 朱震*/
+        .aui-text-primaryDiv {
+            padding-right: 90px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .username {
+            max-width: 6rem;
+            float: left;
+            display: block;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .aui-list li {
+            margin: 10px 0px;
+        }
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="aui-content">
+        <ul class="aui-list">
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../../image/default_portrait.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary aui-card-list-content">我是乔帮主 <span class="aui-label aui-label-info">V3</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">淄博文化中学 老师</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注了你</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">十秒前</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+
+        </ul>
+    </div>
+</section>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        getFollowUser();
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isClean = true;
+                getFollowUser();
+            }
+        });
+        $api.css($api.dom('.aui-refresh-pull-arrow'), 'z-index:0');
+
+    };
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var p = 1;
+    var totalPage;
+    var isClean = true;
+    var identity;
+
+    function getFollowUser() {
+
+        apiObj.Get(UrlRouter.GetFocusMe, {
+            values: {
+                otheruid: $api.getStorage('uid'),
+                p: p,
+                num: 10
+            }
+        }, function (ret, err) {
+            pullRefresh.cancelLoading();
+            if (ret) {
+                api.hideProgress();
+                if (isClean) {
+                    $api.html($api.dom('.aui-list'), '');
+
+                }
+                if (ret.ret == 0) {
+
+                    if (!ret.list || ret.list.length == 0) {
+
+                        $api.html($api.dom('.aui-content'), '<div class="no-data" style="text-align: center;padding-top: 150px"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;left: 30%;"/> </div>');
+//                        $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 3 + 'px');
+                    } else {
+
+                        $api.html($api.dom('aui-list'), '');
+                        for (var i = 0; i < ret.list.length; i++) {
+                            switch (ret.list[i].identitytype) {
+                                case 2:
+                                    identity = '老师';
+                                    break;
+                                case 3:
+                                    identity = '学生';
+                                    break;
+                                case 4:
+                                    identity = '家长';
+                                    break;
+                                default:
+                                    identity = '未知';
+                                    break;
+                            }
+                            if (ret.list[i].follow == false) {
+                                if (ret.list[i].sex == 1) {
+                                    var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                                } else {
+                                    var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                                }
+                                $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b"  uid="' + ret.list[i].uid + '"> ' +
+                                        '<div class="aui-card-list-header aui-card-list-user"  > ' +
+                                        '<div class="aui-card-list-user-avatar followAvatar" onclick="userInfoClick(this)"> ' +
+                                    sexhtml + '<img src="' + ret.list[i].face + '" class="aui-img-round"/> ' +
+                                        '</div>' +
+                                        ' <div class="aui-card-list-user-name aui-font-size-16" tapmode onclick="userInfoClick(this)">' +
+                                        ' <div class="aui-text-primary aui-text-primaryDiv"><span class="username aui-ellipsis-1">' + ret.list[i].realname + '</span>' +
+                                        ' <span class="aui-label aui-label-info">' + ret.list[i].rank + '' +
+                                        '</span>' +
+                                        '</div> ' +
+                                        '</div> ' +
+                                        '<div class="aui-card-list-content aui-text-default aui-text-primaryDiv">' + ret.list[i].xxmc + ' ' + identity + '' +
+                                        '</div> ' +
+                                        '<div class="aui-card-list-content aui-text-default">' + '关注了你' + '' +
+                                        '</div>' +
+                                        '<div class="aui-card-list-content aui-text-default">' + ret.list[i].createtime + '' +
+                                        '</div><div class="aui-btn btn-follow aui-btn-warning" tapmode onclick="btnFollow(this)"><span class="aui-iconfont aui-icon-add"></span>关注</div> </div> </li>');
+                            } else {
+                                if (ret.list[i].sex == 1) {
+                                    var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                                } else {
+                                    var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                                }
+                                $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b" uid="' + ret.list[i].uid + '"> ' +
+                                        '<div class="aui-card-list-header aui-card-list-user" uid="' + ret.list[i].uid + '"> ' +
+                                        '<div class="aui-card-list-user-avatar followAvatar" onclick="userInfoClick(this)">' +
+                                    sexhtml + ' <img src="' + ret.list[i].face + '" class="aui-img-round"/> ' +
+                                        '</div> ' +
+                                        '<div class="aui-card-list-user-name aui-font-size-16" tapmode onclick="userInfoClick(this)"> <div class="aui-text-primary aui-text-primaryDiv">' + ret.list[i].realname + ' <span class="aui-label aui-label-info">' + ret.list[i].rank + '</span></div> </div> <div class="aui-card-list-content aui-text-default aui-text-primaryDiv">' + ret.list[i].xxmc + ' ' + identity + '</div> <div class="aui-card-list-content aui-text-default">' + '关注了你' + '</div><div class="aui-card-list-content aui-text-default">' + ret.list[i].createtime + '</div><div class="aui-btn btn-follow aui-btn-warning" tapmode onclick="btnFollow(this)"><span class="aui-iconfont aui-icon-add"></span>关注</div> </div> </li>');
+                                $api.addCls($api.dom($api.domAll('.aui-card-list')[$api.domAll('.aui-card-list').length - 1], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[$api.domAll('.aui-card-list').length - 1], '.btn-follow'), '取消关注');
+                            }
+                        }
+                    }
+                    p++;
+                    totalPage = ret.totalpage;
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100           //设置距离底部多少距离时触发，默认值为0，数字类型
+                        }
+                    }, function (ret, err) {
+                        if (p > totalPage) {
+                            api.toast({
+                                msg: '已经到底啦，没有更多了',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            isClean = false;
+                            getFollowUser();
+                            api.removeEventListener({
+                                name: 'scrolltobottom'
+                            });
+
+                        }
+                    });
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+        })
+    }
+    //关注
+    function btnFollow(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        var uid = $api.attr($api.closest(context, '.aui-card-list'), 'uid');
+        if ($api.hasCls(context, 'aui-btn-outlined')) {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 0,//取消关注
+                    followuid: uid
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.removeCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '<span class="aui-iconfont aui-icon-add"></span>关注');
+                            }
+                        }
+                    } else {
+                        //alert(ret.msg);
+                    }
+                } else {
+
+                }
+            });
+        } else {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 1,//关注
+                    followuid: uid
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.addCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '取消关注');
+                            }
+                        }
+                    } else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            })
+        }
+    }
+    //查看个人主页
+    function userInfoClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'friendMainPage',
+            url: '../../mine/selfmainview/friendMainPage.html',
+            pageParam: {otheruid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')}
+        });
+    }
+</script>
+</html>

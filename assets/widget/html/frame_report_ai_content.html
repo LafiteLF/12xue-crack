@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提示框</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 14px;
+            min-width: 240px;
+            max-width: 92vw;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16);
+            padding: 18px 10px 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            position: relative;
+            animation: popIn .22s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+            /* margin-bottom: 10px; */
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .block-text {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1a1a1a;
+            text-align: left;
+            margin-bottom: 7px;
+            word-break: break-all;
+            letter-spacing: 1px;
+            text-decoration: underline wavy #0c8617 1px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .content-preview {
+            font-size: 12px;
+            color: #b0b0b0;
+            text-align: left;
+            margin-bottom: 12px;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-style: italic;
+            background: #f7f8fa;
+            border-radius: 8px;
+            padding: 4px 0;
+            box-sizing: border-box;
+        }
+
+        .content-item-title {
+            font-size: 14px;
+            color: #222;
+            font-weight: 600;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .content-item-input input {
+            width: 100%;
+            min-width: 0;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: #f5f6fa;
+            padding: 0 0 0 10px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            box-shadow: 0 1px 4px rgba(12,134,23,0.06);
+            transition: box-shadow 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+
+        .content-item-input input:focus {
+            box-shadow: 0 2px 8px rgba(12,134,23,0.13);
+            background: #eaffea;
+        }
+
+        .button-box {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 18px;
+            gap: 12px;
+        }
+
+        .button-box-item {
+            flex: 1;
+            height: 32px;
+            background: linear-gradient(90deg, #0c8617 0%, #1ed760 100%);
+            color: #fff;
+            text-align: center;
+            line-height: 32px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 1px 5px rgba(30,215,96,0.08);
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.12s;
+            user-select: none;
+        }
+
+        .button-box-item:first-child {
+            background: #e5e5e5;
+            color: #666;
+            box-shadow: none;
+        }
+
+        .button-box-item:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px) scale(1.03);
+        }
+    </style>
+</head>
+
+<body onclick="closeFrame()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="title">举报</div>
+        <div class="content">
+            <div class="content-item">
+                <div class="content-item-title">举报板块</div>
+                <div><span id="report_ai_content_block"></span></div>
+                <div class="content-item-title">举报内容</div>
+                <div id="report_ai_content_content"></div>
+                <div class="content-item-title">举报原因</div>
+                <div class="content-item-input">
+                    <input type="text" placeholder="请输入举报原因" id="report_ai_content_input">
+                </div>
+            </div>
+        </div>
+        <div class="button-box">
+            <div class="button-box-item" onclick="closeFrame()">取消</div>
+            <div class="button-box-item" onclick="submit()">提交</div>
+        </div>
+    </div>
+</body>
+<script>
+    apiready = function () {
+        document.getElementById('report_ai_content_block').innerHTML = api.pageParam.block;
+        if (api.pageParam.content.length > 17) {
+            document.getElementById('report_ai_content_content').innerHTML = api.pageParam.content.substring(0, 16) + '...';
+        } else {
+            document.getElementById('report_ai_content_content').innerHTML = api.pageParam.content;
+        }
+    }
+    function closeFrame() {
+        api.closeFrame();
+    }
+    function submit() {
+        if(document.getElementById('report_ai_content_input').value == ''){
+            api.alert({
+                msg: '请输入举报原因'
+            });
+            return;
+        }
+        api.showProgress()
+        setTimeout(function () {
+            api.hideProgress();
+            api.alert({
+                msg: '举报信息已提交，请等候我们的回复'
+            });
+            api.closeFrame();
+        }, 500);
+
+    }
+</script>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择学校列表</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <style>
+        body {
+
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn">
+        <span class="aui-iconfont aui-icon-back" tapmode onclick="closeWin();"></span>
+    </a>
+    <div class="aui-12xue-title" tapmode onclick="closeWin();">
+        <span style="color:#333" class="title"></span>
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var superFile ;
+    var headerH;
+    var frameH;
+
+    var ijkplayer;
+    apiready = function () {
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        headerH = $api.offset(header).h;
+        frameH = api.winHeight - headerH;
+        if (api.pageParam.title != '') {
+            $api.text($api.dom('.title'), api.pageParam.title);
+        } else {
+            $api.text($api.dom('.title'), '视频资源');
+        }
+        if (api.systemType == 'android' && false) {
+            api.openFrame({
+                name: 'frame_video_view',
+                url: 'frame_video_view.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth,
+                    h: api.winHeight
+                },
+                pageParam: {
+                    path: api.pageParam.path,
+                    title: api.pageParam.title,
+                    isMp3: api.pageParam.isMp3,
+                    filetime: api.pageParam.filetime
+                },
+                bounces: false
+            });
+        } else {
+            api.openFrame({
+                name: 'video_frame',
+                url: 'video_frame.html',
+                rect: {
+                    x: 0,
+                    y: headerH,
+                    w: api.winWidth,
+                    h: frameH
+                },
+                pageParam: {
+                    path: api.pageParam.path,
+                    title: api.pageParam.title,
+                    isMp3: api.pageParam.isMp3,
+                    filetime: api.pageParam.filetime
+                },
+                bounces: false
+            });
+        }
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+
+    };
+
+    function closeWin() {
+        api.sendEvent({
+            name: 'closeVideo'
+        });
+    }
+
+</script>
+</html>

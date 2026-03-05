@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流式数据实时显示</title>
+    <link rel="stylesheet">
+    <link rel="stylesheet" href="../../../css/all.min.css">
+    <link rel="stylesheet" href="../../../script/aiAssistant/markdown/katex-0.16.9.min.css">
+    <script src="../../../script/jquery-3.7.1.min.js"></script>
+    <script src="../../../script/lodash-4.17.21.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: rgba(0, 0, 0, 0.6);
+            /* 深色半透明背景 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 8px 20px;
+        }
+
+        #output {
+            background: #f8f9ff;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            line-height: 1.6;
+            font-size: 16px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        #output:empty {
+            background: #fff;
+        }
+
+        .title {
+            color: #34495e;
+            margin-bottom: 10px;
+            /* 从20px减小到10px */
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: all 0.3s ease;
+            z-index: 3;
+            outline: none;
+        }
+
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+        }
+
+        .title {
+            color: #34495e;
+            margin-bottom: 0;
+            /* 移除底部间距 */
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            /* 从20px减小到10px */
+        }
+
+        .audio-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            /* cursor: pointer; */
+            display: flex;
+            /* 初始状态隐藏按钮 */
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        /* .audio-btn:hover {
+            background: #3db1b1;
+            transform: scale(1.05);
+        } */
+
+        .audio-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .assistant-btn {
+            display: flex;
+            /* margin-right: 10px; */
+            border: 1px solid #39a971;
+            font-size: 12px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 8px;
+            background-color: transparent;
+            color: #333;
+            width: 50px;
+            position: absolute;
+            left: 10px;
+            top: 13px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 添加一个遮罩层用于处理点击事件 -->
+<div class="overlay"></div>
+<div class="container">
+    <div class="title-container">
+        <button class="close-btn" onclick="closeFrame()">
+            <img src="../../../image/closeselect.png" alt="关闭" style="width: 30px; height: 30px;">
+        </button>
+        <h1 class="title" onclick="dataLog()">AI智能解析</h1>
+        <button class="audio-btn" onclick="throttledToggleAudio()" id="audioBtn">
+            <img src="../../../image/newhomework/yuyin1.png" alt="播放" id="audioIcon">
+        </button>
+        <div id="voice-count" style="position: absolute;top:20px;right: 9vw;font-size: 1rem">本月剩余语音播报次数:&nbsp;<span
+                style="color:#F82A1A">0</span></div>
+        <button class="assistant-btn" onclick="toAiAssistant()" id="AssistantBtn">
+            继续问
+        </button>
+    </div>
+    <div id="output"></div>
+</div>
+</body>
+
+<style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 800px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        padding: 8px 20px;
+    }
+
+    #output {
+        background: #f8f9ff;
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        padding: 20px;
+        min-height: 150px;
+        line-height: 1.6;
+        font-size: 16px;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        /* 添加横向滚动 */
+        -webkit-overflow-scrolling: touch;
+        /* 为移动设备添加平滑滚动 */
+    }
+
+    #output:empty {
+        background: #fff;
+    }
+
+    .title {
+        color: #34495e;
+        margin-bottom: 10px;
+        /* 从20px减小到10px */
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .title-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 10px;
+        /* 从20px减小到10px */
+    }
+
+    .audio-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        /* 初始状态隐藏按钮 */
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    /* .audio-btn:hover {
+        background: #3db1b1;
+        transform: scale(1.05);
+        border: none;
+    } */
+
+    .audio-btn img {
+        width: 16px;
+        height: 16px;
+    }
+
+
+    /* 添加数学公式容器样式 */
+    .mjx-chtml {
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 5px 0;
+    }
+
+    /* 优化滚动条样式 */
+    #output::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    #output::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    #output::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+    }
+
+    #output::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+<!-- <script>
+    window.MathJax = {
+        loader: {
+            load: ['input/tex', 'output/chtml']
+        },
+        tex: {
+            inlineMath: [['$', '$']],
+            displayMath: [['$$', '$$']],
+            processEscapes: true
+        },
+        startup: {
+            ready: () => {
+                MathJax.startup.defaultReady();
+            }
+        }
+    };
+</script> -->
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<!-- 移除 MathJax，使用 KaTeX 替代 -->
+<script type="text/javascript" src="../../../script/ThridJS/qiniu.min.js"></script>
+<script type="text/javascript" src="../../../script/12xueUpload.js"></script>
+<script type="text/javascript" src="../../../script/aiAssistant/markdown/marked-4.3.0.min.js"></script>
+<script type="text/javascript" src="../../../script/aiAssistant/markdown/katex-0.16.9.min.js"></script>
+<script>
+    const mathCache = new Map();
+    const renderMath = (text, displayMode) => {
+        const cacheKey = `${text}-${displayMode}`;
+        if (mathCache.has(cacheKey)) {
+            return mathCache.get(cacheKey);
+        }
+        try {
+            const result = katex.renderToString(text, {
+                displayMode,
+                throwOnError: false,
+                strict: 'ignore'
+            });
+            mathCache.set(cacheKey, result);
+            return result;
+        } catch (err) {
+            console.error('KaTeX 渲染错误:', err);
+            return text;
+        }
+    };
+    const createMathExtension = (name, level, patterns, displayMode) => {
+        return {
+            name,
+            level,
+            start(src) {
+                const indices = patterns.map(pattern => src.indexOf(pattern.start));
+                const validIndices = indices.filter(index => index !== -1);
+                return validIndices.length > 0 ? Math.min(...validIndices) : -1;
+            },
+            tokenizer(src) {
+                for (const pattern of patterns) {
+                    // 跳过转义的开始标记
+                    if (src.startsWith(pattern.escape)) continue;
+
+                    const match = pattern.regex.exec(src);
+                    if (match) {
+                        return {
+                            type: name,
+                            raw: match[0],
+                            text: match[1].trim(),
+                        };
+                    }
+                }
+            },
+            renderer(token) {
+                return renderMath(token.text, displayMode);
+            }
+        };
+    };
+    const blockPatterns = [
+        {start: '$$', escape: '\\$$', regex: /^\$\$(.*?)\$\$/s},
+        {start: '\\[', escape: '\\\\\\[', regex: /^\\\[(.*?)\\\]/s}
+    ];
+    const inlinePatterns = [
+        {start: '$', escape: '\\$', regex: /^\$(.*?)\$/},
+        {start: '\\(', escape: '\\\\\\(', regex: /^\\\((.*?)\\\)/}
+    ];
+    marked.use({
+        extensions: [
+            createMathExtension('mathBlock', 'block', blockPatterns, true),
+            createMathExtension('mathInline', 'inline', inlinePatterns, false)
+        ]
+    });
+</script>
+<!-- <script type="text/javascript" id="MathJax-script"  src="../../../script/tex-chtml.js"></script> -->
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+<!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+<!-- <script type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> -->
+<script>
+    let result = '';
+    var getText = '';
+    var getVoice = '';
+    var isPlaying = false;
+    let urlPicList = [];
+    let toastedFlag = false; // 定义一个标志变量，用于控制toast只显示一次
+    let canAutoPlay = true; // 定义一个标志变量，用于控制是否自动播放,点击继续问后置为false，点击播放按钮后置为true
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    let aiVoice = {count: 0};
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = async function () {
+
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeFrame();
+        });
+
+        if (api.pageParam.classroom) {
+            $('#AssistantBtn').css('display', 'none');
+        }
+
+        await getSchoolAIOpen();
+        // PostDta();
+
+        apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+            values: {
+                type: 'ai_voice',
+                schoolid: $api.getStorage('schoolid'),
+            }
+        }, (ret, err) => {
+            if (ret && ret.ret === 0) {
+                aiVoice = ret.data;
+                $('#voice-count').html(`本月剩余语音播报次数:&nbsp;<span>${ret.data.count}</span>`);
+                $('#voice-count > span').css({'color': ret.data.count ? '#4BC7C7' : '#F82A1A', 'font-weight': 'bold'});
+            }
+        })
+    };
+
+    function dataLog() {
+        return;
+        console.log('getText:');
+        console.log(getText);
+        console.log('getResult:');
+        console.log(result);
+    }
+
+    async function toAiAssistant() {
+        if (getText && getText !== '') {
+            //停止音频播放
+            api.stopPlay();
+            audioIcon.src = '../../../image/newhomework/yuyin1.png';
+            isPlaying = false;
+            canAutoPlay = false;
+            let xtid = api.pageParam.xtid;
+            api.openWin({
+                name: 'win_aiAssistant',
+                url: '../../aiAssistant/win_aiAssistant_new.html',
+                pageParam: {
+                    xtid: xtid,
+                    answer: getText,
+                    pictures: api.pageParam.imagePaths
+                    // pictures: urlPicList//此方法不行，因为不是第一次生成的话，这个列表不会在请求中被填充
+                }
+            });
+            return;
+        } else {
+            api.toast({
+                msg: '请等待AI解析完成！',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+
+    }
+
+    async function getSchoolAIOpen() {
+        api.showProgress();
+        await GetDeepSeekExerciseVoice();
+    }
+
+
+    async function GetDeepSeekExerciseVoice() {
+        const ret = await new Promise((resolve, reject) => {
+            apiObj.Get(UrlRouter.GetDeepSeekExerciseVoice, {
+                values: {
+                    xtid: api.pageParam.xtid,
+                    qid: $api.getStorage('uid')
+                }
+            }, function (ret, err) {
+                api.hideProgress();
+                if (ret) {
+                    resolve(ret);
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    reject(err);
+                }
+            });
+        })
+        if (ret.ret == -1) {
+            PostDta();
+        } else if (ret.ret == 0) {
+            getText = ret.dajx_cot;
+            result = ret.dajx_cot;
+            getVoice = ret.dajx_url;
+            simulateStreamOutput(getText); // 模拟流式输出
+        } else {
+            api.toast({
+                msg: ret.msg,
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+    // 新增：上传base64图片到七牛云，返回url
+    function qiniuUpfile(imgBase64) {
+        return new Promise((resolve, reject) => {
+            api.showProgress();
+            var fileKey = (new Date()).valueOf() + 'liushiImg';
+            apiObj.Get(UrlRouter.GetQiNiuToken, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    bucket: 'vodresource',
+                    key: fileKey
+                }
+            }, function (ret, err) {
+                if (ret && ret.ret == 0) {
+                    var token = ret.data.token;
+                    var file = b64ImgToBlob(imgBase64);
+                    var observable = qiniu.upload(file, fileKey, token);
+                    observable.subscribe({
+                        next(res) {
+                        },
+                        error(err) {
+                            api.toast({
+                                msg: '图片上传失败' + err.message + err.code,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                            api.hideProgress();
+                            reject(err);
+                        },
+                        complete(res) {
+                            api.hideProgress();
+                            resolve(QINIU_DOMAIN + res.key);
+                        }
+                    });
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret ? ret.msg : '获取七牛token失败',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    reject(err || new Error('获取七牛token失败'));
+                }
+            });
+        });
+    }
+
+    // 修改PostDta，先上传图片，拿到url后再请求AI
+    async function PostDta() {
+        const outputElement = document.getElementById('output');
+        // 先上传所有图片，拿到url
+        let imagePaths = api.pageParam.imagePaths || [];
+        urlPicList = [];
+        for (let i = 0; i < imagePaths.length; i++) {
+            // 判断是否为base64
+            if (/^data:image\/.+;base64,/.test(imagePaths[i])) {
+                try {
+                    let url = await qiniuUpfile(imagePaths[i]);
+                    urlPicList.push(url);
+                } catch (e) {
+                    return; // 上传失败直接返回
+                }
+            } else {
+                urlPicList.push(imagePaths[i]); // 已经是url
+            }
+        }
+        // 请求的 URL
+        var API_URL = UrlDomain + UrlRouter.PostsendAiMessage;
+        let messages = [];
+        messages.push({
+            role: 'user',
+            content: [{
+                type: 'text',
+                text: `
+图中是一道习题，包括题干和答案，请根据图片中的题目以及正确答案,帮我有条理且简洁地分析下这道题的解题思路,注意一定要精炼！公式必须用$$包裹
+`
+                // text: "简单来个数学式子并讲解"
+            }]
+        });
+        for (let i = 0; i < urlPicList.length; i++) {
+            messages[0].content.push({
+                    type: 'image_url',
+                    image_url: urlPicList[i]
+                }
+            );
+        }
+        const body = {
+            stream: true,
+            message: messages,
+            type: 'Ai_liushi',
+            options: {
+                model: 'ep-20250827162306-cwrh9',
+                thinking: {
+                    type: "disabled"
+                },
+            }
+        }
+        console.log(JSON.stringify(body));
+        // 定义请求体
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': $api.getStorage('token'),
+            },
+            body: JSON.stringify(body)
+        });
+        // 流式数据处理
+        const reader = response.body.getReader();
+        console.log('reader', reader);
+
+        const decoder = new TextDecoder();
+        while (true) {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+            const {done, value} = await reader.read();
+            if (done) {
+                setTimeout(() => {
+                    outputElement.innerHTML = marked.parse(result);
+                }, 100);
+                PostAiCot('');
+                break;
+            }
+            const chunk = decoder.decode(value);
+            chunk.split('\n').forEach(line => {
+                if (line.startsWith('data: ')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+                        const content = data.choices[0].delta.content || '';
+                        result += content;
+                        // console.log(result);
+                        const finalHtml = marked.parse(result);
+                        // console.log(finalHtml);
+                        outputElement.innerHTML = finalHtml;
+                    } catch (e) {
+                    }
+                }
+            });
+        }
+    }
+
+    // 添加模拟流式输出函数
+    function simulateStreamOutput(text) {
+        const outputElement = document.getElementById('output');
+        let index = 0;
+        const interval = 20; // 每个字符的输出间隔，20
+        var memText = '';
+
+        function outputNextChar() {
+
+            if (index < text.length) {
+                memText += text[index];
+                outputElement.innerHTML = marked.parse(memText);
+                index++;
+                setTimeout(outputNextChar, interval);
+            } else {
+                // 文本全部输出完成后，统一处理数学公式
+                outputElement.innerHTML = marked.parse(memText);
+                // 显示播放按钮
+                document.querySelector('.audio-btn').style.display = 'flex';
+                if (!api.pageParam.classroom) {
+                    document.querySelector('.assistant-btn').style.display = 'flex';
+                }
+            }
+            //如果当前处于页面最下方附近，则页面滑动至最下方
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        }
+
+        outputNextChar();
+    }
+
+    // 移除 processContent 函数，因为现在使用 KaTeX 扩展来处理数学公式
+
+    // 修改播放音频函数
+    const throttledToggleAudio = _.throttle(toggleAudio, 1000)
+    toggleAudio.isGenerating = false;
+
+    async function toggleAudio() {
+        canAutoPlay = true;
+        if (!result) return;
+        const audioIcon = document.getElementById('audioIcon');
+        if (!isPlaying) {
+            if (!toggleAudio.isGenerating) {
+                const ret = await new Promise((resolve, reject) => {
+                    apiObj.Post(UrlRouter.PostPayfeeOperationLog, {
+                        values: {
+                            schoolid: $api.getStorage('schoolid'),
+                            type: 'ai_voice',
+                            resource_id: api.pageParam.xtid,
+                            count: aiVoice.count,
+                            card_type: aiVoice.card_type !== undefined ? aiVoice.card_type : null,
+                            ...(aiVoice.card_id !== undefined && {card_id: aiVoice.card_id}),
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            resolve(ret);
+                        } else {
+                            reject(err);
+                        }
+                    })
+                })
+                if ((aiVoice.count <= 0 && ret.ret === 0 && ret.data === 'nonumber') || ret.ret !== 0) {
+                    if ($api.getStorage('upgradeQRCode') === '1') {
+                        api.toast({
+                            msg: '本月剩余语音播报次数已耗尽',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    } else {
+                        api.openFrame({
+                            name: 'frame-number-exhausted',
+                            url: '../frame-number-exhausted.html',
+                        })
+                    }
+                    return
+                } else if (ret.ret === 0 && ret.data === '') {
+                    aiVoice.count -= 1;
+                    $('#voice-count').html(`本月剩余语音播报次数:&nbsp;<span>${aiVoice.count}</span>`);
+                    $('#voice-count > span').css({
+                        'color': aiVoice.count ? '#4BC7C7' : '#F82A1A',
+                        'font-weight': 'bold'
+                    });
+                }
+            }
+            if (getVoice) {
+                // 直接播放已有的音频URL
+                await playAudio(getVoice);
+            } else {
+                if (toggleAudio.isGenerating) {
+                    api.toast({
+                        msg: '音频正在生成中，请稍等...',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    return;
+                }
+                toggleAudio.isGenerating = true;
+                let isCompleted = false;
+                api.toast({
+                    msg: "音频正在生成中，生成完毕后将自动播放，请稍等~",
+                    duration: 2000,
+                    location: 'middle'
+                });
+                const response = await fetch(UrlDomain + UrlRouter.PostsendAiMessage, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'token': $api.getStorage('token'),
+                    },
+                    body: JSON.stringify({
+                        message: [{
+                            role: 'user',
+                            content: [{
+                                type: 'text',
+                                text: '将以下内容转换为可以直接使用tts功能进行转换的文本，不要有任何解释，不要带任何格式，不要有任何原内容中没有的内容，力求转换的文本与原文的读法完全一致。请格外注重其中的各种学科的各种式子，包括但不限于化学式，各种单位的叫法。\n\n'
+                            },
+                                {
+                                    type: 'text',
+                                    text: result
+                                }]
+                        }],
+                        type: 'Ai_Voice',
+                        options: {
+                            model: 'ep-20250827162306-cwrh9',
+                            thinking: {
+                                type: "disabled"
+                            },
+                        }
+                    })
+                });
+                // 流式数据处理
+                const reader = response.body.getReader();
+
+                const decoder = new TextDecoder();
+                let result1 = '';
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) {
+                        break;
+                    }
+                    const chunk = decoder.decode(value);
+                    chunk.split('\n').forEach(line => {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                const content = data.choices[0].delta.content || '';
+                                result1 += content;
+                            } catch (e) {
+                            }
+                        }
+                    });
+                }
+                while (!isCompleted) {
+                    try {
+                        const ret = await new Promise((resolve, reject) => {
+                            apiObj.Post(UrlRouter.GetDeepSeekDajxVoice, {
+                                values: {
+                                    content: result1,
+                                    xtid: api.pageParam.xtid,
+                                    qid: $api.getStorage('uid')
+                                }
+                            }, (ret, err) => {
+                                if (ret) {
+                                    resolve(ret);
+                                } else {
+                                    reject(err)
+                                }
+                            })
+                        });
+
+                        switch (ret.code) {
+                            case -1:
+                                api.toast({
+                                    msg: "此题暂不支持音频播放~",
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                                isCompleted = true;
+                                break;
+                            case 0:
+                                break;
+                            case 1:
+                                await PostAiCot(ret.url);
+                                getVoice = ret.url;
+                                await playAudio(ret.url);
+                                isCompleted = true;
+                                if (!canAutoPlay) {
+                                    api.stopPlay();
+                                    audioIcon.src = '../../../image/newhomework/yuyin1.png';
+                                    isPlaying = false;
+                                }
+                                break;
+                            default:
+                                throw new Error("生成失败")
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    } catch (err) {
+                        isCompleted = true;
+                        api.toast({
+                            msg: "音频生成失败",
+                        });
+                        console.log("语音生成失败", err);
+                    }
+                }
+
+                toggleAudio.isGenerating = false;
+            }
+        } else {
+            audioIcon.src = '../../../image/newhomework/yuyin1.png';
+            isPlaying = false;
+            api.stopPlay();
+        }
+    }
+
+    async function playAudio(url) {
+        const fileName = `audio_${api.pageParam.xtid}.mp3`;
+        const filePath = api.cacheDir + '/' + fileName;
+        const audioIcon = document.getElementById('audioIcon');
+        try {
+            // 下载音频文件
+            const ret = await new Promise((resolve, reject) => {
+                api.download({
+                    url: url,
+                    savePath: filePath,
+                    report: false,
+                    cache: false,
+                    allowResume: true
+                }, function (ret, err) {
+                    if (ret) resolve(ret);
+                    else reject(err);
+                });
+            });
+            if (ret.state !== 1) {
+                console.log(JSON.stringify(ret));
+                api.toast({msg: "音频文件下载失败"});
+                return
+            }
+            isPlaying = true;
+            audioIcon.src = '../../../image/newhomework/yuyin2.gif';
+            api.startPlay({path: filePath}, function (ret, err) {
+                if (ret) {
+                    api.toast({msg: '播放完成'});
+                    audioIcon.src = '../../../image/newhomework/yuyin1.png';
+                    isPlaying = false;
+                } else {
+                    api.alert({msg: JSON.stringify(err)});
+                    console.log(JSON.stringify(err));
+                    isPlaying = false;
+                }
+            });
+
+        } catch (err) {
+            console.log(err);
+            api.toast({msg: '音频播放失败'});
+            isPlaying = false;
+        }
+    }
+
+    async function PostAiCot(url) {
+        // const result = document.getElementById('output').textContent;
+        getText = result; // 更新 getText 变量
+        const audioIcon = document.getElementById('audioIcon');
+        // 调用语音合成接口
+        const ret = await new Promise((resolve, reject) => {
+            apiObj.Post(UrlRouter.PostDeepseekAddCot, {
+                values: {
+                    xtid: api.pageParam.xtid,
+                    dajx_cot: result,
+                    dajx_url: url
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    resolve(ret);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+
+        if (ret.ret == 0) {
+            document.querySelector('.audio-btn').style.display = 'flex';
+        } else {
+            api.toast({
+                msg: '频率过高或次数受限，AI解析失败。',
+                duration: 2000,
+            });
+            // closeFrame();
+        }
+
+    }
+
+    function closeFrame() {
+        setTimeout(() => {
+            api.closeFrame({
+                name: 'frame_liushi'
+            });
+        }, 500);
+    }
+</script>
+
+</html>

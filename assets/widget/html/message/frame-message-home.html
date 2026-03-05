@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background: none;
+            padding-top: 20px;
+        }
+
+        .icon {
+            width: 1.2rem;
+        }
+
+        .aui-badge {
+            width: auto;
+            text-align: center;
+            min-width: 0.8rem;
+            height: 0.8rem;
+            line-height: 0.8rem;
+            padding: 0 0.2rem;
+            font-size: 0.6rem;
+            color: #ffffff;
+            background-color: #ff2600;
+            border-radius: 0.4rem;
+            z-index: 99;
+            position: relative;
+            top: 0;
+            left: 0
+
+        }
+
+        .aui-margin-b-15 {
+            margin-bottom: 0.5rem !important;
+        }
+
+        .aui-content {
+            width: 80%;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <ul class="aui-list aui-list-in aui-margin-b-15" style="border-radius: 0.83vw; overflow: hidden;">
+        <li class="aui-list-item" tapmode onclick="openWin(1)">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx01.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                作业消息
+                <div id="badge-zyxx"></div>
+            </div>
+        </li>
+
+        <li class="aui-list-item" tapmode onclick="openWin(2)">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx02.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                作业问答
+                <div id="badge-zywd"></div>
+            </div>
+        </li>
+
+        <li class="aui-list-item" tapmode onclick="openWin(3)">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx03.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                课堂资源包消息
+                <div id="badge-kcxx"></div>
+            </div>
+        </li>
+        <li class="aui-list-item" tapmode onclick="openWin(9)">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/exammessage_os_icon.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                考试消息
+                <div id="badge-exam"></div>
+            </div>
+        </li>
+        <li class="aui-list-item" tapmode onclick="openWin(4)">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx04.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                通知
+                <div id="badge-tz"></div>
+            </div>
+        </li>
+    </ul>
+
+    <!-- <ul class="aui-list aui-list-in aui-margin-b-15 aui-hide" id="hide" style="border-radius: 0.83vw; overflow: hidden;">
+        <li class="aui-list-item" tapmode onclick="openWin(5);">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx05.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                @我
+                <div id="badge-me"></div>
+            </div>
+        </li>
+    </ul> -->
+    <!-- <ul class="aui-list aui-list-in aui-margin-b-15 aui-hide" id="ishide" style="border-radius: 0.83vw; overflow: hidden;">
+        <li class="aui-list-item " tapmode onclick="openWin(6);">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx06.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                评论
+                <div id="badge-pl"></div>
+            </div>
+        </li>
+
+        <li class="aui-list-item " tapmode onclick="openWin(7);">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx07.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                赞
+                <div id="badge-zan"></div>
+            </div>
+        </li>
+
+        <li class="aui-list-item " tapmode onclick="openWin(8);">
+            <div class="aui-list-item-label-icon">
+                <img class="icon" src="../../image/stuHomePad/xx08.png">
+            </div>
+            <div class="aui-list-item-inner aui-list-item-arrow aui-font-size-14">
+                新关注
+                <div id="badge-xgr"></div>
+            </div>
+        </li>
+    </ul> -->
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var timerId;
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage("token"));
+        if ($api.getStorage("studentSwitch") == 0) {
+            $api.addCls($api.byId("ishide"), 'aui-hide');
+            $api.addCls($api.byId("hide"), 'aui-hide');
+        } else {
+            $api.removeCls($api.byId("ishide"), 'aui-hide');
+            $api.removeCls($api.byId("hide"), 'aui-hide');
+        }
+        getNofiNum();
+        setNotifyInterval();
+        api.addEventListener({
+            name: 'init_user'
+        }, function (ret, err) {
+            apiObj.SetAuthToken(ret.value.token);
+            restartNotifyInterval();
+        });
+        addWinListener();
+    };
+
+    function restartNotifyInterval() {
+        if (timerId) {
+            clearNotifyInterval();
+        }
+        setNotifyInterval();
+    }
+    function setNotifyInterval() {
+        if (!timerId) {
+            timerId = setInterval("getNofiNum()", 30000);
+        }
+    }
+    function clearNotifyInterval() {
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = 0;
+        }
+    }
+    function addWinListener() {
+        api.addEventListener({
+            name: 'viewappear'
+        }, function (ret, err) {
+            setNotifyInterval();
+        });
+        api.addEventListener({
+            name: 'viewdisappear'
+        }, function (ret, err) {
+            clearNotifyInterval();
+        });
+        api.addEventListener({
+            name: 'pause'
+        }, function (ret, err) {
+            clearNotifyInterval();
+        });
+        api.addEventListener({
+            name: 'resume'
+        }, function (ret, err) {
+            restartNotifyInterval();
+        });
+    }
+    var nofi = 0, me = 0, comm = 0, zan = 0, xgr = 0, faq = 0, course = 0, homework = 0, exam = 0;
+
+    //作业消息数量
+    function getHomeworkNum() {
+        apiObj.Get(UrlRouter.Getstuhomeworkmessage, {value: {identitytype: 3}}, function (ret, err) {
+            if (ret && ret.ret == 0) {
+                if (ret.data.homework_dynamic.bchange) {
+                    homework = ret.data.homework_dynamic.count;
+                    $api.addCls($api.byId("badge-zyxx"), 'aui-badge');
+                    $api.text($api.byId("badge-zyxx"), homework);
+                } else {
+                    homework = 0;
+                    $api.text($api.byId("badge-zyxx"), "");
+                    $api.removeCls($api.byId("badge-zyxx"), 'aui-badge');
+                }
+                getCourse();
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: ret.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+
+        });
+    }
+
+    //得到通知消息数量
+    function getNofiNum() {
+        //消息数量
+        apiObj.Get(UrlRouter.Getpullmessage, "", function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.normalnotify_dynamic.bchange) {
+                        nofi = ret.data.normalnotify_dynamic.count;
+                        $api.addCls($api.byId("badge-tz"), 'aui-badge');
+                        $api.text($api.byId("badge-tz"), nofi);
+                    } else {
+                        nofi = 0;
+                        $api.text($api.byId("badge-tz"), "");
+                        $api.removeCls($api.byId("badge-tz"), 'aui-badge');
+                    }
+                    getFaq();
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+
+        });
+    }
+
+    //学生作业问答消息数量
+    function getFaq() {
+        apiObj.Get(UrlRouter.Getstumessage, "", function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.faq_dynamic.bchange) {
+                        faq = ret.data.faq_dynamic.count;
+                        $api.addCls($api.byId("badge-zywd"), 'aui-badge');
+                        $api.text($api.byId("badge-zywd"), faq);
+                    } else {
+                        faq = 0;
+                        $api.text($api.byId("badge-zywd"), "");
+                        $api.removeCls($api.byId("badge-zywd"), 'aui-badge');
+                    }
+                    getHomeworkNum();
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+    //课堂资源包消息数量
+    function getCourse() {
+        apiObj.Get(UrlRouter.Getclassmessage, {values: {identitytype: 3}}, function (ret, err) {
+            if (ret.ret == 0) {
+                //@我
+                if (ret.data.course_dynamic.bchange) {
+                    course = ret.data.course_dynamic.count;
+                    $api.addCls($api.byId("badge-kcxx"), 'aui-badge');
+                    $api.text($api.byId("badge-kcxx"), course);
+                } else {
+                    course = 0;
+                    $api.text($api.byId("badge-kcxx"), "");
+                    $api.removeCls($api.byId("badge-kcxx"), 'aui-badge');
+                }
+                Getnewexammessage();
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: ret.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+    //考试消息数量
+    function Getnewexammessage() {
+        apiObj.Get(UrlRouter.Getnewexammessage, {
+            values: {
+                uid: $api.getStorage("uid"),
+            }
+        }, function (ret, err) {
+            if (ret.ret == 0) {
+                if (ret.data.exammsg_dynamic.bchange) {
+                    exam = ret.data.exammsg_dynamic.count;
+                    $api.addCls($api.byId("badge-exam"), 'aui-badge');
+                    $api.text($api.byId("badge-exam"), exam);
+                } else {
+                    exam = 0;
+                    $api.text($api.byId("badge-exam"), "");
+                    $api.removeCls($api.byId("badge-exam"), 'aui-badge');
+                }
+                getPullcommon();
+            } else {
+                api.toast({
+                    msg: ret.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+
+    //用户@、评论、赞、关注消息
+    function getPullcommon() {
+        apiObj.Get(UrlRouter.Getpullcommon, "", function (ret, err) {
+            if (ret.ret == 0) {
+                //@我
+                if (ret.data.at_dynamic.bchange) {
+                    me = ret.data.at_dynamic.count;
+                    $api.addCls($api.byId("badge-me"), 'aui-badge');
+                    $api.text($api.byId("badge-me"), me);
+                } else {
+                    me = 0;
+                    $api.text($api.byId("badge-me"), "");
+                    $api.removeCls($api.byId("badge-me"), 'aui-badge');
+                }
+                //评论
+                if (ret.data.commentme_dynamic.bchange) {
+                    comm = ret.data.commentme_dynamic.count;
+                    $api.addCls($api.byId("badge-pl"), 'aui-badge');
+                    $api.text($api.byId("badge-pl"), comm);
+                } else {
+                    comm = 0;
+                    $api.text($api.byId("badge-pl"), "");
+                    $api.removeCls($api.byId("badge-pl"), 'aui-badge');
+                }
+                //赞
+                if (ret.data.thumbup_dynamic.bchange) {
+                    zan = ret.data.thumbup_dynamic.count;
+                    $api.addCls($api.byId("badge-zan"), 'aui-badge');
+                    $api.text($api.byId("badge-zan"), zan);
+                } else {
+                    zan = 0;
+                    $api.text($api.byId("badge-zan"), "");
+                    $api.removeCls($api.byId("badge-zan"), 'aui-badge');
+                }
+                //新关注
+                if (ret.data.follow_dynamic.bchange) {
+                    xgr = ret.data.follow_dynamic.count;
+                    $api.addCls($api.byId("badge-xgr"), 'aui-badge');
+                    $api.text($api.byId("badge-xgr"), xgr);
+                } else {
+                    xgr = 0;
+                    $api.text($api.byId("badge-xgr"), "");
+                    $api.removeCls($api.byId("badge-xgr"), 'aui-badge');
+                }
+                //本地存储未读消息总数
+                if ($api.getStorage('teacherSwitch') == 1) {
+                    count = nofi + course + faq + homework + exam;
+                } else {
+                    count = nofi + comm + me + zan + xgr + course + faq + homework + exam;
+
+                }
+                $api.setStorage('all_message', count);
+            } else {
+                $api.setStorage('all_message', 0);
+            }
+            api.sendEvent({
+                name: 'refreshMessageCount',
+                extra: {}
+            });
+        });
+
+    }
+
+
+    function openWin(index) {
+        var winName;
+        var winPath;
+        var data = {};
+        switch (index) {
+            case 1:
+                winName = 'win-homework-message-list';
+                winPath = 'homeworkMessage';
+                if (homework != 0) {
+                    $api.text($api.byId("badge-zyxx"), "");
+                    $api.removeCls($api.byId("badge-zyxx"), 'aui-badge');
+                }
+                break;
+            case 2:
+                winName = 'win-homework-answer-main';
+                winPath = 'homeworkAnswer';
+                if (faq != 0) {
+                    $api.text($api.byId("badge-zywd"), "");
+                    $api.removeCls($api.byId("badge-zywd"), 'aui-badge');
+                }
+                break;
+            case 3:
+                winName = 'win-course-message';
+                winPath = 'courseMessage';
+                if (course != 0) {
+                    $api.text($api.byId("badge-kcxx"), "");
+                    $api.removeCls($api.byId("badge-kcxx"), 'aui-badge');
+                }
+                break;
+            case 4:
+                winName = 'win-notifylist';
+                winPath = 'newnotify';
+                if (nofi != 0) {
+                    $api.text($api.byId("badge-tz"), "");
+                    $api.removeCls($api.byId("badge-tz"), 'aui-badge');
+                }
+                break;
+            case 9:
+                winName = 'win-exam-messagelist';
+                winPath = 'exam';
+                if (exam != 0) {
+                    $api.text($api.byId("badge-exam"), "");
+                    $api.removeCls($api.byId("badge-exam"), 'aui-badge');
+                }
+                break;
+            case 5:
+                winName = 'win-atMe';
+                winPath = 'atMe';
+                if (me != 0) {
+                    $api.text($api.byId("badge-me"), "");
+                    $api.removeCls($api.byId("badge-me"), 'aui-badge');
+                }
+                break;
+            case 6:
+                winName = 'win-comment-main';
+                winPath = 'comments';
+                if (comm != 0) {
+                    $api.text($api.byId("badge-pl"), "");
+                    $api.removeCls($api.byId("badge-pl"), 'aui-badge');
+                }
+                break;
+            case 7:
+                winName = 'win-support';
+                winPath = 'support';
+                if (zan != 0) {
+                    $api.text($api.byId("badge-zan"), "");
+                    $api.removeCls($api.byId("badge-zan"), 'aui-badge');
+                }
+                break;
+            case 8:
+                winName = 'win-new-focus';
+                winPath = 'newFocus';
+                if (xgr != 0) {
+                    $api.text($api.byId("badge-xgr"), "");
+                    $api.removeCls($api.byId("badge-xgr"), 'aui-badge');
+                }
+                break;
+        }
+        api.openWin({
+            name: winName,
+            url: winPath + '/' + winName + '.html',
+            pageParam: data
+        });
+    }
+    //    <h4>作业截止时间:2016-06-06</h4>
+    //    <li class="aui-list-item">
+    //            <div class="aui-list-item-text">
+    //            <div class="aui-list-item-title title">小猫钓鱼</div>
+    //            </div>
+    //            <div class="aui-hr"></div>
+    //
+    //            <div class="aui-info aui-list-item-arrow">
+    //            <div class="stop aui-text-success">截止<span class="aui-text-success">sshh  </span></div>
+    //            <div class="message">3人未完成</div>
+    //    </div>
+    //    </li>
+</script>
+</html>

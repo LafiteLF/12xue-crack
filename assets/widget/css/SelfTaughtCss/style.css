@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* CSS Document */
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+li {
+    list-style: none
+}
+
+.clear {
+    clear: both
+}
+
+.fr {
+    float: right;
+}
+
+.fl {
+    float: left;
+}
+
+.MSheader {
+    width: 100%;
+    height: 45px;
+    background: #4bc7c7;
+    line-height: 50px;
+    text-align: left;
+    font-size: 16px;
+    color: #fff;
+    position: relative;
+    font-weight: bold;
+    font-family: "微软雅黑"
+}
+
+.MSheader span {
+    padding: 0 10px;
+}

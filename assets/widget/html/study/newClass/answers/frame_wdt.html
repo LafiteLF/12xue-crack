@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>问答题，朗读题</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../css/frameDetail.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../css/wx-audio.css" />
+    <script src="../../../../script/interact@1.10.27.min.js"></script>
+    <style>
+        .wdt_content {
+            display: none;
+        }
+
+        .tixingzi {
+            margin-left: 36px;
+        }
+
+        #aiBtn {
+            touch-action: none;   /* 禁止默认手势（必须） */
+            -webkit-user-drag: none; /* 禁止 iOS safari 拖拽图片 */
+            user-select: none;    /* 禁止文字选中 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="kong_bg">
+        <div class="cxjz">
+            <div class="cxjztop clearfix">
+                <img src="../../../../image/newhomework/cxjz.png">
+                <p>您的网络开小差了<br>请检查网络环境并点击重新加载吧～</p>
+            </div>
+            <div class="cxjz_button" onclick="cxjz()">重新加载</div>
+        </div>
+    </div>
+    <div class="wdt_content">
+        <img v-if="isShowAnswer" id="aiBtn" class="noImgClick" @click.stop="PostAIBtn()" src="../../../../image/newhomework/aiBtn.png" style="position: absolute; right: 1vw; top:50%; transform: translateY(-50%); width: 50px; z-index: 300;" alt="AI解析">
+        <div class="content">
+            <!--题干部分开始-->
+            <div class="stem">
+                <ul>
+                    <li class="tixing clearfix">
+                        <div class="tixingzi" v-text="'【'+data.txstr+'】'"></div>
+                    </li>
+                </ul>
+                <div class="tg_content font666" v-html="data.tg"></div>
+                <div class="ldcl" v-if="data.tx=='ldt' && data.dastr!=''">
+                    <h3>朗读材料：</h3>
+                    <p v-html="data.dastr==''?'无':data.dastr"></p>
+                </div>
+            </div>
+            <!--题干部分结束-->
+            <!--答案部分开始-->
+            <dl v-if="complete==2" class="wenda_answer bgFFF">
+                <dt v-if="isShowAnswer" class="defen" style="top: 18px;">
+                    <span style="color: #4bc7c7">回答完毕！</span>
+                </dt>
+                <h2 class="wendah2">【我的答案】</h2>
+                <div v-if="data.tx=='ldt' && is_unable==0" class="lddayinpin clearfix">
+                    <img class="scyp2 noImgClick" src="../../../../image/startPlay.png" onclick="vm.ZSrecordRun(this);"
+                        :playStatus='0' alt="">
+                    <div class="lddaRange"><input class="myRange" type="range" min="0" value="0"
+                            :max='answer[0].filetime'></div>
+                    <p class="ypTimeP" v-text="getTimes(answer[0].filetime)">15:00w</p>
+                </div>
+                <ul class="clearfix wendawdda">
+                    <li v-for="list in answer" v-if="data.tx != 'ldt' || (data.tx=='ldt' && is_unable==1)"
+                        :class="is_unable==1 ? 'wendazi' : (list.is_txt==1 && is_unable==0) ? 'wendazi' : list.is_txt==2 ? 'wendayuyin imgborder' : list.is_txt==3 ? 'wendashipin imgborder' : 'wendatu imgborder'">
+                        <p v-if="is_unable==1 || (list.is_txt==1 && is_unable==0)"
+                            v-html="is_unable==1 ? '未答' : list.is_txt==1 && is_unable==0 ? list.descript : ''"></p>
+                        <p v-if="list.is_txt==0 && is_unable==0">
+                            <img :src="list.serverpath + list.savename + '?imageView2/1/w/300/h/200'">
+                        </p>
+                        <p v-if="list.is_txt==2 || list.is_txt==3" :url="list.serverpath+list.preview_link" tapmode
+                            onclick="vm.videoZYPlay(this)" :filetime="list.filetime">
+                            <img class="noImgClick" src="../../../../image/bof_03.png">
+                        </p>
+                    </li>
+                </ul>
+                <dd :style="isShowAnswer?'display:block':'display:none'" v-if="data.tx!='ldt'" class="needpic">
+                    <h2 class="wendah2" v-text="'【'+data.tx_tip+'】'">
+                    </h2>
+                    <ul>
+                        <li class="wendazi" v-html="data.dastr==''?'无':data.dastr">
+                        </li>
+                    </ul>
+                </dd>
+                <dd :style="isShowAnswer?'display:block':'display:none'" class="needpic">
+                    <h2 class="wendah2">【答案解析】</h2>
+                    <ul>
+                        <li class="wendazi" v-html="data.dajx==''?'无':data.dajx">
+                        </li>
+                    </ul>
+                </dd>
+            </dl>
+            <!--答案部分结束-->
+        </div>
+        <!--答题部分开始-->
+        <div v-if="complete!=2" class="da_content">
+            <textarea v-if='is_txt==1 && is_unable==0 && is_show_textarea==1 ' class="wdtzi" placeholder="请输入要填写的答案"
+                cols="30" rows="10" maxlength="500" :value="answer.length > 0 ? answer[0].descript : ''"></textarea>
+            <div class="lddayinpin clearfix" v-if="data.tx=='ldt' && answer.length>0">
+                <img class="scyp2 noImgClick" src="../../../../image/startPlay.png" onclick="vm.recordRun(this);"
+                    :playStatus='0' alt="">
+                <div class="lddaRange"> <input class="myRange" type="range" min="0" value="0" :max='answer[0].filetime'>
+                </div>
+                <p class="ypTimeP" v-text="getTimes(answer[0].filetime)"></p>
+                <div class="chacha" tapmode onclick="vm.deletePic(this);" id='0'>
+                    <img class="noImgClick" src="../../../../image/newhomework/cha.png">
+                </div>
+            </div>
+            <dl class="clearfix " v-if="is_txt!=1 && answer.length>0 && data.tx!='ldt'">
+                <dd v-for="(list,index) in answer" :class="list.is_txt==0?'wendatu imgborder':'wendatu imgborder'">
+                    <img class="noImgClick" :id="index" onclick="showImage(this)" v-if="list.is_txt==0"
+                        :src="list.serverpath+list.savename+'?imageView2/2/w/300/h/300'"
+                        :fdsrc="list.serverpath+list.savename">
+                    <div :id="'luyin'+index" style="width: 100%; height: 100%">
+                    </div>
+                    <div :id="index" tapmode onclick="vm.deletePic(this);" class="chacha">
+                        <img class="noImgClick" src="../../../../image/newhomework/cha.png">
+                    </div>
+                </dd>
+            </dl>
+            <div
+                :class="is_txt!=1 && answer.length>0?'wdAnswerTypeActive':is_txt==1 && is_unable==0 && is_show_textarea==1?'wdAnswerTypeActive':'wdAnswerType'">
+                <ul>
+                    <li class="openAnserType" tapmode onclick="vm.choose();" style="margin-bottom: 20px;"></li>
+                    <!--<li class="bhz font4BC7C7" tapmode onclick="vm.checded(this)">-->
+                    <!--<span :class="is_unable==1?'inputCheckactive':''"></span>不会做-->
+                    <!--</li>-->
+                </ul>
+            </div>
+
+            <div style="width: 100%; padding-bottom: 2rem" v-if="complete!=2">
+                <div class="upBtn" tapmode onclick="vm.commitAnswer()">提交</div>
+            </div>
+
+        </div>
+        <!--答题部分结束-->
+
+    </div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/wx-audio.js"></script>
+<script type="text/javascript" src="../../../../script/html2canvas.js"></script>
+<script>
+    var apiObj;
+    var classObj, classObjForCloud;
+    var vm;
+    var uiMediaScanner;//打开相册需要的变量
+    var compressListener = {//打开相册需要的变量
+        allCount: 0,
+        successCount: 0
+    };
+    var audioStreamer;
+    var timer = null;
+    var allTimes = 0;
+    var sec;
+    var downloadPath;
+    var moduleDialog = null;//弹窗模块bhzparam
+    var moduleImageScale = null;//图片放大旋转删除
+    var answerBody;
+
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+
+        classObj = new GridOpenApi('http://' + $api.getStorage('ip'), source, version);
+        classObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+
+        moduleDialog = api.require('moduleDialog');
+        moduleImageScale = api.require('moduleImageScale');
+        vue();
+        vm.GetParentexercisesUrl();//获取作业习题详情及答题结果
+        api.addEventListener({// 裁剪图片保存
+            name: 'cutPicture' + api.frameName
+        }, function (ret, err) {
+            var src = ret.value.src;
+            vm.compressImage(src);
+            api.closeFrame({
+                name: 'frame_cutPicture'
+            });
+        });
+        api.addEventListener({// 音频接收
+            name: 'giveRecoreData'
+        }, function (ret, err) {
+            if (ret.value.isfrom == 'jc') {
+                if (ret.value.index == vm.index) {
+                    vm.is_txt = 0;
+                    vm.answer = [];
+                    vm.giveData(ret.value.savename, ret.value.filetime, ret.value.Local_address);
+                }
+                api.closeWin({
+                    name: 'win_reading'
+                });
+            }
+        });
+        api.addEventListener({// 滑动暂停音频
+            name: 'yinpinCLose'
+        }, function (ret, err) {
+            if ($api.domAll('.scyp2').length >= 1) {
+                if ($('.scyp2').attr('playStatus') == 1) {
+                    $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                }
+                audioStreamer = api.require('audioStreamer');
+                clearInterval(timer);
+                audioStreamer.pause();
+                $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                $api.dom('.myRange').disabled = true;
+            }
+        });
+        api.addEventListener({// 画板
+            name: 'DrawingBoardImg'
+        }, function (ret, err) {
+            if (ret.value.name == api.frameName && ret.value.type == 'huaban') {
+                var imgsrc = ret.value.imgsrc;
+                if (vm.is_txt == 1) {
+                    vm.is_txt = 0;
+                    vm.answer = [];
+                } else {
+                    vm.is_txt = 0;
+                }
+                vm.is_unable = 0;
+                vm.qiniuUpfile(imgsrc);
+                api.closeWin({
+                    name: 'Drawing_board'
+                });
+            }
+        });
+
+        api.addEventListener({
+            name: 'answerEnd'
+        }, function (ret, err) {
+            vm.complete = 2;
+            vm.isShowAnswer = true;
+        });
+
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.wdt_content',
+            data: {
+                complete: 0,//作业完成状态
+                data: [],//习题详情
+                schoolid: $api.getStorage('schoolid'),//学校id
+                classid: $api.getStorage('classid'),
+                answer: [],//答案数组
+                is_unable: 0,//是否会做 0会做 1 不会做
+                is_txt: 0,//是否是文字 1是文字 0不是文字
+                is_show_textarea: 0,//是否显示输入框（刚打开页面的时候）
+                isPlaying: false,//老师留言是否播放中
+                isShowAnswer: false,
+                type: '',//习题总分
+                scorelist: '',
+                xtinfo: api.pageParam.xtinfo,
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>选择不会做，会将您已经填写的答案清空，是否确定不会做？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+                paizhaoparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 89,
+                        "h": 178,
+                        "w": 300
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "paizhao",
+                        "showText": "拍照",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41 + 58,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "xiangce",
+                        "showText": "从相册中选择",
+                        "textSize": 14
+                    }]
+                },
+                anniuparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 118,
+                        "h": 236,
+                        "w": 300
+                    },
+                    {
+                        "viewType": 104,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 118 + 40,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "img",
+                        "img": 'widget://image/newhomework/os_06.png',
+                        "img_down": 'widget://image/newhomework/20_06.png'
+
+                    },
+                    {
+                        "viewType": 104,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 118 + 100,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "input",
+                        "img": 'widget://image/newhomework/os_03.png',
+                        "img_down": 'widget://image/newhomework/20_03.png'
+
+                    },
+                    {
+                        "viewType": 104,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 118 + 160,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "shouxie",
+                        "img": 'widget://image/newhomework/os_18.png',
+                        "img_down": 'widget://image/newhomework/20_18.png'
+
+                    }
+                    ]
+                },
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+            },
+            mounted() {
+                interact('#aiBtn')
+                    .draggable({
+                        listeners: {
+                            move (event) {
+                                const target = event.target
+                                const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx
+                                const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy
+
+                                target.style.transform = `translate(${x}px, ${y}px)`
+                                target.setAttribute('data-x', x)
+                                target.setAttribute('data-y', y)
+                            }
+                        }
+                    })
+            },
+            methods: {
+                videoZYPlay: function (context) {
+                    var url = $api.attr(context, 'url');
+                    var filetime = $api.attr(context, 'filetime');
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: '',
+                            isMp3: false,
+                            filetime: filetime
+                        }
+                    });
+                },
+                GetParentexercisesUrl: function () {//获取作业习题详情及答题结果
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetParentexercisesUrl, {
+                        values: {
+                            hwid: vm.xtinfo.kcid,
+                            uid: $api.getStorage('uid'),
+                            xtid: vm.xtinfo.id,
+                            classid: $api.getStorage('classid'),
+                            ytlx: '2',
+                            schoolid: vm.schoolid
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.wdt_content').show();
+                                $('.kong_bg').hide();
+                                vm.data = ret;
+                            } else {
+                                $('.wdt_content').hide();
+                                $('.kong_bg').show();
+                            }
+                        } else {
+                            $('.wdt_content').hide();
+                            $('.kong_bg').show();
+                        }
+                    })
+                },
+                checded: function (context) {//复选框不会做点击事件
+                    $('textarea').blur();
+                    if (vm.answer.length > 0) {
+                        var param = vm.bhzparam;
+                        param.data[1].showText = "<font color='#666666'>选择不会做，会将您已经填写的答案清空，是否确定不会做？</font>";
+                        param.data[2].showText = "确定";
+                        param.data[3].showText = "取消";
+                        moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                            if (ret.state == 'success' && ret.clickID) {
+                                if (ret.clickID == 'ok') {
+                                    vm.answer = [];
+                                    vm.is_unable = 1;//不会做
+                                    dismissDialog();
+                                } else {
+                                    dismissDialog();
+                                }
+                            } else {
+
+                            }
+
+                        });
+                    } else {
+                        vm.answer = [];
+                        vm.is_unable = 1;//不会做
+                    }
+                },
+
+                deletePic: function (context) {    //删除图片答案
+                    if (vm.data.tx == 'ldt') {
+                        var param = vm.bhzparam;
+                        param.data[1].showText = "<font color='#666666'>确定删除该音频吗？</font>";
+                        moduleDialog.showDialog(param, function (ret, err) {
+                            if (ret.state == 'success' && ret.clickID) {
+                                if (ret.clickID == 'ok') {
+                                    if ($api.domAll('.scyp2').length >= 1) {
+                                        if ($('.scyp2').attr('playStatus') == 1) {
+                                            $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                                        }
+                                        audioStreamer = api.require('audioStreamer');
+                                        clearInterval(timer);
+                                        audioStreamer.stop();
+                                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                        $api.dom('.myRange').disabled = true;
+                                    }
+                                    var index;
+                                    index = parseInt($(context).attr('id'));
+                                    vm.answer.splice(index, 1);//删除数据指定索引位置的url
+                                    dismissDialog();
+                                } else {
+                                    dismissDialog();
+                                }
+                            }
+
+                        });
+                    } else {
+                        var index;
+                        index = parseInt($(context).attr('id'));
+                        vm.answer.splice(index, 1);//删除数据指定索引位置的url
+                    }
+
+                },
+                choose: function () {//打开手动批阅题选择答题方式的页面
+                    if (!checkPermission(['camera', 'storage', 'microphone'])) {
+                        return;
+                    }
+                    if (vm.data.tx == 'ldt') {//朗读题
+                        if (vm.answer.length > 0) {
+                            var param = vm.bhzparam;
+                            param.data[1].showText = "<font color='#666666'>再次答题将清除之前录音内容，是否继续进行答题？</font>";
+                            moduleDialog.showDialog(param, function (ret, err) {
+                                if (ret.state == 'success' && ret.clickID) {
+                                    if (ret.clickID == 'ok') {
+                                        if ($api.domAll('.scyp2').length >= 1) {
+                                            if ($('.scyp2').attr('playStatus') == 1) {
+                                                $api.attr($api.dom('.scyp2'), 'playStatus', '0');
+                                            }
+                                            audioStreamer = api.require('audioStreamer');
+                                            clearInterval(timer);
+                                            audioStreamer.stop();
+                                            $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                            $api.dom('.myRange').disabled = true;
+                                        }
+                                        vm.is_txt = 0;
+                                        vm.answer = [];
+                                        api.openWin({
+                                            name: 'win_reading',
+                                            url: '../win_reading.html',
+                                            pageParam: { index: vm.index, isform: 'jc', tg: vm.data.dastr }
+                                        });
+                                        dismissDialog();
+                                    } else {
+                                        dismissDialog();
+                                    }
+                                }
+                            });
+                        } else {
+                            api.openWin({
+                                name: 'win_reading',
+                                url: '../win_reading.html',
+                                pageParam: { index: vm.index, isform: 'jc', tg: vm.data.dastr }
+                            });
+                        }
+                    } else {
+                        moduleDialog.showDialog(vm.anniuparam, function (ret, err) {
+                            if (ret.state == 'success' && ret.clickID) {
+                                if (ret.clickID == 'input') {//输入
+                                    if (vm.is_txt != 1) {
+                                        vm.is_txt = 1;
+                                        vm.is_unable = 0;
+                                        vm.is_show_textarea = 1;
+                                        vm.answer = [];
+                                    } else {
+                                        vm.is_txt = 1;
+                                        vm.is_unable = 0;
+                                        vm.is_show_textarea = 1;
+                                    }
+                                    dismissDialog();
+                                } else if (ret.clickID == 'img') {//图片
+                                    dismissDialog();
+                                    if (vm.getFileNum(0) >= 5) {
+                                        api.toast({
+                                            msg: "最多只能选择5张图片！",
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                        return;
+                                    }
+                                    api.getPicture({
+                                        sourceType: 'camera',
+                                        encodingType: 'jpg',
+                                        mediaValue: 'pic',
+                                        destinationType: 'url',
+                                        targetWidth: 1200,
+                                        //targetHeight: 100,
+                                        quality: 100
+                                    }, function (ret, err) {
+                                        if (ret) {//如果拍了照片
+                                            if (ret.data.length > 0) {
+                                                if (vm.is_txt == 1) {
+                                                    vm.is_txt = 0;
+                                                    vm.answer = [];
+                                                } else {
+                                                    vm.is_txt = 0;
+                                                }
+                                                vm.is_unable = 0;//会做
+                                                CutPictures(ret.data, 0);
+                                            }
+                                        } else {//如果点了取消
+
+                                        }
+                                    });
+                                    dismissDialog();
+
+                                } else if (ret.clickID == 'shouxie') {//手写
+                                    if (vm.getFileNum(0) >= 5) {
+                                        api.toast({
+                                            msg: "最多只能选择5张图片！",
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                        dismissDialog();
+                                        return;
+                                    }
+                                    let boardUrl = '../Drawing_board.html';
+                                    if($api.getStorage('padType') != '1' && api.systemType !== 'ios') {
+                                        boardUrl = '../../newHomework/Drawing_board_new.html';
+                                    }
+                                    api.openWin({
+                                        name: 'Drawing_board',
+                                        url: boardUrl,
+                                        pageParam: { name: api.frameName, type: 'huaban' },
+                                        slidBackEnabled: false
+                                    });
+                                    dismissDialog();
+                                }
+                            }
+                        });
+                    }
+
+                },
+                shoudongpiyue: function (context) {//手动批阅题文字的状态
+                    var textarea = [];
+                    var answer = $api.trim($api.val($api.dom('.wdtzi')));
+                    vm.is_txt = 1;
+                    if (answer.length == 0) {
+                        textarea = [];
+                    } else {
+                        var da = { 'is_txt': vm.is_txt, 'descript': answer, 'is_unable': vm.is_unable };
+                        Vue.set(textarea, 0, da);
+                    }
+                    return textarea;
+                },
+                getFileNum: function (isTxt) {//answer里面图片 视频 音频各自的数量
+                    var num = 0;
+                    for (i = 0; i < vm.answer.length; i++) {
+                        if (vm.answer[i].is_txt == isTxt) {
+                            num = num + 1;
+                        }
+                    }
+                    return num;
+                },
+                openMediaScanner: function (max) {// 选择相册图片 可多选
+                    if (!uiMediaScanner) {
+                        uiMediaScanner = api.require('UIMediaScanner');
+                    }
+                    uiMediaScanner.open({
+                        type: 'picture',
+                        column: 4,
+                        classify: true,
+                        max: max ? max : 5,
+                        sort: {
+                            key: 'time',
+                            order: 'desc'
+                        },
+                        texts: {
+                            stateText: '已选*项',
+                            cancelText: '取消',
+                            finishText: '完成'
+                        },
+                        rotation: true,
+                        styles: {
+                            bg: '#fff',
+                            mark: {
+                                icon: '',
+                                position: 'bottom_left',
+                                size: 20
+                            },
+                            nav: {
+                                bg: '#4bc7c7',
+                                stateColor: '#fff',
+                                stateSize: 18,
+                                cancelBg: 'rgba(0,0,0,0)',
+                                cancelColor: '#fff',
+                                cancelSize: 18,
+                                finishBg: 'rgba(0,0,0,0)',
+                                finishColor: '#fff',
+                                finishSize: 18
+                            }
+                        }
+                    }, function (ret) {
+                        if (ret) {
+                            if (ret.eventType == 'confirm' && ret.list.length > 0) {//如果选了图片 点了确定
+                                if (vm.is_txt == 1) {
+                                    vm.is_txt = 0;
+                                    vm.answer = [];
+                                } else {
+                                    vm.is_txt = 0;
+                                }
+                                vm.is_unable = 0;//会做
+                                compressListener.successCount = 0;
+                                compressListener.allCount = ret.list.length;
+                                for (var i = 0; i < ret.list.length; i++) {
+                                    var selectImg = ret.list[i];
+                                    // 获取图片的路径
+                                    var selectimgPath = selectImg.path;
+                                    var selectimgThumbPath = selectImg.thumbPath;
+                                    // console.warn("image url :" + url);
+                                    if (api.systemType == "ios") {
+                                        uiMediaScanner.transPath({
+                                            path: selectimgPath
+                                        }, function (ret, err) {
+                                            if (ret) {
+                                                vm.compressImage(ret.path);
+                                            } else {
+                                                alert("ios地址转换失败：" + JSON.stringify(err));
+                                            }
+                                        });
+                                    } else {
+                                        vm.compressImage(selectimgPath);
+                                    }
+                                }
+                            }
+                        } else {
+                            alert("图片选择器打开失败");
+                        }
+                    });
+                },
+                compressImage: function (url) {// 图片压缩处理
+                    var imageFilter = api.require('imageFilter');
+                    var imgName = vm.getUrlName(url);
+                    var quality;
+                    if (api.systemType == 'ios') {
+                        quality = 0.2;
+                    } else {
+                        quality = 0.8;
+                    }
+                    imageFilter.compress({
+                        img: url,
+                        quality: quality,
+                        save: {
+                            imgPath: "fs://img_compress/",
+                            imgName: imgName + ".jpg"
+                        }
+                    }, function (ret, err) {
+                        // console.log("compress result : ret=" + JSON.stringify(ret) + "  err:" + JSON.stringify(err));
+                        if (ret.status) {
+                            compressListener.successCount++;
+                            var newimgurl = api.fsDir + "/img_compress/" + imgName + ".jpg";
+                            vm.qiniuUpfile(newimgurl);
+                        } else {
+                        }
+                        imageFilter = '';
+                    })
+                },
+                getUrlName: function (url) {
+                    var index = url.lastIndexOf("/");
+                    var imgName;
+                    if (api.systemType == 'ios') {
+                        var idIndex = url.indexOf("id=");
+                        if (idIndex != -1) {
+                            var idStr = url.substr(idIndex);
+                            var andIndex = url.indexOf("&");
+                            imgName = url.substring(idIndex + 3, andIndex);
+                        } else {
+                            imgName = url.substring(index + 1);
+                        }
+                    } else {
+                        imgName = url.substring(index + 1);
+                    }
+                    return imgName;
+                },
+                qiniuUpfile: function (imgurl, type, index) {//上传图片
+                    api.showProgress({
+                        title: '正在上传图片',
+                        text: '请稍后',
+                        modal: true
+                    });
+                    var fileKey = (new Date()).valueOf() + imgurl;
+                    apiObj.Get(UrlRouter.GetQiNiuToken, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            bucket: 'vodresource',
+                            key: fileKey
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                var qiniuStorage = api.require("qiniuStorage");
+                                qiniuStorage.configUploader({
+                                    params: {},
+                                    checkCrc: false,
+                                    mimeType: '',
+                                    zone: $api.getStorage('qiniuZone')
+                                });
+                                qiniuStorage.start({
+                                    token: ret.data.token,
+                                    path: imgurl,
+                                    key: fileKey
+                                });
+                                qiniuStorage.addEventListener(function (ret) {
+                                    if (ret.eventType == 'complete') {
+                                        if ((api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                                            // 上传成功
+                                            var answerlist = {
+                                                'serverpath': QINIU_DOMAIN,
+                                                'savename': ret.key,
+                                                'filetime': 0,
+                                                'is_txt': 0,
+                                                'Local_address': QINIU_DOMAIN + ret.key
+                                            }; //txt 0图片 2 音频  3视频   Local_address本地地址
+                                            if (type == 'modulesave') {
+                                                Vue.set(vm.answer, index, answerlist);
+                                            } else {
+                                                vm.answer.push(answerlist);//把答案图片放在数组里
+                                            }
+                                            api.hideProgress();
+                                        } else {
+                                            api.hideProgress();
+                                            var msg = '上传失败！';
+                                            if (api.systemType == 'ios') {
+                                                msg = msg + ret.info.statusCode + ret.info.error.domain + ret.info.error.code;
+                                            } else {
+                                                msg = msg + ret.statusCode + ret.error.domain + ret.info.code;
+                                            }
+                                            api.toast({
+                                                msg: msg,
+                                                duration: 3000,
+                                                location: 'bottom'
+                                            });
+                                            //                                                alert('图片上传失败,请重新上传!');
+                                        }
+                                    }
+                                });
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: '图片上传失败，请重新提交答案',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    }
+                    );
+                },
+                giveData: function (savename, filetime, Local_address) {
+                    vm.is_unable = 0;//会做
+                    var answerlist = {
+                        'serverpath': QINIU_DOMAIN,
+                        'savename': savename,
+                        'filetime': filetime,
+                        'is_txt': 2,
+                        'Local_address': Local_address
+                    }; //txt 2 音频  3视频   Local_address本地地址
+                    vm.answer.push(answerlist);//把答案音频放在数组里
+                },
+                yuyin: function (audioItem, index) {
+                    if (audioItem.type == 1) {
+                        if (vm.isPlaying) {
+                            api.stopPlay();
+                            $('.img1').show();
+                            $('.img2').hide();
+                        } else {
+                            $('.img1').show();
+                            $('.img2').hide();
+                            var audioName = audioItem.savename;
+                            var path = "/audio/" + audioName + ".amr";
+                            api.download({
+                                url: audioItem.serverpath + "/" + audioItem.savename,
+                                savePath: 'fs:/' + path,
+                                report: false,
+                                cache: false,
+                                allowResume: false
+                            }, function (ret, err) {
+                                if (ret && ret.state == 1) {
+                                    // 下载成功  ret.savePath
+                                    isDownloading = false;
+                                    api.startPlay({
+                                        path: api.fsDir + path
+                                    }, function (ret, err) {
+                                        if (ret) {
+                                            vm.isPlaying = false;
+                                            $('.img1').show();
+                                            $('.img2').hide();
+
+                                        }
+                                    });
+
+                                    $('.yuyin3').eq(index).find('.img1').hide();
+                                    $('.yuyin3').eq(index).find('.img2').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img1').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img2').hide();
+                                }
+                            });
+                        }
+                        vm.isPlaying = !vm.isPlaying;
+                    }
+
+                },
+                commitAnswer: function () {
+                    api.sendEvent({
+                        name: 'yinpinCLose'
+                    });
+                    if (vm.is_txt == 1 && vm.is_unable == 0 && vm.is_show_textarea == 1) {
+                        vm.answer = vm.shoudongpiyue();
+                    }
+                    if (vm.answer.length == 0) {
+                        api.toast({
+                            msg: '无法提交未作答习题！',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return;
+                    }
+
+                    api.confirm({
+                        title: '提示',
+                        msg: '答案提交后无法修改，是否现在提交?',
+                        buttons: ['立即提交', '检查答案']
+                    }, function (ret, err) {
+                        if (ret.buttonIndex == 1) {
+                            api.showProgress({
+                                title: '答案提交中',
+                                text: '请稍后',
+                                modal: true
+                            });
+                            answerBody = {
+                                uid: $api.getStorage('uid'),
+                                kcid: vm.xtinfo.kcid,
+                                xsbjid: vm.classid,
+                                xkid: vm.data.xkid,
+                                njid: vm.data.njid,
+                                bbid: vm.data.bbid,
+                                sxcid: vm.data.sxcid,
+                                dyid: vm.data.dyid,
+                                jieid: vm.data.jieid,
+                                is_complete: 1,
+                                schoolid: vm.schoolid,
+                                ytlx: 1,//1基础 2拓展
+                                finish_time: 0,
+                                is_auto: 1,
+                                tx: vm.data.tx,
+                                is_unable: 0,
+                                xtid: vm.data.xtid,
+                                da: vm.answer,
+                                daoptions: vm.data.daoption,
+                                tx_code: vm.data.tx_code,
+                                score: 0,
+                                part_score: 0
+                            };
+                            vm.upToPc();
+                        }
+                    });
+                },
+
+                upToPc: function () {
+                    //                    vm.complete = 2;
+                    //                    vm.isShowAnswer = true;
+
+                    //区分云端课堂
+                    if ($api.getStorage('connectType') == 'Lan') {
+                        classObj.Post(UrlRouter.PostAnswer, {
+                            body: $api.jsonToStr({
+                                classid: vm.classid,
+                                uid: $api.getStorage('uid'),
+                                xtid: vm.data.xtid,
+                                kcid: vm.xtinfo.kcid,
+                                isauto: '1',
+                                istxt: 1,
+                                tx: vm.data.tx,
+                                tx_code: vm.data.tx_code,
+                                da: vm.answer
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                ProcessRet1(ret);
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        });
+                    } else {
+                        api.addEventListener({
+                            name: 'ReceiveMessage_7b'
+                        }, function (ret, err) {
+                            ProcessRet1(ret.value.receive);
+                        });
+                        classObjForCloud.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostAnswer, {
+                            body: $api.jsonToStr({
+                                classid: vm.classid,
+                                uid: $api.getStorage('uid'),
+                                xtid: vm.data.xtid,
+                                kcid: vm.xtinfo.kcid,
+                                isauto: '1',
+                                istxt: 1,
+                                tx: vm.data.tx,
+                                tx_code: vm.data.tx_code,
+                                da: vm.answer,
+                                from: 'ReceiveMessage_7b',
+                                vclass_token: $api.getStorage('vclass_token'),
+                                private_token: $api.getStorage('private_token')
+                            })
+                        }, function (ret, err) {
+                            if (ret && ret.status == 1) {
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: '提交失败',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        });
+                    }
+                },
+
+                getTimes: function (value) {
+                    var secondTime = parseInt(value);// 秒
+                    var minuteTime = 0;// 分
+                    if (secondTime > 59) {//如果秒数大于60，将秒数转换成整数
+                        //获取分钟，除以60取整数，得到整数分钟
+                        minuteTime = parseInt(secondTime / 60);
+                        //获取秒数，秒数取佘，得到整数秒数
+                        secondTime = parseInt(secondTime % 60);
+                    }
+                    var result = "" + parseInt(secondTime);
+                    if (minuteTime > 0 && secondTime < 10) {
+                        if (minuteTime > 9) {
+                            result = parseInt(minuteTime) + ":0" + result;
+                        } else {
+                            result = "0" + parseInt(minuteTime) + ":0" + result;
+                        }
+                    } else if (minuteTime > 0 && secondTime >= 10) {
+                        if (minuteTime > 9) {
+                            result = parseInt(minuteTime) + ":" + result;
+                        } else {
+                            result = "0" + parseInt(minuteTime) + ":" + result;
+                        }
+                    } else if (minuteTime == 0 && secondTime < 10) {
+                        result = "00" + ":0" + result;
+                    } else {
+                        result = "00" + ":" + result;
+                    }
+                    return result;
+                },
+                recordRun: function (context) {
+                    audioStreamer = api.require('audioStreamer');
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var bfb;
+                    var recodetime;
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/stop.png');
+                        sec = 0;
+                        allTimes = vm.answer[0].filetime;
+                        recodetime = vm.answer[0].filetime;
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.answer[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.answer[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.answer[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                        audioStreamer.openPlayer({
+                            path: vm.answer[0].Local_address
+                        }, function (ret) {
+                        });
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        clearInterval(timer);
+                        audioStreamer.pause();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                        $api.dom('.myRange').disabled = true;
+                    } else {
+                        $api.dom('.myRange').disabled = false;
+                        $api.attr(context, 'playStatus', '1');
+                        recodetime = vm.answer[0].filetime;
+                        //这个是一样的  重新播放
+                        if (api.systemType == 'ios') {
+                            audioStreamer.resume();
+                        } else {
+                            audioStreamer.openPlayer({
+                                path: vm.answer[0].Local_address,
+                            }, function (ret) {
+                            });
+                        }
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/stop.png');
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.answer[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.answer[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.answer[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+                ZSrecordRun: function (context) {
+                    audioStreamer = api.require('audioStreamer');
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var bfb;
+                    var recodetime;
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/stop.png');
+                        sec = 0;
+                        allTimes = vm.answer[0].filetime;
+                        recodetime = vm.answer[0].filetime;
+                        var url = vm.answer[0].serverpath + vm.answer[0].savename;
+                        var path = "/audio/" + url;
+                        api.download({
+                            url: url,
+                            savePath: 'fs:/' + path,
+                            report: false,
+                            cache: false,
+                            allowResume: false
+                        }, function (ret, err) {
+                            if (ret && ret.state == 1) {
+                                timer = setInterval(function (e) {
+                                    sec = sec + 1;
+                                    allTimes = allTimes - 1;
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    console.log(sec);
+                                    if (allTimes == 0 || sec >= vm.answer[0].filetime) {
+                                        clearInterval(timer);
+                                        $api.attr(context, 'playStatus', '0');
+                                        $api.dom('.myRange').value = 0;
+                                        $api.dom('.myRange').disabled = true;
+                                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                        $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.answer[0].filetime));
+                                        $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                                    } else {
+                                        var range = $api.dom('.myRange');
+                                        range.value = sec;
+                                        range.disabled = false;
+                                        range.onchange = function () {
+                                            sec = parseInt(this.value);
+                                            range.value = sec;
+                                            allTimes = vm.answer[0].filetime - sec;
+                                            var time = vm.getTimes(allTimes);
+                                            $api.text($api.dom('.ypTimeP'), time);
+                                            bfb = sec / recodetime * 100;
+                                            bfb = bfb.toFixed(2);
+                                            var ss = 'background-size: ' + bfb + '% 100%';
+                                            $api.css($api.dom('.myRange'), ss);
+                                            audioStreamer.seekToTime({
+                                                time: sec
+                                            });
+                                        };
+                                        var time = vm.getTimes(allTimes);
+                                        $api.css($api.dom('.myRange'), ss);
+                                        $api.text($api.dom('.ypTimeP'), time);
+                                    }
+                                }, 1000);
+                                downloadPath = api.fsDir + path;
+                                audioStreamer.openPlayer({
+                                    path: downloadPath
+                                }, function (ret) {
+                                });
+                            }
+                        });
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        clearInterval(timer);
+                        audioStreamer.pause();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                        $api.dom('.myRange').disabled = true;
+                    } else {
+                        $api.dom('.myRange').disabled = false;
+                        $api.attr(context, 'playStatus', '1');
+                        recodetime = vm.answer[0].filetime;
+                        //这个是一样的  重新播放
+                        if (api.systemType == 'ios') {
+                            audioStreamer.resume();
+                        } else {
+                            audioStreamer.openPlayer({
+                                path: downloadPath,
+                            }, function (ret) {
+                            });
+                        }
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../../image/stop.png');
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.answer[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.answer[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.answer[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+                PostAIBtn: async function () {
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    try{
+                        const ret = await new Promise((resolve, reject) => {
+                            apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostPayfeeOperationLog, {
+                                body: $api.jsonToStr({
+                                    schoolid: $api.getStorage('schoolid'),
+                                    type: 'ai_analysis',
+                                    resource_id: vm.data.xtid,
+                                    count: aiAnalysis.count,
+                                    card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                    ...(aiAnalysis.card_id !== undefined && {card_id: aiAnalysis.card_id}),
+                                })
+                            }, function (ret, err) {
+                                if (ret) {
+                                    resolve(ret);
+                                } else {
+                                    reject(err);
+                                }
+                            })
+                        });
+                        if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber')|| ret.ret !== 0) {
+                            api.hideProgress()
+                            if ($api.getStorage('upgradeQRCode') !== '0') {
+                                api.toast({
+                                    msg: '本月剩余AI解析次数已耗尽',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            } else {
+                                api.openFrame({
+                                    name: 'frame-number-exhausted',
+                                    url: '../../frame-number-exhausted.html',
+                                })
+                            }
+                            return
+                        }
+                        if(ret.ret === 0 && ret.data === ''){
+                            api.execScript({
+                                name: 'win-xsdt-dt-main-pad',
+                                script: 'postAddOperationLog()'
+                            });
+                        }
+                    }catch (e){
+                        console.error(e);
+                        api.hideProgress()
+                        alert('网络错误')
+                        return
+                    }
+                    const tgContent = document.querySelector('.tg_content');
+                    const needPics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...needPics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            // const base64Data = imgUrl.replace(/^data:image\/\w+;base64,/, '');
+                            // var imageName = 'screenshot_'+ index + vm.data.xtid + '.png';
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../../newHomework/frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.data.xtid,
+                                        imagePaths: imageUrls,
+                                        classroom: true,
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.hideProgress();
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+    function showImage(context) {
+        if ($api.getStorage('padType') != '1') {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    $(context).attr('fdsrc')
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+            return
+        }
+        var url = $(context).attr('fdsrc');
+        var index = $(context).attr('id');
+        var param = { "deviceType": "deviceType_pad", "url": url };
+        moduleImageScale.showImage(param, function (ret, err) {
+            if (ret) {
+                if (ret.state == "success" && ret.clickID == 'clickID_close') {
+                    moduleImageScale.dismissImage();
+                } else if (ret.state == "success" && ret.clickID == 'clickID_save') {
+                    vm.qiniuUpfile(ret.imageSavePath, 'modulesave', index);
+                    moduleImageScale.dismissImage();
+                } else if (ret.state == "success" && ret.clickID == 'clickID_delete') {
+                    vm.answer.splice(index, 1);
+                    moduleImageScale.dismissImage();
+                }
+            } else {
+                alert(JSON.stringify(err));
+            }
+
+
+        });
+
+    }
+    function cxjz() {
+        vm.GetParentexercisesUrl();
+    }
+    function CutPictures(src, tkindex) {
+        api.openFrame({
+            name: 'frame_cutPicture',
+            url: '../../../frame_cutPicture.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: api.winHeight
+            },
+            pageParam: { src: src, frameName: api.frameName, tkindex: tkindex },
+            bounces: false
+        });
+    }
+
+
+    function ProcessRet1(ret) {
+        api.hideProgress();
+        if (ret) {
+            if (ret.status == '-1') {
+                api.toast({
+                    msg: '你已经不是本班学生',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else if (ret.status == '0') {
+                api.toast({
+                    msg: '提交失败！',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else if (ret.status == '1') {
+                api.toast({
+                    msg: '提交成功！',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+                api.sendEvent({
+                    name: 'commited'
+                })
+                vm.complete = 2;
+            }
+        }
+    }
+
+</script>
+
+</html>

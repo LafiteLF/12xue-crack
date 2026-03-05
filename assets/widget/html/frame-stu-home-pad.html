@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            background-color: transparent;
+            writing-mode: horizontal-tb;
+            direction: ltr;
+        }
+
+        #main {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 主要内容区域 */
+        .content {
+            display: flex;
+            padding: 0 4vw 2vh;
+            margin-bottom: 2vh;
+            align-items: flex-start;
+            flex-direction: row;
+            height: 90%;
+
+        }
+
+        .left-section {
+            background: #56DBDB;
+            position: relative;
+            width: 38vw;
+            height: 100%;
+            flex-shrink: 0;
+            margin-left: 10px;
+            border-radius: 2vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 2vh;
+        }
+
+        .left-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .middle-section {
+            background-size: 100% 100%;
+            width: 46vw;
+            height: 100%;
+            margin-left: 2vw;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+
+
+        }
+
+        .right-buttons {
+            width: 5vw;
+            display: flex;
+            flex-direction: column;
+            /* gap: 3vh; */
+            align-items: center;
+            margin-top: 15vh;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 2vw;
+            padding: 2vh 1vw;
+            box-shadow: 0 0.5vh 2vh rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-left: 3vw;
+            flex-shrink: 0;
+        }
+
+        /* 用子元素的 margin 模拟 gap */
+        .right-buttons>*+* {
+            margin-top: 3vh;
+        }
+
+        .section-title {
+            text-align: center;
+            padding: 1.5vh 0;
+            border-radius: 2vw 2vw 0 0;
+            font-size: 2vw;
+            font-weight: bold;
+        }
+
+        .cards-container {
+            border-top: none;
+            border-radius: 0 0 2vw 2vw;
+            display: grid;
+            gap: 2vh;
+            align-items: center;
+        }
+
+        /* 左侧AI同步学习区域标题 */
+        .left-section-title {
+            color: white;
+            font-size: 2vw;
+            font-weight: bold;
+            text-align: center;
+            padding: 2vh 0 1.5vh 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 白色容器框 */
+        .left-section-container {
+            background: white;
+            border-radius: 2vw;
+            margin: 0 2vw 4vh 2vw;
+            padding: 2vh 1.5vw;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0.5vh 2vh rgba(0, 0, 0, 0.1),
+                inset 0 -10px 30px rgba(1, 171, 255, 0.20),
+                inset -5px 0 10px rgba(1, 171, 255, 0.15),
+                inset 5px 0 10px rgba(1, 171, 255, 0.15);
+        }
+
+
+        /* 左侧AI同步学习区域布局 */
+        .left-section .cards-container {
+            display: grid;
+            grid-template-rows: 1fr 1fr 1fr;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+        }
+
+        /* 卡片内容布局 左边文字+箭头，右边图标 */
+        .card-content {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            /* padding: 1.5vh 1.8vw; */
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        .card-top {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+            padding-left: 1.8vw;
+        }
+
+        .card-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            /* margin-bottom: 1vh; */
+            writing-mode: horizontal-tb;
+            text-orientation: mixed;
+        }
+
+        .card-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            /* margin-left: 1vw; */
+        }
+
+        .card-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: auto;
+        }
+
+        .card-text {
+            font-size: 1.6vw;
+            color: #333;
+            /* margin-bottom: 1vh; */
+            writing-mode: horizontal-tb;
+            text-orientation: mixed;
+        }
+
+        .card-subtitle {
+            font-size: 1.4vw;
+            color: #666;
+            opacity: 0.8;
+        }
+
+        .card-icon-new {
+            width: 5vw;
+            margin-right: 1.2vw;
+            object-fit: contain;
+        }
+
+        .card-arrow-new {
+            width: 2vw;
+            height: 2vw;
+            opacity: 0.7;
+            margin-top: 1vh;
+        }
+
+        /* 小卡片使用统一布局 - 左边文字+箭头，右边图标 */
+        .card-small .card-content {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            /* padding: 1.2vh 1.3vw; */
+        }
+
+        .card-small .card-top {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+            writing-mode: horizontal-tb;
+            direction: ltr;
+        }
+
+        .card-small .card-left {
+            margin-bottom: 1vh;
+            writing-mode: horizontal-tb;
+            direction: ltr;
+        }
+
+        .card-small .card-right {
+            flex-shrink: 0;
+        }
+
+        .card-small .card-bottom {
+            width: auto;
+        }
+
+        .card-small .card-text {
+            writing-mode: horizontal-tb;
+            text-orientation: mixed;
+            direction: ltr;
+            white-space: nowrap;
+        }
+
+        .card-small .card-icon-new {
+            width: 4.5vw;
+            /* height: 4.5vw; */
+            margin-right: 2.5vw;
+            object-fit: contain;
+        }
+
+        .card-small .card-right {
+            /* width: 5vw; */
+            /* height: 5vw; */
+            /* margin-left: 0.5vw; */
+        }
+
+        /* 不同卡片的背景色 */
+        .card-oral {
+            background: linear-gradient(to right, #FEE4C4 0%, #FFEDC7 100%);
+        }
+
+        .card-ai-learning {
+            background: linear-gradient(to right, #DBE7FE 0%, #CFF0FB 100%);
+        }
+
+        .card-knowledge {
+            background: #BCF3D2;
+        }
+
+        .card-essay {
+            background: linear-gradient(to right, #FED8D8 0%, #FDE8D4 100%);
+        }
+
+        .card-knowledge .card-text,
+        .card-essay .card-text {
+            writing-mode: horizontal-tb !important;
+            text-orientation: mixed !important;
+            direction: ltr !important;
+            white-space: nowrap !important;
+            display: inline-block !important;
+        }
+
+        .card-knowledge .card-left,
+        .card-essay .card-left {
+            writing-mode: horizontal-tb !important;
+            direction: ltr !important;
+        }
+
+
+        /* 默认布局 - 4个卡片（没有选课时） */
+        .classroom-cards {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(4, 1fr);
+            height: 100%;
+            width: 100%;
+        }
+
+        /* 没有选课时的布局 - 作业(3份) + 打分(1份) + 课堂讲义(2份) + 互动课堂(2份) */
+        .classroom-cards .card:nth-child(1) {
+            /* 作业 - 占左侧3份 */
+            grid-column: 1;
+            grid-row: 1 / span 3;
+            height: 100%;
+            width: 100%;
+        }
+
+        .classroom-cards .card:nth-child(2) {
+            /* 打分 - 没有选课时，打分是第2个卡片，占左侧1份 */
+            grid-column: 1;
+            grid-row: 4;
+            height: 100%;
+            width: 100%;
+        }
+
+        .classroom-cards .card:nth-child(3) {
+            /* 课堂讲义 - 没有选课时，课堂讲义是第3个卡片，占右侧2份 */
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            height: 100%;
+            width: 100%;
+        }
+
+        .classroom-cards .card:nth-child(4) {
+            /* 互动课堂 - 没有选课时，互动课堂是第4个卡片，占右侧2份 */
+            grid-column: 2;
+            grid-row: 3 / span 2;
+            height: 100%;
+            width: 100%;
+        }
+
+        .classroom-cards .card:nth-child(5) {
+            grid-column: 2;
+            grid-row: 3 / span 2;
+            height: 70%;
+            width: 100%;
+        }
+
+        /* 课堂同步区域卡片背景色 */
+        .classroom-cards .card:nth-child(1) {
+            background: linear-gradient(to right, #DBE7FE 0%, #CFF0FB 100%);
+        }
+
+        .classroom-cards .card:nth-child(2) {
+            background: linear-gradient(to right, #FFF4E6 0%, #FFE4B5 100%);
+        }
+
+        .classroom-cards .card:nth-child(3) {
+            background: linear-gradient(to right, #FED8D8 0%, #FDE8D4 100%);
+        }
+
+        .classroom-cards .card:nth-child(4) {
+            background: #BCF3D2;
+        }
+
+        /* 有选课时的卡片背景色 */
+
+        .classroom-cards.has-xuanke .card:nth-child(5) {
+            background: linear-gradient(to right, #E9DDFE 0%, #EFE7FF 100%);
+        }
+
+
+        /* 有选课时的布局 - 5个卡片 */
+        .classroom-cards.has-xuanke {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(4, 1fr);
+        }
+
+        /* 有选课时 - 作业卡片占据2份 */
+        .classroom-cards.has-xuanke .card:nth-child(1) {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* 有选课时 - 打分卡片占据1份 */
+        .classroom-cards.has-xuanke .card:nth-child(2) {
+            grid-column: 1;
+            grid-row: 4;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* 有选课时 - 选课卡片占据1份 */
+        .classroom-cards.has-xuanke .card:nth-child(5) {
+            grid-column: 1;
+            grid-row: 3;
+            height: 100%;
+            width: 100%;
+        }
+
+
+        /* 卡片样式 */
+        .card {
+            -webkit-tap-highlight-color: transparent;
+            border-radius: 1.5vw;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 左侧大卡片样式 */
+        .left-section .card-large {
+            height: 100%;
+        }
+
+        /* 左侧小卡片样式 */
+        .left-section .card-small {
+            height: 100%;
+            width: 100%;
+        }
+
+
+        .card-title {
+            font-size: 1.8vw;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card-icon {
+            width: 4vw;
+            height: 4vw;
+        }
+
+        .card-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-arrow {
+            font-size: 2vw;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+
+        .handout {
+            margin-top: 5px;
+        }
+
+
+        /* 底部功能区域 */
+        .bottom-section {
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 2vh;
+        }
+
+        .bottom-section>*:not(:first-child) {
+            margin-left: 2vw;
+        }
+
+        .bottom-card {
+            border-radius: 2vw;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 25%;
+            height: 20vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2vh 1.5vw;
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.50);
+        }
+
+        .bottom-card-icon {
+            width: 3vw;
+            /* height: 6vh; */
+            margin-bottom: 3vh;
+        }
+
+        .bottom-card-text {
+            font-size: 1.3vw;
+            /* font-weight: bold; */
+            color: #333;
+        }
+
+
+        /* 右侧应用设置按钮 */
+        .right-buttons .fixed-btn {
+            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 5vw;
+            height: 8vh;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .right-buttons .fixed-btn:hover {
+            transform: translateY(-0.2vh);
+        }
+
+        .right-buttons .fixed-btn .btn-icon {
+            width: 3.5vw;
+            height: 3.5vw;
+            margin-bottom: 0.5vh;
+            position: relative;
+        }
+
+
+        .right-buttons .fixed-btn .btn-icon img {
+            width: 2vw;
+            height: 2vw;
+            position: relative;
+            z-index: 2;
+            margin-left: 0.7vw;
+        }
+
+        .right-buttons .fixed-btn .btn-text {
+            font-size: 1.2vw;
+            font-weight: 500;
+            text-align: center;
+        }
+
+
+        .hebing {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            gap: 1.5vw;
+            writing-mode: horizontal-tb;
+            direction: ltr;
+        }
+
+        .classroom-sync {
+            background: #56DBDB;
+            width: 100%;
+            flex: 1;
+            height: 0;
+            padding: 0;
+            border-radius: 2vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 1vh;
+        }
+
+        /* 课堂同步区域标题 */
+        .classroom-sync-title {
+            color: white;
+            font-size: 2vw;
+            font-weight: bold;
+            text-align: center;
+            padding: 2vh 0 1.5vh 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 课堂同步白色容器框 */
+        .classroom-sync-container {
+            background: white;
+            border-radius: 2vw;
+            margin: 0 2vw 1.5vh 2vw;
+            padding: 2vh 1.5vw;
+            flex: 1;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0.5vh 2vh rgba(0, 0, 0, 0.1),
+                inset 0 -10px 30px rgba(1, 171, 255, 0.20),
+                inset -5px 0 10px rgba(1, 171, 255, 0.15),
+                inset 5px 0 10px rgba(1, 171, 255, 0.15);
+        }
+
+        .classroom-sync::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 15% 25%, rgba(255, 255, 255, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(255, 255, 255, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .ai-icon {
+            font-size: 3vw;
+            color: white;
+        }
+
+        button {
+            outline: none;
+        }
+    </style>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../script/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="../script/vue.global.prod-3.5.18.js"></script>
+    <script type="text/javascript" src="../script/aui-tab.js"></script>
+    <script type="text/javascript" src="../script/login/login.js"></script>
+    <script type="text/javascript" src="../script/common.js"></script>
+    <script type="text/javascript" src="../script/fastclick.js"></script>
+</head>
+
+<body>
+    <div id="main">
+        <!-- 主要内容区域 -->
+        <div class="content">
+            <!-- 左侧AI同步学习区域 -->
+            <div class="left-section">
+                <!-- 内部元素水平排列 -->
+                <div style="display: flex; justify-content: center; align-items: center; z-index: 2;">
+
+                    <!-- 左边的图标 -->
+                    <img src="../image/luosi.png" style="width: 1vw; height: 1vw;">
+
+                    <div class="left-section-title" style="padding: 2vh 12vw 1.5vh;">自主学习</div>
+
+                    <!-- 右边的图标 -->
+                    <img src="../image/luosi.png" style="width: 1vw; height: 1vw;">
+
+                </div>
+                <!-- 白色容器框 -->
+                <div class="left-section-container">
+                    <div class="cards-container">
+                        <!-- 口语训练卡片 -->
+                        <div class="card card-large card-oral" @click="openFrame({id: '11'})">
+                            <div class="card-content">
+                                <div class="card-top">
+                                    <div class="card-left">
+                                        <div class="card-text">口语训练</div>
+                                    </div>
+                                    <div class="card-bottom">
+                                        <!-- 右箭头 -->
+                                        <img src="../image/kouyujt.png" alt="箭头" class="card-arrow-new">
+                                    </div>
+                                </div>
+                                <div class="card-right">
+                                    <!-- 口语训练图标 -->
+                                    <img src="../image/kouyu.png" alt="口语训练图标" class="card-icon-new"
+                                        style="width: 7vw;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI伴学卡片 -->
+                        <div class="card card-large card-ai-learning" @click="openFrame({id: '10'})">
+                            <div class="card-content">
+                                <div class="card-top">
+                                    <div class="card-left">
+                                        <!-- 如果默认写ai伴学，审核时修改文本会闪一下，很容易露馅，所以先空着 -->
+                                        <div class="card-text" id="aiAssistantText"></div>
+                                    </div>
+                                    <div class="card-bottom">
+                                        <!-- 右箭头 -->
+                                        <img src="../image/aijt.png" alt="箭头" class="card-arrow-new">
+                                    </div>
+                                </div>
+                                <div class="card-right">
+                                    <!--AI伴学图标 -->
+                                    <img src="../image/ai.png" alt="AI伴学图标" class="card-icon-new" style="width: 7vw;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hebing">
+                            <!-- 知识图谱卡片 -->
+                            <div class="card card-small card-knowledge" @click="openFrame({id: '12'})"
+                                style="position: relative;">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text">知识图谱</div>
+                                        </div>
+                                        <div class="card-bottom">
+                                            <!-- 右箭头 -->
+                                            <img src="../image/zstpjt.png" alt="箭头" class="card-arrow-new">
+                                        </div>
+                                    </div>
+                                    <div class="card-right" style="position:absolute;right: 0;bottom: 0;">
+                                        <!-- 知识图谱图标 -->
+                                        <img src="../image/zstp.png" alt="知识图谱图标" style="width:7vw; margin-top: 5vh;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI作文批阅卡片 -->
+                            <div class="card card-small card-essay" @click="openAiEssayReview"
+                                style="position: relative;">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text" style="font-size: 1.6vw;">AI作文批阅</div>
+                                        </div>
+                                        <div class="card-bottom">
+                                            <!-- ：右箭头 -->
+                                            <img src="../image/aipyjt.png" alt="箭头" class="card-arrow-new">
+                                        </div>
+                                    </div>
+                                    <div class="card-right" style="position:absolute;right: 0;bottom: 0;">
+                                        <!-- AI作文批阅图标 -->
+                                        <img src="../image/aipy.png" alt="AI作文批阅图标" style="width: 6.8vw; ">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; padding: 0 2vw 1.5vh 2vw; z-index: 2;">
+
+                    <!-- 左侧装饰组 -->
+                    <img src="../image/luosi.png" style="width: 1vw; height: 1vw;">
+                    <img src="../image/zuoce.png" style="height: 3vh; margin-left: 3vw;">
+
+                    <!-- 自动伸缩的空白区域，-->
+                    <div style="flex-grow: 1;"></div>
+
+                    <!-- 右侧装饰组 -->
+                    <img src="../image/youce.png" style="height: 3vh; margin-right: 3vw;">
+                    <img src="../image/luosi.png" style="width: 1vw; height: 1vw;">
+
+                </div>
+            </div>
+
+            <!-- 中间区域包含课堂同步和底部卡片 -->
+            <div class="middle-section">
+                <!-- 课堂同步区域 -->
+                <div class="classroom-sync">
+                    <!-- 课堂同步标题 -->
+                    <div style="display: flex; justify-content: center; align-items: center; z-index: 2;">
+
+                        <!-- 左边的图标 -->
+                        <img src="../image/luosi.png" style="width: 1vw; height: 1vw;">
+
+                        <div class="left-section-title" style="padding: 2vh 15vw 1.5vh;">课堂同步</div>
+
+                        <!-- 右边的图标 -->
+                        <img src="../image/luosi.png" style="width: 1vw; height: 1vw;">
+
+                    </div>
+                    <!-- 白色容器框 -->
+                    <div class="classroom-sync-container">
+                        <div class="cards-container classroom-cards"
+                            :class="{'has-xuanke': chooseSubjectType != 1 && gradelist.length > 0}">
+                            <!-- 作业卡片 -->
+                            <div class="card" @click="openFrame({id: '0'})">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text">作业</div>
+                                            <div class="card-subtitle"
+                                                v-if="chooseSubjectType != 1 && gradelist.length > 0">
+                                            </div>
+                                        </div>
+                                        <div class="card-bottom">
+                                            <img src="../image/aijt.png" alt="箭头" class="card-arrow-new">
+                                        </div>
+                                    </div>
+                                    <div class="card-right">
+                                        <!--作业图标 -->
+                                        <img src="../image/zy1.png" alt="作业图标" class="card-icon-new"
+                                            style="width: 8vw;">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- 打分卡片 -->
+                            <div class="card" @click="openFrame({id: '8'})" style="position: relative;">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text">打分</div>
+                                        </div>
+                                    </div>
+                                    <div class="card-right" style="position:absolute;right: 1vw;bottom: 0;top: 0;">
+                                        <!--打分图标 -->
+                                        <img src="../image/df.png" alt="打分图标" style="width: 6vw;">
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- 课堂资源包卡片 -->
+                            <div class="card" @click="openFrame({id: '6'})">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text">课堂资源包</div>
+                                        </div>
+                                        <div class="card-bottom">
+                                            <!-- 右箭头 -->
+                                            <img src="../image/aipyjt.png" alt="箭头" class="card-arrow-new">
+                                        </div>
+                                    </div>
+                                    <div class="card-right">
+                                        <!-- 课堂讲义图标 -->
+                                        <img src="../image/ktjy.png" alt="课堂讲义图标" class="card-icon-new"
+                                            style="width: 6vw;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 互动课堂卡片 -->
+                            <div class="card" @click="openFrame({id: '1'})">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text">互动课堂</div>
+                                        </div>
+                                        <div class="card-bottom">
+                                            <!-- 右箭头 -->
+                                            <img src="../image/zstpjt.png" alt="箭头" class="card-arrow-new">
+                                        </div>
+                                    </div>
+                                    <div class="card-right">
+                                        <!-- 互动课堂图标 -->
+                                        <img src="../image/hdkt.png" alt="互动课堂图标" class="card-icon-new"
+                                            style="width: 6vw;">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 选课卡片 -->
+                            <div v-if="chooseSubjectType != 1 && gradelist.length > 0" class="card"
+                                @click="GetSelectCourseStuOpenSelect(true, schoolid)" style="position: relative;">
+                                <div class="card-content">
+                                    <div class="card-top">
+                                        <div class="card-left">
+                                            <div class="card-text">选课</div>
+                                        </div>
+                                    </div>
+                                    <div class="card-right" style="position:absolute;right: 2vw;bottom: 0;top: 0;">
+                                        <!-- 选课图标 -->
+                                        <img src="../image/xk.png" alt="选课图标" style="width: 4vw;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        style="position: absolute; bottom: -1vh; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 1vh 2vw 1.5vh 2vw; z-index: 2;">
+                        <!-- 左侧竖杠图片 -->
+                        <img src="../image/shu.png" style="height: 1vh; margin-left: 3vw;">
+                        <!-- 中间横杠图片 -->
+                        <img src="../image/heng.png" style="height: 1.5vh;">
+                        <!-- 右侧竖杠图片 -->
+                        <img src="../image/shu.png" style="height: 1vh; margin-right: 3vw;">
+                    </div>
+                </div>
+                <!-- 底部功能区域 - 在课堂同步下方 -->
+                <div class="bottom-section">
+                    <!-- 错题本卡片 -->
+                    <div class="bottom-card" @click="openFrame({id: '2'})">
+                        <!-- 错题本图标 -->
+                        <img src="../image/ctb.png" alt="错题本图标" class="bottom-card-icon">
+                        <div class="bottom-card-text">错题本</div>
+                    </div>
+
+                    <!-- 学科课程卡片 -->
+                    <div class="bottom-card" @click.stop="openFrame({id: '13'})">
+                        <!-- 学科课程图标 -->
+                        <img src="../image/xkkc.png" alt="学科课程图标" class="bottom-card-icon">
+                        <div class="bottom-card-text">学科课程</div>
+                    </div>
+
+                    <!-- 考试测评卡片 -->
+                    <div class="bottom-card" @click="openFrame({id: '3'})">
+                        <!-- 考试测评图标 -->
+                        <img src="../image/kscp.png" alt="考试测评图标" class="bottom-card-icon">
+                        <div class="bottom-card-text">考试测评</div>
+                    </div>
+
+                    <div class="bottom-card" @click.stop="openStudentProgressReport">
+                        <img src="../image/student_progress_report.png" alt="诊断提升" class="bottom-card-icon" />
+                        <div class="bottom-card-text">诊断提升</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 右侧应用设置按钮 -->
+            <div class="right-buttons">
+                <div class="fixed-btn" @click="openFrame({id: '5'})" v-if="padType == '1'">
+                    <div class="btn-icon">
+                        <img src="../image/yingyong.png" alt="应用">
+                    </div>
+                    <div class="btn-text">应用</div>
+                </div>
+                <div class="fixed-btn" @click="setUp">
+                    <div class="btn-icon">
+                        <img src="../image/shezhi.png" alt="设置">
+                    </div>
+                    <div class="btn-text">设置</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var sendSuc = true;
+    var hsClass = false;//学生有没有申请还没有创建的班级
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var apiObj2 = new GridOpenApi('http://blacklist.12xue.com/api', source, version);
+    var classid = [];
+    var name = '';
+    var path = '';
+    var systemType;
+    //审核数据，由于有时间限制，所以超时后即使不关闭auditMode也无所谓
+    const audit = { uid: '1054145308281422015', deadlineTime: 1768014024000 + 1000 * 60 * 60 * 24 * 7, auditMode: true }//Students005
+    const { createApp, computed } = Vue
+    apiready = async function () {
+        if (audit.auditMode && $api.getStorage('padType') == '2' && new Date().getTime() < audit.deadlineTime && $api.getStorage('uid') == audit.uid) {
+            document.getElementById('aiAssistantText').innerText = '词汇记忆';
+        } else {
+            document.getElementById('aiAssistantText').innerText = 'AI伴学';
+        }
+        const app = createApp({
+            data() {
+                return {
+                    photoHeight: '',
+                    personName: $api.getStorage('realname'),
+                    XdClass: '',
+                    School: '',
+                    Grade: '',
+                    face: $api.getStorage('head_url'),
+                    schoolid: '',
+                    isxuanke: true,
+                    xkok: false,
+                    chooseSubjectType: 1,//1不选课 2开始选课3 选课完成
+                    SubjectData: {},
+                    gradelist: [],
+                    padType: '', //存储 padType
+                    /* 以下为单词记忆提醒功能 */
+                    memorization_alarms: { '上午': null, '下午': null, '晚上': null },
+                    /* 以上为单词记忆提醒功能 */
+
+                }
+            },
+            computed: {},
+            async beforeMount() {
+                this.padType = $api.getStorage('padType');
+                //   this.padType = 1;
+
+                if (!this.face) {
+                    this.getPersonFace();
+                }
+                await this.getClassInfo();
+                // this.getScorecheckAudit();
+            },
+            mounted() {
+                var that = this;
+                api.addEventListener({
+                    name: 'oralTraining_memorization_setAlarm'
+                }, function (ret, err) {
+                    that.setAlarm(ret.value.whichAlarm);
+                });
+                api.addEventListener({
+                    name: 'oralTraining_memorization_cancelAlarm'
+                }, function (ret, err) {
+                    that.cancelAlarm(ret.value.whichAlarm);
+                });
+
+                api.addEventListener({
+                    name: 'close_testReport_frame'
+                }, function () {
+                    api.closeFrame({
+                        name: 'win_testReport'
+                    });
+                });
+                this.initAlarm();
+            },
+            methods: {
+                /* 以下为单词记忆提醒功能 */
+                initAlarm() {
+                    if ($api.getStorage('oralTraining_memorization_alarm上午_id')) {
+                        this.setAlarm('上午');
+                    }
+                    if ($api.getStorage('oralTraining_memorization_alarm下午_id')) {
+                        this.setAlarm('下午');
+                    }
+                    if ($api.getStorage('oralTraining_memorization_alarm晚上_id')) {
+                        this.setAlarm('晚上');
+                    }
+                },
+                setAlarm(time) {
+                    this.cancelAlarm(time);
+                    const alarmTime = new Date().setHours($api.getStorage('oralTraining_memorization_alarm' + time).split(':')[0], $api.getStorage('oralTraining_memorization_alarm' + time).split(':')[1], 0, 0);
+                    let timeout = alarmTime - new Date().getTime();
+                    if (timeout < 0) timeout = timeout + 24 * 60 * 60 * 1000;
+                    this.memorization_alarms[time] = setTimeout(() => {
+                        api.alert({
+                            title: '学习提醒',
+                            msg: '到了学习单词的时间啦，自己定下的计划，一定要完成哦！',
+                        });
+                    }, timeout);
+                    setTimeout(() => {
+                        this.initAlarm();
+                    }, timeout + 1000 * 10);//响铃10秒后重新检查，防止不关闭页面导致第二天不再提醒
+                },
+                cancelAlarm(time) {
+                    if (this.memorization_alarms[time] != null) {
+                        clearTimeout(this.memorization_alarms[time]);
+                        this.memorization_alarms[time] = null;
+                    }
+                },
+                /* 以上为单词记忆提醒功能 */
+                GetStudentStudentgradeid(schoolid) {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.SetAuthToken($api.getStorage('token'));
+                    apiObj.Get(UrlRouter.GetStudentStudentgradeid, {
+                        values: {
+                            schoolid: schoolid,
+                            uid: $api.getStorage('uid'),
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                api.hideProgress();
+                                this.gradelist = ret.data
+                                if (this.gradelist.length > 0) {
+                                    this.GetSelectCourseStuOpenSelect(false, schoolid)
+                                }
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                },
+                GetSelectCourseStuOpenSelect(isclick, schoolid) {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.SetAuthToken($api.getStorage('token'));
+                    apiObj.Get(UrlRouter.GetSelectCourseStuOpenSelect, {
+                        values: {
+                            schoolid: schoolid,
+                            uid: $api.getStorage('uid'),
+                            gradeid: this.gradelist.toString()
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                api.hideProgress();
+                                this.chooseSubjectType = ret.data.type;
+                                // this.chooseSubjectType = 1;
+                                this.SubjectData = ret.data
+                                if (isclick) {//如果是点击进入
+                                    this.openSelectSubject()
+                                }
+                            } else {
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                },
+
+                async getClassInfo() {
+                    apiObj.SetAuthToken($api.getStorage("token"));
+                    await new Promise(resolve => {
+                        apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                            values: {
+                                uid: $api.getStorage('uid'),
+                                identitytype: '3'
+                            }
+                        }, (ret, err) => {
+                            if (ret && ret.ret == 0) {
+                                if (ret.data.length > 0) {
+                                    //区分七牛上传区域
+                                    switch (ret.data[0].provinceid) {
+                                        case 350000:
+                                            $api.setStorage('qiniuZone', 'z2');
+                                            break;
+                                        case 410000:
+                                        case 610000:
+                                            $api.setStorage('qiniuZone', 'z0');
+                                            break;
+                                        default:
+                                            $api.setStorage('qiniuZone', 'z0');
+                                            break;
+                                    }
+                                    var schoolid = ret.data[0].id;
+                                    this.schoolid = ret.data[0].id;
+                                    this.GetStudentStudentgradeid(schoolid);
+                                    $api.setStorage('schoolid', schoolid);
+                                    this.School = ret.data[0].xxmc;
+                                    var classlist = ret.data[0].class;
+                                    if (classlist.length > 0) {
+                                        for (var i = 0; i < classlist.length; i++) {
+                                            if (classlist[i].type == 1) {
+                                                this.XdClass = classlist[0].xdtitle + ' ' + classlist[0].bjmc;
+                                                $api.setStorage('XdClass', this.XdClass)
+                                                if (classlist[i].xd == 34) {
+                                                    $api.setStorage('gzxd', '34');
+                                                }
+                                                if (classlist[i].njmc == '2020') {
+                                                    $api.setStorage('njmc', '2020');
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        this.XdClass = '暂无班级';
+                                        $api.setStorage('XdClass', this.XdClass);
+                                    }
+                                } else {
+                                    this.XdClass = '暂无学校和班级';
+                                    this.School = '';
+                                    $api.setStorage('XdClass', this.XdClass);
+                                }
+                            } else {
+                                this.XdClass = '暂无学校和班级';
+                                this.School = '';
+                                $api.setStorage('XdClass', this.XdClass);
+                            }
+                            resolve(ret);
+                        });
+                    });
+                },
+                getPersonInfo() {
+                    apiObj.Get(UrlRouter.GetDynamicspaceinfo, {
+                        values: {
+                            otheruid: $api.getStorage('uid')
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $api.setStorage("reply_userinfo", ret);
+                                this.personName = ret.realname;
+                                this.Grade = ret.rank;
+                            }
+                        }
+                    });
+                },
+                getPersonFace() {
+                    apiObj.Get(UrlRouter.GetPortrait, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            size: 'b'
+                        }
+                    }, (ret, err) => {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $api.setStorage('head_url', ret.face);
+                                this.face = ret.face;
+                            }
+                        }
+                    });
+                },
+                openSelectSubject() {//进入选课
+                    if (this.chooseSubjectType == 3) {//已选，进入走班信息界面
+                        api.openWin({
+                            name: 'win_subject',
+                            url: '../html/study/chooseSubject/win_subject.html',
+                            pageParam: { SubjectData: this.SubjectData, schoolid: this.schoolid }
+                        });
+                    } else if (this.chooseSubjectType == 2) {//未选，进入选课界面
+                        api.openWin({
+                            name: 'win_choose_subject',
+                            url: '../html/study/chooseSubject/win_choose_subject.html',
+                            pageParam: { SubjectData: this.SubjectData, schoolid: this.schoolid }
+                        });
+                    } else if (this.chooseSubjectType == 4) {
+                        alert('选课已经结束，请联系老师！')
+                    } else {
+                        api.toast({
+                            msg: '选课还未开始哦！',
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                },
+                async openFrame(context) {
+                    if (sendSuc) {
+                        sendSuc = false;
+                        setTimeout(function () {
+                            sendSuc = true;
+                        }, 1000);//1秒后才能点击
+                    } else {
+                        return;
+                    }
+                    getClassB();
+                    var index = context.id;
+                    switch (index) {
+                        case '0':
+                            //作业
+                            name = 'win-subject-list-pad';
+                            path = '../html/study/newHomework/win-subject-list-pad.html';
+                            break;
+                        case '1':
+                            //互动课堂
+                            name = 'classroom';
+                            path = 'classroom';
+                            break;
+
+                        case '2':
+                            //错题本
+                            name = 'win_error_subject_list_pad';
+                            path = '../html/study/errorNewEx/win_error_subject_list_pad.html';
+                            break;
+                        case '13':
+                            //给青岛长江初中部关闭学科课程
+                            if ($api.getStorage('schoolid') == '1033144479114437070') {
+                                api.toast({
+                                    msg: '该功能已关闭'
+                                })
+                                return;
+                            }
+                            //学科课程
+                            name = 'frame-Intelligence';
+                            path = '../html/newIntelligence/frame-Intelligence.html';
+                            break;
+                        case '3':
+                            //考试
+                            name = 'win_exam_subject_list';
+                            path = '../html/study/examination/win_exam_subject_list.html';
+                            break;
+                        case '4':
+                            //学分乐园
+                            name = 'win-myscorezoo';
+                            path = '../html/study/ScoreZoo/win-myscorezoo.html';
+                            break;
+                        case '7':
+                            //学分乐园
+                            name = 'win-myscorezoo';
+                            path = '../html/study/ScoreZoo/win-myscorezoo.html';
+                            break;
+                        case '5':
+                            //我的应用
+                            if ($api.getStorage('padType') != '2' && $api.getStorage('padType') != '3') {
+                                if ($api.getStorage('deviceModel') == 1) {
+                                    api.sendEvent({
+                                        name: 'openAppStore'
+                                    });
+                                } else {
+                                    if (api.deviceModel == 'SM-P600' && api.deviceModel == 'Lenovo TB-X804F') {
+                                        return;
+                                    }
+                                    api.sendEvent({
+                                        name: 'myapps'
+                                    });
+                                }
+                            } else {
+                                if ($api.getStorage('padType') == '2') {
+                                    api.toast({
+                                        msg: '该功能正在完善中，请耐心等待！',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+                            }
+                            name = 'win-appstore';
+                            path = '../html/appStore/win-appstore.html';
+                            break;
+                        case '6':
+                            //课堂资源包
+                            name = 'win-course-subject-list-pad';
+                            path = '../html/study/newCourse/win-course-subject-list-pad.html';
+                            break;
+
+
+                        //学生打分
+                        case '8':
+                            try {
+                                await new Promise((resolve, reject) => {
+                                    apiObj.SetAuthToken($api.getStorage("token"));
+                                    apiObj.Get(UrlRouter.GetScorecheckAudit, {
+                                        values: {
+                                            isdetail: '1'
+                                        }
+                                    }, (ret, err) => {
+                                        // console.log('asdas', JSON.stringify(ret));
+                                        if (ret && ret.ret == 0 && ret.data.status == 1) {
+                                            // 显示学生打分功能
+                                            name = 'win_studentDf';
+                                            path = '../html/study/studentDf/win_studentDf.html';
+
+                                        } else {
+                                            api.toast({
+                                                msg: '打分功能未开启',
+
+                                            })
+                                            reject();//抛错误 触发错误
+
+                                        }
+                                        resolve();//正常返回
+                                    });
+
+                                })
+                            } catch {
+                                return;
+                            }
+
+                            break;
+                        case '10':
+                            //ai伴学
+                            name = 'win_aiAssistant';
+                            path = '../html/aiAssistant/win_aiAssistant_new.html';
+                            if (audit.auditMode && $api.getStorage('padType') == '2' && new Date().getTime() < audit.deadlineTime && $api.getStorage('uid') == audit.uid) {
+                                path = 'https://en-web.12xue.com/pages/html/memorization/win-memorization-root.html';
+                            }
+                            break;
+                        case '11':
+                            name = 'oralTraining-win-main';
+                            //var ruurl = apiUrlIndex == '3' ? 'https://en-test-front.12xue.com' : 'https://en-web.12xue.com';//测试？测试：线上
+                            //var ruurl = 'http://192.168.103.254:4003/static';//本地
+                            var ruurl=enWebEntry;
+                            let board = $api.getStorage('oralTrainingBoard') == 'sentence' ? '/pages/html/sentences/win-sentence-main.html' : '/pages/html/word/win-main.html';//默认进入单词
+                            path = api.systemType == 'ios' ? ruurl + '/pages/html/win-intro.html' : ruurl + board;
+
+                            // 检测网络状态，如果无网络则使用本地缓存页
+                            var connectionType = api.connectionType;
+                            if (connectionType === 'none' || connectionType === 'unknown') {
+                                // 无网络，使用本地缓存页
+                                name = 'oralTraining-offline';
+                                path = '../html/study/oralTraining/frame-oral-offline.html';
+                            }
+                            break;
+                        case '12':
+                            name = 'index';
+                            path = '../html/study/aiknowledge/frame_knowledge.html';
+                            break;
+                        case '14':
+                            name = '';
+                            path = '';
+                            break;
+                    }
+
+                    if ($api.getStorage('isLogin') == 'true') {
+                        checkClassid();
+                    } else {
+                        api.toast({
+                            msg: '请重新登陆',
+                            duration: 3000,
+                            location: 'middle'
+                        });
+                    }
+                },
+                openPerson() {
+                    api.openWin({
+                        name: 'win-person-pad',
+                        url: 'personPad/win-person-pad.html'
+                    });
+                },
+                setUp() {//设置跳转个人中心
+                    api.openWin({
+                        name: 'win-person-pad',
+                        url: './personPad/win-person-pad.html'
+                    });
+                },
+                openAiEssayReview() {
+                    api.openWin({
+                        name: 'win-aiEssayReview',
+                        url: './aiEssayReview/win-aiEssayReview.html',
+                        slidBackEnabled: false
+                    })
+                },
+                async openStudentProgressReport() {
+                    const res = await new Promise((resolve, reject) => {
+                        apiObj.Get(UrlRouter.GetSchoolConfig, {
+                            values: {
+                                schoolid: $api.getStorage("schoolid"),
+                                type: 'phase_report'
+                            }
+                        }, function (res, err) {
+                            if (res) {
+                                resolve(res);
+                            } else {
+                                reject(err);
+                            }
+                        });
+                    })
+                    if (res) {
+                        if (res.data.length > 0 && String(res.data[0].value) == "1") {
+
+                            api.openFrame({
+                                name: 'win_testReport',
+                                url: 'testReport/LBA/entrance.html',
+                                rect: {
+                                    x: 0,
+                                    y: 0,
+                                    w: 'auto',
+                                    h: 'auto'
+                                },
+                                bgColor: 'rgba(0,0,0,0)',
+                                bounces: false
+                            })
+                        } else {
+                            api.toast({
+                                msg: '学校暂未开通此功能'
+                            })
+                        }
+                    }
+                }
+            }
+        });
+
+        const vm = app.mount('#main');
+
+        // 初始化逻辑
+        systemType = api.systemType;
+
+        api.addEventListener({
+            name: 'resume'
+        }, function (ret, err) {
+            if (getCurrentTimestamp() - $api.getStorage('loginSyncTime') > 1800 || typeof $api.getStorage('loginSyncTime') == 'undefined') {
+                postLoginSync();
+            }
+        });
+
+        api.addEventListener({//选课成功 刷新首页状态
+            name: 'istijiao'
+        }, function (ret, err) {
+            vm.GetSelectCourseStuOpenSelect(false, vm.schoolid);
+        });
+
+        if (api.pageParam.sex == '0') { //未设置性别
+            api.openFrame({
+                name: 'frame-choose-sex',
+                url: 'frame-choose-sex.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: $api.getStorage('padHeight')
+                },
+                bounces: false
+            });
+        }
+
+        //手动热更新功能
+        var mam = api.require('mam');
+        mam.checkSmartUpdate(function (ret, err) {
+            if (ret) {
+                if (ret.packages && ret.packages.length != 0) {
+                    var msg;
+                    if (ret.packages[0].extra != null && ret.packages[0].extra != '') {
+                        msg = '更新日志：\n' + ret.packages[0].extra;
+                    } else {
+                        msg = '修改部分已知问题';
+                    }
+                    mam.startSmartUpdate(function (ret, err) {
+                        if (ret) {
+                            if (ret.state == 3) {
+                                api.alert({
+                                    title: '云修复完成',
+                                    msg: msg,
+                                    buttons: ['重启后生效']
+                                }, function (ret, err) {
+                                    if (ret.buttonIndex == 1) {
+                                        //重启应用
+                                        api.sendEvent({
+                                            name: 'restartApp'
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    };
+
+    // apiready();
+
+    // 辅助函数
+    function checkClassid() {
+        if (name == 'win-appstore') {
+            return 0;
+        } else if (name == 'ChoiceSubject_win') {
+            api.openWin({
+                name: name,
+                url: path,
+                slidBackEnabled: false
+            });
+        } else if (name == 'classroom') {
+            apiObj.SetAuthToken($api.getStorage('token'));
+            apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    identitytype: '3'
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        if (ret.data != '') {
+                            if (ret.data[0].class && ret.data[0].class != '') {
+                                classid.length = 0;
+                                for (var i = 0; i < ret.data[0].class.length; i++) {
+                                    classid.push(ret.data[0].class[i].bjid);
+                                    $api.setStorage('groupSchoolid', ret.data[0].id);
+                                }
+                                $api.setStorage('classidForClass', classid);
+                                var classArr = ret.data[0].class;
+                                if (name == "classroom") {
+                                    apiObj.Get(UrlRouter.GetV1ClasspayStatus, {
+                                        values: {
+                                            mac_addr: $api.getStorage('macAdress')
+                                        }
+                                    }, function (ret, err) {
+                                        api.hideProgress();
+                                        if (ret) {
+                                            if (ret.ret == 0) {
+                                                if (ret.data) {
+                                                    if (ret.data.status >= 8) {
+                                                        //未开通付费功能
+                                                        api.openWin({
+                                                            name: 'win-classlimit',
+                                                            url: '../html/study/newClass/win-classlimit.html'
+                                                        });
+                                                    } else if (ret.data.status != 0 && ret.data.status != 3 && ret.data.status != 2 && ret.data.status != 5) {
+                                                        api.openWin({
+                                                            name: 'not_opened',
+                                                            url: 'not_opened.html'
+                                                        });
+                                                    } else {
+                                                        //接入H5课堂
+                                                        api.openWin({
+                                                            name: 'win-interaction-home-pad',
+                                                            url: '../html/study/newClass/win-interaction-home-pad.html',
+                                                            pageParam: { classArr: classArr },
+                                                            slidBackEnabled: false
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    api.openWin({
+                                        slidBackEnabled: false,
+                                        name: name,
+                                        url: path,
+                                        pageParam: { classid: classid }
+                                    });
+                                }
+                            } else {
+                                handleNoClass();
+                            }
+                        } else {
+                            handleNoClass();
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            });
+        } else {
+            //请求classid
+            apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    identitytype: '3'
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        if (ret.data != '') {
+                            if (ret.data[0].class && ret.data[0].class != '') {
+                                $api.setStorage('newSchoolId', ret.data[0].id);
+                                $api.setStorage('stuXD', ret.data[0].class[0].xd);
+                                classid.length = 0;
+                                for (var i = 0; i < ret.data[0].class.length; i++) {
+                                    classid.push(ret.data[0].class[i].bjid);
+                                }
+                                if (name == "classroom") {
+                                    //接入H5课堂
+                                    var classArr = ret.data[0].class;
+                                    api.openWin({
+                                        name: 'win-interaction-home-pad',
+                                        url: '../html/study/newClass/win-interaction-home-pad.html',
+                                        pageParam: { classArr: classArr },
+                                        slidBackEnabled: false
+                                    });
+                                } else {
+                                    // 口语训练特殊处理
+                                    if (name == 'oralTraining-win-main' || name == 'oralTraining-offline') {
+                                        var pageParams = {
+                                            uid: $api.getStorage('uid'),
+                                            token: $api.getStorage('token'),
+                                            padType: $api.getStorage('padType'),
+                                            upgradeQRCode: $api.getStorage('upgradeQRCode'),
+                                            apiUrlIndex: apiUrlIndex,
+                                            classid: classid
+                                        };
+
+                                        // 如果是离线模式，直接打开缓存页
+                                        if (name == 'oralTraining-offline') {
+                                            api.openWin({
+                                                slidBackEnabled: false,
+                                                name: name,
+                                                url: path,
+                                                pageParam: pageParams
+                                            });
+                                        } else {
+                                            // 在线模式，尝试打开远程服务，设置超时降级
+                                            openOralTrainingWithFallback(path, pageParams);
+                                        }
+                                    } else if (name == 'oralTraining-win-main' && api.systemType == 'ios') {
+                                        api.openWin({
+                                            slidBackEnabled: false,
+                                            name: name,
+                                            url: path,
+                                            pageParam: {
+                                                uid: $api.getStorage('uid'),
+                                                token: $api.getStorage('token'),
+                                                padType: $api.getStorage('padType'),
+                                                upgradeQRCode: $api.getStorage('upgradeQRCode'),
+                                                apiUrlIndex: apiUrlIndex,
+                                                classid: classid
+                                            }
+                                        });
+                                    } else {
+                                        api.openWin({
+                                            slidBackEnabled: false,
+                                            name: name,
+                                            url: path,
+                                            pageParam: { classid: classid }
+                                        });
+                                    }
+                                }
+                            } else {
+                                handleNoClass();
+                            }
+                        } else {
+                            handleNoClass();
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            });
+        }
+    }
+
+    function handleNoClass() {
+        apiObj.Get(UrlRouter.GetStudentAuditClass, {
+            values: {
+                uid: $api.getStorage('uid'),
+                type: '1'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.length == 0 && !hsClass) {
+                        api.confirm({
+                            title: '',
+                            msg: '目前未加入班级，是否前往加入班级',
+                            buttons: ['取消', '确定']
+                        }, function (ret, err) {
+                            if (ret) {
+                                if (ret.buttonIndex == 2) {
+                                    openMyClassWin();
+                                }
+                            }
+                        });
+                    } else {
+                        api.confirm({
+                            title: '',
+                            msg: '班级正在审核，是否前往查看',
+                            buttons: ['取消', '确定']
+                        }, function (ret, err) {
+                            if (ret) {
+                                if (ret.buttonIndex == 2) {
+                                    openMyClassWin();
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        })
+    }
+
+    function getClassB() {
+        apiObj.Get(UrlRouter.GetStudentAuditClassB, {
+            values: {
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.length == 0) {
+                        hsClass = false;
+                    } else {
+                        hsClass = true;
+                    }
+                } else {
+                    hsClass = false;
+                }
+            } else {
+                hsClass = false;
+            }
+        });
+    }
+
+    function openMyClassWin() {
+        api.openWin({
+            slidBackEnabled: false,
+            name: 'myclass_win',
+            url: '../html/mine/myclass/myclass_win.html',
+            reload: true
+        });
+    }
+
+    function postLoginSync() {
+        apiObj.Post(UrlRouter.postLoginSync, {
+            values: {
+                uid: $api.getStorage('uid'),
+                identitytype: 3
+            }
+        }, function (ret, err) {
+            $api.setStorage('loginSyncTime', getCurrentTimestamp());
+        })
+    }
+
+    function getCurrentTimestamp() {
+        return Math.round(new Date() / 1000)
+    }
+
+    // 口语训练服务降级处理
+    // 注意：这个超时只检测页面是否能打开，不影响页面内部的API接口调用
+    function openOralTrainingWithFallback(remotePath, pageParams) {
+        // 直接尝试打开远程服务，不设置超时
+        // 如果页面无法加载，APICloud 的 WebView 会自然显示加载失败
+        // 此时用户可以通过返回按钮回到首页，或者我们可以监听加载失败事件
+
+        api.showProgress({
+            title: '正在连接...',
+            text: '请稍候',
+            modal: false
+        });
+
+        // 尝试打开远程服务
+        api.openWin({
+            slidBackEnabled: false,
+            name: 'oralTraining-win-main',
+            url: remotePath,
+            pageParam: pageParams,
+            cachePolicy: 'noCache' ,
+            // 页面加载完成后隐藏进度条
+            pageParam: Object.assign({}, pageParams, {
+                fromFallback: true
+            })
+        });
+
+        // 1秒后隐藏加载提示（给页面一点加载时间）
+        setTimeout(function () {
+            api.hideProgress();
+        }, 1000);
+    }
+</script>
+
+</html>

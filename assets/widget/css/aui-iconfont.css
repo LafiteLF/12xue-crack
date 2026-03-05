@@ -1,0 +1,178 @@
+@charset "UTF-8";
+@font-face {
+    font-family: "auiicon";
+    src: url('aui-iconfont.2.0.ttf') format('truetype');
+}
+
+.aui-iconfont {
+    font-family: "auiicon" !important;
+    font-size: 16px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.aui-icon-pic:before {
+    content: "\e614";
+}
+
+.aui-icon-voice:before {
+    content: "\e615";
+}
+
+.aui-icon-comment:before {
+    content: "\e616";
+}
+
+.aui-icon-community:before {
+    content: "\e617";
+}
+
+.aui-icon-close:before {
+    content: "\e618";
+}
+
+.aui-icon-check1:before {
+    content: "\e619";
+}
+
+.aui-icon-at:before {
+    content: "\e604";
+}
+
+.aui-icon-emoji:before {
+    content: "\e607";
+}
+
+.aui-icon-home:before {
+    content: "\e605";
+}
+
+.aui-icon-search:before {
+    content: "\e60e";
+}
+
+.aui-icon-right:before {
+    content: "\e60f";
+}
+
+.aui-icon-left:before {
+    content: "\e601";
+}
+
+.aui-icon-left1:before {
+    content: "\e610";
+}
+
+.aui-icon-fold:before {
+    content: "\e611";
+}
+
+.aui-icon-unfold:before {
+    content: "\e612";
+}
+
+.aui-icon-message:before {
+    content: "\e606";
+}
+
+.aui-icon-add:before {
+    content: "\e609";
+}
+
+.aui-icon-delete:before {
+    content: "\e600";
+}
+
+.aui-icon-forward:before {
+    content: "\e61a";
+}
+
+.aui-icon-check:before {
+    content: "\e61b";
+}
+
+.aui-icon-back:before {
+    content: "\e601";
+}
+
+.aui-icon-tencent:before {
+    content: "\e60a";
+}
+
+.aui-icon-wechat:before {
+    content: "\e60b";
+}
+
+.aui-icon-qq:before {
+    content: "\e60c";
+}
+
+.aui-icon-sina:before {
+    content: "\e60d";
+}
+
+.aui-icon-appreciate:before {
+    content: "\e61c";
+}
+
+.aui-icon-my:before {
+    content: "\e602";
+}
+
+.aui-icon-xinlv:before {
+    content: "\e603";
+}
+
+.aui-icon-phone:before {
+    content: "\e608";
+}
+
+.aui-icon-copy:before {
+    content: "\e613";
+}
+
+.aui-icon-audio:before {
+    content: "\e61d";
+}
+
+.aui-icon-collectNull:before {
+    content: "\e61e";
+}
+
+.aui-icon-collectFill:before {
+    content: "\e61f";
+}
+
+.aui-icon-card:before {
+    content: "\e622";
+}
+
+.aui-icon-pencil:before {
+    content: "\e621";
+}
+
+.aui-icon-scan:before {
+    content: "\e623";
+}
+
+.aui-icon-edit:before {
+    content: "\e624";
+}
+
+.aui-icon-share:before {
+    content: "\e625";
+}
+
+.aui-icon-forback:before {
+    content: "\e6d7";
+}
+
+.aui-icon-qingkong:before {
+    content: "\e632";
+}
+
+.aui-icon-bandui:before {
+    content: "\e652";
+}

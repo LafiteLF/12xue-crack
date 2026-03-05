@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>考试等待页面</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+        .content{
+            width: 100%; height:100%;
+            background: url("../../../image/exam/ksddbg.jpg") no-repeat center center  ;
+            background-size: 100% 100%;
+        }
+        .exammain{
+            height:396px ;
+            width: 646px;
+           background: url("../../../image/exam/ksddbg2.png") no-repeat center center ;
+            background-size: auto 100%;
+            position: fixed;
+            left: calc(50% - 323px);
+            top:calc(50% - 198px)
+        }
+        .exam-time {
+            font-size: 18px; color:#4bc7c7 ; text-align: center;  padding-top: 099px; font-weight: bold;
+        }
+        .exam-time span{
+            font-size: 50px; color:#4bc7c7 ; text-align: center; font-weight: bold; padding-top: 100px;    text-shadow: #969191 0 2px 2px; margin-right: 12px;
+        }
+        .exam-subject{font-size: 25px; text-align: center ; color: #333333; font-weight: bold; margin-top: 36px}
+        .exam-class{ font-size: 20px; text-align: center; margin: 0 auto; margin-top: 45px ;max-width:90% }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak>
+<div class="exammain">
+    <div class="exam-wait">
+    <div class="exam-time"><span  v-text="showtime(time)"></span>后开始</div>
+    <div class="exam-subject" v-text="list.xkname "></div>
+    <div class="exam-class " >
+    <span class="overflow"  style="    display: inline-block;  max-width: 90%; vertical-align: bottom;  margin-bottom: -2px;"  v-text="examXq.bjmc+' ('+examXq.fbrxm+' 老师'"></span>)
+    </div>
+    </div>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript" src="../../../script/countdown.js"></script>
+<script type="text/javascript" src="../../../script/DateUtil.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var newtimejs;
+    apiready = function () {
+        vm.examXq=api.pageParam.examXq;
+        vm.list=api.pageParam.list;
+        vm.time=api.pageParam.examXq.is_start;
+        vm.GetPaperStuinfo();
+        newtimejs = setInterval(function () {
+            vm.time--;
+            if (vm.time == 0) {
+                clearInterval(newtimejs);
+                vm.GetPaperStuinfo();
+            }else if(vm.time/60===0){
+                vm.GetPaperStuinfo();
+            }
+        }, 1000);
+        api.addEventListener({
+            name:'resume'
+        }, function(ret, err){
+            vm.GetPaperStuinfo();
+        });
+        api.addEventListener({
+            name:'online'
+        }, function(ret, err){
+            vm.GetPaperStuinfo();
+        });
+
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            time:0,
+            examXq: {},
+            list:{}
+        },
+        methods: {
+            showtime:function(time){
+                return DateUtil.formatTimeToFriendly(time)
+            },
+            GetPaperStuinfo: function (list) {// 学生获取有考试的科目
+                // api.showProgress({
+                //     title: '加载中',
+                //     text: '请稍后...',
+                //     modal: false
+                // });
+                apiObj.Get(UrlRouter.GetPaperStuinfo, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        classid:api.pageParam.list.bjid,
+                        paperid:api.pageParam.list.id
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            vm.time=ret.data.is_start;
+                            if(ret.data.is_complete==1){
+                                ksks();
+                            }else if(ret.data.is_complete==2||ret.data.is_complete==4||ret.data.is_complete==5){
+                                api.sendEvent({
+                                    name: 'reloadSubjectList'
+                                });
+                                api.closeToWin({
+                                    name: 'win_exam_subject_list'
+                                });
+                            }
+                        }
+                        else{
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret .msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    }else{
+                        api.hideProgress();
+                        api.toast({
+                            msg: err .msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } ,'','',false);
+            },
+        }
+    });
+    function ksks() {
+        api.openWin({
+            name: 'win_detail',
+            url: 'win_detail.html',
+            pageParam: {
+                examtitle:api.pageParam.examXq.title,
+                examid:api.pageParam.examXq.id,
+                exambjid:api.pageParam.examXq.bjid,
+                examMateriallist:api.pageParam.examXq.materiallist,
+                examzts:api.pageParam.examXq.zts,
+                index:0,
+                complete:1,
+                zyyq:api.pageParam.examXq.content
+            }
+        });
+    }
+</script>
+</html>

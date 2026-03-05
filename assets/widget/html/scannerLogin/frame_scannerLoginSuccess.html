@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            position: absolute;
+            background-color: #FFFFFF;
+            overflow: hidden;
+        }
+
+        .aui-content {
+            height: 50%;
+            /*position: absolute;*/
+        }
+
+        .titleDiv {
+            width: 100%;
+            height: 1rem;
+            background-color: #4bc7c7;
+        }
+
+        .closeFrameDiv {
+            color: #4bc7c7;
+            margin-top: 0.5rem;
+            height: 1rem;
+            width: 4rem;
+            text-align: center;
+        }
+
+        .imageDiv {
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .myImage {
+            width: 30%;
+        }
+
+        .bottomDiv {
+            margin-top: 15%;
+            margin-bottom: 0;
+            height: 20%;
+            position: relative;
+            text-align: center;
+        }
+
+        .aui-btn {
+            width: 40%;
+            margin-top: 0.5rem;
+            margin-left: 30%;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <div class="titleDiv"></div>
+    <div class="closeFrameDiv" tapmode onclick="closeThisFrame()">关闭</div>
+    <div class="imageDiv">
+        <img class="myImage" src="../../image/scanner/scannersuccess.png" alt=""/>
+
+        <div style="margin-top: 10px;">12xue客户端登录确认</div>
+    </div>
+</div>
+<div class="bottomDiv">
+    <div class="aui-btn aui-btn-primary aui-btn-block aui-btn-outlined aui-btn-sm" tapmode onclick="scannerLogin()">登录
+    </div>
+    <div class="aui-btn aui-btn-block aui-btn-outlined aui-btn-sm" tapmode onclick="closeThisFrame()"
+         style="border: 1px solid #FFFFFF;color: gray">取消登录
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var type;
+    apiready = function () {
+        type = api.pageParam.type;
+    };
+    function scannerLogin() {
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Post(UrlRouter.ScanLogin, {
+            values: {
+                code: api.pageParam.content
+//                uid:$api.getStorage('uid')
+            }
+        }, function (ret, err) {
+//            alert(JSON.stringify(ret));
+            if (ret) {
+                if (ret.ret == 0) {
+//                    api.toast({
+//                        msg: '登录成功',
+//                        duration: 2000,
+//                        location: 'bottom'
+//                    });
+//                    setTimeout(function () {
+                    closeThisFrame();
+//                    },2000);
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+    function closeThisFrame() {
+
+//        api.closeFrame({
+//            name: 'frame_scannerLoginSuccess'
+//        });
+        if (type == 'index') {
+//            api.toast({
+//                msg: '登录成功',
+//                duration: 1000,
+//                location: 'bottom'
+//            });
+            setTimeout(function () {
+                api.closeToWin({
+                    name: 'win-stu-main',
+                    animation: {
+                        type: 'reveal',
+                        subType: 'from_top',
+                        duration: 500
+                    }
+                });
+            }, 1000);
+        } else {
+            api.closeFrame({
+                name: 'frame_scannerLoginSuccess'
+            });
+        }
+
+    }
+</script>
+</html>

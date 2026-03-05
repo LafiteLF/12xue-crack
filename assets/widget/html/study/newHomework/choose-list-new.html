@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .content {
+            width: 50%;
+            height: 70%;
+            top: 15%;
+            position: absolute;
+            left: 30%;
+            background: #fff;
+            overflow-y: auto;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            display: none
+        }
+
+        /*::-webkit-scrollbar-thumb {*/
+        /*    border-radius: 10px;*/
+        /*    background: #4bc7c7;*/
+        /*    -webkit-box-shadow: #4bc7c7;*/
+        /*}*/
+
+        /*::-webkit-scrollbar-thumb:window-inactive {*/
+        /*    background: #4bc7c7;*/
+        /*}*/
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+        .left {
+            width: 32%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            height: 100%;
+            float: left;
+            display: inline;
+        }
+
+        .unit {
+            display: inline-block;
+            color: #666666;
+            margin-left: 20%;
+            font-size: 0.7rem;
+            border: 1px solid #c8c8c8;
+            border-radius: 16px;
+            text-align: center;
+            padding-top:4px;
+            width: 60%;
+            margin-bottom: 18px;
+        }
+
+        .center {
+            width: 3%;
+            height: 100%;
+            float: left;
+            display: inline;
+        }
+
+        .xuxian-one {
+            background-image: url("../../../image/stuHomePad/xuxian3.png");
+            background-repeat: repeat-y;
+            height: 47%;
+        }
+
+        .xuxian-two {
+            background-image: url("../../../image/stuHomePad/jiantou.png");
+            background-position: 0% 47%;
+            background-size: 100% 100%;
+            height:6%;
+            background-repeat: no-repeat ;
+        }
+        .xuxian-three {
+            background-image: url("../../../image/stuHomePad/xuxian3.png");
+            background-repeat: repeat-y;
+            height: 47%;
+        }
+
+        .right {
+            width: 64%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            height: 100%;
+            float: left;
+            display: inline;
+        }
+
+        .grade {
+            /*padding-right: 65px;*/
+            /*padding-left: 65px;*/
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            color: #666666;
+            margin-left: 13%;
+            font-size: 0.7rem;
+            border: 1px solid #c8c8c8;
+            border-radius: 16px;
+            text-align: center;
+            padding-top:4px;
+            width: 70%;
+            margin-bottom: 11px;
+        }
+
+        /*[v-cloak] {*/
+            /*display: none;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="close" onclick="closeWin()" tapmode></div>
+<div class="aui-content">
+    <div class="content" v-cloak="">
+        <div class="left">
+            <div style="margin-top: 20px">
+            <span class="unit"  
+                  v-for="list in grade" 
+                  :style="list.id==selectgrade.id?'color:#4bc7c7;border-color: #4bc7c':''"
+                  v-text="list.name"
+                  @click="chooseGrade(list)"
+            
+            ></span>
+        </div>
+        </div>
+        <div class="center">
+            <div class="xuxian-one"></div>
+            <div class="xuxian-two"></div>
+            <div class="xuxian-three"></div>
+        </div>
+        <div class="right">
+            <div style="margin-top: 20px">
+            <span class="grade" 
+                  v-for="list in sxc"
+                  :style="list.id==selectsxc.id?'color:#4bc7c7;border-color: #4bc7c':''"
+                  v-text="list.name"
+                  @click="chooseSxc(list)"
+            
+            > </span>
+        </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue()
+        vm.sxclist();
+
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data:api.pageParam.data,
+                grade:api.pageParam.grade,
+                sxc:[],
+                danyuan:[],
+                selectgrade:api.pageParam.selectgrade,
+                selectsxc:api.pageParam.selectsxc,
+                // selectdy:api.pageParam.selectdy
+            },
+            methods: {
+                sxclist:function(){
+                    for(var i=0;i<vm.grade.length;i++){
+                        if(vm.grade[i].id==vm.selectgrade.id){
+                            vm.sxc=vm.grade[i].data;
+                        }
+                    }
+                },
+                chooseGrade:function (list) {
+                    vm.selectgrade=list;
+                    vm.sxclist();
+                },
+                chooseSxc:function (list) {
+                    // alert(JSON.stringify(list))
+                    vm.selectsxc=list;
+                    api.sendEvent({
+                        name: 'chooseunit',
+                        extra: {
+                            selectgrade:vm.selectgrade,
+                            selectsxc:vm.selectsxc,
+                        }
+                    });
+                    api.closeFrame();
+                },
+
+            }
+        });
+    }
+    function closeWin() {
+        api.closeFrame();
+    }
+</script>

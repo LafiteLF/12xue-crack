@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body{
+            background-color: #f2f2f2;
+            font-size: 0.7rem;
+        }
+        .content{
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            padding-bottom: 1rem;
+        }
+        .zymc {
+            /*padding-left: 0.5rem;*/
+            padding-top: 0.8rem;
+            padding-bottom: 0.5rem;
+         }
+
+        img {
+            /*max-height: 90%;*/
+            max-width: 90%;
+
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="zymc aui-ellipsis-1"></div>
+    <div class="img"></div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        $api.html($api.dom('.zymc'), api.pageParam.zymc);
+        $api.html($api.dom('.img'),'<img src="'+ decodeURIComponent(api.pageParam.url)+'" style="max-width: 100%;" tapmode onclick="imgClick(this)"/>');
+    };
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        var photoBrowser = api.require('photoBrowser');
+        photoBrowser.open({
+            images: [
+                src
+            ],
+            placeholderImg: 'widget://image/loading_more.gif',
+            bgColor: '#fff'
+        }, function(ret, err){
+            if (ret.eventType == 'click'){
+                photoBrowser.close();
+            }
+        });
+    }
+</script>
+</html>

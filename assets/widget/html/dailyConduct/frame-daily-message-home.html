@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        .aui-list {
+            background-color: #EEEEEE;
+        }
+
+        .aui-card-list {
+            background-color: #EEEEEE;
+        }
+
+        .message-content {
+            background-color: white;
+            padding: 5px;
+        }
+        .message-content-old{
+            background-color:#F8F8F8;
+            padding: 5px;
+        }
+        .status{
+            color:#F8F8F8;
+        }
+        .status-content {
+            margin-top: 5px;
+        }
+
+        .status-wait {
+            color: #FF8A7E;
+        }
+        .status-pass{
+            color: #00bbd4;
+        }
+        .aui-pull-right {
+            color: #ADADAD;
+        }
+        .time{
+            color: #9F9F9F;
+        }
+        .aui-card-list{
+            margin-bottom: -15px;
+        }
+        .txt-old{
+            color: #C2C2C2;
+        }
+    </style>
+    <title>Title</title>
+
+</head>
+<body>
+<ul class="aui-list">
+    <li class="aui-card-list aui-card-list-content aui-card-list-content-padded">
+        <div class="time">今日 14:36</div>
+        <div class="message-content">
+            <div>取消“2015级二班王小妮、李易峰、李厚生因乱扔垃圾原因扣2分。”</div>
+            <div class="status-content"><span class="status-wait ">待审核</span><span
+                    class="aui-pull-right">来自：<span>我</span></span></div>
+        </div>
+    </li>
+    <li class="aui-card-list aui-card-list-content aui-card-list-content-padded">
+        <!--<div class="time">今日 14:36</div>-->
+        <div class="message-content">
+            <div>取消“2015级二班王小妮、李易峰、李厚生因乱扔垃圾原因扣2分。”</div>
+            <div class="status-content"><span class="status-pass">已审核</span><span
+                    class="aui-pull-right">来自：<span>我</span></span></div>
+        </div>
+    </li>
+
+    <li class="aui-card-list aui-card-list-content aui-card-list-content-padded">
+        <div class="time">2016-06-01 14:36</div>
+        <div class="message-content-old">
+            <div class="txt-old">取消“2015级二班王小妮、李易峰、李厚生因乱扔垃圾原因扣2分。”</div>
+            <div class="status-content"><span class="status">已审核</span><span
+                    class="aui-pull-right">来自：<span>政教处王二妮</span></span></div>
+        </div>
+    </li>
+</ul>
+</body>
+<script type="text/javascript">
+    var wsServer = 'ws://172.16.43.3:9443';
+    var websocket = new WebSocket(wsServer);
+    websocket.onopen = function (evt) {
+        console.log("Connected to WebSocket server.");
+    }
+
+    function send() {
+        var vet = {"ret": 0, "msg": "ok"};
+        websocket.send(vet);
+
+    }
+    websocket.onmessage = function (evt) {
+        console.log('Retrieved data from server: ' + evt.data);
+        alert(evt.data);
+    };
+
+</script>
+</html>

@@ -1,0 +1,392 @@
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/*清除浮动*/
+.content {
+    padding-top: 1px;
+}
+
+.tg-content,.da-content {
+    background-color: white;
+    min-height: 3rem;
+    padding: 1rem;
+    padding-top: 0.5rem;
+    font-size: 1.2rem;
+    border: 1px solid #e4e4e8;
+
+}
+
+.tg-content img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.dajx img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.zqda img {
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.wdda-da img {
+    width: 30%;
+    margin-left: 0.5rem;
+}
+
+.xt-inputArea textarea {
+    width: 40%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.tixing {
+    display: inline-block;
+    width: 100%;
+}
+
+.tixing span {
+    margin-right: 10px;
+    font-size: 16px;
+    color: #999;
+}
+
+.tixing span b {
+    font-weight: normal;
+    font-size: 16px;
+    color: #4bc7c7
+}
+
+.tixing span:nth-of-type(1) {
+    color: #333;
+    font-size: 22px;
+}
+
+.tigan {
+    padding-left: 23px;
+    margin-top: 10px;
+}
+
+.tigan, .tigan p {
+    color: #666;
+    font-size: 18px !important;
+}
+
+.biaoji img {
+    width: 100%;
+    vertical-align: bottom
+}
+
+em {
+    font-style: italic;
+}
+
+em, em * {
+    font-style: italic;
+}
+
+strong {
+    display: inline
+}
+
+.xx-div {
+    /*background-color: red;*/
+    /*height: 4rem;*/
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.xx-span {
+    background-color: white;
+    width: 55px;
+    height: 55px;
+    border: 1px solid #4BC7C7;
+    border-radius: 100px;
+    text-align: center;
+    line-height: 55px;
+    color: #4BC7C7;
+    margin: 0 1.5rem;
+    margin-top: 0.5rem;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.bhz {
+    display: inline-block;
+    width: 100px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    border: 1px dashed #4BC7C7;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    color: #4BC7C7
+}
+
+.bhz input {
+    margin-right: 5px;
+}
+
+.xt-inputArea {
+    padding-top: 40px;
+}
+
+.input-num {
+    max-width: 15%;
+    display: inline-block;
+    vertical-align: top;
+    height: 50px;
+    line-height: 50px;
+    padding-left: 40px;
+}
+
+.xt-inputArea .input-area {
+    width: 40%;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #e7e7e7;
+    /*padding: 0 5px;*/
+    font-size: 16px;
+    margin-right: 20px;overflow-x: auto;white-space:nowrap; height: 10px !important;line-height: 12px;
+}
+
+.aui-list-item-inner {
+    margin-bottom: 20px
+}
+
+.bhz span {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 1px solid #4BC7C7;
+    border-radius: 3px;
+    margin-bottom: 9px;
+    vertical-align: bottom;
+    margin-right: 8px;
+}
+
+.inputCheckactive {
+    background: url("../image/checked.png") no-repeat center center #fff;
+    background-size: 100%;
+}
+
+.xxactive {
+    background-color: #4BC7C7;
+    border: 1px solid #4BC7C7;
+    color: #fff;
+}
+
+.xzdtfs {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    line-height: 1;
+    /*margin-top: 4%;*/
+    margin-bottom: 20px;
+    background-image: url("../image/stuHomePad/dianji.png");
+    background-size: 100% 100%;
+    opacity: 0.6
+}
+
+.xzdtfs:active {
+    opacity: 1
+}
+
+.xt-inputArea textarea {
+    width: 99%;
+    display: inline-block;
+    vertical-align: top;
+    background: #fff;
+    border: 1px solid #e4e4e8;
+    padding: 0.75rem;
+    overflow-y: auto;
+    height: 180px;
+}
+
+#inputarea {
+    display: none;
+}
+
+.hdfs {
+    width: 100px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.hdfsafter {
+    float: right !important;
+}
+
+.imganswer {
+    display: none;
+    text-align: left
+}
+
+.imganswer li {
+    margin-left: 1%;
+    margin-right: 1%;
+    height: 8rem;
+    width: 31%;
+    position: relative;
+    /*background-color: orange;*/
+    float: left;
+    margin-bottom: 1%;
+    overflow: hidden;
+    text-align: center;
+}
+
+.imganswer li img:nth-of-type(1) {
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+}
+.daimg img:nth-of-type(1) {
+
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+}
+.dayuyin{background: #fff!important;    box-shadow: 0px 0px 10px #dedbdb;}
+.dashipin{background: #000!important;}
+.dashipin img {
+}
+.dayuyin img:nth-of-type(1) {
+    width: 40px!important; height: 40px!important;
+    margin-top: 80px!important;
+    margin-left: 5px!important;
+    margin-right: 5px!important;
+}
+.yinpin{ width: 100%; height: 100%;; border: 1px solid #f4f4f4; margin-bottom: 15px; border-radius: 3px;
+}
+.yinpin img{  width: 40px!important; height: 40px!important;margin-top: 80px!important;
+    margin-left: 5px!important;
+    margin-right: 5px!important;}
+.yinpin p{ display: inline-block;
+    font-size: 14px;
+    width: 45px;    vertical-align: top;
+    margin-top: 90px;}
+.dayuyin p{
+    display: inline-block;
+    font-size: 14px;
+    width: 45px;    vertical-align: top;
+    margin-top: 90px;
+}
+input[type=range] {
+    -webkit-appearance: none;
+    width: 300px;
+    border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+    height:7px;
+    border-radius: 10px; /*将轨道设为圆角的*/
+  background: #ededed/*轨道内置阴影效果*/
+}
+input[type=range]:focus {
+    outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 15px;
+    width: 15px;
+    margin-top: -2px; /*使滑块超出轨道部分的偏移量相等*/
+    background: #4bc7c7;
+    border-radius: 50%; /*外观设置为圆形*/
+
+}
+.dayuyin input{width: calc(100% - 120px )!important;
+    vertical-align: top;
+    margin-top: 97px;}
+.chacha {
+    position: absolute;
+    top: 0px!important;
+    right: 1%!important;
+    width: 40px!important;
+    height: 40px!important;
+}
+.biaoji img {
+    width: 100%;
+    vertical-align: bottom
+}
+
+em {
+    font-style: italic;
+}
+
+em, em * {
+    font-style: italic;
+}
+
+strong {
+    display: inline
+}
+.da-content h2{ font-size: 20px;}
+.daan{  color: #666;
+    font-size: 18px !important; padding: 10px 0 10px 10px; }
+.da-content a{ color: #666!important;}
+.accuracy{
+    position: absolute;
+    display: inline-block;
+    right: 20px;
+    font-size: 16px;
+    color: #ffcc00;
+    height: 25px; line-height: 25px;
+
+}
+.accuracy img{width: 25px;vertical-align: bottom}
+.my-Answer img,.true-Answer img,.answer-Parsing img{max-width: 90%}
+textArea::-webkit-input-placeholder{ color: #d5d5d5}
+textArea:-moz-placeholder{
+    color:#d5d5d5
+}
+textArea::-moz-placeholder{
+    color:#d5d5d5
+}
+textArea:-ms-input-placeholder{
+    color:#d5d5d5
+}
+.yuyin{
+    display: inline-block;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    border: 1px solid #4bc7c7;
+    border-radius: 6px;
+    position: relative;margin-right: 10px;
+    margin-bottom: 10px;
+}
+.yuyin img{ width: 12px!important; margin-left: 10px; margin-top: 6px}
+.yuyin span{ position: absolute; right: 10px;font-size: 14px;
+    color: #999;}
+.img2{ display: none}
+
+.imgDiv,.videoDic{
+    padding-left: 0.5rem;
+}
+.containter {
+    padding-left: 0.5rem;
+    height: 100%;
+    /*background-color: red;*/
+}
+.swfDiv {
+    text-align: center;
+    width: 100%;
+    margin-top: 30%;
+    display: block;
+    color: #666666;
+}
+.videobofang{width: 100%; height: 100%; background: url("../image/video_bg2.png") no-repeat center; background-size: 100% 100%; position: relative}
+.videobofang img{ width: 76px!important; height: 76px!important;  position: absolute; left: calc(50% - 38px); top: calc(50% - 38px)}

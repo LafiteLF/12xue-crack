@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>次数已耗尽</title>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+    <script src="../../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+        }
+
+        #main {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #button-close {
+            margin-top: 4.25vh;
+            width: 11.979vw;
+            height: 5.4vh;
+            color: #4BC7C7;
+            font-size: 1.458vw;
+            border: 0.1vw solid #4BC7C7;
+            border-radius: 1.7vw;
+            background: none;
+        }
+
+        #button-close:active {
+            color: white;
+            background: #4BC7C7;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div v-show="isLoaded" style="background: rgba(0,0,0, 0.6);width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+        <div style="display: flex;flex-direction: column;background: #FFFFFF;border-radius: 0.83vw;padding: 3.75vh 3.6vw;align-items: center;">
+            <div style="display: flex;color:#333333;font-size: 1.458vw;line-height: 1.8">您的使用次数已耗尽，若想获取更多使用次数，<br>请家长使用微信/浏览器扫码，查看使用说明～
+            </div>
+            <img v-if="QRCode !== ''" style="width: 7.8125vw;height: 7.8125vw;margin-top:2.83vh;"
+                 :src="QRCode" alt="12xue">
+            <button id="button-close" @click.stop="close">
+                知道了
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    const {createApp, ref, onBeforeMount, computed} = Vue
+
+    createApp({
+        setup() {
+            const apiObj = ref(new GridOpenApi(UrlDomain, source, version));
+            const QRCode = ref('');
+            const isLoaded = ref(false)
+
+            function close() {
+                api.closeFrame();
+            }
+
+            onBeforeMount(async () => {
+                await new Promise(resolve => {
+                    apiready = () => {
+                        resolve()
+                    }
+                })
+                apiObj.value.SetAuthToken($api.getStorage('token'));
+                try{
+                    await new Promise((resolve, reject) => {
+                        apiObj.value.Get(UrlRouter.GetMaterialMaterialServer, {
+                            values: {
+                                type: 'AI_DISPLAY_1'
+                            }
+                        }, function (res, err) {
+                            if (res) {
+                                QRCode.value = res.url;
+                                resolve()
+                            } else {
+                                reject(err)
+                            }
+                        });
+                    });
+                }catch(error){
+                    console.error(error)
+                }
+                isLoaded.value = true;
+            })
+            return {
+                close,
+                isLoaded,
+                QRCode
+            }
+        }
+    }).mount('#main')
+</script>
+</html>

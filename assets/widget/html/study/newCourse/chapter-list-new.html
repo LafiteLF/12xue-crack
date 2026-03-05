@@ -1,0 +1,139 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .aui-border-t:before, .aui-border-b:after {
+            height: 0px;
+        }
+
+        .content {
+            width: 35%;
+            height: 70%;
+            top: 15%;
+            position: absolute;
+            left: 32.5%;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            display: none
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #4bc7c7;
+            -webkit-box-shadow: #4bc7c7;
+        }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: #4bc7c7;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+        .unit-one {
+            display: inline-block;
+            color: #666666;
+            margin-left: 15%;
+            font-size: 0.7rem;
+            border: 1px solid #c8c8c8;
+            border-radius: 16px;
+            text-align: center;
+            width: 70%;
+            margin-top: 20px;
+            margin-bottom: 17px;
+            padding-top: 4px;
+        }
+        .unit {
+            display: inline-block;
+            color: #666666;
+            margin-left: 15%;
+            font-size: 0.7rem;
+            border: 1px solid #c8c8c8;
+            border-radius: 16px;
+            text-align: center;
+            width: 70%;
+            margin-bottom: 8px;
+            padding-top: 4px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+        }
+
+        /*[v-cloak] {*/
+            /*display: none;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="api.closeFrame()"></div>
+<div class="content" v-cloak="">
+    <div class="content-one">
+        <span class="unit-one" @click="chooseDy({'id':0,'name':'全部单元'})" :style="selectdy.id==0?'color:#4bc7c7;border-color: #4bc7c':''">全部单元</span>
+        <p class="unit overflow"   :style="list.id==selectdy.id?'color:#4bc7c7;border-color: #4bc7c':''" v-for="list in selectsxc.data"  @click="chooseDy(list)"><span class="aui-ellipsis-1" style="display: block;width:70%;margin-left: 15%" v-text="list.name"></span></p>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue()
+
+    };
+    function vue(){
+        vm = new Vue({
+            el: '.content',
+            data: {
+                grade:api.pageParam.grade,
+                selectsxc:api.pageParam.selectsxc,
+                selectdy:api.pageParam.selectdy
+            },
+            methods: {
+
+                chooseDy:function (list) {
+                    vm.selectdy=list;
+                    api.sendEvent({
+                        name: 'chooseDy',
+                        extra: {
+                            selectdy:vm.selectdy,
+                        }
+                    });
+                    api.closeFrame();
+                }
+            }
+        });
+    }
+</script>

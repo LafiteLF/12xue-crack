@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>提问</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+
+        body {
+            background: #f2f2f2;
+        }
+
+        .content {
+            padding-top: 0.5rem;
+            height: 100%;
+            position: relative;
+        }
+
+        textarea {
+
+            width: calc(100% - 40px);
+            height: 200px;
+            background: #fff;
+            border: 1px solid #e4e4e8;
+            margin: 0 20px;
+            padding: 10px;
+
+        }
+
+        .yuyin {
+            width: 70px;
+            display: inline-block;
+            text-align: center;
+            margin-right: 10px;
+
+        }
+
+        .tupian:active {
+            background-color: #f2f2f2;
+        }
+
+        .tupian {
+            width: 60px;
+            display: inline-block;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .report-check {
+            position: absolute;
+            top: calc(0.5rem + 210px);
+            right: 20px;
+        }
+
+        ul {
+            padding-left: 20px;
+            padding-top: 20px;
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        ul li div {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #999;
+            border-radius: 10px;
+            line-height: 55px;
+        }
+
+        ul li div img {
+            width: 30px;
+            height: 30px;
+            vertical-align: middle
+        }
+
+        ul li span {
+            font-size: 0.6rem;
+            color: #666
+        }
+
+        .image-content {
+            background-color: white;
+            /*width: 100%;*/
+            height: 5rem;
+            margin: 0 20px;
+            padding: 10px;
+            padding-top: 0.5rem;
+            position: relative;
+            margin-bottom: 0.2rem;
+        }
+
+        .imageDiv {
+            margin-left: 1%;
+            margin-right: 1%;
+            height: 4rem;
+            width: 4rem;
+            position: relative;
+            /*background-color: orange;*/
+            float: left;
+            margin-bottom: 1%;
+            overflow: hidden;
+
+        }
+
+        .imageDiv img:nth-of-type(1) {
+            height: 4rem;
+            width: 4rem;
+
+        }
+
+        .chacha {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .footP {
+            position: absolute;
+            right: 5px;
+            bottom: 2px;
+            font-size: 0.6rem;
+            color: #ccc;
+        }
+
+        .btn-audio {
+            width: 80px;
+            margin: 10px;
+        }
+
+        .yuyindiv {
+            margin-left: 7px;
+        }
+
+        .yitu {
+            width: 15px;
+            float: left;
+            padding-top: 2px;
+        }
+
+        .seconds {
+            color: #4BC7C7;
+            margin-left: 15px;
+        }
+
+        .aui-btn-primary {
+            width: 4rem;
+            border: 1px solid #4BC7C7 !important;
+            border-radius: 6px;
+            background-color: #fff;
+            height: 1.45rem;
+        }
+
+        .aui-btn-primary:active {
+            background-color: #fff !important;
+        }
+
+        .display-voice {
+            margin: 0 20px;
+            padding: 10px;
+            margin-top: 12px;
+            background: white;
+            padding-top: 0.5rem;
+
+            margin-bottom: 0.5rem;
+        }
+
+        .word-count {
+            /*margin-top: 13px;*/
+            /*margin-bottom: 13px;*/
+            color: #cccccc;
+            margin-right: 5px;
+            font-size: 14px;
+            margin-top: 9px;
+        }
+
+        .contenttext::-webkit-input-placeholder {
+            color: #cccccc;
+            font-size: 0.7rem;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+        .deleterecord {
+            width: 1rem;
+            height: 1rem;
+            /*display: inline-block;*/
+            /*vertical-align: middle;*/
+            /*margin-left: -21px;*/
+            /*margin-top: -42px;*/
+            position: relative;
+            right: calc(0.9rem - 1px);
+            top: -0.55rem;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak>
+    <div style="font-size: 0.7rem;margin-left: 15px;padding-top: 6px;padding-bottom: 6px;color: #666">关于<span id="miaoshu"
+                                                                                            v-text="miaoshu">【题目一】</span>的提问：
+    </div>
+    <textarea id="content-text" class="contenttext" style="overflow-y: auto" maxlength="140" oninput="onTextChangeListener();"
+              placeholder="请输入提问内容"></textarea>
+    <div class="report-check"><span class="word-count aui-pull-right">0/140</span></div>
+    <ul>
+        <li class="tupian" tapmode onclick="selectImage()">
+            <div><img src="../../../image/stuHomePad/tupian.png"></div>
+            <span style="text-align: center">图片</span>
+        </li>
+        <li class="yuyin aui-hide" tapmode onclick="selectVoice();">
+            <div class="yuyindiv"><img src="../../../image/stuHomePad/mkf.png"></div>
+            <span style="text-align: center">语音</span>
+        </li>
+    </ul>
+    <div style="bottom: 0;width: 100%">
+        <div class="display-voice border-bottom border-top" v-if="hasAudio">
+            <div class="btn-audio aui-btn aui-btn-primary  " onclick="palyAudio(this);">
+                <div ontouchstart="gtouchstart(event)" ontouchend="gtouchend()">
+                    <div class="yitu"><img src="../../../image/yuyin1.png" width="15px"></div>
+                    <span id="seconds" class="seconds" v-text="seconds+'″'"></span></div>
+            </div>
+            <img class="deleterecord" src="../../../image/shanchu.png" onclick="deleteRecord();">
+        </div>
+        <div class="image-content" v-if="daArr.length != 0">
+            <div class="imageDiv" v-for="(image,index) in daArr">
+                <img onclick="openPic(this)" :src="image" alt="">
+                <img id=index class="chacha" src="../../../image/shanchu.png" @click="deleteImage(index)">
+            </div>
+            <div class="imageDiv">
+                <img style="width: 2rem;height: 2rem;;margin-top: 1rem" onclick="selectImage()"
+                     src="../../../image/tianjia.png" alt="">
+            </div>
+            <P class="footP">最多可选3张图片</P>
+        </div>
+
+
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/hammer.min.js"></script>
+<script type="text/javascript" src="../../../script/textarea-delete.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var picArr = [];
+    var pImageList = [];//图片地址
+    var uiMediaScanner;// 选择图片
+    var compressListener = {
+        allCount: 0,
+        successCount: 0
+    };
+    var photoBrowser;
+    var path = '';
+    //    var audio;
+    var pAudio = "";// 音频URL
+    var hasAudio = false;
+    var seconds; //录音时间
+    var timeOutEvent = 0;
+
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            daArr: [],//图片内容
+            yuyinArr: [],//语音内容
+            hasAudio: false,//是否有音频
+            seconds: '',//音频的长度
+            miaoshu: ""
+        },
+        methods: {
+            deleteImage: function (index) {
+                vm.daArr.splice(index, 1);//删除数据指定索引位置的url
+            }
+
+        }
+    });
+
+    function gtouchstart() {
+        timeOutEvent = setTimeout("longPress()", 800);
+        return false;
+    }
+
+    function gtouchend() {
+        clearTimeout(timeOutEvent);
+        //清除定时器
+        if (timeOutEvent != 0) {
+//            alert("你这是点击，不是长按");
+        }
+        return false;
+    }
+
+    //录音
+    function selectVoice() {
+        if (!checkPermission(['microphone'])) {
+            return;
+        }
+        api.openFrame({
+            name: 'frame-record',
+            url: 'frame-record.html'
+        });
+    }
+
+    function openPic(context) {
+        var index = -1;
+        var url = $api.attr(context, 'src');
+        //计算索引 不能用id作为索引
+        for (var i = 0; i < vm.daArr.length; i++) {
+            if (url == vm.daArr[i]) {
+                index = i;
+            }
+        }
+        api.execScript({
+            script: "isOpenPic=true;"
+        });
+        photoBrowser.open({
+            images: vm.daArr,
+            placeholderImg: 'widget://../image/loading_more.gif',
+            bgColor: '#000000',
+            activeIndex: index
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                api.execScript({
+                    script: "isOpenPic=true;"
+                });
+                photoBrowser.close();
+            }
+        });
+    }
+
+    function gtouchmove(event) {
+        clearTimeout(timeOutEvent);
+        //清除定时器
+        timeOutEvent = 0;
+        $api.css($api.dom('.yuyindiv'), 'background-color: #f2f2f2;');
+        api.sendEvent({
+            name: 'closeYuYinFrame',
+            extra: {key1: 'value', key2: 'value'}
+        });
+    }
+    //真正长按后应该执行的内容
+    function longPress() {
+        return;
+        timeOutEvent = 0;
+        if (vm.hasAudio) {
+            // 长按  删除
+            api.confirm({
+                title: '确定要删除该语音吗？',
+                buttons: ["确定", "取消"]
+            }, function (ret, err) {
+                if (ret.buttonIndex == 1) {
+                    $api.text($api.byId("seconds"), "");
+                    $api.css($api.dom(".display-voice"), 'display:none;');
+                    vm.hasAudio = false;
+                    api.stopPlay();
+                }
+            });
+        }
+    }
+    function deleteRecord() {
+        if (vm.hasAudio) {
+            api.confirm({
+                title: '确定要删除该语音吗？',
+                buttons: ["确定", "取消"]
+            }, function (ret, err) {
+                if (ret.buttonIndex == 1) {
+                    $api.text($api.byId("seconds"), "");
+                    $api.css($api.dom(".display-voice"), 'display:none;');
+                    vm.hasAudio = false;
+                    api.stopPlay();
+                }
+            });
+        }
+    }
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage("token"));
+    apiready = function () {
+        photoBrowser = api.require('photoBrowser');
+//        var hammer = new Hammer($api.dom('.yuyin'));
+//        hammer.on("press", function (ev) {
+//            $api.css($api.dom('.yuyindiv'), 'background-color: #d5d5d5;');
+//            api.openFrame({
+//                name: 'frame-yuyin-record-pad',
+//                url: 'frame-yuyin-record-pad.html',
+//                rect: {
+//                    x: 0,
+//                    y: 0,
+//                    w: api.winWidth,
+//                    h: padWinHeight
+//                },
+//                pageParam: {name: 'pageparam'},
+//                bounces: false
+//            });
+//        });
+        vm.miaoshu = api.pageParam.resdesc;
+        api.addEventListener({
+            name: 'audio'
+        }, function (ret, err) {
+            path = ret.value.path;
+//        seconds = ret.value.seconds;
+            if (seconds == 0 || seconds == "0") {
+                return;
+            }
+            $api.text($api.byId("seconds"), seconds);
+            vm.seconds = ret.value.seconds;
+            $api.css($api.dom(".display-voice"), 'display:block;');
+            if (seconds > 0) {
+                hasAudio = true;
+            }
+        });
+//        hammer.on("pressup", function (ev) {
+//            $api.css($api.dom('.yuyindiv'), 'background-color: #f2f2f2;');
+//            api.sendEvent({
+//                name: 'stopRecordForTiWen',
+//                extra: {}
+//            });
+//        });
+        api.addEventListener({
+            name: 'selectTiWen-pad'
+        }, function (ret, err) {
+            var type = ret.value.type;
+            selectAnswerPad(type)
+        });
+        api.addEventListener({
+            name: 'audio'
+        }, function (ret, err) {
+            path = ret.value.path;
+            vm.seconds = ret.value.seconds;
+            if (vm.seconds == 0 || vm.seconds == "0") {
+                return;
+            }
+            if (vm.seconds > 0) {
+                $api.text($api.byId("seconds"), vm.seconds);
+                $api.css($api.dom(".display-voice"), 'display:block;');
+                vm.hasAudio = true;
+            }
+        });
+    };
+    // 播放音频
+    var isPalying = false;// 是否正在播放
+    function palyAudio(context) {
+        if (isPalying) {
+            api.stopPlay();
+            $(context).find('.yitu').html('<img src="../../../image/yuyin1.png" width="15px">');
+        } else {
+            api.startPlay({
+                path: api.fsDir + path
+            }, function (ret, err) {
+                if (ret) {
+                    isPalying = false;
+                    $(context).find('.yitu').html('<img src="../../../image/yuyin1.png" width="15px">');
+                }
+            });
+            $(context).find('.yitu').html('<img src="../../../image/yuyin2.gif" width="15px">');
+        }
+        isPalying = !isPalying;
+    }
+
+    //选择答题方式
+    function selectAnswerPad(type) {
+
+        if (!checkPermission(['camera'])) {
+            return;
+        }
+
+        if (vm.daArr.length >= 3) {
+            api.toast({
+                msg: "最多可选3张图片",
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        if (type == 'camera') {
+            api.getPicture({
+                sourceType: 'camera',
+                encodingType: 'jpg',
+                mediaValue: 'pic',
+                destinationType: 'url',
+                //targetWidth: 100,
+                //targetHeight: 100,
+                quality: 50
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.data.length > 5) {
+                        vm.isTxt = false;
+                        vm.daArr.push(ret.data);
+                    }
+                } else {
+
+                }
+            });
+        } else if (type == 'photo') {
+            var imgAccountMax = 3 - vm.daArr.length;// 还可以选择图片数量的最大值
+            openMediaScanner(imgAccountMax);
+
+        }
+    }
+
+    // 选择相册图片 可多选
+    function openMediaScanner(max) {
+        if (!uiMediaScanner) {
+            uiMediaScanner = api.require('UIMediaScanner');
+        }
+        uiMediaScanner.open({
+            type: 'picture',
+            column: 4,
+            classify: true,
+            max: max ? max : 5,
+            sort: {
+                key: 'time',
+                order: 'desc'
+            },
+            texts: {
+                stateText: '已选*项',
+                cancelText: '取消',
+                finishText: '完成'
+            },
+            rotation: true,
+            styles: {
+                bg: '#fff',
+                mark: {
+                    icon: '',
+                    position: 'bottom_left',
+                    size: 20
+                },
+                nav: {
+                    bg: '#4bc7c7',
+                    stateColor: '#fff',
+                    stateSize: 18,
+                    cancelBg: 'rgba(0,0,0,0)',
+                    cancelColor: '#fff',
+                    cancelSize: 18,
+                    finishBg: 'rgba(0,0,0,0)',
+                    finishColor: '#fff',
+                    finishSize: 18
+                }
+            }
+        }, function (ret) {
+            if (ret) {
+                if (!ret.list) {
+                    return
+                }
+                ;
+                compressListener.successCount = 0;
+                compressListener.allCount = ret.list.length;
+                for (var i = 0; i < ret.list.length; i++) {
+                    var selectImg = ret.list[i];
+                    // 获取图片的路径
+                    var selectimgPath = selectImg.path;
+                    var selectimgThumbPath = selectImg.thumbPath;
+                    if (api.systemType == "ios") {
+                        uiMediaScanner.transPath({
+                            path: selectimgPath
+                        }, function (ret, err) {
+                            if (ret) {
+                                compressImage(ret.path);
+                            } else {
+                                alert("ios地址转换失败：" + JSON.stringify(err));
+                            }
+                        });
+                    } else {
+                        compressImage(selectimgPath);
+                    }
+                }
+                console.log(JSON.stringify(ret));
+            } else {
+                alert("图片选择器打开失败");
+            }
+        });
+    }
+
+    // 图片压缩处理
+    function compressImage(url) {
+        var imageFilter = api.require('imageFilter');
+        var index = url.lastIndexOf("/");
+        var imgName = url.substring(index + 1, url.lastIndexOf("."));
+        //获取图片大小
+        // 单位：Byte
+        imageFilter.getAttr({
+            path: url
+        }, function (ret, err) {
+            if (ret.size > 5242880) {//图片文件大于5M
+                api.toast({
+                    msg: '图片文件不能大于5MB~',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+                compressListener.allCount--;
+            } else {
+                var quality;
+                if (api.systemType == 'ios') {
+                    quality = 0.2;
+                } else {
+                    quality = 0.6;
+                }
+                imageFilter.compress({
+                    img: url,
+                    quality: quality,
+                    save: {
+                        imgPath: "fs://img_compress/",
+                        imgName: imgName + ".jpg"
+                    }
+                }, function (ret, err) {
+                    console.log("compress result : ret=" + JSON.stringify(ret) + "  err:" + JSON.stringify(err));
+                    if (ret.status) {
+                        compressListener.successCount++;
+                        vm.daArr.push(api.fsDir + "/img_compress/" + imgName + ".jpg");
+                    } else {
+                        alert("图片压缩失败" + JSON.stringify(err));
+                    }
+                    imageFilter = '';
+                });
+            }
+        });
+    }
+
+    //删除图片答案
+    function deletePic(context) {
+        var li = $api.closest(context, "div");
+        var lis = $api.domAll(".daanImgDiv");
+        var index = -1;
+        for (var i = 0; i < lis.length; i++) {
+            if (li == lis[i]) {
+                index = i;
+                break;
+            }
+        }
+
+        vm.daArr.splice(index, 1);//删除数据指定索引位置的url
+    }
+
+    function selectImage() {
+        if (!checkPermission(['camera', 'storage'])) {
+            return;
+        }
+        if (vm.daArr.length == 3) {
+            api.toast({
+                msg: '最多可选3张图片',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        api.getPicture({
+            sourceType: 'camera',
+            encodingType: 'jpg',
+            mediaValue: 'pic',
+            destinationType: 'url',
+            quality: 50
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.data.length > 5) {
+                    vm.isTxt = false;
+                    vm.daArr.push(ret.data);
+                }
+            } else {
+
+            }
+        });
+        //2022/6/22 移除从相册选择
+        // api.openFrame({
+        //     name: 'frame-tiwen-select-pad',
+        //     url: 'frame-tiwen-select-pad.html',
+        //     rect: {
+        //         x: 0,
+        //         y: 0,
+        //         w: 'auto',
+        //         h: api.winHeight
+        //     },
+        //     pageParam: {name: 'pageparam'},
+        //     bounces: false
+        // });
+    }
+
+    //点击对号
+    function reply() {
+        var replyTxt = clear_emoji($api.val($api.dom("#content-text")));
+        if (!checkImageCompress()) {
+            return;
+        }
+
+        if ((replyTxt == "" || replyTxt == null) && vm.daArr.length == 0 && !vm.hasAudio) {
+            api.toast({
+                msg: '请先输入文字内容',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else {
+            api.showProgress({
+                title: '加载中',
+                text: '请稍后...',
+                modal: true
+            });
+            if (vm.daArr && vm.daArr.length > 0) {
+                pImageList = [];
+                qiniuUpfile(0);
+            } else {
+                if (vm.hasAudio) {
+                    // 无图片 有声音
+                    qiniuUpSound();
+                } else {
+                    postReply();
+                }
+            }
+        }
+    }
+
+    //网络请求
+    function postReply() {
+        var content = clear_emoji($api.val($api.dom(".content textarea")));
+        var params = {};
+        if (pImageList && pImageList != undefined && pImageList.length > 0) {
+            for (var i = 0; i < pImageList.length; i++) {
+                params["imagelist[" + i + "]"] = pImageList[i];
+            }
+        }
+        if (pAudio && pAudio != "") {
+            params["audiolist"] = '{"url":"' + pAudio + '","duration":' + vm.seconds + '}';
+        }
+
+
+        params["zyid"] = api.pageParam.zyid;
+        params["classid"] = api.pageParam.classid;
+        params["content"] = content;
+        params["tuid"] = api.pageParam.tuid;
+        params["restype"] = api.pageParam.restype;
+        params["restitle"] = api.pageParam.restitle;
+        params["resdesc"] = api.pageParam.resdesc;
+        params["resdescript"] = api.pageParam.resdescript;
+        params["resid"] = api.pageParam.resid;
+        params["fromuid"] = $api.getStorage("uid");
+//        alert(pImageList + "-----params=" + JSON.stringify(params));
+        apiObj.Post(UrlRouter.PostHomeworkQuestion, {
+            values: params
+        }, function (ret, err) {
+            if (ret && ret.ret == 0) {
+                //发布成功 关掉win  刷新首页动态
+                api.sendEvent({
+                    name: 'finishReply'
+                });
+                api.hideProgress();
+                api.closeWin();
+            } else {
+                var msg = '';
+                if (ret) {
+                    msg = ret.msg;
+                } else {
+                    msg = err;
+                }
+                api.hideProgress();
+                api.toast({
+                    msg: msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+
+    }
+
+    // 上传音频
+    function qiniuUpSound() {
+//        var obj = api.require('qiniuUpfile');
+//        obj.upfile({
+//            file: api.fsDir + path
+//        }, function (ret, err) {
+//            if (ret.status) {
+//                if (ret.oper == "complete") {
+
+        var fileKey = (new Date()).valueOf() + api.fsDir + path;
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid-tch'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    var qiniuStorage = api.require("qiniuStorage");
+                    qiniuStorage.configUploader({
+                        params: {},
+                        checkCrc: false,
+                        mimeType: '',
+                        zone: $api.getStorage('qiniuZone')
+                    });
+                    qiniuStorage.start({
+                        token: ret.data.token,
+                        path: api.fsDir + path,
+                        key: fileKey
+                    });
+                    qiniuStorage.addEventListener(function (ret) {
+                        if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                            //上传成功后组装访问路径，或直接访问文档
+                            pAudio = "http://vod-qiniu.12xue.com/" + ret.key;
+                            // 图片音频都上传完毕 调12xue接口
+                            postReply();
+                        } else if (ret.oper == "progress") {
+                            //上传过程中获取进度数据
+                        }
+//            } else {
+//                api.hideProgress();
+//                api.toast({
+//                    msg: JSON.stringify(ret.msg),
+//                    duration: 2000,
+//                    location: 'bottom'
+//                });
+                    });
+                } else {
+                    api.hideProgress();
+
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+
+            } else {
+                api.hideProgress();
+
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+
+        });
+    }
+
+    function qiniuUpfile(index) {
+//        var obj = api.require('qiniuUpfile');
+//        obj.upfile({
+//            file: vm.daArr[index]
+//        }, function (ret, err) {
+//
+//            if (ret.status) {
+//                if (ret.oper == "complete") {
+        var fileKey = (new Date()).valueOf() + vm.daArr[index];
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    var qiniuStorage = api.require("qiniuStorage");
+                    qiniuStorage.configUploader({
+                        params: {},
+                        checkCrc: false,
+                        mimeType: '',
+                        zone: $api.getStorage('qiniuZone')
+                    });
+                    qiniuStorage.start({
+                        token: ret.data.token,
+                        path: vm.daArr[index],
+                        key: fileKey
+                    });
+                    qiniuStorage.addEventListener(function (ret) {
+                        if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                            //上传成功后组装访问路径，或直接访问文档
+                            pImageList.push("http://vod-qiniu.12xue.com/" + ret.key);
+//                    pImageList.push("http://obbm2oob4.bkt.clouddn.com/" + ret.info.key);
+                            if (index < vm.daArr.length - 1) {
+                                //一张一张上传   vaseUrl  res-12xue.com????
+                                qiniuUpfile(++index);
+                            } else {
+                                //上传完毕  判断有无音频  上传音频调12xue接口
+                                if (vm.hasAudio) {
+                                    qiniuUpSound();
+                                } else {
+                                    postReply();
+
+                                }
+
+                            }
+                        }
+                        else if (ret.oper == "progress") {
+                            //上传过程中获取进度数据
+                        }
+
+                    });
+                } else {
+                    api.hideProgress();
+
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+
+            } else {
+                api.hideProgress();
+
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+
+        });
+    }
+
+    /**
+     * 检查图片压缩进度
+     * @returns {boolean} true 压缩完成
+     */
+    function checkImageCompress() {
+        if (compressListener.allCount != 0 && compressListener.allCount != compressListener.successCount) {
+            api.toast({
+                msg: '正在压缩图片，请稍后操作',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function getUrlName(url) {
+        var index = url.lastIndexOf("/");
+        var imgName;
+        if (api.systemType == 'ios') {
+            var idIndex = url.indexOf("id=");
+            if (idIndex != -1) {
+                var idStr = url.substr(idIndex);
+                var andIndex = url.indexOf("&");
+                imgName = url.substring(idIndex + 3, andIndex);
+            } else {
+                imgName = url.substring(index + 1);
+            }
+        } else {
+            imgName = url.substring(index + 1);
+        }
+        return imgName;
+    }
+</script>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>作业列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+
+        body {
+            background: #f2f2f2;
+        }
+        /*清除浮动*/
+        .content {
+            text-align: center;
+            padding-top: 14%;
+        }
+
+        .content img {
+            width: 150px;
+            display: block;
+            margin: 0 auto
+        }
+
+        span {
+            font-size: 1rem;
+            color: #4bc7c7;
+            padding: 30px 0px 10px 0px;
+            display: block;
+        }
+
+        p {
+            font-size: 0.8rem;
+            color: #666
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <img :src="getRemark(remark)">
+    <span v-text="content"></span>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    function initVue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                remark: '',
+                content: ''
+
+            },
+            methods: {
+                getRemark: function (remark) {
+                    var imgUrl;
+                    if (remark == '1') {
+                        imgUrl = '../../../image/stuHomePad/you.png'
+                    }
+                    if (remark == '2') {
+                        imgUrl = '../../../image/stuHomePad/liang.png'
+                    }
+                    if (remark == '3') {
+                        imgUrl = '../../../image/stuHomePad/zhong.png'
+                    }
+                    if (remark == '4') {
+                        imgUrl = '../../../image/stuHomePad/cha.png'
+                    }
+                    return imgUrl;
+                }
+            }
+        });
+    }
+    apiready = function () {
+        initVue();
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.GetRemark, {
+            values: {
+                uid: $api.getStorage('uid'),
+                classid: api.pageParam.classid,
+                hwid: api.pageParam.hwid
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.remark = ret.remark;
+                    vm.content = ret.content;
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+
+
+    }
+</script>
+</html>

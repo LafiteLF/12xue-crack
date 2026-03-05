@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择题</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>
+    <style>
+        .xzt_content {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<div class="xzt_content">
+    <div class="content">
+        <img v-if=" material.is_complete==1&& material.res_type!=2  " class="aibtn noImgClick"
+            src="../../../image/newhomework/aiBtn.png" @click="PostAIBtn()">
+        <img  v-if=" material.is_complete==1&& material.res_type!=2  "   class="jrctb noImgClick" :src="isctb!=1?'../../../image/newhomework/join.png':'../../../image/newhomework/out.png'" @click="PostExercisesTriggerWrong()">
+        <div class="stem">
+            <ul>
+                <li class="tixing clearfix">
+                    <div class="tihao" v-text="(index+1)+'.'"></div>
+                    <div class="tixingzi" v-text="'【'+material.txstr+'】'"></div>
+                </li>
+                <li class="zsd" v-if="material.is_complete==1" @click="alertzsd(material.zsdmc)">
+                    <span>难易度：</span><img  class="noImgClick" :src="material.nyd==1?'../../../image/newhomework/1xing.png':material.nyd==2?'../../../image/newhomework/2xing.png':material.nyd==3?'../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{material.zsdmc}}
+                </li>
+            </ul>
+            <div class="tg_content font666" v-html="material.tg"></div>
+            <div class="scyinpin clearfix" v-if="material.tx=='tdjh' && material.attachments">
+                <img class="scyp1 noImgClick" src="../../../image/newhomework/yuyinimg.png">
+                <img class="scyp2 noImgClick" :playStatus='0' onclick="vm.studentRecord(this);" src="../../../image/startPlay.png" alt="">
+                <div class="ypRange"><input class="myRange" type="range" min="0"  value="0"  :max='material.attachments[0].filetime' ></div>
+                <p class="ypTimeP"  v-text="getOutTime(material.attachments[0].filetime)"></p>
+                <audio class="hideenAudio" :src='material.attachments[0].serverpath + material.attachments[0].preview_link' ></audio>
+            </div>
+<!--            <div class="tdjhxx"  v-if="material.tx=='tdjh'">-->
+<!--                <p v-for="list in material.options" v-html="'<span>'+list.xx+'</span>'+'.'+list.description"></p>-->
+<!--            </div>-->
+        </div>
+        <!--答案部分开始-->
+        <dl v-if="material.is_complete==1" class="wenda_answer bgFFF">
+            <div  class="defen">
+                <img  class="noImgClick"  v-if="material.is_true!=0"
+                      :src="material.is_true==1?' ../../../image/newhomework/zhengque.png':material.is_true==2?'../../../image/newhomework/cuowu.png':material.is_true==3?'../../../image/newhomework/bandui.png':''">
+                <span :style="material.is_true==1?'color: #4bc7c7':material.is_true==2?'color: #df7605':material.is_true==3?'color: #ffcd06':''"
+                      v-text="material.is_true==1?'正确':material.is_true==2?'错误':material.is_true==3?'正确率'+material.accuracy+'%':''"></span>
+                <span v-if="material.is_true==0" style="color: #ff778c">待批</span>
+            </div>
+            <dd>
+                <h2 class="wendah2">【我的答案】</h2>
+                <ul class="clearfix wendawdda">
+                    <li class="wendazi">
+                        <p v-text="material.is_unable==1?'不会做':material.xsdastr"></p>
+                    </li>
+                </ul>
+            </dd>
+            <dd v-if="material.audio && material.audio.length>0" >
+                <h2 class="wendah2">【老师留言】</h2>
+                <ul class="clearfix">
+                    <li :class="ylist.type==1?'teacher_liuyan yuyin3':'teacher_liuyan_zi yuyin3'"
+                        v-for="(ylist , index) in material.audio" @click="yuyin(ylist,index)">
+                        <img   v-if="ylist.type==1" class="audio-img img1 noImgClick" src="../../../image/newhomework/yuyin1.png"/>
+                        <img   v-if="ylist.type==1" class="audio-img img2 noImgClick" src="../../../image/newhomework/yuyin2.gif"/>
+                        <span v-if="ylist.type==1" v-text="ylist.filetime+'″'"></span>
+                        <span v-if="ylist.type==2" v-text="ylist.descript"></span>
+                    </li>
+                </ul>
+            </dd>
+            <dd class="needpic">
+                <h2 class="wendah2" v-text="'【'+material.tx_tip+'】'"> </h2>
+                <ul>
+                    <li class="wendazi" v-html="material.dastr==''?'无':material.dastr"></li>
+                </ul>
+            </dd>
+            <dd class="needpic">
+                <h2 class="wendah2">【答案解析】</h2>
+                <ul>
+                    <li class="wendazi" v-html="material.dajx==''?'无':material.dajx"></li>
+                </ul>
+            </dd>
+            <div class="jrctbkong"></div>
+        </dl>
+        <!--答案部分结束-->
+    </div>
+    <!--作答部分开始-->
+    <ul v-if="showdati && material.is_complete==0" class="option">
+        <!--单选-->
+        <li v-for="list in material.options" v-if="material.tx!='duoxt'" :id="list.id" :class="answer[0]==list.id?'danxoption xxactive':'danxoption'" v-text="material.tx=='pdt'?list.description:list.xx" tapmode onclick="vm.xxselectClicked(this)"></li>
+        <!--多选-->
+        <li v-for="list in material.options" v-if="material.tx=='duoxt'" :id="list.id" :class="isdxactive(list.id)?'duoxoption xxactive':'duoxoption'" v-text="list.xx" tapmode onclick="vm.xxselectClicked(this)"></li>
+        <li class="bhz font4BC7C7" tapmode onclick="vm.checded(this)">
+            <span :class="is_unable==1?'inputCheckactive':''"></span>不会做
+        </li>
+    </ul>
+    <!--作答部分结束-->
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript" src="../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var queryHomewokAnswer;
+    var allTimes = 0;//音频播放
+    var sec;
+    var timer = null;
+    apiready = function () {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        vue();
+        if(vm.material.is_complete==0){
+            if (JSON.stringify(api.pageParam.queryHomewokAnswer) == '[]') {
+                queryHomewokAnswer = {};
+            } else {
+                queryHomewokAnswer = JSON.parse(api.pageParam.queryHomewokAnswer[0].xtgroup.replace('&apos;', "'"));
+            }
+            if (queryHomewokAnswer.hasOwnProperty(vm.material.id)) {//缓存的答案
+                vm.answer = queryHomewokAnswer[vm.material.id].da;
+                vm.is_unable = queryHomewokAnswer[vm.material.id].is_unable;
+            }
+        }
+        api.addEventListener({// 滑动暂停音频
+            name: 'yinpinCLose'
+        }, function (ret, err) {
+            if($api.domAll('.scyp2').length>=1){
+                if($('.scyp2').attr('playStatus')==1){
+                    $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                }
+                audioStreamer = api.require('audioStreamer');
+                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                clearInterval(timer);
+                var hideenAudio = $api.dom('.hideenAudio');
+                hideenAudio.pause();
+            }
+            api.stopPlay();
+            $('.img1').show();
+            $('.img2').hide();
+        });
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.xzt_content',
+            data: {
+                showdati:false,
+                index: api.pageParam.index,//当前frame的索引
+                material: api.pageParam.material,//当前习题资料
+                answer: [],//答案数组
+                complet: api.pageParam.complet,//答题状态
+                is_unable: 0,//是否会做 0会做 1不会做
+                isPlaying: false,//老师留言是否播放中
+                isctb : api.pageParam.material.is_ctb,
+            },
+            created: function () {
+                this.initDatePicker();
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+            },
+            methods: {
+                initDatePicker: function () {
+                    this.$nextTick(function () {
+                        api.hideProgress();
+                        $('.xzt_content').show();
+                        vm.showdati=true;
+                    })
+                },
+                PostExercisesTriggerWrong:function(){//错题本改版 ，添加错题本、移除错题本、表及重点
+                    var type;
+                    if(vm.isctb==1){
+                        type = 'outbook';
+                    }else{
+                        type = 'addbook';
+                    }
+                    apiObj.Post(UrlRouter.PostExercisesTriggerWrong, {
+                        values: {
+                            sys_id:vm.material.sys_id,
+                            kc_type:3,
+                            type:type
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                if(type=='outbook'){
+                                    vm.isctb=0;
+                                    api.toast({
+                                        msg: '已移出错题本',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }else{
+                                    vm.isctb=1;
+                                    api.toast({
+                                        msg: '成功加入错题本',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+
+                            }else{
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        }else{
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                alertzsd:function(content){
+                    alert('知识点：'+content);
+                },
+                yuyin: function (audioItem, index) {
+                    if (audioItem.type == 1) {
+                        if (vm.isPlaying) {
+                            api.stopPlay();
+                            $('.img1').show();
+                            $('.img2').hide();
+                        } else {
+                            $('.img1').show();
+                            $('.img2').hide();
+                            var audioName = audioItem.savename;
+                            var path = "/audio/" + audioName + ".amr";
+                            api.download({
+                                url: audioItem.serverpath + "/" + audioItem.savename,
+                                savePath: 'fs:/' + path,
+                                report: false,
+                                cache: false,
+                                allowResume: false
+                            }, function (ret, err) {
+                                if (ret && ret.state == 1) {
+                                    // 下载成功  ret.savePath
+                                    isDownloading = false;
+                                    api.startPlay({
+                                        path: api.fsDir + path
+                                    }, function (ret, err) {
+                                        if (ret) {
+                                            vm.isPlaying = false;
+                                            $('.img1').show();
+                                            $('.img2').hide();
+
+                                        }
+                                    });
+
+                                    $('.yuyin3').eq(index).find('.img1').hide();
+                                    $('.yuyin3').eq(index).find('.img2').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img1').show();
+                                    $('.yuyin3').eq(index).siblings().find('.img2').hide();
+                                }
+                            });
+                        }
+                        vm.isPlaying = !vm.isPlaying;
+                    }
+
+                },
+                isdxactive: function (xxid) {//判断多选选项是否选择了
+                    if (vm.answer.length > 0) {
+                        for (var i = 0; i < vm.answer.length; i++) {
+                            if (vm.answer[i] == xxid) {
+                                return true;
+                            }
+                        }
+                    }
+                },
+                xxselectClicked: function (context) {//选择判断题选项点击事件
+                    if (vm.material.tx == 'duoxt') {//判断是多选题 可以选多个答案
+                        if (vm.answer.length == 0) {
+                            vm.answer.push($(context).attr('id'));
+                            vm.is_unable = 0;//会做
+                            vm.saveAnswer(vm.is_unable, vm.answer);
+                        } else {
+                            for (var i = 0; i < vm.answer.length; i++) {
+                                if (vm.answer[i] == $(context).attr('id')) {
+                                    vm.answer.splice(i, 1);
+                                    if (vm.answer.length == 0) {
+                                        vm.is_unable = 1;//不会做
+                                    } else {
+                                        vm.is_unable = 0;//会做
+                                    }
+                                    vm.saveAnswer(vm.is_unable, vm.answer);
+                                    return;
+                                } else if (i == vm.answer.length - 1) {
+                                    vm.answer.push($(context).attr('id'));
+                                    vm.is_unable = 0;//会做
+                                    vm.saveAnswer(vm.is_unable, vm.answer);
+                                    return;
+                                }
+                            }
+                        }
+                    } else {//判断是单选 或者判断题 只有一个选项的
+                        Vue.set(vm.answer, 0, $(context).attr('id'));
+                        vm.is_unable = 0;//会做
+                        vm.saveAnswer(vm.is_unable, vm.answer);
+                    }
+                },
+                checded: function (context) {//复选框不会做点击事件
+                    vm.answer = [];
+                    vm.is_unable = 1;//不会做
+                    vm.saveAnswer(vm.is_unable, vm.answer);
+
+                },
+                saveAnswer: function (is_unable, da) {
+                    var eachxtgroup = {
+                        'is_auto': 1,
+                        'tx': vm.material.tx,
+                        'is_unable': is_unable,
+                        'xtid': vm.material.id,
+                        'da': da,
+                        'daoptions': vm.material.daoptions,
+                        'tx_code': vm.material.tx_code,
+                    };
+                    api.sendEvent({
+                        name: 'saveAnswerHuancunGxts',
+                        extra: {
+                            eachxtgroup: eachxtgroup,
+                            zyid: vm.material.id,
+                        }
+                    });
+                },
+                studentRecord:function (context) {
+                    var url =   vm.material.attachments[0].serverpath + vm.material.attachments[0].preview_link;   // 获取一下  data.attachments[0].serverpath + data.attachments[0].preview_link
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var recodetime = vm.material.attachments[0].filetime;  // 获取一下  filetime
+                    var hideenAudio = $api.dom('.hideenAudio');
+                    var range = $api.dom('.myRange');
+                    range.disabled = true;
+                    var bfb;  //1
+//这是没有播放的情况  播放点击的音频  可能有其他音频正在播放  先关掉其他音频  再播放这个音频
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        hideenAudio.play();
+                        sec = 0;
+                        allTimes = recodetime;
+                        timer = setInterval(function (e) {
+                            console.log(hideenAudio.currentTime +'  ' + sec);
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb =  sec/recodetime *100;   //2
+                            bfb = bfb.toFixed(2);//2
+                            var ss = 'background-size: '+bfb + '% 100%';//2
+                            if (allTimes == 0 || sec >= recodetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                var time = vm.getOutTime(recodetime);
+                                $api.text($api.dom('.ypTimeP'), time);
+                                range.value = 0;
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%'); //3
+                            } else {
+                                range.value = sec;
+//                                range.onchange = function () {
+//                                    sec = parseInt(this.value);
+//                                    range.value = sec;
+//                                    hideenAudio.currentTime = sec;
+//                                    allTimes = recodetime - sec;
+//                                    var time = vm.getOutTime(allTimes);
+//                                    $api.text($api.dom('.ypTimeP'), time);
+//                                };
+                                var time = vm.getOutTime(allTimes);
+                                $api.css($api.dom('.myRange'), ss);  //4
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                        clearInterval(timer);
+                        hideenAudio.pause();
+                    } else {
+                        $api.attr(context, 'playStatus', '1');
+                        hideenAudio.play();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb =  sec/recodetime *100;    //5
+                            bfb = bfb.toFixed(2);   //5
+                            var ss = 'background-size: '+bfb + '% 100%';  //5
+                            if (allTimes == 0 || sec >= recodetime) {
+                                $api.attr(context, 'playStatus', '0');
+                                clearInterval(timer);
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                var time = vm.getOutTime(recodetime);
+                                $api.text($api.dom('.ypTimeP'), time);
+                                range.value = 0;
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');   //6
+                            } else {
+                                range.value = sec;
+//                                range.onchange = function () {
+//                                    sec = parseInt(this.value);
+//                                    range.value = sec;
+//                                    hideenAudio.currentTime = sec;
+//                                    allTimes = recodetime - sec;
+//                                    var time = vm.getOutTime(allTimes);
+//                                    $api.text($api.dom('.ypTimeP'), time);
+//                                };
+                                var time = vm.getOutTime(allTimes);
+                                $api.css($api.dom('.myRange'), ss);    //7
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+                getOutTime: function (intime) {
+                    var outTime = '';
+                    if(intime<=9){
+                        outTime = '00:0'+intime;
+                    }else if(intime<59){
+                        outTime = '00:'+intime;
+                    }else {
+                        var min =parseInt(intime/60);
+                        var sec = intime%60;
+                        if(sec<=9){
+                            if(min>0&&min<10){
+                                outTime ='0'+ min+ ':0' + sec ;
+                            }else if(min>=10){
+                                outTime = min+ ':0' + sec ;
+                            }else{
+                                outTime = '00:0'+sec;
+                            }
+                        }else{
+                            if(min>0&&min<10){
+                                outTime ='0'+ min + ':'+ sec ;
+                            }else if(min>=10){
+                                outTime = min + ':'+ sec ;
+                            }else {
+                                outTime = '00:'+sec;
+                            }
+                        }
+                    }
+                    return outTime;
+                },
+                PostAIBtn: async function () {
+                    if (vm.material.tx == 'tdjh') {
+                        api.toast({
+                            msg: '听力题暂不支持AI解析'
+                        })
+                        return;
+                    }
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostPayfeeOperationLog, {
+                            body: $api.jsonToStr({
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_analysis',
+                                resource_id: vm.material.id,
+                                count: aiAnalysis.count,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                ...(aiAnalysis.card_id !== undefined && {card_id: aiAnalysis.card_id}),
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                resolve(ret);
+                            } else {
+                                reject(err);
+                            }
+                        })
+                    });
+                    if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber') || ret.ret === -1) {
+                        if ($api.getStorage('upgradeQRCode') === '1') {
+                            api.toast({
+                                msg: '本月剩余AI解析次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../../study/frame-number-exhausted.html',
+                            })
+                        }
+                        return
+                    }
+                    if (ret.ret === 0 && ret.data === '') {
+                        api.execScript({
+                            name: 'win_detail_gxts',
+                            script: 'postAiAnalysis()'
+                        });
+                    }
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const tgContent = document.querySelector('.tg_content');
+                    const needPics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...needPics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            // 当所有图片都处理完成时
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../../study/newHomework/frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.material.id,
+                                        imagePaths: imageUrls
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                },
+
+
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+</script>
+</html>

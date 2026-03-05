@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>录音</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle{
+            width:400px;
+        }
+        .name{
+            width: 300px;
+            float: left;
+            height: 49px;
+        }
+        .name span {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 72px;
+            margin-top: 13px;
+            font-size: 1.5rem;
+        }
+
+        .name img {
+            width: 18px;
+            margin-left: 10px;
+            vertical-align: top;
+            margin-top: 14px
+        }
+        .dprs{
+             text-align: center;
+             line-height: 49px;
+             display: inline;
+             width: 80px;
+             font-size: 1.5rem;
+        }
+
+        .jixiti{
+            text-align: right;
+            line-height: 49px;
+            display: inline;
+            width: 30px;
+            font-size: 1.2rem;
+        }
+        [v-cloak] {
+            /*display: none;*/
+        }
+    </style>
+</head>
+<body>
+<div class="content1" v-cloak>
+
+<header class="clearfix">
+    <div onclick="closeWin();" class="winTitle pull_left">
+        组员习题批阅
+    </div>
+    <div class="name">
+        <span v-text="currentName" style="color: #696969">啊哈哈</span>
+        <img v-if="currentDC == 1"  src="../../../../image/newhomework/zhengque.png">
+        <img v-if="currentDC == 3"  src="../../../../image/newhomework/bandui.png">
+        <img v-if="currentDC == 2"  src="../../../../image/newhomework/cuowu.png">
+        <span class="zql" :style="currentDC==1?'color:#4bc7c7':currentDC==3?'color:#FFCC00':'color:#F57F17'"  v-if="currentDC == 3&&isFenzhi == 0" v-text="zql + '%'"></span>
+        <span class="zql" :style="currentDC==1?'color:#4bc7c7':currentDC==3?'color:#FFCC00':'color:#F57F17'" v-if="currentDC == 3&&isFenzhi == 1" v-text="fz + '分'"></span>
+    </div>
+    <div style="width: 100px;height: 49px;float: right" onclick="vm.choosext();">
+        <p class="dprs" style="color: #696969">待批<span style="color: #ff778c" v-text="daipiNum"></span>人</p>
+        <img style="width: 12px;height: 8px;" src="../../../../image/jiantou.png" alt="">
+    </div>
+    <div style="width: 50px;height: 49px;float: right">
+        <p class="jixiti" v-if="tx == 'tkt'" v-text="'空'+currentSort">sss</p>
+        <p class="jixiti" v-if="answersSort.length != 0&&tx != 'tkt'" v-text="'('+currentSort+')'"></p>
+    </div>
+</header>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+//        GetcorrectAnswerOptionStudents();
+        vm.getHWstuExamStatus();
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.addEventListener({
+            name: 'changeWithUid'
+        }, function (ret, err) {
+            vm.changeWithUid(ret.value.uid);
+        });
+        api.addEventListener({
+            name: 'changeWithXT'
+        }, function (ret, err) {
+            api.closeFrameGroup({
+                name: 'frame_group' + vm.currentSort,
+            });
+            vm.currentIndex = ret.value.pageIndex;
+            vm.currentSort = ret.value.sort;
+            vm.fz = ret.value.fz;
+            vm.getHWstuExamStatus2(ret.value.sort);
+        });
+        api.addEventListener({
+            name: 'changeCurrentFZ'
+        }, function (ret, err) {
+            vm.dataList[ret.value.index].is_true = ret.value.isTrue;
+            vm.dataList[ret.value.index].score = ret.value.fenzhi;
+            vm.currentDC = ret.value.isTrue;
+            if(ret.value.fristTrue == 0){
+                vm.daipiNum = vm.daipiNum - 1;
+                vm.yipiNum = vm.yipiNum + 1;
+                api.setFrameGroupIndex({
+                    name: 'frame_group' + vm.currentSort,
+                    index: ret.value.index + 1
+                });
+            }
+            if(vm.daipiNum == 0&&vm.answersSort.length!=0){
+                api.sendEvent({
+                    name: 'xsbtn',
+                });
+            }
+            vm.fz = ret.value.fenzhi;
+
+        });
+        api.addEventListener({
+            name: 'changeCurrentDC'
+        }, function (ret, err) {
+            vm.dataList[ret.value.index].is_true = ret.value.isTrue;
+            vm.dataList[ret.value.index].accuracy = ret.value.zql/100;
+            vm.currentDC = ret.value.isTrue;
+            if(ret.value.fristTrue == 0){
+                vm.daipiNum = vm.daipiNum - 1;
+                vm.yipiNum = vm.yipiNum + 1;
+                api.setFrameGroupIndex({
+                    name: 'frame_group' + vm.currentSort,
+                    index: ret.value.index + 1
+                });
+            }
+            if(vm.daipiNum == 0&&vm.answersSort.length!=0){
+                api.sendEvent({
+                    name: 'xsbtn',
+                });
+            }
+
+            if(ret.value.isTrue == 3){
+                vm.zql = ret.value.zql;
+            }
+        });
+
+        api.addEventListener({
+            name: 'pause'
+        }, function(ret, err) {
+            api.sendEvent({
+                name: 'changeYinPin',
+            });
+        });
+
+
+
+
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name:'keyback'
+        },function(ret,err){
+            closeWin();
+        });
+    };
+    function closeWin() {
+        api.closeWin();
+    }
+
+    function vue() {
+        vm = new Vue({
+            el: '.content1',
+            data: {
+                currentIndex: 0,
+                currentData:{},
+                currentName:'', //当前学生姓名
+                currentDC:0, //当前对错
+                dataList: [],
+                daipiList:[],
+                yipiList:[],
+                daipiNum: 0,
+                yipiNum: 0,
+                answersSort:[],
+                currentSort:'',
+                tx_code:'',
+                pendingApprovalcontent: api.pageParam.pendingApprovalcontent,
+                zql:0,
+                fz:0,
+                isFenzhi: 0,
+                is_unable:'',
+                tx: ''   // 0 代表  不显示空  （1）    1代表填空题   2代表多小题
+            },
+            methods: {
+                choosext: function () {
+                    api.openFrame({
+                        name: 'frame_student',
+                        url: 'frame_student.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winWidth,
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            tuid: api.pageParam.tuid, //获取hwid
+                            hwid: api.pageParam.hwid, //获取hwid
+                            classid: api.pageParam.classid,
+                            xtid: api.pageParam.xtid,
+                            ytlx: api.pageParam.ytlx,
+                            tx_code:api.pageParam.tx_code,
+                            is_auto:'0',
+                            answersSort:vm.answersSort,
+                            yipiList:vm.yipiList,
+                            daipiList:vm.daipiList,
+                            currentSort:vm.currentSort,
+                            isFenzhi:vm.isFenzhi,
+                            fz:vm.fz,
+                            tx:vm.tx,
+                        },
+                        bounces: false
+                    });
+                },
+                getHWstuExamStatus: function () {//待批主观题列表
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetcorrectMobileExercisesIndex, {
+                        values: {
+                            tuid: api.pageParam.tuid, //获取hwid
+                            hwid: api.pageParam.hwid, //获取hwid
+                            classid: api.pageParam.classid,
+                            xtid: api.pageParam.xtid,
+                            ytlx: api.pageParam.ytlx,
+                            leaderuid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.currentName = ret.data.realname;
+                                vm.currentData = ret.data.exercisesInfo;
+                                vm.daipiList = ret.data.dpList;
+                                vm.yipiList = ret.data.ypList;
+                                vm.daipiNum = ret.data.dpList.length;
+                                vm.yipiNum = ret.data.ypList.length;
+                                vm.dataList = ret.data.dpList.concat(ret.data.ypList);
+                                vm.currentDC = vm.dataList[vm.currentIndex].is_true;
+                                vm.answersSort = ret.data.answersSort;
+                                vm.tx_code = ret.data.exercisesInfo.tx_code;
+                                vm.currentSort = ret.data.sort;
+                                vm.zql = vm.dataList[vm.currentIndex].accuracy * 100;
+                                vm.is_unable = ret.data.studentAnswers.is_unable;
+                                vm.tx= ret.data.exercisesInfo.tx;
+                                if(ret.data.studentAnswers.scoreTotal == 0){
+                                    vm.isFenzhi = 0;
+                                }else {
+                                    vm.isFenzhi = 1;
+                                    vm.fz = ret.data.studentAnswers.score;
+                                }
+                                vm.openFrame();
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    })
+                },
+                getHWstuExamStatus2: function (sort) {//待批主观题列表
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetcorrectMobileExercisesIndex, {
+                        values: {
+                            tuid: api.pageParam.tuid, //获取hwid
+                            hwid: api.pageParam.hwid, //获取hwid
+                            classid: api.pageParam.classid,
+                            xtid: api.pageParam.xtid,
+                            ytlx: api.pageParam.ytlx,
+                            leaderuid: $api.getStorage('uid'),
+                            sort:sort,
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.currentName = ret.data.realname;
+                                vm.currentData = ret.data.exercisesInfo;
+                                vm.daipiList = ret.data.dpList;
+                                vm.yipiList = ret.data.ypList;
+                                vm.daipiNum = ret.data.dpList.length;
+                                vm.yipiNum = ret.data.ypList.length;
+                                vm.dataList = ret.data.dpList.concat(ret.data.ypList);
+                                vm.currentDC = vm.dataList[vm.currentIndex].is_true;
+                                vm.answersSort = ret.data.answersSort;
+                                vm.tx_code = ret.data.exercisesInfo.tx_code;
+                                vm.currentSort = ret.data.sort;
+                                vm.openFrame();
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    })
+                },
+                openFrame: function () {
+                    var header = document.querySelector('header');
+                    var headerH = $api.offset(header).h;
+                    var frameH = padWinHeight - headerH;
+                    api.setStatusBarStyle({
+                        style: 'light'
+                    });
+                    var frames = [];
+                    for (var i = 0; i < vm.dataList.length; i++) {
+                        frames.push({
+                            name: "frame_marking",
+                            url: 'frame_marking.html',
+                            pageParam: {
+                                index:i,
+                                data: vm.dataList[i],
+                                answersSort:vm.answersSort,
+                                sort:vm.currentSort,
+                                headerH:headerH,
+                                isFenzhi:vm.isFenzhi,
+                                tuid: api.pageParam.tuid,
+                                hwid: api.pageParam.hwid,
+                                classid: api.pageParam.classid,
+                                xtid: api.pageParam.xtid,
+                                ytlx: api.pageParam.ytlx,
+                                tx:vm.tx
+                            },
+                            bounces: false
+                        });
+                    }
+                    api.openFrameGroup({
+                        name: 'frame_group'+ vm.currentSort,
+                        url: 'frame_marking.html',
+                        rect: {
+                            x: 0,
+                            y: headerH,
+                            w: api.winWidth,
+                            h: frameH
+                        },
+                        frames: frames,
+                        index: vm.currentIndex,
+                        preload: 0,
+                    },function (ret, err) {
+                        if (ret) {
+                            vm.funActive(ret.index)
+                        }
+                    });
+                },
+                funActive: function (index) {
+
+                    if(vm.currentIndex!=0 && index == 0){
+                        api.sendEvent({
+                            name: 'appearYz',
+                        });
+//                        api.toast({
+//                            msg: '已到第一个学生',
+//                            duration: 1000,
+//                            location: 'bottom'
+//                        });
+                    }
+                    if(index == vm.dataList.length-1){
+                        api.sendEvent({
+                            name: 'appearZz',
+                        });
+//                        api.toast({
+//                            msg: '已到最后一个学生',
+//                            duration: 1000,
+//                            location: 'bottom'
+//                        });
+                    }
+                    api.sendEvent({
+                        name: 'changeYinPin',
+                    });
+                    vm.currentIndex = index;
+                    vm.currentName = vm.dataList[index].realname;
+                    vm.currentDC = vm.dataList[index].is_true;
+                    vm.zql = vm.dataList[index].accuracy * 100;
+                    vm.fz = vm.dataList[index].score;
+                },
+                closeWin: function () {
+                    api.sendEvent({
+                        name: 'shuaxinMark',
+                        extra: { }
+                    });
+                    setTimeout( api.closeWin(), 1000);
+                },
+                changeWithUid:function (xsuid) {
+                    for(var i=0;i<vm.dataList.length;i++){
+                        if(xsuid == vm.dataList[i].uid){
+                            vm.currentIndex = i;
+                            api.setFrameGroupIndex({
+                                name: 'frame_group'+ vm.currentSort,
+                                index: vm.currentIndex
+                            });
+                        }
+                    }
+                },
+                nextXt:function () {
+                    api.closeFrameGroup({
+                        name: 'frame_group' + vm.currentSort,
+                    });
+                    for(var i = 0;i< vm.answersSort.length;i++){
+                        if(vm.currentSort == vm.answersSort[i]){
+                            vm.currentSort = vm.answersSort[i+1];
+                            break;
+                        }
+                    }
+                    vm.currentIndex = 0;
+                    vm.fz = 0;
+                    vm.getHWstuExamStatus2(vm.currentSort);
+                },
+
+            }
+        });
+    }
+
+
+
+
+
+
+</script>
+</html>

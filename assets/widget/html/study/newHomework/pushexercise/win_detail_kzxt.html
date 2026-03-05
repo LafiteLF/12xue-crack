@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>win</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle {
+            width: calc(100% - 340px);
+        }
+
+    </style>
+</head>
+<body>
+<div class="content1">
+    <header class="clearfix">
+        <div onclick="closeWin();" class="winTitle pull_left">习题推送</div>
+    </header>
+    <div style="position: absolute;left: 50%;transform: translateX(-50%);top: 1.5rem;font-size: 1.5rem;color:#999999">
+        本月剩余AI解析次数:&nbsp;<span style="font-weight: bold;"
+                                       :style="{'color': aiAnalysis.count > 0 ? '#4BC7C7': '#F82A1A'}">{{
+            aiAnalysis.count
+        }}</span>
+    </div>
+    <div class="content" v-if="materialtzxt.length>0">
+        <div class="type bg4BC7C7 fontFFF">{{ current + 1 }}/{{ xitinum }}</div>
+        <ul class="scroll">
+            <li v-for="(list , index) in materialtzxt" v-text="index+1" :class="current==index?'current':''" tapmode
+                onclick="vm.itemClick(this)"></li>
+        </ul>
+    </div>
+    <ul class="right_btn">
+        <li tapmode onclick="vm.winpageUpOnclick();"><img src="../../../../image/up1.png"></li>
+        <li tapmode onclick="vm.winnextOnclick();"><img src="../../../../image/down1.png"></li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var params = {};// 上传附件参数
+    // 提问
+    var sort;
+    var restype;
+    var resdesc;
+    var resdescript;
+    var restitle;
+    var moduleDialog = null;//弹窗模块
+    windowError();
+    apiready = function () {
+        moduleDialog = api.require('moduleDialog');
+        vue();
+        vm.GetStudenthomeworkUrl(vm.hwid, vm.xsbjid);//获取作业详情
+        if (vm.complete != 2) {
+            vm.PostAnswerUpdateHomeworkComplete(2);
+        }
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+        // var index = api.pageParam.classid.indexOf(api.pageParam.detailData.bjid);
+        // vm.inClass = index==-1?false:true;
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content1',
+            data: {
+                hwid: api.pageParam.detailData.id,//作业id
+                xsbjid: api.pageParam.detailData.bjid,//学生班级id
+                homeworkListData: api.pageParam.detailData,//作业列表传过来的数据
+                complete: api.pageParam.complete,//作业完成状态
+                data: [],
+                materialtzxt: [],//扩展习题列
+                current: 0,
+                xitinum: 0,
+                isEvaluate: api.pageParam.detailData.remark ? api.pageParam.detailData.remark : '',//是否显示评论
+                isUpload: api.pageParam.detailData.is_attach ? api.pageParam.detailData.is_attach : '',//是否显示上传附件
+                inClass: true,//判断学生是否还在此作业的班级
+                pingyu: api.pageParam.detailData.content ? api.pageParam.detailData.content : '',
+                paizhaoparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 89,
+                        "h": 178,
+                        "w": 300
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "paizhao",
+                        "showText": "拍照",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41 + 58,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "xiangce",
+                        "showText": "从相册中选择",
+                        "textSize": 14
+                    }]
+                },
+                aiAnalysis: {count: 0}
+            },
+            mounted: function () {
+                this.$watch('aiAnalysis', () => {
+                    $api.setStorage('aiAnalysis', this.aiAnalysis);
+                },{deep: true});
+
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        type: 'ai_analysis',
+                        schoolid: $api.getStorage('schoolid'),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        this.aiAnalysis = ret.data;
+                    }else{
+                        this.aiAnalysis = {count: 0}
+                    }
+                })
+            },
+            updated: function () {
+            },
+            methods: {
+                GetStudenthomeworkUrl: function (hwid, classid) {//获取作业详情
+                    vm.materialtzxt = api.pageParam.tuisongList;
+                    vm.xitinum = api.pageParam.tuisongList.length;
+                    vm.openFrameGroup();
+
+                },
+                openFrameGroup: function () {
+                    var header = document.querySelector('header');
+                    var leftW = 67;
+                    var rightW = $api.offset($api.dom('.right_btn')).w;
+                    var headerH = $api.offset(header).h;
+                    var frameAry = [];
+                    var frameObj = {};
+                    for (var i = 0; i < vm.materialtzxt.length; i++) {
+                        var url;
+                        if (vm.materialtzxt[i].zyqf != 2) {//素材
+                            if (vm.materialtzxt[i].filetype == '.mp3' || vm.materialtzxt[i].filetype == '.wma') {
+                                url = 'frame_homework_voice_pad.html';
+                            } else {
+                                url = 'frame_xzt.html';
+                            }
+                        } else {
+                            switch (vm.materialtzxt[i].tx_code) {
+                                case '1'://单选 多选 判断 听单句话 单项选择
+                                    url = 'frame_xzt.html';
+                                    break;
+                                case '2':// 填空题 名著导读
+                                    url = 'frame_tkt.html';
+                                    break;
+                                case '3'://问答题 语言表达 默写 翻译 作文 朗读 证明 书面表达 朗读 解答 辨析 简答 计算
+                                    url = "frame_wdt.html";
+                                    break;
+                                case '4'://复合题带选项
+                                    if (vm.materialtzxt[i].tx == 'tdh' || vm.materialtzxt[i].tx == 'tdb' || vm.materialtzxt[i].tx == 'ttt') {//听对话 听对白
+                                        url = "frame_listen.html";
+                                    } else {//完型填空 阅读理解 材料选择题
+                                        url = "frame_wxtk.html";
+                                    }
+                                    break;
+                                case '5'://复合题不带选项 ：材料分析 解答 现代文阅读 综合探究 实验与探究 是个减伤 文言文批阅
+                                    url = "frame_sytj.html";
+                                    break
+                            }
+                        }
+                        frameObj = {
+                            name: 'frame_Detail_kzxt' + (i + 1),
+                            url: url,
+                            bounces: false,
+                            bgColor: '#f2f2f2',
+                            pageParam: {
+                                index: i,
+                                material: vm.materialtzxt[i],
+                                xsbjid: vm.xsbjid,
+                                schoolid: vm.data.schoolid,
+                                complete: vm.complete,
+                                isConvert: vm.materialtzxt[i].is_convert,
+                                convertStatus: vm.materialtzxt[i].convert_status,
+                                filetype: vm.materialtzxt[i].filetype,
+                                winData: vm.data
+                            }
+                        };
+                        frameAry.push(frameObj);
+                    }
+                    api.openFrameGroup({
+                        name: 'frame_Detail_kzxt',
+                        scrollEnabled: false,
+                        rect: {
+                            x: leftW + 10,
+                            y: headerH + 10,
+                            w: api.winWidth - leftW - rightW - 30,
+                            h: $api.getStorage('padHeight') - headerH - 10
+                        },
+                        index: api.pageParam.index,
+                        preload: 0,
+                        frames: frameAry,
+                        reload: true
+                    }, function (ret, err) {
+                        vm.current = ret.index;
+                        if (vm.current > 4) {
+                            $api.dom('.scroll').scrollTop = (vm.current - 4) * 47;
+                        } else {
+                            $api.dom('.scroll').scrollTop = 0;
+                        }
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+                    });
+                },
+                winpageUpOnclick: function () {//右边上一个按钮切换
+                    if (vm.current == 0) {
+                        api.toast({
+                            msg: '已经是第一个了',
+                            duration: 2000,
+                            location: 'bottom'
+
+                        })
+                    } else {
+                        vm.current = vm.current - 1;
+                        api.setFrameGroupIndex({
+                            name: 'frame_Detail_kzxt',
+                            index: vm.current,
+                            scroll: true
+                        });
+                    }
+                },
+                winnextOnclick: function () {//右边下一个按钮切换
+                    if (vm.current == vm.xitinum - 1) {
+                        api.toast({
+                            msg: '已经是最后一个了',
+                            duration: 2000,
+                            location: 'bottom'
+
+                        })
+                    } else {
+                        vm.current = vm.current + 1;
+                        api.setFrameGroupIndex({
+                            name: 'frame_Detail_kzxt',
+                            index: vm.current,
+                            scroll: true
+                        });
+                    }
+                },
+                itemClick: function (context) {//左边题号切换
+                    vm.current = $(context).index();
+                    api.setFrameGroupIndex({
+                        name: 'frame_Detail_kzxt',
+                        index: vm.current,
+                        scroll: true
+                    });
+                },
+                openEvaluateFrame: function (e) {
+                    api.openWin({
+                        name: 'win-evaluate-pad',
+                        url: '../win-evaluate-pad.html',
+                        pageParam: {remark: vm.isEvaluate, content: vm.pingyu},
+                    });
+                },
+                upFilevm: function () {
+                    if (!checkPermission(['camera', 'storage'])) {
+                        return;
+                    }
+                    moduleDialog.showDialog(vm.paizhaoparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'xiangce') {//相册
+
+                                if (api.systemType == 'ios') {
+                                    api.getPicture({
+                                        sourceType: 'photo',
+                                        encodingType: 'jpg',
+                                        mediaValue: 'pic',
+                                        destinationType: 'url',
+                                        quality: 50
+                                    }, function (ret, err) {
+                                        if (ret.data.length > 5) {
+                                            getFujianUrl(ret.data);
+                                        }
+                                    });
+                                } else {
+                                    var uiMediaScanner = api.require('UIMediaScanner');
+                                    uiMediaScanner.open({
+                                        type: 'picture',
+                                        column: 4,
+                                        classify: true,
+                                        max: 1,
+                                        sort: {
+                                            key: 'time',
+                                            order: 'desc'
+                                        }, rotation: true,
+                                        texts: {
+                                            stateText: '已选*项',
+                                            cancelText: '取消',
+                                            finishText: '完成'
+                                        },
+                                        styles: {
+                                            bg: '#fff',
+                                            mark: {
+                                                icon: '',
+                                                position: 'bottom_left',
+                                                size: 20
+                                            },
+                                            nav: {
+                                                bg: '#4bc7c7',
+                                                stateColor: '#fff',
+                                                stateSize: 18,
+                                                cancelBg: 'rgba(0,0,0,0)',
+                                                cancelColor: '#fff',
+                                                cancelSize: 18,
+                                                finishBg: 'rgba(0,0,0,0)',
+                                                finishColor: '#fff',
+                                                finishSize: 18
+                                            }
+                                        }
+                                    }, function (ret) {
+                                        if (ret.eventType == 'confirm') {
+                                            if (ret.list.length != 0) {
+                                                getFujianUrl(ret.list[0].path);
+                                            }
+                                        }
+                                    })
+                                }
+
+                                dismissDialog();
+                            } else if (ret.clickID == 'paizhao') {//拍照
+                                api.getPicture({
+                                    sourceType: 'camera',
+                                    encodingType: 'jpg',
+                                    mediaValue: 'pic',
+                                    destinationType: 'url',
+                                    quality: 50
+                                }, function (ret, err) {
+                                    if (ret) {//如果拍了照片
+                                        if (ret.data.length > 0) {
+                                            getFujianUrl(ret.data);
+                                        }
+                                    } else {//如果点了取消
+
+                                    }
+                                });
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+
+                    });
+                },
+                opentiwenFrame: function () {
+                    var material = vm.materialtzxt[vm.current];
+                    sort = vm.current + 1;
+                    if (material.zyqf == 2) {
+                        restype = 1;
+                        resdesc = '【' + sort + '.' + material.txstr + '】';
+                        resdescript = '【' + material.txstr + '】';
+                    } else {
+                        restype = 2;
+                        resdesc = '【' + sort + '.' + '素材】';
+                        resdescript = '【素材】';
+                    }
+                    restitle = material.zymc;
+                    api.openWin({
+                        name: 'win-tiwen-pad',
+                        url: '../win-tiwen-pad.html',
+                        pageParam: {
+                            restype: restype,
+                            resdesc: resdesc,
+                            restitle: restitle,
+                            resdescript: resdescript,
+                            zyid: material.hwid,
+                            classid: vm.homeworkListData.bjid,
+                            resid: material.zyid,
+                            data: material,
+                            tuid: vm.homeworkListData.uid
+                        }
+                    });
+                },
+            }
+        })
+    }
+
+    function closeWin() {
+        api.sendEvent({
+            name: 'RefreshTSXT'
+        });
+        api.closeWin();
+    }
+
+    function getFujianUrl(url) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        params["uid"] = $api.getStorage("uid");
+        params["classid"] = vm.xsbjid;
+        params["hwid"] = vm.hwid;
+        params["title"] = url.substr(url.lastIndexOf("/") + 1);
+        params["filetype"] = url.substr(url.lastIndexOf("."));
+        params["serverpath"] = "http://vod-qiniu.12xue.com/";
+        var imageFilter = api.require('imageFilter');
+        imageFilter.getAttr({
+            path: url
+        }, function (ret, err) {
+            if (ret.status) {
+                params["filesize"] = ret.size;
+            } else {
+                api.hideProgress();
+                alert(JSON.stringify(err));
+            }
+        });
+        qiniuUpfile(url);
+    }
+
+    // 上传附件到七牛
+    var QINIU_DOMAIN = "http://vod-qiniu.12xue.com/";
+
+    function qiniuUpfile(url) {
+        var fileKey = (new Date()).valueOf() + url;
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            var qiniuStorage = api.require("qiniuStorage");
+            qiniuStorage.configUploader({
+                params: {},
+                checkCrc: false,
+                mimeType: '',
+                zone: $api.getStorage('qiniuZone')
+            });
+            qiniuStorage.start({
+                token: ret.data.token,
+                path: url,
+                key: fileKey
+            });
+            qiniuStorage.addEventListener(function (ret) {
+//                if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+//                    //上传成功后组装访问路径，或直接访问文档
+//                    params["savename"] = ret.key;
+//                    postHomeworkAttach();
+//                }
+
+                if (ret.eventType == 'complete') {
+                    if ((api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                        //上传成功后组装访问路径，或直接访问文档
+                        params["savename"] = ret.key;
+                        postHomeworkAttach();
+                    } else {
+                        api.hideProgress();
+                        var msg = '上传失败！';
+                        if (api.systemType == 'ios') {
+                            msg = msg + ret.info.statusCode + ret.info.error.domain + ret.info.error.code;
+                        } else {
+                            msg = msg + ret.statusCode + ret.error.domain + ret.info.code;
+                        }
+                        api.toast({
+                            msg: msg,
+                            duration: 3000,
+                            location: 'bottom'
+                        });
+                    }
+                }
+
+            });
+        });
+    }
+
+    function postHomeworkAttach() {
+        apiObj.Post(UrlRouter.PostHomeworkAttach, {
+            values: params
+        }, function (ret, err) {
+            api.hideProgress();
+            var msg = '';
+            if (ret && ret.ret == 0) {
+                msg = "上传附件成功";
+            } else {
+                if (ret) {
+                    msg = ret.msg;
+                } else {
+                    msg = err;
+                }
+            }
+            api.toast({
+                msg: msg,
+                duration: 2000,
+                location: 'bottom'
+            });
+        })
+    }
+
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+
+    function postAiAnalysis() {
+        if(vm.aiAnalysis.count > 0) {
+            vm.aiAnalysis.count -= 1;
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>-->
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        /*滚动条样式*/
+        .right-div::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            height: 100%;
+        }
+
+        .right-div::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        .right-div::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+
+        progress {
+            width: 100%;
+            height: 5px;
+            border: none;
+            background: #e2f6f6;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: #E0FAF9;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #87dada;
+            border-radius: 20px;
+        }
+        .content {
+            width: 44%;
+            height: calc(35% + 50px);
+            top: 25%;
+            position: absolute;
+            left: 29%;
+            /*overflow-y: scroll;*/
+            border-radius: 5px;
+        }
+
+        .bottomClass{
+            width: 100%;
+            top: 100%;
+            height: 80px;
+            position: absolute;
+            left: 0;
+            background-color: white;
+            /*overflow-y: scroll;*/
+            /*border-radius: 5px;*/
+        }
+
+
+        .left-div{
+            float: left;
+            width: 25%;
+            height: calc(100% - 50px);
+            background-color: #F2F2F2;
+            overflow-y: auto;
+        }
+        .right-div{
+            float: right;
+            width: 75%;
+            height: calc(100% - 50px);
+            background-color: #FFFFFF;
+            overflow-y: scroll;
+        }
+        .left-div dl{
+            width: 100%;
+            /*height: 100%;*/
+            background: #F2F2F2;
+            margin: 0 auto;
+            border-radius: 5px;
+            /*overflow-y: auto;*/
+        }
+        .left-div dl dd {
+            height: 55px;
+            line-height: 55px;
+            font-size: 0.7rem;
+            color: #333333;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+        .left-div dl dd:active {
+            line-height: 55px;
+            font-size: 0.7rem;
+            color: #4bc7c7;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;;
+        }
+        .right-div dl{
+            width: 100%;
+            /*height: 100%;*/
+            background: #F2F2F2;
+            margin: 0 auto;
+            border-radius: 5px;
+            /*overflow-y: auto;*/
+        }
+        .right-div dl dd{
+            height: 40px;
+            line-height: 40px;
+            font-size: 0.7rem;
+            border: 1px solid #4bc7c7;
+            /*padding: 0 10%;*/
+            text-align: center;
+            margin: 15px 20px;
+            border-radius: 5px;
+            color: #4bc7c7;
+        }
+        .right-div dl dd:active{
+            height: 40px;
+            line-height: 40px;
+            font-size: 0.7rem;
+            border: 1px solid #4bc7c7;
+            /*padding: 0 10%;*/
+            text-align: center;
+            margin: 15px 20px;
+            border-radius: 5px;
+            color: #FFFFFF;
+            background-color: #4bc7c7;
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .item-selected{
+            background-color: #FFFFFF;
+        }
+        .item-normal{
+            background-color: #F2F2F2;
+        }
+        .leftBtn{
+            width: 120px;
+            height:40px;
+            background-color: #4bc7c7;
+            display: inline-block;
+            line-height: 40px;
+            text-align: center;
+            margin-left: 25%;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: white;
+        }
+        .rightBtn{
+            width: 120px;
+            height:40px;
+            background-color: #4bc7c7;
+            display: inline-block;
+            line-height: 40px;
+            text-align: center;
+            margin-left: 50px;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="close" tapmode onclick="api.closeFrame({
+    name: 'popStudentDf'
+});"></div>
+<div  id="app1" class="content" >
+    <div class="topClass" style="height: 50px;background-color: white;text-align: center;line-height: 50px;color: grey;">为<span class="xsname" style="color: black"></span>同学打分</div>
+    <div class="left-div">
+        <dl>
+            <dd v-for="item,index in datalist" :style="item.id==selectGradeId?'background-color: white':'background-color: #F2F2F2'" @click="gradeClick(item,index)"v-text="item.title"></dd>
+        </dl>
+    </div>
+    <div class="right-div">
+        <dl style="background-color: #FFFFFF">
+            <dd class="item-content aui-ellipsis-1" :style="chapt.id==selectidArr[changeIndex]?'background-color: #D7FFFE':'background-color:white'" v-for="chapt,index in chaptList" tapmode @click="itemClick(chapt,index)" v-text="getTitle(chapt)"></dd>
+        </dl>
+    </div>
+    <div class="bottomClass">
+        <div class="leftBtn" onclick="api.closeFrame({name: 'popStudentDf'});">取消</div>
+        <div class="rightBtn" @click="score()">确定</div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        if(api.pageParam.xsData.realname.length >= 6){
+            $api.text($api.dom('.xsname'), api.pageParam.xsData.realname.slice(0,5)+'…');
+        }else {
+            $api.text($api.dom('.xsname'), api.pageParam.xsData.realname);
+        }
+        var vm = new Vue({
+            el: '.content',
+            data: {
+                datalist: api.pageParam.evaluate,
+                selectGradeId: api.pageParam.evaluate[0].id,
+                chaptList:api.pageParam.evaluate[0].chiled,
+                changeIndex:0,
+                selectidArr:[],
+                selectid:'',
+            },
+            methods: {
+                gradeClick:function (item,index) {
+                    vm.changeIndex = index;
+                    vm.selectGradeId =api.pageParam.evaluate[index].id;
+                    vm.chaptList = api.pageParam.evaluate[index].chiled;
+                },
+                itemClick: function (item,index) {
+                    if(vm.selectidArr.length == 0){
+                        for(var i=0;i< api.pageParam.evaluate.length;i++){
+                            vm.selectidArr.push(0);
+                        }
+                    }
+                    vm.selectidArr[vm.changeIndex] = item.id;
+                    this.$forceUpdate();
+                },
+                score:function () {
+                    var scArr = [];
+                    for(var i=0;i<vm.selectidArr.length;i++){
+                        if(vm.selectidArr[i] !=0){
+                            var str = api.pageParam.evaluate[i].id+'_'+vm.selectidArr[i];
+                            scArr.push(str);
+                        }
+                    }
+                    if(scArr.length == 0){
+                        api.toast({
+                            msg: '请先打分后再点击确定',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return;
+                    }
+                    var xsuidArr =[];
+                    xsuidArr.push(api.pageParam.xsuid);
+                    var parm = {};
+                    parm['uid'] = xsuidArr;
+                    parm['score'] = scArr;
+                    parm['classid'] = api.pageParam.bjid;
+                    parm['tuid'] = $api.getStorage('uid');
+                    parm['identitytype'] = '3';
+                    apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostGrouptechUscoring,{
+                        body:$api.jsonToStr(parm)
+                    }, function (ret, err) {
+                        if(ret.ret == 0){
+                            api.sendEvent({
+                                name: 'gengxindafen'
+                            });
+                            api.closeFrame({
+                                name: 'popStudentDf'
+                            });
+                        }
+                    });
+                },
+                getTitle:function (chapt) {
+                    if(chapt.title.length >= 9){
+                        return chapt.title.slice(0,8)+'…'+'('+chapt.score+')';
+                    }else {
+                        return chapt.title+'('+chapt.score+')';
+                    }
+                }
+            }
+        });
+    };
+
+</script>
+</html>

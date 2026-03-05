@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .content_choose {
+            width: 35%;
+            max-height: 50%;
+            height: auto;
+            top: 25%;
+            position: absolute;
+            left: 32.5%;
+            border-radius: 5px;
+            background: white;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .camera {
+            width: 100%;
+            height: 50px;
+            border-radius: 6px;
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .camera button {
+            border-width: 0;
+            background-color: #4bc7c7;
+            height: 100%;
+            width: 50%;
+            font-size: 18px;
+        }
+
+        .album {
+            width: 100%;
+            height: 50px;
+            border-radius: 6px;
+            color: white;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .album button {
+            border-width: 0;
+            background-color: #4bc7c7;
+            height: 100%;
+            width: 50%;
+            font-size: 18px;
+        }
+
+        .alert {
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .alert p {
+            font-size: 15px;
+            color: #9a9a9a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="close" tapmode onclick="api.closeFrame({
+    name: 'frame_chooseImg'
+});"></div>
+<div class="content_choose">
+    <div tapmode onclick="vm.camera(this);" class="camera">
+        <button>
+            拍照
+        </button>
+    </div>
+<!--    <div tapmode onclick="vm.album(this);" class="album">-->
+<!--        <button>-->
+<!--            从相册中选择-->
+<!--        </button>-->
+<!--    </div>-->
+    <div class="alert">
+        <p>最多添加6张照片</p>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    apiready = function () {
+        vue();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content_choose',
+            data: {
+                currentImgNums: api.pageParam.currentImgNums,
+                current_sys_id: api.pageParam.current_sys_id,
+            },
+            methods: {
+                camera: function (item) {
+                    openCorrectionCamera();
+
+                },
+                album: function (item) {
+                    api.sendEvent({
+                        name: 'openCorrectionAlbum',
+                        extra: {
+                            currentImgNums: vm.currentImgNums,
+                            maxsort: api.pageParam.maxsort,
+                        }
+                    });
+                    api.closeFrame({
+                        name: 'frame_chooseImg'
+                    });
+                },
+            }
+        });
+    }
+
+    function openCorrectionCamera() {
+        if (!checkPermission(['camera'])) {
+            return;
+        }
+
+        api.getPicture({
+            sourceType: 'camera',
+            encodingType: 'jpg',
+            mediaValue: 'pic',
+            destinationType: 'url',
+            allowEdit: true,
+            quality: 50,
+        }, function (ret, err) {
+            if (ret.data.length > 3) {
+                if (vm.currentImgNums == 0) {
+                    api.openFrame({
+                        name: 'frame_cutImg',
+                        url: 'frame_cutImg.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            src: ret.data,
+                            sort: api.pageParam.sort,
+                            current_sys_id: api.pageParam.current_sys_id,
+                            from: 'camera',
+                            flag: 'zerocamera',
+                            currentImgNums: 0,
+                            currentImgData: [],
+                        },
+                        bounces: false
+                    });
+
+                } else {
+                    api.openFrame({
+                        name: 'frame_cutImg',
+                        url: 'frame_cutImg.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            src: ret.data,
+                            frameName: 'frame_displayImg',
+                            sort: api.pageParam.sort,
+                            current_sys_id: api.pageParam.current_sys_id,
+                            from: 'camera',
+                            currentImgNums: vm.currentImgNums
+                        },
+                        bounces: false
+                    });
+                }
+
+                api.closeFrame();
+            }
+        });
+    }
+</script>
+</html>

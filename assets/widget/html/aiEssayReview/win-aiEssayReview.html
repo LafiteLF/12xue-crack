@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>AI作文批阅</title>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../../script/ThridJS/qiniu.min.js"></script>
+    <script type="text/javascript" src="../../script/12xueUpload.js"></script>
+    <script type="text/javascript" src="../../script/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="../../script/vue.global.prod-3.5.18.js"></script>
+    <script type="text/javascript" src="../../script/Sortable-1.15.6.min.js"></script>
+    <script type="text/javascript" src="../../script/vue-draggable-next@2.2.1.global.min.js"></script>
+    <script type="text/javascript" src="../../script/interact@1.10.27.min.js"></script>
+    <style>
+        button {
+            outline: none;
+        }
+
+        html {
+            --wrem: 0.1vw;
+            --hrem: 0.1vh;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #main {
+            width: 100%;
+            height: 100%;
+        }
+
+        .radio-input {
+            display: none;
+        }
+
+        .custom-radio {
+            display: inline-block;
+            width: calc(35 * var(--wrem));
+            height: calc(35 * var(--wrem));
+            border: calc(2 * var(--wrem)) solid #D9D9D9;
+            background: #FFFFFF;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .radio-input:checked + .custom-radio {
+            border-color: #4BC7C7;
+            background-color: #4BC7C7;
+        }
+
+        .radio-input:checked + .custom-radio::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 25%;
+            height: 45%;
+            border: solid white;
+            border-width: 0 calc(3 * var(--wrem)) calc(3 * var(--wrem)) 0;
+            transform: translate(-50%, -60%) rotate(45deg);
+        }
+
+        #displayImage {
+            touch-action: none; /* 禁止默认手势（必须） */
+            -webkit-user-drag: none; /* 禁止 iOS safari 拖拽图片 */
+            user-select: none; /* 禁止文字选中 */
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div style="display: grid; grid-template-rows: auto auto 1fr auto; width: 100%; height: 100%; background: url('../../image/aiEssayReview/background.jpg') no-repeat center center; background-size: 100% 100%;">
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr; width: 100%; margin-top: calc(65 * var(--hrem)); padding: 0 calc(40 * var(--wrem)); align-items: center; box-sizing: border-box;">
+            <div style="display: flex; align-items: center;">
+                <img src="../../image/aiEssayReview/back.png" @click.stop="close"
+                     style="width: calc(40 * var(--wrem)); height: calc(40 * var(--wrem)); margin-right: calc(17 * var(--wrem));"
+                     alt="返回">
+                <div style="color: #333333; font-size: calc(40*var(--wrem))">AI作文批阅</div>
+            </div>
+            <div style="color: #888888; font-size: calc(28 * var(--wrem))">本月剩余AI批阅次数:
+                <span style="margin-left: calc(15 * var(--wrem)); font-weight: bold;"
+                      :style="aiReview.count !== 0 ? {'color': '#4BC7C7'} : {'color': '#F82A1A'}">
+                    {{ aiReview.count }}
+                </span>
+            </div>
+            <div @click.stop="openReviewRecords"
+                 style="position: relative; margin-left: auto; display: flex; flex-direction: row; align-items: center;justify-content: center; border: calc(2 * var(--wrem)) solid #4BC7C7; border-radius: calc(6 * var(--wrem)); padding: calc(5 * var(--hrem)) calc(10 * var(--wrem))">
+                <img src="../../image/aiEssayReview/review_records.png" alt="批阅记录"
+                     style="width: calc(40 * var(--wrem)); height: auto; margin-right: calc(5 * var(--wrem));">
+                <div style="color: #4BC7C7; font-size: calc(28 * var(--wrem));">批阅记录</div>
+                <div v-if="isRedDot"
+                     style="position:absolute; border-radius: 50%; background: red; top: 0; right: 0; width: calc(15 * var(--wrem)); height: calc(15 * var(--wrem)); transform: translate(50%, -50%)"></div>
+            </div>
+        </div>
+        <div style="position: relative; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2,auto); justify-items: center; margin: calc(55 * var(--hrem)) auto 0; width: fit-content; column-gap: calc(220 * var(--wrem)); row-gap: calc(12 * var(--hrem));">
+            <div style="position:absolute; top: 30%; left: 3%; transform: translateY(-50%); width: 94%; height: calc(16 * var(--hrem)); background: white;"></div>
+            <div style="position:absolute; top: 30%; left: 3%; transform: translateY(-50%); height: calc(16 * var(--hrem)); background: #4BC7C7;"
+                 :style="{'width': Math.max(progressBarIndex - 1, 0)/ 3 * 94 + '%', transition: 'width 0.3s'}"></div>
+            <img :src="progressBarIndex > 0 ? '../../image/aiEssayReview/select_finish.png' : '../../image/aiEssayReview/select.png'"
+                 alt="选择" style="width: calc(57 * var(--wrem)); height: auto; object-fit: contain; z-index: 1">
+            <img :src="progressBarIndex > 1.5 ? '../../image/aiEssayReview/require_finish.png' : '../../image/aiEssayReview/require.png'"
+                 alt="要求" style="width: calc(57 * var(--wrem)); height: auto; object-fit: contain; z-index: 1">
+            <img :src="progressBarIndex > 2.5 ? '../../image/aiEssayReview/composition_finish.png' : '../../image/aiEssayReview/composition.png'"
+                 alt="作文" style="width: calc(57 * var(--wrem)); height: auto; object-fit: contain; z-index: 1">
+            <img :src="progressBarIndex > 3 ? '../../image/aiEssayReview/result_finish.png' : '../../image/aiEssayReview/result.png'"
+                 alt="结果" style="width: calc(57 * var(--wrem)); height: auto; object-fit: contain; z-index: 1;">
+            <div style="color:#666666; font-size: calc(26 * var(--wrem));"
+                 :style="progressBarIndex > 0 ? {'color': '#4BC7C7'}: {}">选择
+            </div>
+            <div style="color:#666666; font-size: calc(26 * var(--wrem));"
+                 :style="progressBarIndex > 1.5 ? {'color': '#4BC7C7'}: {}">要求
+            </div>
+            <div style="color:#666666; font-size: calc(26 * var(--wrem));"
+                 :style="progressBarIndex > 2.5 ? {'color': '#4BC7C7'}: {}">作文
+            </div>
+            <div style="color:#666666; font-size: calc(26 * var(--wrem));"
+                 :style="progressBarIndex > 3 ? {'color': '#4BC7C7'}: {}">结果
+            </div>
+        </div>
+        <template v-if="status === 1">
+            <div style="margin: calc(50 * var(--hrem)) auto 0 auto; background: white; width: calc(1500 * var(--wrem)); border-radius: calc(20 * var(--wrem)); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 calc(100 * var(--wrem)); box-sizing: border-box;">
+                <div style="color: #666666; font-size: calc(34 * var(--wrem)); font-weight: bold;">选择学段和学科</div>
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                    <div style="color: #666666; font-size: calc(30 * var(--wrem)); margin-top: calc(48 * var(--hrem)); font-weight: bold;">
+                        学段
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(100 * var(--wrem)); margin-top: calc(23 * var(--hrem)); height: calc(160 * var(--hrem));">
+                        <label style="display: flex; flex-direction: row; background: #F3F9FE; border-radius: calc(10 * var(--wrem)); align-items: center; padding: 0 calc(48 * var(--wrem)); box-sizing: border-box; border: calc(3 * var(--wrem)) solid #F3F9FE;"
+                               :style="academicStage === '初中' ? {'border': 'calc(3 * var(--wrem)) solid #4BC7C7'} : {}">
+                            <input type="radio" value="初中" v-model="academicStage" class="radio-input">
+                            <span class="custom-radio" style="margin-right: calc(31 * var(--wrem));"></span>
+                            <span style="color: #333333; font-size: calc(34 * var(--wrem));">初中</span>
+                            <img src="../../image/aiEssayReview/junior_high_school.png" alt="初中"
+                                 style="margin-left: auto; width: calc(130 * var(--wrem)); height: auto;">
+                        </label>
+                        <label style="display: flex; flex-direction: row; background: #F3F9FE; border-radius: calc(10 * var(--wrem)); align-items: center; padding: 0 calc(48 * var(--wrem)); box-sizing: border-box; border: calc(3 * var(--wrem)) solid #F3F9FE;"
+                               :style="academicStage === '高中' ? {'border': 'calc(3 * var(--wrem)) solid #4BC7C7'} : {}">
+                            <input type="radio" value="高中" v-model="academicStage" class="radio-input">
+                            <span class="custom-radio" style="margin-right: calc(31 * var(--wrem));"></span>
+                            <span style="color: #333333; font-size: calc(34 * var(--wrem));">高中</span>
+                            <img src="../../image/aiEssayReview/high_school.png" alt="高中"
+                                 style="margin-left: auto; width: calc(121 * var(--wrem)); height: auto;">
+                        </label>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; width: 100%;">
+                    <div style="color: #666666; font-size: calc(30 * var(--wrem)); margin-top: calc(48 * var(--hrem)); font-weight: bold;">
+                        学科
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(100 * var(--wrem)); margin-top: calc(23 * var(--hrem)); height: calc(160 * var(--hrem));">
+                        <label style="display: flex; flex-direction: row; background: #F3F9FE; border-radius: calc(10 * var(--wrem)); align-items: center; padding: 0 calc(48 * var(--wrem)); box-sizing: border-box; border: calc(3 * var(--wrem)) solid #F3F9FE;"
+                               :style="subject === '语文' ? {'border': 'calc(3 * var(--wrem)) solid #4BC7C7'} : {}">
+                            <input type="radio" value="语文" v-model="subject" class="radio-input">
+                            <span class="custom-radio" style="margin-right: calc(31 * var(--wrem));"></span>
+                            <span style="color: #333333; font-size: calc(34 * var(--wrem));">语文</span>
+                            <img src="../../image/aiEssayReview/chinese.png" alt="语文"
+                                 style="margin-left: auto; width: calc(110 * var(--wrem)); height: auto;">
+                        </label>
+                        <label style="display: flex; flex-direction: row; background: #F3F9FE; border-radius: calc(10 * var(--wrem)); align-items: center; padding: 0 calc(48 * var(--wrem)); box-sizing: border-box; border: calc(3 * var(--wrem)) solid #F3F9FE;"
+                               :style="subject === '英语' ? {'border': 'calc(3 * var(--wrem)) solid #4BC7C7'} : {}">
+                            <input type="radio" value="英语" v-model="subject" class="radio-input">
+                            <span class="custom-radio" style="margin-right: calc(31 * var(--wrem));"></span>
+                            <span style="color: #333333; font-size: calc(34 * var(--wrem));">英语</span>
+                            <img src="../../image/aiEssayReview/english.png" alt="英语"
+                                 style="margin-left: auto; width: calc(108 * var(--wrem)); height: auto">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button @click.stop="nextButton"
+                    style="margin: calc(63 * var(--hrem)) auto; background: #C9C9C9; border: none; border-radius: calc(35 * var(--wrem)); width: calc(700 * var(--wrem)); height: calc(70 * var(--hrem)); color: white; font-size: calc(28 * var(--wrem));"
+                    :style="nextButtonStyle">
+                下一步
+            </button>
+        </template>
+        <template v-else>
+            <div style="margin: calc(50 * var(--hrem)) auto 0 auto; background: white; width: calc(1500 * var(--wrem)); height: auto; min-height: 0; border-radius: calc(20 * var(--wrem)); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(40 * var(--hrem)) calc(100 * var(--wrem)); box-sizing: border-box;"
+                 :style="status === 4 ? { 'margin-bottom': 'calc(40 * var(--hrem))', 'width': 'calc(1800 * var(--wrem))'}: {}">
+                <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%;">
+                    <div style="display: flex; flex-direction: row; color:#4BC7C7; font-size: calc(34 * var(--wrem)); font-weight: bold;">
+                        <div style="margin-right: calc(20 * var(--wrem));">{{ academicStage }}</div>
+                        <div>{{ subject }}</div>
+                    </div>
+                    <div style="color: #666666; font-size: calc(34 * var(--wrem)); font-weight: bold;"
+                         v-text="({2: '上传作文要求',3: '上传手写作文',4: 'AI批阅结果'})[status]"></div>
+                    <div style="margin-left: auto; color: #999999; font-size: calc(24 * var(--wrem));"
+                         v-text="({2: '最多1张图片', 3: '最多6张图片'})[status]"></div>
+                </div>
+                <template v-if="status !== 4">
+                    <template v-if="status === 2">
+                        <div v-if="!imageRequireUrl"
+                             style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: calc(50 * var(--hrem)); width: 100%; flex: 1; background: #F3F9FE; border: calc(3 * var(--wrem)) dashed #4BC7C7; border-radius: calc(10 * var(--wrem));">
+                            <img src="../../image/aiEssayReview/photograph.png" alt="拍照"
+                                 style="width: calc(54 * var(--wrem)); height: auto">
+                            <div style="text-align: center; line-height: 1.5; color: #333333; font-size: calc(24 * var(--wrem)); margin-top: calc(30 * var(--hrem))">
+                                拍照上传作文要求<br>支持裁剪和旋转
+                            </div>
+                        </div>
+                        <div v-else
+                             style="position: relative; flex: 1; min-height: 0; margin-top: calc(50 * var(--hrem)); width: 100%; background: #F3F9FE; border: calc(3 * var(--wrem)) dashed #4BC7C7; border-radius: calc(10 * var(--wrem));">
+                            <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                                <div style="width: 100%; max-height: 100%; overflow-y: auto;">
+                                    <img @click.stop="displayImage" :src="imageRequireUrl" alt="图片"
+                                         style="max-width: 100%; display: block; margin: 0 auto;">
+                                </div>
+                            </div>
+                            <div style="position: absolute;display: flex; flex-direction: row; top: calc(20 * var(--hrem)); right: calc(30 * var(--wrem));">
+                                <img @click.stop="imageEdit" src="../../image/aiEssayReview/edit.png" alt="编辑"
+                                     style="width: calc(60 * var(--wrem)); height: calc(60 * var(--wrem)); margin-right: calc(20 * var(--wrem));">
+                                <img @click.stop="imageRequireUrl = ''" src="../../image/aiEssayReview/remove.png"
+                                     alt="删除"
+                                     style="width: calc(60 * var(--wrem)); height: calc(60 * var(--wrem));">
+                            </div>
+                        </div>
+                    </template>
+                    <div @click.stop="getPicture"
+                         style="display: flex; flex-direction: row; margin-top: calc(30 * var(--hrem)); align-items: center; background: #F3F9FE; border-radius: calc(10 * var(--wrem)); border: calc(3 * var(--wrem)) solid #4BC7C7; width: 100%; height: calc(90 * var(--hrem)); justify-content: center;">
+                        <img src="../../image/aiEssayReview/camera.png" alt="相机"
+                             style="width: calc(36 * var(--wrem)); height: auto; margin-right: calc(20 * var(--wrem));">
+                        <div style="color: #333333; font-size: calc(28 * var(--wrem));"
+                             v-text="status === 2 ? '拍照作文要求' : '拍照手写作文'"></div>
+                    </div>
+                    <template v-if="status === 3">
+                        <div v-if="imageCompositionUrlList.length === 0"
+                             style="flex: 1;display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%;">
+                            <img src="../../image/aiEssayReview/composition_tip.png" alt="作文"
+                                 style="width: calc(58 * var(--wrem)); height: auto">
+                            <div style="color: #C6C6C6; font-size: calc(24 * var(--wrem)); margin-top: calc(20 * var(--hrem))">
+                                暂未添加作文照片
+                            </div>
+                        </div>
+                        <template v-else>
+                            <draggable v-model="imageCompositionUrlList" item-key="element" :animation="200" tag="div"
+                                       :filter="'.no-drag'" :prevent-on-filter="false" :delay="150"
+                                       :touch-start-threshold="5"
+                                       style="flex: 1;display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); margin-top: calc(25 * var(--hrem));width: 100%; gap: calc(23 * var(--hrem)) calc(60 * var(--wrem)); min-height: 0">
+                                <div v-for="(element,index) in imageCompositionUrlList" :key="index"
+                                     style="position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;padding: 0 calc(10 * var(--wrem)); box-sizing: border-box; background: #F3F9FE; border: calc(1 * var(--wrem)) solid #4BC7C7; border-radius: calc(10 * var(--wrem)); width: 100%; height: 100%;">
+                                    <img @click.stop="displayImage(index)" :src="element"
+                                         :alt=" '作文' + `${index + 1}`"
+                                         style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                    <div style="position: absolute; left: calc(10 * var(--wrem)); bottom: calc(5 * var(--hrem)); color:#4BC7C7; font-size: calc(22 * var(--wrem));">
+                                        {{ index + 1 }}
+                                    </div>
+                                    <div class="no-drag"
+                                         style="position: absolute; right:0; top: 0;display: flex; flex-direction: row;">
+                                        <img @click.stop.prevent="imageEdit(index)"
+                                             src="../../image/aiEssayReview/edit.png"
+                                             alt="编辑"
+                                             style="width: calc(60 * var(--wrem)); height: auto; object-fit: contain;">
+                                        <img @click.stop.prevent="imageRemove(index)"
+                                             src="../../image/aiEssayReview/remove.png"
+                                             alt="删除"
+                                             style="width: calc(60 * var(--wrem)); height: auto; object-fit: contain;">
+                                    </div>
+                                </div>
+                            </draggable>
+                        </template>
+                        <div style="display: flex; flex-direction: row; width: 100%; justify-content: flex-start; align-items: center; margin-top: calc(30 * var(--hrem));">
+                            <img src="../../image/aiEssayReview/tip.png" alt="提示"
+                                 style="width: calc(23 * var(--wrem)); height: auto; object-fit: contain; margin-right: calc(11 * var(--wrem));">
+                            <div style="color: #999999; font-size: calc(24 * var(--wrem))">长按图片可拖拽调整顺序</div>
+                        </div>
+                    </template>
+                </template>
+                <template v-else>
+                    <div id="frame-aiEssayReviewResult"
+                         style="background: #F3F9FE; width: 100%; flex:1; margin-top: calc(50 * var(--hrem)); border-radius: calc(10 * var(--wrem));"></div>
+                </template>
+            </div>
+            <div v-if="isImageEdit" @click.stop.self="isImageEdit = false; isCropping = false"
+                 style="position: fixed; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10;">
+                <div style="position: relative; background: white; border-radius: calc(10 * var(--wrem)); width: calc(1400 * var(--wrem)); max-height: 90%;; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; padding: calc(50 * var(--hrem)) calc(40 * var(--wrem)) calc(30 * var(--hrem)) calc(40 * var(--wrem));">
+                    <div style="color: #666666; font-size: calc(34 * var(--wrem)); font-weight: bold;">编辑图片</div>
+                    <div style="display: flex; flex: 1; width: 100%; min-height: 0; margin-top: calc(50 * var(--hrem)); position: relative; background: #F3F9FE; border: calc(3 * var(--wrem)) dashed #4BC7C7; border-radius: calc(10 * var(--wrem));">
+                        <div style="width: 100%; position: relative; overflow-y: auto;">
+                            <canvas ref="canvas" style="max-width: 100%; margin: 0 auto; display: block;"></canvas>
+                            <canvas v-show="isCropping" ref="overlay"
+                                    style="position: absolute; top: 0; left: 0; display: block;"></canvas>
+                        </div>
+                        <div style="position: absolute;display: flex; flex-direction: row; top: calc(20 * var(--hrem)); right: calc(30 * var(--wrem));">
+                            <img @click.stop="imageRotate" src="../../image/aiEssayReview/rotation.png" alt="旋转"
+                                 style="width: calc(60 * var(--wrem)); height: auto; object-fit: contain; margin-right: calc(30 * var(--wrem));">
+                            <img @click.stop="imageCrop"
+                                 :src="isCropping ? '../../image/aiEssayReview/cropping_selected.png' : '../../image/aiEssayReview/cropping.png'"
+                                 alt="裁剪"
+                                 style="width: calc(60 * var(--wrem)); height: auto; object-fit: contain;">
+                        </div>
+                        <div v-if="status === 3"
+                             style="position: absolute; left: calc(10 * var(--wrem)); bottom: calc(5 * var(--hrem)); color: #4BC7C7; font-size: calc(32 * var(--wrem));">
+                            {{ imageEditIndex + 1 }}
+                        </div>
+                    </div>
+                    <button @click.stop="imageSave"
+                            style="flex-shrink: 0; margin-top: calc(30 * var(--wrem)); width: calc(400 * var(--wrem)); height: calc(70 * var(--hrem)); border: none; border-radius: calc(35 * var(--wrem)); background: #4BC7C7; color: white; font-size: calc(28 * var(--wrem));">
+                        保存
+                    </button>
+                </div>
+            </div>
+            <template v-if="status !== 4">
+                <div style="display: flex; flex-direction: row; width: calc(1500 * var(--wrem)); margin: calc(60 * var(--hrem)) auto; justify-content: space-between;">
+                    <button @click.stop="prevButton"
+                            style="width: calc(403 * var(--wrem)); height: calc(73 * var(--hrem)); background: #DEFFFF; border: calc(3 * var(--wrem)) solid #4BC7C7; border-radius: calc(35 * var(--wrem)); color: #4BC7C7; font-size: calc(28 * var(--wrem));">
+                        上一步
+                    </button>
+                    <button v-if="status === 2" @click.stop="nextButton"
+                            style="width: calc(403 * var(--wrem)); height: calc(73 * var(--hrem)); background: #C9C9C9; border: none; border-radius: calc(35 * var(--wrem)); color: white; font-size: calc(28 * var(--wrem));"
+                            :style="nextButtonStyle">
+                        下一步
+                    </button>
+                    <button @click.stop="correctingEssays" v-else
+                            style="width: calc(403 * var(--wrem)); height: calc(73 * var(--hrem)); background: #C9C9C9; border: none; border-radius: calc(35 * var(--wrem)); color: white; font-size: calc(28 * var(--wrem));"
+                            :style="nextButtonStyle" v-text="isUpload ? '正在上传' : '开始批改'">
+                    </button>
+                </div>
+                <div v-if="isCorrectingTip"
+                     style="position: fixed; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; z-index: 10">
+                    <div style="position: relative;background: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: calc(70 * var(--hrem)) calc(151 * var(--wrem)) calc(45 * var(--hrem)); border-radius: calc(16 * var(--wrem));">
+                        <div style="color: #333333; font-size: calc(28 * var(--wrem)); text-align: center; line-height: 1.5;">
+                            作文已上传成功，AI正在批阅中<br>稍后可在批阅记录中查看批阅结果
+                        </div>
+                        <button @click.stop="correctingTip"
+                                style="color: white; font-size: calc(28 * var(--wrem)); background: #4BC7C7; border: none; border-radius: calc(33 * var(--wrem));margin-top: calc(46 * var(--hrem)); padding: calc(10 * var(--hrem)) calc(73 * var(--wrem));">
+                            知道了
+                        </button>
+                        <img src="../../image/aiEssayReview/correctingTip.png" alt="批改提示"
+                             style="position: absolute; left: 50%; top: 0; transform: translate(-50%, -75%); width: calc(153 * var(--wrem)); height: auto; object-fit: contain;">
+                    </div>
+                </div>
+            </template>
+        </template>
+    </div>
+    <div v-if="isDisplayImage" @click.stop="isDisplayImage = false"
+         style="position: fixed; display: flex; align-items: center; justify-content: center; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: rgba(0,0,0,0.6)">
+        <img id="displayImage" :src="displayImageUrl"
+             style="max-width: 100%; max-height: 100%; display: block; transform-origin: center;" alt="图片">
+    </div>
+</div>
+<script>
+    const {createApp, onBeforeMount, onMounted, ref, computed} = Vue
+    const app = createApp({
+        setup() {
+            const academicStage = ref('') //学段
+            const subject = ref('') //学科
+            const status = ref(1) //状态
+            const imageRequireUrl = ref('') //要求图片
+            const isImageEdit = ref(false) //编辑页面
+            const canvas = ref(null) //图片编辑框
+            const overlay = ref(null) //图片裁剪框
+            const image = new Image()
+            const isCropping = ref(false) //裁剪
+            let angle = 0 //旋转角度
+            let rect = null
+            let isDragging = false //裁剪框拖拽
+            let dragMode = null //"move" 移动, "resize" 缩放
+            let activeHandle = null
+            let startX = 0, startY = 0
+            const imageCompositionUrlList = ref([]) //作文图片列表
+            const imageEditIndex = ref(0)
+            const isCorrectingTip = ref(false)
+            const apiObj = new GridOpenApi(UrlDomain, source, version)
+            const aiReview = ref({count: 0}) //AI批阅
+            const isUpload = ref(false) //上传图片
+            const isRedDot = ref(false) //红点提示
+            const result = ref('') //批阅结果
+            const isDisplayImage = ref(false) //图片展示
+            const displayImageUrl = ref('') //图片展示路径
+            let scale = 1 //图片展示缩放
+            let x = 0, y = 0 //图片展示移动
+
+            const nextButtonStyle = computed(() => {
+                switch (status.value) {
+                    case 1:
+                        if (academicStage.value !== '' && subject.value !== '') {
+                            return {
+                                'background': '#4BC7C7'
+                            }
+                        } else {
+                            return {
+                                'pointer-events': 'none'
+                            }
+                        }
+                    case 2:
+                        if (imageRequireUrl.value !== '') {
+                            return {
+                                'background': '#4BC7C7'
+                            }
+                        } else {
+                            return {
+                                'pointer-events': 'none'
+                            }
+                        }
+                    case 3:
+                        if (imageCompositionUrlList.value.length > 0) {
+                            if (isUpload.value) {
+                                return {
+                                    'pointer-events': 'none'
+                                }
+                            }
+                            return {
+                                'background': '#4BC7C7'
+                            }
+                        } else {
+                            return {
+                                'pointer-events': 'none'
+                            }
+                        }
+                    default:
+                        return {
+                            'pointer-events': 'none',
+                        }
+                }
+            })
+
+            const progressBarIndex = computed(() => {
+                if (status.value === 4) {
+                    return 4
+                }
+                switch (status.value) {
+                    case 1:
+                        if (academicStage.value !== '' && subject.value !== '') {
+                            return 1
+                        } else {
+                            return 0
+                        }
+                    case 2:
+                        if (imageRequireUrl.value !== '') {
+                            return 2
+                        } else {
+                            return 1.5
+                        }
+                    case 3:
+                        if (imageCompositionUrlList.value.length > 0) {
+                            return 3
+                        } else {
+                            return 2.5
+                        }
+                    case 4:
+                        return 4
+                }
+            })
+
+            onBeforeMount(async () => {
+                $('html').css({
+                    "--wrem": (window.innerWidth / 1920) + "px",
+                    "--hrem": (window.innerHeight / 1200) + "px",
+                    width: window.innerWidth + "px",
+                    height: window.innerHeight + "px",
+                })
+                await new Promise(resolve => {
+                    apiready = () => {
+                        resolve()
+                    }
+                })
+
+                api.addEventListener({
+                    name: 'keyback'
+                }, () => {
+                    close()
+                });
+
+                apiObj.SetAuthToken($api.getStorage('token'))
+                const params = api.pageParam || {}
+                const mapping = {
+                    status: status,
+                    academicStage: academicStage,
+                    subject: subject,
+                    content: result
+                }
+
+                for (const key in mapping) {
+                    if (params[key] !== undefined) {
+                        mapping[key].value = params[key]
+                    }
+                }
+
+                if (status.value === 4) {
+                    api.showProgress({
+                        title: '加载中...',
+                        text: '请稍后...',
+                        modal: true,
+                    })
+                    try {
+                        await new Promise((resolve, reject) => {
+                            api.writeFile({
+                                path: 'fs://frame-aiEssayReviewResult.html',
+                                data: result.value
+                            }, function (ret, err) {
+                                if (ret.status) {
+                                    resolve()
+                                } else {
+                                    console.error(JSON.stringify(err))
+                                    reject(err)
+                                }
+                            })
+                        })
+                        const rect = $('#frame-aiEssayReviewResult')[0].getBoundingClientRect()
+                        api.openFrame({
+                            name: 'frame-aiEssayReviewResult',
+                            url: 'fs://frame-aiEssayReviewResult.html',
+                            rect: {
+                                x: rect.left,
+                                y: rect.top,
+                                w: rect.width,
+                                h: rect.height
+                            },
+                            reload: true
+                        })
+                    } catch (e) {
+                        console.error(e)
+                    }
+                    api.hideProgress()
+                }
+
+                try {
+                    await Promise.all([
+                        new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                                values: {
+                                    type: 'ai_review',
+                                    schoolid: $api.getStorage('schoolid')
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret === 0) {
+                                        aiReview.value = ret.data
+                                    } else {
+                                        if(ret.ret === 1104){
+                                            alert(ret.msg)
+                                            close()
+                                        }
+                                        aiReview.value = {count: 0}
+                                    }
+                                    resolve()
+                                } else {
+                                    reject(err)
+                                }
+                            })
+                        }),
+                        new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetFindOfflineRedTip, {}, function (ret, err) {
+                                if (ret) {
+                                    isRedDot.value = ret.ret === 0 && Object.keys(ret.data).length > 0;
+                                    resolve()
+                                } else {
+                                    reject(err)
+                                }
+                            })
+                        })
+                    ])
+                } catch (e) {
+                    console.error(e)
+                }
+            })
+
+            onMounted(() => {
+                interact('#displayImage')
+                    .draggable({
+                        listeners: {
+                            move(event) {
+                                x += event.dx
+                                y += event.dy
+                                $('#displayImage').css('transform', `translate(${x}px, ${y}px) scale(${scale})`);
+                            }
+                        }
+                    })
+                    .gesturable({
+                        listeners: {
+                            move(event) {
+                                // 缩放
+                                scale *= (1 + event.ds)
+                                // 限制缩放范围 1 ~ 3
+                                scale = Math.min(Math.max(scale, 1), 3)
+
+                                // 平移（保持手势中心点）
+                                x += event.dx
+                                y += event.dy
+
+                                $('#displayImage').css('transform', `translate(${x}px, ${y}px) scale(${scale})`);
+                            }
+                        }
+                    })
+            })
+
+            function close() {
+                if (isUpload.value) {
+                    api.toast({
+                        msg: '上传过程中禁止返回'
+                    })
+                } else {
+                    api.closeWin();
+                }
+            }
+
+            function prevButton() {
+                status.value -= 1
+            }
+
+            function nextButton() {
+                status.value += 1;
+            }
+
+            function imageEdit(index) {
+                isImageEdit.value = true
+                angle = 0
+                switch (status.value) {
+                    case 2:
+                        image.src = imageRequireUrl.value
+                        break
+                    case 3:
+                        if (index > imageCompositionUrlList.value.length - 1) {
+                            return
+                        }
+                        imageEditIndex.value = index
+                        image.src = imageCompositionUrlList.value[index]
+                        break
+                    default:
+                        return
+                }
+                image.onload = imageDraw
+            }
+
+            function imageDraw() {
+                const ctx = canvas.value.getContext('2d')
+                let width = image.width;
+                let height = image.height;
+                if (angle % 180 !== 0) {
+                    width = image.height;
+                    height = image.width;
+                }
+                canvas.value.width = width
+                canvas.value.height = height
+                ctx.clearRect(0, 0, width, height)
+                ctx.save()
+                ctx.translate(width / 2, height / 2)
+                ctx.rotate(angle * Math.PI / 180)
+                ctx.drawImage(image, -image.width / 2, -image.height / 2)
+                ctx.restore()
+            }
+
+            function imageRotate() {
+                angle += 90
+                if (angle >= 360) {
+                    angle = 0
+                }
+                imageDraw()
+            }
+
+            function drawOverlay() {
+                const octx = overlay.value.getContext("2d")
+                octx.clearRect(0, 0, overlay.value.width, overlay.value.height)
+                if (!isCropping.value || !rect) return
+
+                // 半透明遮罩
+                octx.fillStyle = "rgba(0,0,0,0.3)"
+                octx.fillRect(0, 0, overlay.value.width, overlay.value.height)
+
+                // 裁剪框
+                octx.clearRect(rect.x, rect.y, rect.w, rect.h)
+                octx.strokeStyle = "#4BC7C7"
+                octx.lineWidth = 2
+                octx.setLineDash([6])
+                octx.strokeRect(rect.x, rect.y, rect.w, rect.h)
+
+                // 四个角手柄
+                const size = 10
+                octx.fillStyle = "white"
+                octx.setLineDash([])
+                ;[
+                    [rect.x, rect.y], // 左上
+                    [rect.x + rect.w, rect.y], // 右上
+                    [rect.x, rect.y + rect.h], // 左下
+                    [rect.x + rect.w, rect.y + rect.h] // 右下
+                ].forEach(([cx, cy]) => {
+                    octx.fillRect(cx - size / 2, cy - size / 2, size, size)
+                    octx.strokeRect(cx - size / 2, cy - size / 2, size, size)
+                })
+            }
+
+            function bindOverlayEvents() {
+                const size = 10;
+
+                const startDrag = (x, y) => {
+                    startX = x;
+                    startY = y;
+
+                    activeHandle = getHandle(startX, startY, size);
+                    if (activeHandle) {
+                        dragMode = "resize";
+                    } else if (isInRect(startX, startY, rect)) {
+                        dragMode = "move";
+                    } else {
+                        return false; // 没点在裁剪框上
+                    }
+                    isDragging = true;
+                    return true;
+                };
+
+                const moveDrag = (x, y) => {
+                    if (!isDragging) return;
+
+                    if (dragMode === "move") {
+                        const dx = x - startX;
+                        const dy = y - startY;
+                        rect.x += dx;
+                        rect.y += dy;
+                        startX = x;
+                        startY = y;
+                    } else if (dragMode === "resize") {
+                        if (activeHandle === "tl") {
+                            rect.w += rect.x - x;
+                            rect.h += rect.y - y;
+                            rect.x = x;
+                            rect.y = y;
+                        } else if (activeHandle === "tr") {
+                            rect.w = x - rect.x;
+                            rect.h += rect.y - y;
+                            rect.y = y;
+                        } else if (activeHandle === "bl") {
+                            rect.w += rect.x - x;
+                            rect.x = x;
+                            rect.h = y - rect.y;
+                        } else if (activeHandle === "br") {
+                            rect.w = x - rect.x;
+                            rect.h = y - rect.y;
+                        }
+                    }
+                    drawOverlay();
+                };
+
+                const endDrag = () => {
+                    isDragging = false;
+                    dragMode = null;
+                    activeHandle = null;
+                };
+
+                // 🖱️ 鼠标事件
+                overlay.value.addEventListener("mousedown", e => {
+                    const {offsetX, offsetY} = getRelativeCoords(e);
+                    if (!startDrag(offsetX, offsetY)) return;
+
+                    const onMouseMove = (e) => {
+                        const {offsetX, offsetY} = getRelativeCoords(e);
+                        moveDrag(offsetX, offsetY);
+                    };
+                    const onMouseUp = () => {
+                        endDrag();
+                        document.removeEventListener("mousemove", onMouseMove);
+                        document.removeEventListener("mouseup", onMouseUp);
+                    };
+
+                    document.addEventListener("mousemove", onMouseMove);
+                    document.addEventListener("mouseup", onMouseUp);
+                });
+
+                // 📱 触屏事件
+                overlay.value.addEventListener("touchstart", e => {
+                    if (e.touches.length > 1) {
+                        // 双指及以上 -> 不启用裁剪框拖拽，让页面自己滚动/缩放
+                        return;
+                    }
+                    const t = e.touches[0];
+                    const {offsetX, offsetY} = getRelativeCoords(t);
+                    if (!startDrag(offsetX, offsetY)) return;
+
+                    const onTouchMove = (e) => {
+                        if (isDragging) {
+                            if (e.touches.length === 1) {
+                                e.preventDefault(); // 只在单指时阻止页面滚动
+                                const t = e.touches[0];
+                                const {offsetX, offsetY} = getRelativeCoords(t);
+                                moveDrag(offsetX, offsetY);
+                            }
+                        }
+                    };
+                    const onTouchEnd = () => {
+                        endDrag();
+                        document.removeEventListener("touchmove", onTouchMove);
+                        document.removeEventListener("touchend", onTouchEnd);
+                    };
+
+                    document.addEventListener("touchmove", onTouchMove, {passive: false});
+                    document.addEventListener("touchend", onTouchEnd);
+                });
+            }
+
+            function getRelativeCoords(e) {
+                const rect = overlay.value.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                return {offsetX: x, offsetY: y};
+            }
+
+            function getHandle(x, y, size) {
+                const handles = {
+                    tl: [rect.x, rect.y],
+                    tr: [rect.x + rect.w, rect.y],
+                    bl: [rect.x, rect.y + rect.h],
+                    br: [rect.x + rect.w, rect.y + rect.h]
+                }
+                for (let key in handles) {
+                    const [hx, hy] = handles[key]
+                    if (Math.abs(x - hx) < size && Math.abs(y - hy) < size) {
+                        return key
+                    }
+                }
+                return null
+            }
+
+            function isInRect(x, y, rect) {
+                return x >= rect.x && x <= rect.x + rect.w &&
+                    y >= rect.y && y <= rect.y + rect.h
+            }
+
+            function imageCrop() {
+                if (!isCropping.value) {
+                    isCropping.value = true
+                    // 开启裁剪模式，显示默认裁剪框
+                    resizeOverlay()
+                    const canvasRect = canvas.value.getBoundingClientRect();
+                    const marginX = canvasRect.width * 0.05;  // 左右各 10%
+                    const marginY = canvasRect.height * 0.1; // 上下各 10%
+                    rect = {
+                        x: marginX,
+                        y: marginY,
+                        w: canvasRect.width - marginX * 2,
+                        h: canvasRect.height - marginY * 2
+                    };
+                    drawOverlay()
+                    bindOverlayEvents()
+                } else {
+                    // 再次点击 -> 退出裁剪模式
+                    isCropping.value = false
+                    rect = null
+                    drawOverlay()
+                }
+            }
+
+            function resizeOverlay() {
+                if (!canvas.value || !overlay.value) return;
+
+                // overlay 始终覆盖 canvas
+                overlay.value.style.position = 'absolute';
+                overlay.value.style.left = canvas.value.offsetLeft + 'px';
+                overlay.value.style.top = canvas.value.offsetTop + 'px';
+                overlay.value.style.width = canvas.value.clientWidth + 'px';
+                overlay.value.style.height = canvas.value.clientHeight + 'px';
+
+                const dpr = window.devicePixelRatio || 1;
+                overlay.value.width = Math.round(canvas.value.clientWidth * dpr);
+                overlay.value.height = Math.round(canvas.value.clientHeight * dpr);
+
+                const octx = overlay.value.getContext('2d');
+                octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                drawOverlay();
+            }
+
+            function imageSave() {
+                api.showProgress({
+                    title: '正在保存...',
+                    text: '请稍后...',
+                    modal: true,
+                })
+                let targetCanvas = canvas.value;
+                if (isCropping.value && rect) {
+                    // 有裁剪框 -> 裁剪
+                    const canvasRect = canvas.value.getBoundingClientRect();
+                    const scaleX = canvas.value.width / canvasRect.width;
+                    const scaleY = canvas.value.height / canvasRect.height;
+
+                    const x = Math.max(0, rect.x * scaleX);
+                    const y = Math.max(0, rect.y * scaleY);
+                    const w = Math.min(rect.w * scaleX, canvas.value.width - x);
+                    const h = Math.min(rect.h * scaleY, canvas.value.height - y);
+
+                    const cropCanvas = document.createElement("canvas")
+                    cropCanvas.width = w
+                    cropCanvas.height = h
+                    const ctx = cropCanvas.getContext("2d")
+                    ctx.drawImage(
+                        canvas.value,
+                        x, y, w, h,
+                        0, 0, w, h
+                    )
+                    targetCanvas = cropCanvas;
+                }
+                const data = targetCanvas.toDataURL("image/jpeg")
+                switch (status.value) {
+                    case 2:
+                        imageRequireUrl.value = data
+                        break;
+                    case 3:
+                        imageCompositionUrlList.value[imageEditIndex.value] = data
+                        break;
+                }
+
+                // 保存后退出裁剪模式
+                isCropping.value = false
+                rect = null
+                drawOverlay()
+                api.hideProgress()
+
+                isImageEdit.value = false
+            }
+
+            function imageRemove(index) {
+                if (index > imageCompositionUrlList.value.length - 1) {
+                    return
+                }
+                imageCompositionUrlList.value.splice(index, 1);
+            }
+
+            function generateUUID() {
+                // RFC4122 version 4 UUID
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            async function correctingEssays() {
+                try{
+                    await new Promise((resolve, reject) => {
+                        apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                            values: {
+                                type: 'ai_review',
+                                schoolid: $api.getStorage('schoolid')
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                if (ret.ret === 0) {
+                                    aiReview.value = ret.data
+                                } else {
+                                    if(ret.ret === 1104){
+                                        alert(ret.msg)
+                                        close()
+                                        reject(new Error(ret.msg))
+                                    }
+                                    aiReview.value = {count: 0}
+                                }
+                                resolve()
+                            } else {
+                                reject(err)
+                            }
+                        })
+                    })
+                }catch(e){
+                    console.error(e)
+                    return
+                }
+                if (aiReview.value.count <= 0) {
+                    if ($api.getStorage('upgradeQRCode') !== '0') {
+                        api.toast({
+                            msg: '本月剩余AI批阅次数已耗尽',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    } else {
+                        api.openFrame({
+                            name: 'frame-number-exhausted',
+                            url: '../study/frame-number-exhausted.html',
+                        })
+                    }
+                    return
+                }
+                try {
+                    const tempImageList = [imageRequireUrl.value, ...imageCompositionUrlList.value];
+                    isUpload.value = true
+                    const qiniuImageList = await Promise.all(tempImageList.map(async (image) => {
+                        const fileKey = Date.now() + '_' + generateUUID()
+                        let res = await new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetQiNiuToken, {
+                                values: {
+                                    uid: $api.getStorage('uid'),
+                                    bucket: 'vodresource',
+                                    key: fileKey
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    resolve(ret)
+                                } else {
+                                    alert('获取七牛云token失败')
+                                    reject(err)
+                                }
+                            })
+                        })
+                        if (res.ret !== 0) {
+                            alert('获取七牛云token失败')
+                            throw new Error('获取七牛云token失败');
+                        }
+                        const token = res.data.token
+                        if (!/^data:image/.test(image)) {
+                            const trans = api.require('trans')
+                            res = await new Promise((resolve, reject) => {
+                                trans.decodeImgToBase64({
+                                    imgPath: image
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        resolve(ret)
+                                    } else {
+                                        alert('图片转码失败')
+                                        reject(err)
+                                    }
+                                })
+                            })
+                            if (!res.status) {
+                                alert('图片转码失败')
+                                throw new Error('图片转码失败');
+                            }
+                            image = res.base64Str
+                        }
+                        const blob = b64ImgToBlob(image)
+                        const observable = qiniu.upload(blob, fileKey, token)
+                        res = await new Promise((resolve, reject) => {
+                            observable.subscribe({
+                                next(res) {
+                                },
+                                error(err) {
+                                    alert('图片上传失败')
+                                    console.error(err)
+                                    reject(err)
+                                },
+                                complete(res) {
+                                    // console.log('上传完成', JSON.stringify(res))
+                                    resolve(QINIU_DOMAIN + res.key)
+                                }
+                            })
+                        })
+                        return res
+                    }))
+                    //语文学科id  1071  英语 2887
+                    //学段  34高中    31初中
+                    const res = await new Promise((resolve, reject) => {
+                        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostAIofflineAiCorrect, {
+                            body: {
+                                'question': qiniuImageList[0],
+                                'xkid': subject.value === '语文' ? '1071' : '2887',
+                                'xd': academicStage.value === '初中' ? '31' : '34',
+                                'answer': qiniuImageList.slice(1),
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                resolve(ret)
+                            } else {
+                                alert('请求AI批阅失败')
+                                reject(err)
+                            }
+                        })
+                    })
+                    if (res.ret !== 0) {
+                        alert(JSON.stringify(res.msg))
+                        return
+                    }
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Post(UrlRouter.PostPayfeeOperationLog, {
+                            values: {
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_review',
+                                count: aiReview.value.count,
+                                card_type: aiReview.value.card_type !== undefined ? aiReview.value.card_type : null,
+                                ...(aiReview.value.card_id !== undefined && {card_id: aiReview.value.card_id}),
+                                data: res.data.id
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                resolve(ret)
+                            } else {
+                                alert('次数扣除失败')
+                                reject(err)
+                            }
+                        })
+                    })
+                    if (ret.ret !== 0) {
+                        alert(JSON.stringify(ret.msg))
+                        return
+                    }
+                    aiReview.value.count--
+                } catch (e) {
+                    isUpload.value = false
+                    alert('上传出错')
+                    console.error(e)
+                    return
+                }
+                isUpload.value = false
+                isCorrectingTip.value = true
+            }
+
+            function correctingTip() {
+                academicStage.value = ''
+                subject.value = ''
+                status.value = 1
+                imageRequireUrl.value = ''
+                imageCompositionUrlList.value = []
+                isCorrectingTip.value = false
+            }
+
+            function getPicture() {
+                if (status.value === 3 && imageCompositionUrlList.value.length >= 6) {
+                    api.toast({
+                        msg: '图片数量超过限制'
+                    })
+                    return
+                }
+                api.getPicture({
+                    sourceType: 'camera',
+                    encodingType: 'jpg',
+                    mediaValue: 'pic',
+                    destinationType: 'url'
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.data === '') {
+                            return
+                        }
+                        switch (status.value) {
+                            case 2:
+                                imageRequireUrl.value = ret.data
+                                break
+                            case 3:
+                                imageCompositionUrlList.value.push(ret.data)
+                                break
+                        }
+                    } else {
+                        // api.alert({
+                        //     msg: JSON.stringify(err)
+                        // });
+                    }
+                })
+            }
+
+            function openReviewRecords() {
+                isRedDot.value = false
+                api.openWin({
+                    name: 'ReviewRecords',
+                    url: './ReviewRecords.html',
+                    reload: true,
+                    slidBackEnabled: false
+                })
+            }
+
+            function displayImage(index) {
+                switch (status.value) {
+                    case 2:
+                        displayImageUrl.value = imageRequireUrl.value
+                        break
+                    case 3:
+                        displayImageUrl.value = imageCompositionUrlList.value[index]
+                        break
+                }
+                isDisplayImage.value = true;
+            }
+
+            return {
+                academicStage,
+                subject,
+                status,
+                nextButtonStyle,
+                imageRequireUrl,
+                isImageEdit,
+                canvas,
+                overlay,
+                isCropping,
+                imageCompositionUrlList,
+                imageEditIndex,
+                isCorrectingTip,
+                progressBarIndex,
+                aiReview,
+                isUpload,
+                isRedDot,
+                isDisplayImage,
+                displayImageUrl,
+                prevButton,
+                nextButton,
+                imageEdit,
+                imageRotate,
+                imageCrop,
+                imageSave,
+                imageRemove,
+                correctingEssays,
+                correctingTip,
+                close,
+                getPicture,
+                openReviewRecords,
+                displayImage,
+            }
+        }
+    })
+    app.component('draggable', VueDraggableNext.VueDraggableNext)
+    app.mount('#main')
+</script>
+</body>
+</html>

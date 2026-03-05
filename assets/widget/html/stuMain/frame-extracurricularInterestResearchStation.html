@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>课外趣研站</title>
+    <script src="../../script/api.js"></script>
+    <script src="../../script/12XueApi_Router.js"></script>
+    <script src="../../script/12XueApi_SDK.js"></script>
+    <script src="../../script/jquery-3.7.1.min.js"></script>
+    <script src="../../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        html {
+            width: 100vw;
+            height: 100vh;
+            --wrem: calc(100vw / 1920);
+            --hrem: calc(100vh / 1200);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        img {
+            display: block;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #main {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+        <div style="display: grid; grid-auto-flow: column; grid-auto-columns: auto; width: fit-content; margin: 0 calc(180 * var(--wrem))">
+            <img @click.stop="setStatus(1)" style="width: calc(364 * var(--wrem));"
+                 :src="status === 1 ? '../../image/stuMain/extracurricularInterestResearchStation/credit_paradise_selected.png': '../../image/stuMain/extracurricularInterestResearchStation/credit_paradise.png'"
+                 alt="学分乐园">
+            <img v-if="IsDisplayInformation" @click.stop="setStatus(2)" style="width: calc(364 * var(--wrem));"
+                 :src="status === 2 ? '../../image/stuMain/extracurricularInterestResearchStation/extracurricular_information_selected.png': '../../image/stuMain/extracurricularInterestResearchStation/extracurricular_information.png'"
+                 alt="课外资讯">
+        </div>
+        <div v-if="status === 1" id="frame" style="width: 100%; flex: 1;"></div>
+        <div v-else
+             style="display: grid; grid-auto-flow: row; row-gap: calc(20 * var(--wrem)); margin: 0 calc(192 * var(--wrem)) calc(40 * var(--hrem)); box-sizing: border-box; overflow-y: auto;">
+            <div style="display: flex; flex-direction: column; background: white; border-radius: calc(16 * var(--wrem));">
+                <div style="display: flex;flex-direction: row; align-items: center; margin-top: calc(24 * var(--hrem));">
+                    <div style="background: #FFCD06; width: calc(8 * var(--wrem)); height: calc(36 * var(--hrem));"></div>
+                    <div style="color: #50B8B9; font-size: calc(32 * var(--wrem)); margin-left: calc(52 * var(--wrem));">
+                        课外驿站
+                    </div>
+                    <div @click.stop="openWin(1)"
+                         style="color: #50B8B9; font-size: calc(28 * var(--wrem)); margin-left: auto; margin-right: calc(60 * var(--wrem));">
+                        查看全部>
+                    </div>
+                </div>
+                <div style="height: 1px; background: linear-gradient(to bottom, #E4E4E8 0%, #E4E4E8 50%, transparent 50%); margin: calc(24 * var(--hrem)) calc(60 * var(--wrem)) 0;"></div>
+                <div v-for="(item, index) in information['2']" :key="index"
+                     style="display: flex; flex-direction: column; margin: calc(30 * var(--hrem)) 0; padding: 0 calc(60 * var(--wrem));">
+                    <div @click.stop="openInformation(item)"
+                         style="display: flex; flex-direction: row; align-items: center;">
+                        <div style="flex: 1; display: flex; flex-direction: column; line-height: 1;">
+                            <div style="color: #333333; font-size: calc(32 * var(--wrem));">{{ item['title'] }}</div>
+                            <div style="display: grid; grid-auto-flow: column; width: fit-content; column-gap: calc(20 * var(--wrem)); color: #999999; font-size: calc(24 * var(--wrem)); margin-top: calc(20 * var(--hrem)); align-items: center;">
+                                <div v-if="item['type']=== 'hot'"
+                                     style="color: #FF778C; font-size: calc(20 * var(--wrem)); border: calc(1 * var(--wrem)) solid #FF778C; border-radius: calc(6 * var(--wrem)); padding: calc(8 * var(--hrem)) calc(10 * var(--wrem)) calc(4 * var(--hrem));">
+                                    热门
+                                </div>
+                                <div>{{ item['user_text'] }}</div>
+                                <div>{{ item['good'] }}赞</div>
+                                <div>{{ item['update_time'] }}</div>
+                            </div>
+                        </div>
+                        <img :src="`${item['cover_text']}`" :alt="`${item['title']}`"
+                             style="width: calc(220 * var(--wrem)); height: calc(140 * var(--hrem))">
+                    </div>
+                    <div v-if="index < information['2'].length - 1"
+                         style="height: 1px; background: linear-gradient(to bottom, #E4E4E8 0%, #E4E4E8 50%, transparent 50%); margin: calc(24 * var(--hrem)) 0 0;">
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; background: white; border-radius: calc(16 * var(--wrem));">
+                <div style="display: flex;flex-direction: row; align-items: center; margin-top: calc(24 * var(--hrem));">
+                    <div style="background: #FFCD06; width: calc(8 * var(--wrem)); height: calc(36 * var(--hrem));"></div>
+                    <div style="color: #50B8B9; font-size: calc(32 * var(--wrem)); margin-left: calc(52 * var(--wrem));">
+                        兴趣体验
+                    </div>
+                    <div @click.stop="openWin(2)"
+                         style="color: #50B8B9; font-size: calc(28 * var(--wrem)); margin-left: auto; margin-right: calc(60 * var(--wrem));">
+                        查看全部>
+                    </div>
+                </div>
+                <div style="height: 1px; background: linear-gradient(to bottom, #E4E4E8 0%, #E4E4E8 50%, transparent 50%); margin: calc(24 * var(--hrem)) calc(60 * var(--wrem)) 0;"></div>
+                <div v-for="(item, index) in information['1']" :key="index"
+                     style="display: flex; flex-direction: column; margin: calc(30 * var(--hrem)) 0; padding: 0 calc(60 * var(--wrem));">
+                    <div @click.stop="openInformation(item)"
+                         style="display: flex; flex-direction: row; align-items: center;">
+                        <div style="flex: 1; display: flex; flex-direction: column; line-height: 1;">
+                            <div style="color: #333333; font-size: calc(32 * var(--wrem));">{{ item['title'] }}</div>
+                            <div style="display: grid; grid-auto-flow: column; width: fit-content; column-gap: calc(20 * var(--wrem)); color: #999999; font-size: calc(24 * var(--wrem)); margin-top: calc(20 * var(--hrem)); align-items: center;">
+                                <div v-if="item['type']=== 'hot'"
+                                     style="color: #FF778C; font-size: calc(20 * var(--wrem)); border: calc(1 * var(--wrem)) solid #FF778C; border-radius: calc(6 * var(--wrem)); padding: calc(8 * var(--hrem)) calc(10 * var(--wrem)) calc(4 * var(--hrem));">
+                                    热门
+                                </div>
+                                <div>{{ item['user_text'] }}</div>
+                                <div>{{ item['good'] }}赞</div>
+                                <div>{{ item['update_time'] }}</div>
+                            </div>
+                        </div>
+                        <img :src="`${item['cover_text']}`" :alt="`${item['title']}`"
+                             style="width: calc(220 * var(--wrem)); height: calc(140 * var(--hrem))">
+                    </div>
+                    <div v-if="index < information['2'].length - 1"
+                         style="height: 1px; background: linear-gradient(to bottom, #E4E4E8 0%, #E4E4E8 50%, transparent 50%); margin: calc(24 * var(--hrem)) 0 0;"></div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; background: white; border-radius: calc(16 * var(--wrem));">
+                <div style="display: flex;flex-direction: row; align-items: center; margin-top: calc(24 * var(--hrem));">
+                    <div style="background: #FFCD06; width: calc(8 * var(--wrem)); height: calc(36 * var(--hrem));"></div>
+                    <div style="color: #50B8B9; font-size: calc(32 * var(--wrem)); margin-left: calc(52 * var(--wrem));">
+                        有点意思
+                    </div>
+                    <div @click.stop="openWin(3)"
+                         style="color: #50B8B9; font-size: calc(28 * var(--wrem)); margin-left: auto; margin-right: calc(60 * var(--wrem));">
+                        查看全部>
+                    </div>
+                </div>
+                <div style="height: 1px; background: linear-gradient(to bottom, #E4E4E8 0%, #E4E4E8 50%, transparent 50%); margin: calc(24 * var(--hrem)) calc(60 * var(--wrem)) 0;"></div>
+                <div v-for="(item, index) in information['3']" :key="index"
+                     style="display: flex; flex-direction: column; margin: calc(30 * var(--hrem)) 0; padding: 0 calc(60 * var(--wrem));">
+                    <div @click.stop="openInformation(item)"
+                         style="display: flex; flex-direction: row; align-items: center;">
+                        <div style="flex: 1; display: flex; flex-direction: column; line-height: 1;">
+                            <div style="color: #333333; font-size: calc(32 * var(--wrem));">{{ item['title'] }}</div>
+                            <div style="display: grid; grid-auto-flow: column; width: fit-content; column-gap: calc(20 * var(--wrem)); color: #999999; font-size: calc(24 * var(--wrem)); margin-top: calc(20 * var(--hrem)); align-items: center;">
+                                <div v-if="item['type']=== 'hot'"
+                                     style="color: #FF778C; font-size: calc(20 * var(--wrem)); border: calc(1 * var(--wrem)) solid #FF778C; border-radius: calc(6 * var(--wrem)); padding: calc(8 * var(--hrem)) calc(10 * var(--wrem)) calc(4 * var(--hrem));">
+                                    热门
+                                </div>
+                                <div>{{ item['user_text'] }}</div>
+                                <div>{{ item['good'] }}赞</div>
+                                <div>{{ item['update_time'] }}</div>
+                            </div>
+                        </div>
+                        <img :src="`${item['cover_text']}`" :alt="`${item['title']}`"
+                             style="width: calc(220 * var(--wrem)); height: calc(140 * var(--hrem))">
+                    </div>
+                    <div v-if="index < information['2'].length - 1"
+                         style="height: 1px; background: linear-gradient(to bottom, #E4E4E8 0%, #E4E4E8 50%, transparent 50%); margin: calc(24 * var(--hrem)) 0 0;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    const {createApp, ref, onBeforeMount, onMounted, nextTick} = Vue
+    createApp({
+        setup() {
+            const status = ref(1)
+            const apiObj = new GridOpenApi(UrlDomain, source, version);
+            const information = ref({})
+            const IsDisplayInformation = ref(false)
+
+            onBeforeMount(() => {
+                $('html').css({
+                    'width': window.innerWidth + 'px',
+                    'height': window.innerHeight + 'px',
+                    '--wrem': window.innerWidth / 1920 + 'px',
+                    '--hrem': window.innerHeight / 1200 + 'px',
+                })
+            })
+
+            onMounted(async () => {
+                await new Promise((resolve) => {
+                    apiready = () => {
+                        resolve()
+                    }
+                })
+
+                try {
+                    await Promise.all([
+                        new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetArticleList, {
+                                values: {
+                                    category: 1,
+                                    p: 1,
+                                    num: 2
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret === 0) {
+                                        information.value['1'] = ret.list
+                                        resolve()
+                                    } else {
+                                        reject(new Error('获取兴趣体验失败'))
+                                    }
+                                } else {
+                                    reject(err)
+                                }
+                            })
+                        }),
+                        new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetArticleList, {
+                                values: {
+                                    category: 2,
+                                    p: 1,
+                                    num: 2
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret === 0) {
+                                        information.value['2'] = ret.list
+                                        resolve()
+                                    } else {
+                                        reject(new Error('获取课外驿站失败'))
+                                    }
+                                } else {
+                                    reject(err)
+                                }
+                            })
+                        }),
+                        new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetArticleList, {
+                                values: {
+                                    category: 3,
+                                    p: 1,
+                                    num: 2
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret === 0) {
+                                        information.value['3'] = ret.list
+                                        resolve()
+                                    } else {
+                                        reject(new Error('获取有点意思失败'))
+                                    }
+                                } else {
+                                    reject(err)
+                                }
+                            })
+                        }),
+                        new Promise((resolve, reject) => {
+                            apiObj.Get(UrlRouter.GetWeiboSetting,{
+                                values: {
+                                    schoolid: $api.getStorage('schoolid'),
+                                    uid: $api.getStorage('uid'),
+                                    identitytype: '3'
+                                }
+                            },function (ret,err){
+                                if(ret){
+                                    if(ret.ret === 0 && ret.data.article === 1){
+                                        IsDisplayInformation.value = true
+                                    }
+                                    resolve()
+                                }else{
+                                    reject(err)
+                                }
+                            })
+                        })
+                    ])
+                    for (let key in information.value) {
+                        information.value[key].forEach(item => {
+                            const date = new Date(item['update_time'] * 1000)
+                            item['update_time'] = date.getFullYear() + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + String(date.getDate()).padStart(2, '0')
+                        })
+                    }
+                    // console.log('内容',JSON.stringify(information.value))
+                } catch (e) {
+                    console.error(e)
+                    return
+                }
+
+                await setStatus(status.value)
+            })
+
+            async function setStatus(index) {
+                status.value = index
+                await nextTick()
+                switch (index) {
+                    case 1:
+                        const $frame = $('#frame')
+                        api.openFrame({
+                            name: 'frame-myscorezoo',
+                            url: '../study/ScoreZoo/frame-myscorezoo.html',
+                            rect: {
+                                x: $frame.offset().left,
+                                y: $frame.offset().top + api.pageParam.header.h,
+                                w: $frame.width(),
+                                h: $frame.height()
+                            },
+                        })
+                        break
+                    case 2:
+                        api.setFrameAttr({
+                            name: 'frame-myscorezoo',
+                            hidden: true
+                        })
+                        break
+                }
+            }
+
+            function openWin(index) {
+                switch (index) {
+                    case 1:
+                        api.openWin({
+                            name: 'win-article-list',
+                            url: '../articlenew/win-article-list.html',
+                            pageParam: {index: 0}
+                        });
+                        break
+                    case 2:
+                        api.openWin({
+                            name: 'win-article-list',
+                            url: '../articlenew/win-article-list.html',
+                            pageParam: {index: 1}
+                        });
+                        break
+                    case 3:
+                        api.openWin({
+                            name: 'win-article-list',
+                            url: '../articlenew/win-article-list.html',
+                            pageParam: {index: 2}
+                        });
+                        break
+                }
+            }
+
+            function openInformation(param) {
+                api.openWin({
+                    name: 'win-article-detail',
+                    url: '../articlenew/win-article-detail.html',
+                    pageParam: {
+                        id: param.id,
+                        url: param.url,
+                        title: param.title,
+                        description: param.description
+                    }
+                });
+            }
+
+            return {
+                status,
+                information,
+                IsDisplayInformation,
+                setStatus,
+                openWin,
+                openInformation
+            }
+        }
+    }).mount('#main')
+</script>
+</html>

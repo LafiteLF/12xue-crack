@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>乐园</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        body{
+        }
+
+        .name-content {
+            width: 80%;
+            font-size: 20px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 3px;
+            position:relative;
+        }
+
+        table {  width: 100%;
+
+            /*防止表格变形*/
+            table-layout: fixed;
+            word-wrap: break-word;
+
+            /*是将表格边框的间隙去掉*/
+            border-collapse: collapse;
+            /*color: #E5E5E5;*/
+            background-color: #fff;
+
+        }
+        .main{
+            width: 100%;
+            border: solid thin #E5E5E5;
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 0px 27px;
+        }
+        td, th {
+            padding: 4px;;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        tr{ height: 40px; line-height: 40px;background: #fff}
+        tr, th {
+
+        }
+        th{ border-right: 0px;
+            border-left:0px; color: #999; font-size: 0.7rem;}
+        tr, td {
+
+            text-align: center;
+            color: #72d36d;
+            font-size: 0.7rem;
+        }
+        tr+tr{ border-top: 1px dashed #d5d5d5}
+        tr td:nth-of-type(5){
+            color: #ff778c;
+        }
+        td,th{ height: 80%; margin-top: 10%}
+        td+td{  background: url("../../../image/stuHomePad/xian.jpg") no-repeat left center;
+            background-size: 1px 60%;
+
+        }
+        th+th{ border-left: 0px solid #fff}
+        .titletd {
+            color: #4bc7c7;
+        }
+        .left-q{     display: block;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: solid thin #eaeaea;
+            border-radius: 30px;
+            left: 3px;
+            top: 103px;
+            position: absolute;}
+        .left-b{ display: block; width: 17px; height: 30px; background: #fff; position: absolute;left: 3px;
+            top: 103px;z-index: 10}
+        .right-q{     display: block;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: solid thin #eaeaea;
+            border-radius: 30px;
+            right: 3px;
+            top: 103px;
+            position: absolute;}
+        .right-b{ display: block; width: 17px; height: 30px; background: #fff; position: absolute;right: 3px;
+            top: 103px;z-index: 10}
+
+        img {
+            margin-top: 40%;
+            width: 40%;
+            margin-left: 30%;
+        }
+
+        p {
+            width: 100%;
+            text-align: center;
+        }
+        .title-div{ padding-bottom: 15px; padding-top: 5px;    font-size: 0.65rem;}
+
+        [v-cloak] {
+            display: none;
+        }
+        .aui-refresh-content{ display: none}
+    </style>
+</head>
+
+<body>
+
+<section class="aui-refresh-content" id="app" v-cloak>
+    <div v-if="contents.length==0 && contents==''"  style="width: 30%; margin: 0 auto; padding-top: 12%;text-align: center" class="aui-content">
+        <img src="../../../image/stuHomePad/noContent.png" style="width: 100%; max-width: 508px; margin: 0px;">
+    </div>
+    <div   v-else  class="name-content"  >
+        <!--<div class="title-div">温馨提示:小组互评得分=个人评分/小组人数</div>-->
+        <div class="main">
+            <b class="left-b"></b>
+            <span class="left-q"></span>
+            <b class="right-b"></b>
+            <span class="right-q"></span>
+        <table   >
+            <tr  class="bt">
+                <th>时间</th>
+                <th>获得/扣除</th>
+                <th>评分项</th>
+                <th>评分人</th>
+            </tr>
+            <tr align=center v-for="item in contents">
+                <td v-html="item.create_time"> </td>
+                <td  :style="item.score<0?'color:#ff778c':item.score>0?'color:#72d36d':'color:#72d36d'" v-html="item.score"></td>
+                <td v-html="item.evaluatetitle"> </td>
+                <td v-html="item.teacher"> </td>
+            </tr>
+        </table></div>
+    </div>
+
+</section>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+    var vm = null;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var pullRefresh;
+    //    var isRefresh = true;
+    var page = 1;
+    var totalPages;//总页数
+    var allRecordArr = [];
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        vm = new Vue({
+            el: '#app',
+            data: {
+                contents: '32'
+            }
+        });
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                vm.contents = '';
+                page = 1;
+                $('.aui-refresh-content').hide();
+                getStuScoreRecord();
+            }
+        });
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+                if(totalPages > page){
+                    page ++;
+                    getStuScoreRecord();
+                }else {
+                    api.toast({
+                        msg: '已经到底了,没有更多记录了',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+        });
+        getStuScoreRecord();
+    };
+    function getStuScoreRecord() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+//        var schoolid= api.pageParam.schoolid;
+//        alert(schoolid)
+        apiObj.Get(UrlRouter.GetGrouptechRecord, {
+            values: {
+                schoolid: api.pageParam.schoolid,
+                type: 1,
+                page: page,
+                num: 30
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    $('.aui-refresh-content').show();
+                    tohaolis = ret.totalPages;
+                    if (page == 1) {
+                        vm.contents = '';
+                        allRecordArr = [];
+                        pullRefresh.cancelLoading();
+                    }
+                    var dataArr = ret.data;
+                    if (dataArr.length != 0) {
+                        for (var i = 0; i < dataArr.length; i++) {
+                            if (ret.data[i].score > 0) {
+                                dataArr[i].score = '+' + ret.data[i].score;
+                            } else {
+                                dataArr[i].score = ret.data[i].score;
+                            }
+                        }
+                        allRecordArr = allRecordArr.concat(dataArr);
+                        vm.contents = allRecordArr;
+                    } else {
+//                        var divEl = $api.dom('.aui-content');
+//                        $api.css(divEl, 'display: block;');
+//                        var tabEl = $api.dom('.aui-refresh-content');
+//                        $api.css(tabEl, 'display: none;');
+                    }
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+</script>
+</html>

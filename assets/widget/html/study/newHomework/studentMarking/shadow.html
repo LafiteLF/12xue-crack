@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>待批习题列表</title>
+    <link rel="stylesheet" href="../../../../css/publicCss.css">
+    <link rel="stylesheet" href="../../../../css/frameDetail.css">
+    <style>
+
+        html,body{
+           background-color: rgba(0, 0, 0, 0);
+        }
+
+        .content {
+
+            border: 0 solid #e4e4e8; !important;
+        }
+
+
+        .markingBottom {
+            position: fixed;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            width: 100%;
+            height: 60px;
+            /*opacity: 0.9;*/
+        }
+
+        .markingBottom ul {
+            float: left;
+            padding-left: 10px
+        }
+
+        .markingBottom ul li {
+            padding: 12px 12px;
+            float: left;
+            padding-top: 13px;
+        }
+
+        .markingBottom ul li img {
+            width: 34px;
+            height: 34px;
+        }
+
+        .markingButton {
+            width: 120px;
+            height: 60px;
+            border-left: 1px solid #d3d3d3;
+            float: right
+        }
+
+        .markingButton p {
+            width: 50%;
+            float: left;
+            text-align: center
+        }
+
+        .markingButton p img {
+            width: 25px;
+            display: block;
+            margin: 0 auto;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            margin-bottom: 5px
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="content">
+    <img style="position: absolute;height: 24px;width: auto;left: 190px;top: 13px;" src="../../../../image/shadowimages/shadow2.png"   alt="">
+    <img style="position: absolute;width: 150px;height: auto;left: 70px;top: 40px;" src="../../../../image/shadowimages/shadow0.png"   alt="">
+
+    <img style="position: absolute;height: 26px;width: auto;right: 20px;top: 13px;" src="../../../../image/shadowimages/shadow9.png"   alt="">
+    <img style="position: absolute;width: 180px;height: auto;right: 140px;top: 35px;" src="../../../../image/shadowimages/shadow.png"   alt="">
+
+
+    <img style="position: absolute;height: 50px;width: 50px;right: 7px;top: 67px;" src="../../../../image/shadowimages/shadow11.png"   alt="">
+    <img style="position: absolute;width: 130px;height: auto;right: 60px;top: 88px;" src="../../../../image/shadowimages/shadow1.png"   alt="">
+
+    <img style="position: absolute;width: 120px;height: auto;left: calc(50% - 210px);top: 200px;" src="../../../../image/shadowimages/shadow7.png"   alt="">
+    <img style="position: absolute;width: 120px;height: auto;right:calc(50% - 210px);top: 200px;" src="../../../../image/shadowimages/shadow4.png"   alt="">
+
+    <img style="position: absolute;width: 100px;height: auto;right:calc(50% - 50px);top: 370px;" src="../../../../image/shadowimages/shadow3.png" onclick="api.closeFrame();"   alt="">
+
+    <img style="position: absolute;width: 54px;height: auto;right: 5px;top: 150px;" src="../../../../image/shadowimages/shadow8.png"   alt="">
+    <img style="position: absolute;width: 90px;height: auto;right: 60px;top: 250px;" src="../../../../image/shadowimages/shadow10.png"   alt="">
+
+    <img style="position: absolute;width: 54px;height: auto;right: 5px;top: 81%;" src="../../../../image/shadowimages/shadow5.png"   alt="">
+    <img style="position: absolute;width: 150px;height: auto;right: 60px;top: 77%;" src="../../../../image/shadowimages/shadow6.png"   alt="">
+
+
+</div>
+</body>
+
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+
+    }
+</script>
+</html>

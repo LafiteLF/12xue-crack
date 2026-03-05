@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        .aui-searchbar {
+            position: relative;
+            width: 80%;
+            margin: 0 auto;
+
+        }
+        .aui-tab{
+            width: 80%;
+            margin: 0 auto;
+            color: #fff!important;
+        }
+        .aui-tab-item {
+            color: #999999;
+            background-color: #ffffff;
+
+
+        }
+
+        .aui-tab-item.aui-active {
+            border-bottom: 2px solid #4bc7c7;
+            color: #333333;
+        }
+
+        .btn-search {
+            position: absolute;
+            top: 0.38rem;
+            padding: 0.15rem 0.3rem;
+            right: 0.4rem;
+
+        }
+
+        .aui-searchbar-input {
+            padding-left: 1%;
+            padding-right: 1%;
+        }
+
+        .aui-searchbar .aui-iconfont {
+            line-height: 1.4rem;
+            margin-right: 0rem;
+
+        }
+
+        .aui-searchbar form {
+            width: 88%;
+            margin-right: 0.2rem;
+        }
+
+        .gone {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!--<header class="aui-bar aui-bar-nav">-->
+    <!--<a class="aui-pull-left aui-btn">-->
+        <!--<span class="aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></span>-->
+    <!--</a>-->
+    <!--<div class="aui-12xue-title" tapmode onclick="api.closeWin();">选择要@的人</div>-->
+<!--</header>-->
+<header class="aui-bar aui-bar-nav">
+<a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+<span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin();'></span>选择要@的人
+</a>
+</header>
+<div class="aui-searchbar search-bar" id="search">
+    <div class="aui-searchbar-input aui-border-radius" style="margin-right: 3rem">
+        <i class="aui-iconfont aui-icon-search"></i>
+        <form action="javascript:search();">
+            <input type="search" placeholder="请输入搜索人姓名" tapmode onclick="showTab(false);" id="search-input"
+                   onpropertychange="handle();"
+                   oninput="onTextChangeListener();">
+        </form>
+        <i class="aui-iconfont aui-icon-close aui-margin-r-5 gone" tapmode onclick="closeSearch();"></i>
+    </div>
+    <div class="aui-btn aui-btn-primary btn-search" tapmode onclick="search();">搜索</div>
+</div>
+<div></div>
+<div class="aui-tab " id="tab">
+    <div class="aui-tab-item aui-active">学校</div>
+    <div class="aui-tab-item">关注人</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+
+<script type="text/javascript">
+    var isShowTab = false;
+    var tab;
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h + $api.offset($api.dom("#tab")).h + $api.offset($api.dom("#search")).h;
+        var frameH = padWinHeight - headerH;
+        tab = new auiTab({
+            element: document.getElementById("tab"),
+            index: 1,
+            repeatClick: false
+        }, function (ret) {
+            api.setFrameGroupIndex({
+                name: 'tabGroup',
+                index: ret.index - 1,
+                scroll: false
+            });
+        });
+        api.openFrameGroup({
+            name: 'tabGroup',
+            scrollEnabled: true,
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            index: 0,
+            frames: [{
+                name: 'frame-choose-@people-0',
+                url: 'frame-choose-@people.html',
+                pageParam: {type: 'school'}
+            }, {
+                name: 'frame-choose-@people-1',
+                url: 'frame-choose-@people.html',
+                pageParam: {type: 'follow'}
+            }]
+        }, function (ret, err) {
+            tab.setActive(ret.index + 1);
+        });
+    };
+
+    /**
+     * 点击搜索框里的叉叉  隐藏叉叉
+     * 搜索的内容清空  展示tab
+     * 关闭搜索结果
+     */
+    function closeSearch() {
+        $api.addCls($api.dom(".aui-icon-close"), "gone");
+        $api.dom("#search-input").value = '';
+        showTab(true);
+        api.closeFrame({
+            name: 'frame-choose-@people'
+        });
+    }
+
+    function showTab(isShow) {
+        isShowTab = isShow;
+        if (isShow) {
+            $api.removeCls($api.dom("#tab"), "gone");
+        } else {
+            $api.addCls($api.dom("#tab"), "gone");
+            $api.dom('#search-input').focus();
+        }
+        api.setFrameGroupAttr({
+            name: 'tabGroup',
+            hidden: !isShow
+        });
+    }
+    //搜索框文字改变的回调
+    function onTextChangeListener() {
+        var value = $api.dom("#search-input").value;
+        if (value == "") {
+            $api.addCls($api.dom(".aui-icon-close"), "gone");
+            if (!isShowTab) {
+                //没有内容  而且  未展示tab时   显示tab
+                showTab(true);
+            }
+        } else {
+            $api.removeCls($api.dom(".aui-icon-close"), "gone");
+            if (isShowTab) {
+                //有内容  若tab显示  改为隐藏
+                showTab(false);
+            }
+        }
+    }
+    //搜索按钮的点击事件
+    function search() {
+        var value = $api.dom("#search-input").value;
+        if (value == "") {
+            alert("请先输入再搜索");
+            return;
+        }
+        api.openFrame({
+            name: 'frame-choose-@people',
+            url: 'frame-choose-@people.html',
+            rect: {
+                x: 0,
+                y: $api.offset($api.dom("header")).h + $api.offset($api.dom("#search")).h,
+                w: "auto",
+                h: "auto"
+            },
+            pageParam: {type: 'search', name: value},
+            reload: true
+        });
+    }
+</script>
+</html>

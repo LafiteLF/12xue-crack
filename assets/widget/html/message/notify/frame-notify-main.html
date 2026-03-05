@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+
+    <style>
+        .aui-content {
+            background: #F4F4F4;
+            width: 80%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .aui-list-view {
+            margin-bottom: 0px;
+            background: transparent;
+        }
+
+        .ul-read {
+            border-top: 1px dashed #e5e5e5;
+        }
+
+        .aui-list-view:after {
+            border-bottom: 0px solid transparent;
+        }
+
+        .aui-list-view-cell {
+            height: auto;
+        }
+
+        .li-content {
+            background-color: white;
+            border-radius: 6px;
+            height: auto;
+        }
+
+        .time {
+            text-align: center;
+            margin: 0px 1.4rem;
+            font-size: 0.6rem;
+            padding-top: 0.7rem;
+            padding-bottom: 0.7rem;
+            color: #333;
+        }
+
+        .li-content .title {
+            color: #333;
+            font: 0.8rem bold;
+            padding-top: 0.8rem;
+            text-align: center;
+        }
+
+        .li-content .title .mark {
+            float: left;
+            width: 6px;
+            height: 20px;
+            background-color: #ffcd06;
+        }
+
+        .li-content .content {
+
+            font-size: 0.7rem;
+            color: #666;
+            width: 94%;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        .btn-audio {
+            width: 80px;
+            margin: 10px;;
+        }
+
+        .type {
+            color: #aaa;
+        }
+        .audio-time{
+            text-align: right;
+            height: 24px;
+            color: #999999;
+        }
+        .aui-img-object {
+            width: 100%;
+            max-width: 100%;
+            /*max-height: 90px; !*计算设置与宽相等*!*/
+        }
+
+        .aui-col-xs-4 {
+            padding: 0rem 0.4rem 0 0.4rem;
+        }
+
+        .ul-img {
+            width: 94%;
+            margin: 20px auto;
+        }
+
+        .content-footer {
+            border-top: 1px solid #e4e4e4;
+            width: 94%;
+            margin-left: 3%;
+            margin-top: 0.4rem;
+            padding: 0.7rem 0;
+            color: #aaa;
+        }
+
+        .content-footer div {
+            text-align: right;
+            font-size: 0.6rem;
+            color: #999;
+            width: 100%;display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        .btn-voice {
+            width: 40%;
+        }
+
+        .comiis_wrapad img {
+            width: 15px;
+
+        }
+
+        .content-img ul li {
+            width: calc(16.66% - 4px);
+            margin: 0 2px;
+            float: left;
+            height: 120px;
+            overflow: hidden;
+        }
+
+        .content-img ul li img {
+            width: 90%;
+            height: auto !important;
+            min-height: 120px;
+        }
+        .aui-icon-audio:before {
+            color: #00bbd4;
+            content: "\e61d";
+            margin-top: 4px;
+            height: 26px;
+            text-align: left;
+
+        }
+
+        .second{
+            color: #999999;
+        }
+        .aui-btn-primary{
+            border: 1px solid #4BC7C7 !important;
+            border-radius: 6px;
+        }
+        .content-audio {
+            width: 94% !important;
+            margin: 0 auto !important;
+        }
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content" style="height: 100%;">
+
+    <div class="aui-content">
+        <ul class="ul-notify">
+            <!--<li>-->
+                <!--<div class="time">-->
+                    <!--今日 14:26-->
+                <!--</div>-->
+                <!--<div class="li-content">-->
+                    <!--<div class="title">-->
+                        <!--<div class="mark">-->
+
+                        <!--</div>-->
+                        <!--家长会通知-->
+                    <!--</div>-->
+                    <!--<div class="content">-->
+                        <!--这是家长会的内容了开始的记录卡飞机上来的减肥了开始叫对方老师讲道理可减肥课老师的接口附加赛的离开就付款了圣诞节快乐放暑假快乐的附件是考虑到解放路口流量看电视减肥了肯定撒-->
+                    <!--</div>-->
+                    <!--<div class="content-img">-->
+                        <!--<ul class="aui-list-view aui-grid-view ul-img aui-clearfix" style="height: 100px;">-->
+                            <!--<li class="aui-list-view-cell aui-img  ">-->
+                                <!--<img class="aui-img-object" src="../../../image/ajaj.jpg" alt="">-->
+                            <!--</li>-->
+                            <!--<li class="aui-list-view-cell aui-img  ">-->
+                                <!--<img class="aui-img-object" src="../../../image/default_portrait.png" alt="">-->
+                            <!--</li>-->
+                            <!--<li class="aui-list-view-cell aui-img  ">-->
+                                <!--<img class="aui-img-object" src="../../../image/default_portrait.png" alt="">-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    <!--</div>-->
+                    <!--<div class="content-audio">-->
+                        <!--<div class="btn-audio aui-btn aui-btn-primary aui-btn-outlined">-->
+                            <!--<span class="aui-iconfont aui-icon-audio"></span>-->
+                            <!--<span class="audio-time">8"</span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--<div class="content-footer aui-ellipsis-1">-->
+                        <!--<div>来自：烟台一中 张明老师</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+    <!--<div class="no-data" style="display: none;height: 100%;">-->
+    <!--<div style="height: 35%;"></div>-->
+    <!--<div style="margin: 0 auto 0px auto;text-align: center">-->
+    <!--<img src="../../../image/no_data.png" style="width:30%">-->
+    <!--</div>-->
+    <!--<div style="text-align: center;color: #2F2F2F;padding: 0.3rem;">暂无数据</div>-->
+    <!--</div>-->
+</section>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/message/notify/frame-notify-main.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+
+
+<script type="text/javascript">
+    var apiObj = "";
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage("token"));
+        init();
+    };
+</script>
+</html>

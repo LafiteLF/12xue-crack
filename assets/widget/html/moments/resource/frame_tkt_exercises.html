@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>填空题</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>
+    <style>
+        .tkt_content {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<div class="tkt_content" id="tkt_content">
+    <div class="tkt_top">
+        <ul>
+            <li class="tixing clearfix">
+                <div class="tihao" v-text="1 +'.'"></div>
+                <div class="tixingzi" v-text="'【'+data.txstr+'】'"></div>
+            </li>
+            <li class="zsd" @click="alertzsd(data.zsdmc)">
+                <span>难易度：</span><img  class="noImgClick"
+                                       :src="data.nyd==1?'../../../image/newhomework/1xing.png':data.nyd==2?'../../../image/newhomework/2xing.png':data.nyd==3?'../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{data.zsdmc}}
+            </li>
+        </ul>
+    </div>
+    <div class="tkt_left" id="left" style="width: calc(100% - 25px - 37px)">
+        <div class="tg_content font666" v-html="data.tg"></div>
+        <div class="scyinpin clearfix" v-if="data.tx=='tdjh' && data.attachments">
+            <img  class="scyp1 noImgClick" src="../../../image/newhomework/yuyinimg.png">
+            <img class="scyp2 noImgClick" :playStatus='0' onclick="vm.studentRecord(this);"  src="../../../image/startPlay.png" alt="">
+            <div class="ypRange"> <input class="myRange" type="range" min="0"  value="0"  :max='data.attachments[0].filetime' ></div>
+            <p class="ypTimeP" v-text="getOutTime(data.attachments[0].filetime)"></p>
+            <audio class="hideenAudio" :src='data.attachments[0].serverpath + data.attachments[0].preview_link' ></audio>
+        </div>
+        <div class="tdjhxx"  v-if="data.tx=='tdjh'">
+            <p v-for="list in data.options" v-html="'<span>'+list.xx+'</span>'+'.'+list.description"></p>
+        </div>
+        <div class="ldcl" v-if="data.tx=='ldt' && data.dastr!=''">
+            <h3>朗读材料：</h3>
+            <p v-html="data.dastr==''?'无':data.dastr"></p>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var timer = null;
+    apiready = function () {
+        console.log('=======' + $api.jsonToStr(api.pageParam.homeworkListData));
+        vue();
+        $('.tkt_content').show();
+        for (var i = 0; i < $api.domAll('img').length; i++) {
+            if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+            }
+        }
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.tkt_content',
+            data: {
+                data: api.pageParam.homeworkListData,
+                xiaotinum: ''
+            },
+            updated: function () {
+//                for (var i = 0; i < $api.domAll('img').length; i++) {
+//                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+//                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+//                    }
+//                }
+            },
+            methods: {
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                studentRecord:function (context) {
+                    var url =   vm.data.attachments[0].serverpath + vm.data.attachments[0].preview_link;   // 获取一下  data.attachments[0].serverpath + data.attachments[0].preview_link
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var recodetime = vm.data.attachments[0].filetime;  // 获取一下  filetime
+                    var hideenAudio = $api.dom('.hideenAudio');
+                    var range = $api.dom('.myRange');
+                    range.disabled = true;
+                    var bfb;  //1
+//这是没有播放的情况  播放点击的音频  可能有其他音频正在播放  先关掉其他音频  再播放这个音频
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        hideenAudio.play();
+                        sec = 0;
+                        allTimes = recodetime;
+                        timer = setInterval(function (e) {
+                            console.log(hideenAudio.currentTime +'  ' + sec);
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb =  sec/recodetime *100;   //2
+                            bfb = bfb.toFixed(2);//2
+                            var ss = 'background-size: '+bfb + '% 100%';//2
+                            if (allTimes == 0 || sec >= recodetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                var time = vm.getOutTime(recodetime);
+                                $api.text($api.dom('.ypTimeP'), time);
+                                range.value = 0;
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%'); //3
+                            } else {
+                                range.value = sec;
+//                                range.onchange = function () {
+//                                    sec = parseInt(this.value);
+//                                    range.value = sec;
+//                                    hideenAudio.currentTime = sec;
+//                                    allTimes = recodetime - sec;
+//                                    var time = vm.getOutTime(allTimes);
+//                                    $api.text($api.dom('.ypTimeP'), time);
+//                                };
+                                var time = vm.getOutTime(allTimes);
+                                $api.css($api.dom('.myRange'), ss);  //4
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                        clearInterval(timer);
+                        hideenAudio.pause();
+                    } else {
+                        $api.attr(context, 'playStatus', '1');
+                        hideenAudio.play();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb =  sec/recodetime *100;    //5
+                            bfb = bfb.toFixed(2);   //5
+                            var ss = 'background-size: '+bfb + '% 100%';  //5
+                            if (allTimes == 0 || sec >= recodetime) {
+                                $api.attr(context, 'playStatus', '0');
+                                clearInterval(timer);
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                var time = vm.getOutTime(recodetime);
+                                $api.text($api.dom('.ypTimeP'), time);
+                                range.value = 0;
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');   //6
+                            } else {
+                                range.value = sec;
+//                                range.onchange = function () {
+//                                    sec = parseInt(this.value);
+//                                    range.value = sec;
+//                                    hideenAudio.currentTime = sec;
+//                                    allTimes = recodetime - sec;
+//                                    var time = vm.getOutTime(allTimes);
+//                                    $api.text($api.dom('.ypTimeP'), time);
+//                                };
+                                var time = vm.getOutTime(allTimes);
+                                $api.css($api.dom('.myRange'), ss);    //7
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+                getOutTime: function (intime) {
+                    var outTime = '';
+                    if(intime<=9){
+                        outTime = '00:0'+intime;
+                    }else if(intime<59){
+                        outTime = '00:'+intime;
+                    }else {
+                        var min =parseInt(intime/60);
+                        var sec = intime%60;
+                        if(sec<=9){
+                            if(min>0&&min<10){
+                                outTime ='0'+ min+ ':0' + sec ;
+                            }else if(min>=10){
+                                outTime = min+ ':0' + sec ;
+                            }else{
+                                outTime = '00:0'+sec;
+                            }
+                        }else{
+                            if(min>0 && min < 10){
+                                outTime ='0'+ min + ':'+ sec ;
+                            }else if(min>=10){
+                                outTime = min + ':'+ sec ;
+                            }else {
+                                outTime = '00:'+sec;
+                            }
+                        }
+                    }
+                    return outTime;
+                }
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+</script>
+</html>

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>问答题，朗读题</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/wx-audio.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/ErrorBookLeftBtn.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+
+        .wenda_answer {
+            padding: 0 10px 10px 0;
+            margin-top: 0;
+            position: relative;
+            width: calc(100% - 10px);
+        }
+
+        .defen {
+            top: 25px;
+        }
+
+        /*滚动条样式*/
+        *::-webkit-scrollbar {
+            /*滚动条整体样式*/
+            width: 5px;
+            /*高宽分别对应横竖滚动条的尺寸*/
+            height: 100%;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        *::-webkit-scrollbar-track {
+            /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="all_wdt_content" v-cloak style="width: 100%">
+        <ul class="leftedit_btn" style="width: 79px">
+            <li id="leftedit_btn_checkanswer" tapmode onclick="vm.onCheckAnswerClick();"><img class="noImgClick"
+                    id="leftedit_btn_checkanswer_src"
+                    :src="complete == 1?'../../../image/check_answer_down.png':'../../../image/check_answer_up.png'">
+            </li>
+
+
+            <li id="leftedit_btn_AI" v-if="complete" tapmode @click="PostAIBtn();">
+                <img class="noImgClick" id="leftedit_btn_remove_src" src="../../../image/newhomework/aiBtn.png">
+            </li>
+        </ul>
+
+        <div style="margin-left: 89px;width: calc(100% - 89px)">
+            <div class="wdt_content">
+                <div class="content">
+                    <!--题干部分开始-->
+                    <div class="stem">
+                        <ul style="margin-left: 89px; width: calc(100% - 89px)">
+                            <li class="tixing" v-text="'【'+txstr+'】'"></li>
+                            <li v-if="complete==1" class="zsd" @click="alertzsd(data.zsdmc)">
+                                <span>难易度：</span><img class="noImgClick"
+                                    :src="csContent.nyd==1?'../../../image/newhomework/1xing.png':csContent.nyd==2?'../../../image/newhomework/2xing.png':csContent.nyd==3?'../../../image/newhomework/3xing.png':''"><span>
+                                    知识点：</span>{{
+                                data.zsdmc
+                                }}
+                            </li>
+                        </ul>
+                        <!--<div style="margin-left:-10px;margin-right: -25px;width: calc(100% + 35px);height: 10px;border-bottom: 1px solid #e4e4e8"></div>-->
+                        <div class="tg_content font666" style="padding-left: 10px;" v-html="data.tg"></div>
+                        <div v-if="data.tx=='ldt' && data.dastr!=''" class="tg_content font666"
+                            style="padding-left: 10px;font-weight: normal;" v-text="'朗读材料:'"></div>
+                        <div v-if="data.tx=='ldt' && data.dastr!=''" class="tg_content font666"
+                            style="padding-left: 10px;" v-html="data.dastr"></div>
+                    </div>
+                    <!--题干部分结束-->
+                    <!--答案部分开始-->
+                    <dl v-if="complete==1" class="wenda_answer bgFFF">
+                        <div
+                            style="margin-bottom: 20px;margin-top: -20px;margin-right: 10px;width: calc(100% + 10px);height: 10px;border-bottom: 1px solid #e4e4e8">
+                        </div>
+                        <!-- <dt class="defen">
+
+
+                             <img class="noImgClick" v-if="data.is_true!=0"
+                                :src="data.is_true==1?' ../../../image/newhomework/zhengque.png':data.is_true==2?'../../../image/newhomework/cuowu.png':data.is_true==3?'../../../image/newhomework/bandui.png':''"> 
+                            <span
+                                :style="data.is_true==1?'color: #4bc7c7':data.is_true==2?'color: #df7605':data.is_true==3?'color: #ffcd06':''"
+                                v-text="data.is_true==1?'正确':data.is_true==2?'错误':data.is_true==3?'正确率'+data.accuracy+'%':''"></span>
+                            <span v-if="data.is_true==0" style="color: #ff778c">待批</span>
+                        </dt> -->
+                        <dd>
+                            <h2 class="wendah2">【我的答案】</h2>
+                            <ul>
+                                <li class="wendazi">
+                                    <img v-if="photoPath" :src="photoPath" alt="拍摄的图片"
+                                        style="max-width: 300px; max-height: 300px; display:block; margin-top:10px;">
+
+                                </li>
+                            </ul>
+                            <!--<div v-if="data.tx=='ldt' && data.is_unable==0" class="lddayinpin clearfix">-->
+                            <!--<img class="scyp2 noImgClick" src="../../../image/startPlay.png"-->
+                            <!--onclick="vm.ZSrecordRun(this);" :playStatus='0' alt="">-->
+                            <!--<div class="lddaRange"><input class="myRange" type="range" min="0" value="0"-->
+                            <!--:max='data.xsdaobj[0].filetime'></div>-->
+                            <!--<p class="ypTimeP" v-text="getTimes(data.xsdaobj[0].filetime)"></p>-->
+                            <!--</div>-->
+
+                            <div v-if="csContent.tx=='ldt' && data.is_unable==0" class="lddayinpin clearfix">
+                                <img class="scyp2 noImgClick" src="../../../image/startPlay.png"
+                                    onclick="vm.ZSrecordRun(this);" :playStatus='0' alt="">
+                                <div class="lddaRange"><input class="myRange" type="range" min="0" value="0"
+                                        :max='data.xsdaobj[0].filetime'></div>
+                                <p class="ypTimeP" v-text="getTimes(csContent.xsdaobj[0].filetime)"></p>
+                            </div>
+
+
+
+                        </dd>
+                        <dd v-if="data.tx!='ldt'" class="needpic">
+                            <h2 class="wendah2">【{{ csContent.tx_tip }}】</h2>
+                            <ul>
+                                <li class="wendazi" v-html="csContent.dastr==''?'无':csContent.dastr">
+                                </li>
+                            </ul>
+                        </dd>
+                        <dd class="needpic">
+                            <h2 class="wendah2">【答案解析】</h2>
+                            <ul>
+                                <li class="wendazi" v-html="csContent.dajx==''?'无':csContent.dajx">
+                                </li>
+                            </ul>
+                        </dd>
+                    </dl>
+
+
+
+                    <ul v-if=" photoPath == ''&&this.csContent.type_text !== '错题原题'">
+                        <li class="openAnserType" tapmode @click="choose"></li>
+                    </ul>
+                    <div v-if="csShow&&this.csContent.type_text !== '错题原题'"
+                        style="position: relative; display: inline-block;">
+                        <img v-if="photoPath" :src="photoPath" alt="拍摄的图片"
+                            style="max-width: 300px; max-height: 300px; display:block; margin-top:10px; border-radius: 8px;">
+
+                        <!-- 右上角的叉号 -->
+                        <span v-if="photoPath" @click="removePhoto" style="
+                                position: absolute;
+                                top: 10px;
+                                right: 4px;
+                                background: rgba(0,0,0,0.5);
+                                color: white;
+                                border-radius: 50%;
+                                width: 30px;
+                                height: 30px;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                align-items: center;
+                                text-align: center;
+                                line-height: 24px;
+                                font-weight: bold;
+                                cursor: pointer;
+                                z-index: 10;
+                            ">×</span>
+                    </div>
+
+                    <div v-if="csShow&&this.csContent.type_text !== '错题原题'" class="tijiao" tapmode
+                        onclick="vm.checkAnswer()">提交
+                    </div>
+                    <!--答案部分结束-->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/wx-audio.js"></script>
+<script type="text/javascript" src="../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var moduleDialog = null;//弹窗模块bhzparam
+
+    var timer = null;
+    var audioStreamer;
+    var sec;
+    var downloadPath;
+    apiready = function () {
+        vue();
+        api.addEventListener({// 点击查看答案或者切换题目暂停音频
+            name: 'yinpinCLose'
+        }, function (ret, err) {
+            vm.complete = !vm.complete;
+            if ($api.domAll('.scyp2').length >= 1) {
+                if ($('.scyp2').attr('playStatus') == 1) {
+                    $api.attr($api.dom('.scyp2'), 'playStatus', '2');
+                }
+                audioStreamer = api.require('audioStreamer');
+                clearInterval(timer);
+                audioStreamer.pause();
+                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                $api.dom('.myRange').disabled = true;
+            }
+        });
+        vm.isdt = api.pageParam.isdt;
+        vm.totalCount = api.pageParam.totalCount;
+        vm.index = api.pageParam.index;
+
+        vm.current_page = api.pageParam.index;///////
+
+        // 从接口获取数据
+        vm.getExInfo();
+
+
+        document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchstart', function () {
+            document.getElementById('leftedit_btn_checkanswer_src').src = "../../../image/check_answer_down.png";
+        });
+        document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchend', function () {
+            document.getElementById('leftedit_btn_checkanswer_src').src = "../../../image/check_answer_up.png";
+        });
+        vm.getExInfo();
+
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.all_wdt_content',
+            data: {
+                csContent: api.pageParam.csContent[api.pageParam.index - 1],
+
+                photoPath: '',
+                isSubmit: false,
+
+
+
+                csShow: true,
+                current_page: 0,
+                isdt: 1,
+                important: 0,
+                index: 0,
+                totalCount: 0,
+                data: {},
+                tx_type: '',
+                answerArr: [],//答案数组
+                complete: 0,
+                answerStr: '',//答案字符串
+                dastr: '',//习题正确答案
+                is_true: '',//本次答题是否正确
+                txstr: '',
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>确认移出错题本？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+            },
+
+            mounted() {
+                console.log(JSON.stringify(this.csContent))
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+                for (var i = 0; i < $api.domAll('a').length; i++) {
+                    $api.css($api.domAll('a')[i], 'color: #666;');
+                    $api.domAll('a')[i].onclick = function () {
+                        return false;
+                    }
+                }
+            },
+
+
+            methods: {
+                videoZYPlay: function (context) {
+                    var url = $api.attr(context, 'url');
+                    var filetime = $api.attr(context, 'filetime');
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: '',
+                            isMp3: false,
+                            filetime: filetime
+                        }
+                    });
+                },
+
+                removePhoto: function () {
+                    this.photoPath = ''
+                },
+
+                checkAnswer: function () {
+                    if (this.photoPath == '') {
+                        api.toast({
+                            msg: '请提交答案',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return false
+                    }
+                    this.isSubmit = true
+                    this.csShow = false
+                    api.sendEvent({//暂停音频
+                        name: 'yinpinCLose'
+                    });
+                },
+
+                choose: function () {
+                    api.getPicture({
+                        sourceType: 'camera',     // 'camera','library','album'
+                        encodingType: 'jpg',      // 'jpg' 或 'png'
+                        destinationType: 'base64',   // 'url' 获取本地路径，'base64' 获取 base64
+                        allowEdit: false,
+                        quality: 50
+                    }, (ret, err) => {
+                        console.log('拍照回调执行');
+                        if (ret && ret.data) {
+
+                            this.photoPath = ret.base64Data
+
+
+
+
+
+                        } else {
+                            console.log('拍照失败:', err);
+
+                        }
+                    });
+                },
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                tihuan: function (content) {
+                    return content.replace(/#/g, "<font color='#999'>或</font>");
+                },
+
+                onCheckAnswerClick: function () {
+
+                    if (this.csContent.type_text == '错题原题') {
+                        this.csShow = !this.csShow
+                        this.isSubmit = false
+
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+
+                        return true
+                    }
+
+                    if (!this.isSubmit) {
+                        api.toast({
+                            msg: '请提交答案'
+
+                        })
+                        return false
+                    }
+                    if (this.photoPath == '' && this.csContent.type_text !== '错题原题') {
+
+
+
+
+                        api.toast({
+                            msg: '请提交答案',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return false
+                    }
+                    this.csShow = !this.csShow
+                        this.isSubmit = false
+
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+
+
+
+                },
+
+                getTimes: function (value) {
+                    var secondTime = parseInt(value);// 秒
+                    var minuteTime = 0;// 分
+                    if (secondTime > 59) {//如果秒数大于60，将秒数转换成整数
+                        //获取分钟，除以60取整数，得到整数分钟
+                        minuteTime = parseInt(secondTime / 60);
+                        //获取秒数，秒数取佘，得到整数秒数
+                        secondTime = parseInt(secondTime % 60);
+                    }
+                    var result = "" + parseInt(secondTime);
+                    if (minuteTime > 0 && secondTime < 10) {
+                        if (minuteTime > 9) {
+                            result = parseInt(minuteTime) + ":0" + result;
+                        } else {
+                            result = "0" + parseInt(minuteTime) + ":0" + result;
+                        }
+                    } else if (minuteTime > 0 && secondTime >= 10) {
+                        if (minuteTime > 9) {
+                            result = parseInt(minuteTime) + ":" + result;
+                        } else {
+                            result = "0" + parseInt(minuteTime) + ":" + result;
+                        }
+                    } else if (minuteTime == 0 && secondTime < 10) {
+                        result = "00" + ":0" + result;
+                    } else {
+                        result = "00" + ":" + result;
+                    }
+                    return result;
+                },
+                getExInfo: function () {
+                    vm.data = {
+                        sys_id: api.pageParam.id || this.csContent.id,
+                        kc_type: api.pageParam.kc_type || this.csContent.sys_type,
+                        xtid: api.pageParam.xtid || this.csContent.xtid,
+                        zsdmc: this.csContent.zsdmc,
+                        nyd: this.csContent.nyd,
+                        is_important: this.csContent.is_important,
+                        tg: this.csContent.tg,
+                        daoptions: this.csContent.daoptions,
+                        xsdaobj: this.csContent.xsdaobj,
+                        dajx: this.csContent.dajx,
+                        tx_tip: this.csContent.tx_tip,
+                        is_auto: this.csContent.is_auto,
+                        dastr: this.csContent.dastr,
+                        tx: this.csContent.tx,
+                        txstr: this.csContent.txstr,
+                        children: this.csContent.children
+                    };
+
+
+
+
+
+
+
+                    vm.tx_type = vm.data.tx;
+                    vm.txstr = vm.data.txstr;
+                    vm.important = vm.data.is_important;
+                    vm.dastr = vm.data.dastr;
+                    $('.all_wdt_content').css('display', 'block');
+
+
+
+                },
+                ZSrecordRun: function (context) {
+                    audioStreamer = api.require('audioStreamer');
+                    var playStatus = $api.attr(context, 'playStatus');
+                    var bfb;
+                    var recodetime;
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr(context, 'playStatus', '1');
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        sec = 0;
+                        allTimes = vm.data.xsdaobj[0].filetime;
+                        recodetime = vm.data.xsdaobj[0].filetime;
+                        var url = vm.data.xsdaobj[0].serverpath + vm.data.xsdaobj[0].savename;
+                        var path = "/audio/" + url;
+                        api.download({
+                            url: url,
+                            savePath: 'fs:/' + path,
+                            report: false,
+                            cache: false,
+                            allowResume: false
+                        }, function (ret, err) {
+                            if (ret && ret.state == 1) {
+                                timer = setInterval(function (e) {
+                                    sec = sec + 1;
+                                    allTimes = allTimes - 1;
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    console.log(sec);
+                                    if (allTimes == 0 || sec >= vm.data.xsdaobj[0].filetime) {
+                                        clearInterval(timer);
+                                        $api.attr(context, 'playStatus', '0');
+                                        $api.dom('.myRange').value = 0;
+                                        $api.dom('.myRange').disabled = true;
+                                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                        $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.data.xsdaobj[0].filetime));
+                                        $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                                    } else {
+                                        var range = $api.dom('.myRange');
+                                        range.value = sec;
+                                        range.disabled = false;
+                                        range.onchange = function () {
+                                            sec = parseInt(this.value);
+                                            range.value = sec;
+                                            allTimes = vm.data.xsdaobj[0].filetime - sec;
+                                            var time = vm.getTimes(allTimes);
+                                            $api.text($api.dom('.ypTimeP'), time);
+                                            bfb = sec / recodetime * 100;
+                                            bfb = bfb.toFixed(2);
+                                            var ss = 'background-size: ' + bfb + '% 100%';
+                                            $api.css($api.dom('.myRange'), ss);
+                                            audioStreamer.seekToTime({
+                                                time: sec
+                                            });
+                                        };
+                                        var time = vm.getTimes(allTimes);
+                                        $api.css($api.dom('.myRange'), ss);
+                                        $api.text($api.dom('.ypTimeP'), time);
+                                    }
+                                }, 1000);
+                                downloadPath = api.fsDir + path;
+                                //                                if (api.systemType == 'ios') {
+                                //                                    if(downloadPath.indexOf('.mp3') != -1){
+                                //                                        audioStreamer.openPlayer({
+                                //                                            path: downloadPath
+                                //                                        }, function (ret) {
+                                //                                        });
+                                //                                    } else {
+                                //                                        var audioTrans = api.require('audioTrans');
+                                //                                        audioTrans.amrToWav({
+                                //                                            path: downloadPath
+                                //                                        }, function (ret) {
+                                //                                            if (ret) {
+                                //                                                var path1 = ret.path;
+                                //                                                audioStreamer.openPlayer({
+                                //                                                    path: path1
+                                //                                                }, function (ret) {
+                                //                                                });
+                                //                                            }
+                                //                                        });
+                                //                                    }
+                                //
+                                //                                } else {
+                                audioStreamer.openPlayer({
+                                    path: downloadPath
+                                }, function (ret) {
+                                });
+                                //                                }
+                            }
+                        });
+
+
+                    } else if (playStatus == '1') {
+                        $api.attr(context, 'playStatus', '2');
+                        clearInterval(timer);
+                        audioStreamer.pause();
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                        $api.dom('.myRange').disabled = true;
+                    } else {
+                        $api.dom('.myRange').disabled = false;
+                        $api.attr(context, 'playStatus', '1');
+                        recodetime = vm.data.xsdaobj[0].filetime;
+                        //这个是一样的  重新播放
+                        if (api.systemType == 'ios') {
+                            audioStreamer.resume();
+                        } else {
+                            audioStreamer.openPlayer({
+                                path: downloadPath,
+                            }, function (ret) {
+                            });
+                        }
+                        $api.attr($api.dom('.scyp2'), 'src', '../../../image/stop.png');
+                        timer = setInterval(function (e) {
+                            sec = sec + 1;
+                            allTimes = allTimes - 1;
+                            bfb = sec / recodetime * 100;
+                            bfb = bfb.toFixed(2);
+                            var ss = 'background-size: ' + bfb + '% 100%';
+                            console.log(sec);
+                            if (allTimes == 0 || sec >= vm.data.xsdaobj[0].filetime) {
+                                clearInterval(timer);
+                                $api.attr(context, 'playStatus', '0');
+                                $api.dom('.myRange').value = 0;
+                                $api.dom('.myRange').disabled = true;
+                                $api.attr($api.dom('.scyp2'), 'src', '../../../image/startPlay.png');
+                                $api.text($api.dom('.ypTimeP'), vm.getTimes(vm.data.xsdaobj[0].filetime));
+                                $api.css($api.dom('.myRange'), 'background-size: 0% 100%');
+                            } else {
+
+                                var range = $api.dom('.myRange');
+                                range.value = sec;
+                                range.disabled = false;
+                                range.onchange = function () {
+                                    sec = parseInt(this.value);
+                                    range.value = sec;
+                                    allTimes = vm.data.xsdaobj[0].filetime - sec;
+                                    var time = vm.getTimes(allTimes);
+                                    $api.text($api.dom('.ypTimeP'), time);
+                                    bfb = sec / recodetime * 100;
+                                    bfb = bfb.toFixed(2);
+                                    var ss = 'background-size: ' + bfb + '% 100%';
+                                    $api.css($api.dom('.myRange'), ss);
+                                    audioStreamer.seekToTime({
+                                        time: sec
+                                    });
+                                };
+                                var time = vm.getTimes(allTimes);
+                                $api.css($api.dom('.myRange'), ss);
+                                $api.text($api.dom('.ypTimeP'), time);
+                            }
+                        }, 1000);
+                    }
+                },
+                PostAIBtn: async function () {
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostPayfeeOperationLog, {
+                            body: $api.jsonToStr({
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_analysis',
+                                resource_id: vm.data.xtid,
+                                count: aiAnalysis.count,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                ...(aiAnalysis.card_id !== undefined && { card_id: aiAnalysis.card_id }),
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                api.sendEvent({
+                                    name: 'aiAnalysisReduce'
+                                });
+                                resolve(ret);
+                            } else {
+                                reject(err);
+                            }
+                        })
+                    });
+                    if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber') || ret.ret === -1) {
+                        if ($api.getStorage('upgradeQRCode') === '1') {
+                            api.toast({
+                                msg: '本月剩余AI解析次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../../study/frame-number-exhausted.html',
+                            })
+                        }
+                        return
+                    }
+
+                    if (ret.ret === 0 && ret.data === '') {
+                        api.execScript({
+                            name: 'win_error_detail_new',
+                            script: 'postAIjxNum();'
+                        });
+                    }
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const tgContent = document.querySelector('.tg_content');
+                    const needPics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...needPics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            // 保存图片到相册    
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            // 当所有图片都处理完成时
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../../study/newHomework/frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.data.xtid,
+                                        imagePaths: imageUrls
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                },
+            }
+        });
+    }
+
+
+    //图片点击放大
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+</script>
+
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e5e5;
+        }
+
+        a {
+            display: inline-block;
+            float: left
+        }
+
+        span b {
+            color: #333333 !important;
+            font-weight: normal;
+            font-size: 0.8rem
+        }
+
+        .choose {
+            text-align: right;
+            position: relative;
+            padding-right: 25px;
+            width:80% ;
+            /* right: 0px; */
+            float: right;
+        }
+
+        span {
+            padding-right: 2px;
+            color: #999999;
+            font-size: 0.7rem
+        }
+        .choosehide:after{
+            content: '';
+            display: block;
+            position: absolute;
+            /* color: #999999 !important; */
+            /* margin-right: 20px; */
+            width: 10px;
+            height: 10px;
+            /* float: right; */
+            padding-right: 20px;
+            background: url("../../image/stuHomePad/xljt.jpg") no-repeat right center;
+            background-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            right: 15px;
+            text-overflow: ellipsis;
+            bottom: 25px;
+        }
+        .choose span{ display: inline-block;  white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; vertical-align: bottom}
+        /*.choose span:nth-of-type(2),.choose span:nth-of-type(6),.choose span:nth-of-type(7){*/
+            /*max-width: calc(19% - 37px);*/
+        /*}*/
+        /*.choose span:nth-of-type(3),.choose span:nth-of-type(4),.choose span:nth-of-type(5),.choose span:nth-of-type(8){*/
+            /*max-width: calc(10% - 17px);*/
+        /*}*/
+        .chooseschool{
+            background: url("../../image/stuHomePad/xljt.jpg") no-repeat right center;
+            background-size: 12px;
+            color: #999999;
+            font-size: 0.7rem; overflow: hidden;
+            text-overflow: ellipsis; vertical-align: bottom;white-space: nowrap;display: inline-block;
+            padding-right: 16px;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin();">
+        <span class="aui-iconfont aui-icon-left" ><b>智能导练</b></span>
+    </a>
+    <div class="choose" >
+        <span  class="chooseschool" style=" max-width: calc(15% - 17px);"  v-text="recommend.type=='practice'?'12xue精品':recommend.type=='school'?'校本共享的':recommend.type=='self'?'我老师创作的':recommend.type=='other'?'其他':''"  tapmode onclick="vm.choosetype()"></span>
+        <span class="choosehide" style=" max-width: calc(15% - 17px);"  v-if="recommend.type=='practice' && schoolmc_show == 1 " tapmode onclick="vm.choose()" v-text="recommend.schoolmc"></span>
+        <span  class="choosehide" style=" max-width: calc(10% - 17px);" tapmode onclick="vm.choose()" v-text="recommend.njmc"></span>
+        <span class="choosehide" style=" max-width: calc(10% - 17px);"   tapmode onclick="vm.choose()" v-text="recommend.bbmc"></span>
+        <span  class="choosehide" style=" max-width: calc(10% - 17px);"  tapmode onclick="vm.choose()" v-text="recommend.sxcmc"></span>
+        <span  class="choosehide" style=" max-width: calc(15% - 17px);"  tapmode onclick="vm.choose()" v-text="recommend.dyid==0?'全部':recommend.dymc"></span>
+        <span  class="choosehide" style=" max-width: calc(15% - 17px);"  tapmode onclick="vm.choose()" v-text="recommend.jieid==0?'全部':recommend.jiemc"></span>
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var kmmc;
+    var status;
+    apiready = function () {
+        kmmc = api.pageParam.kmmc;
+        status = api.pageParam.status;
+        $('.titlea b').html(kmmc);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        vm.GetPracticeChaptlist(api.pageParam.kmid,'all');
+        api.addEventListener({
+            name: 'selectdata'
+        }, function (ret, err) {
+            if(ret.value.recommend){
+                vm.recommend = ret.value.recommend;
+            }
+            vm.nowstatus = ret.value.nowstatus;
+            vm.openFrame();
+        });
+        api.addEventListener({
+            name: 'selectType1'
+        }, function (ret, err) {
+            vm.recommend.type = ret.value.type;
+            vm.nowstatus.id=5;
+            vm.nowstatus.name="全部";
+            vm.GetPracticeChaptlist(api.pageParam.kmid,vm.recommend.type);
+        });
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin()
+        });
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            chaptlist: '',//所有数据
+            recommend: '',//默认数据
+            nowstatus: {'id': '5', 'name': '全部'},//当前完成状态
+            schoolmc_show: -1
+        },
+        methods: {
+            choosetype:function(){
+                api.openFrame({
+                    name: 'selectType',
+                    url: 'selectType.html',
+                    rect: {
+                        x: '0',
+                        y: '0',
+                        w: 'auto',
+                        h: api.winHeight
+                    },
+                    pageParam: {
+                        type:vm.recommend.type
+                    },
+                    bounces: false
+                });
+            },
+            openFrame: function () {
+                var header = document.querySelector('header');
+                var headerH = $api.offset(header).h;
+                var frameH = padWinHeight - headerH;
+                api.openFrame({
+                    name: 'frame-Intelligence-course-list',
+                    url: 'frame-Intelligence-course-list.html',
+                    rect: {
+                        x: 0,
+                        y: headerH,
+                        w: 'auto',
+                        h: frameH
+                    },
+                    pageParam: {
+                        recommend: vm.recommend,
+                        kmmc: kmmc,
+//                        nowSection: vm.nowSection,
+                        nowstatus: vm.nowstatus,
+                        chaptlist:vm.chaptlist
+                    },
+                    bounces: false,
+                    reload: true
+                });
+            },
+            GetPracticeChaptlist: function (kmid ,type) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetPracticeChaptlist, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        xkid: kmid,
+                        type:type,
+                        ispractice:status
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            if(JSON.stringify(ret.data.chaptlist.Grade)=='{}'){
+                                $('.choosehide').hide();
+                                vm.schoolmc_show = 0;
+                                vm.chaptlist = ret.data.chaptlist;
+                                vm.recommend = ret.data.recommend;
+                            }else{
+                                $('.choosehide').show();
+                                vm.schoolmc_show = 1;
+                                vm.chaptlist = ret.data.chaptlist;
+                                vm.recommend = ret.data.recommend;
+                                if (ret.data.recommend.id == undefined) {
+                                    if (vm.chaptlist.school.length != 0) {
+                                        var schoolid = vm.chaptlist.school[0].id;
+                                        var njid = vm.chaptlist.Grade[schoolid][0].id;
+                                        var bbid = vm.chaptlist.Publisher[schoolid][njid][0].id;
+                                        var sxcid = vm.chaptlist.Volume[schoolid][bbid][0].id;
+                                        var dyid = vm.chaptlist.Section[schoolid][sxcid][0].id;
+                                        var jieid = vm.chaptlist.Cell[schoolid][dyid][0].id;
+                                        vm.recommend = {
+                                            "njid": njid,
+                                            "bbid": bbid,
+                                            "sxcid": sxcid,
+                                            "schoolid": schoolid,
+                                            "dyid":dyid,
+                                            "jieid":jieid,
+                                            "schoolmc": vm.chaptlist.school[0].name,
+                                            "njmc": vm.chaptlist.Grade[schoolid][0].name,
+                                            "bbmc": vm.chaptlist.Publisher[schoolid][njid][0].name,
+                                            "sxcmc": vm.chaptlist.Volume[schoolid][bbid][0].name,
+                                            "dymc": vm.chaptlist.Section[schoolid][sxcid][0].name,
+                                            "jiemc": vm.chaptlist.Cell[schoolid][dyid][0].name,
+                                            "type":ret.data.recommend.type
+                                        };
+                                        $('.choosehide').show();
+                                        vm.schoolmc_show = 1;
+                                    }else{
+                                        vm.recommend={
+                                            "type":ret.data.recommend.type
+                                        };
+                                        $('.choosehide').hide();
+                                        vm.schoolmc_show = 0;
+                                    }
+                                } else {
+                                    vm.recommend = ret.data.recommend;
+                                    $('.choosehide').show();
+                                    vm.schoolmc_show = 1;
+                                }
+
+                            }
+                            vm.openFrame()
+                        } else {
+                            api.toast(
+                                {
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                            )
+                        }
+                    } else {
+                        api.toast(
+                            {
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                        )
+                    }
+
+                })
+            },
+            choose: function () {
+                api.openFrame({
+                    name: 'select',
+                    url: 'select.html',
+                    rect: {
+                        x: '0',
+                        y: '0',
+                        w: 'auto',
+                        h: api.winHeight
+                    },
+                    pageParam: {
+                        chaptlist: vm.chaptlist,
+                        recommend: vm.recommend,
+                        nowstatus: vm.nowstatus,
+                    },
+                    bounces: false
+                });
+            }
+
+        }
+    });
+    function closeWin() {
+        api.sendEvent({
+            name: 'shuaxin-frame-Intelligence'
+        });
+        api.closeWin();
+
+    }
+</script>

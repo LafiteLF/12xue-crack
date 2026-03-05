@@ -1,0 +1,112 @@
+.class Lcom/apicloud/glide/manager/RequestManagerFragment$FragmentRequestManagerTreeNode;
+.super Ljava/lang/Object;
+.source "RequestManagerFragment.java"
+
+# interfaces
+.implements Lcom/apicloud/glide/manager/RequestManagerTreeNode;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/apicloud/glide/manager/RequestManagerFragment;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x2
+    name = "FragmentRequestManagerTreeNode"
+.end annotation
+
+
+# instance fields
+.field final synthetic this$0:Lcom/apicloud/glide/manager/RequestManagerFragment;
+
+
+# direct methods
+.method private constructor <init>(Lcom/apicloud/glide/manager/RequestManagerFragment;)V
+    .locals 0
+
+    .line 181
+    iput-object p1, p0, Lcom/apicloud/glide/manager/RequestManagerFragment$FragmentRequestManagerTreeNode;->this$0:Lcom/apicloud/glide/manager/RequestManagerFragment;
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+.method synthetic constructor <init>(Lcom/apicloud/glide/manager/RequestManagerFragment;Lcom/apicloud/glide/manager/RequestManagerFragment$1;)V
+    .locals 0
+
+    .line 181
+    invoke-direct {p0, p1}, Lcom/apicloud/glide/manager/RequestManagerFragment$FragmentRequestManagerTreeNode;-><init>(Lcom/apicloud/glide/manager/RequestManagerFragment;)V
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public getDescendants()Ljava/util/Set;
+    .locals 4
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "()",
+            "Ljava/util/Set<",
+            "Lcom/apicloud/glide/RequestManager;",
+            ">;"
+        }
+    .end annotation
+
+    .line 184
+    iget-object v0, p0, Lcom/apicloud/glide/manager/RequestManagerFragment$FragmentRequestManagerTreeNode;->this$0:Lcom/apicloud/glide/manager/RequestManagerFragment;
+
+    invoke-virtual {v0}, Lcom/apicloud/glide/manager/RequestManagerFragment;->getDescendantRequestManagerFragments()Ljava/util/Set;
+
+    move-result-object v0
+
+    .line 185
+    new-instance v1, Ljava/util/HashSet;
+
+    .line 186
+    invoke-interface {v0}, Ljava/util/Set;->size()I
+
+    move-result v2
+
+    invoke-direct {v1, v2}, Ljava/util/HashSet;-><init>(I)V
+
+    .line 187
+    invoke-interface {v0}, Ljava/util/Set;->iterator()Ljava/util/Iterator;
+
+    move-result-object v0
+
+    :cond_0
+    :goto_0
+    invoke-interface {v0}, Ljava/util/Iterator;->hasNext()Z
+
+    move-result v2
+
+    if-eqz v2, :cond_1
+
+    invoke-interface {v0}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+
+    move-result-object v2
+
+    check-cast v2, Lcom/apicloud/glide/manager/RequestManagerFragment;
+
+    .line 188
+    invoke-virtual {v2}, Lcom/apicloud/glide/manager/RequestManagerFragment;->getRequestManager()Lcom/apicloud/glide/RequestManager;
+
+    move-result-object v3
+
+    if-eqz v3, :cond_0
+
+    .line 189
+    invoke-virtual {v2}, Lcom/apicloud/glide/manager/RequestManagerFragment;->getRequestManager()Lcom/apicloud/glide/RequestManager;
+
+    move-result-object v2
+
+    invoke-virtual {v1, v2}, Ljava/util/HashSet;->add(Ljava/lang/Object;)Z
+
+    goto :goto_0
+
+    :cond_1
+    return-object v1
+.end method

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@id/root" android:background="#000000" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.apicloud.widget.IJKView android:id="@id/mo_video" android:background="#000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerInParent="true" />
+    <ImageView android:id="@id/iv_repeatImg" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    <LinearLayout android:gravity="center" android:orientation="vertical" android:id="@id/ll_control" android:background="@drawable/mo_ijkplayer_playmodule_player_center_bg" android:visibility="gone" android:layout_width="80.0dp" android:layout_height="80.0dp" android:layout_centerInParent="true">
+        <ImageView android:layout_gravity="center" android:id="@id/app_video_control_icon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/mo_ijkplayer_volume" />
+        <TextView android:textSize="18.0dp" android:textColor="@android:color/white" android:id="@id/app_video_volume" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="50%" />
+    </LinearLayout>
+    <RelativeLayout android:id="@id/rl_progress" android:background="@drawable/mo_ijkplayer_playmodule_player_center_bg" android:visibility="gone" android:layout_width="80.0dp" android:layout_height="80.0dp" android:layout_centerInParent="true">
+        <ImageView android:id="@id/iv_progress" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3.0dp" android:src="@drawable/mo_ijkplayer_fast_forward" android:layout_centerHorizontal="true" />
+        <ProgressBar android:id="@id/pb" android:layout_width="match_parent" android:layout_height="4.0dp" android:layout_marginLeft="4.0dp" android:layout_marginTop="4.0dp" android:layout_marginRight="4.0dp" android:progressDrawable="@drawable/mo_ijkplayer_video_dialog_progress" android:layout_below="@id/iv_progress" android:layout_centerHorizontal="true" style="@android:style/Widget.ProgressBar.Horizontal" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/rl_head" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <ImageView android:id="@id/iv_back" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/mo_ijkplayer_btn_back_white" />
+        <TextView android:id="@id/tv_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toRightOf="@id/iv_back" />
+        <RelativeLayout android:id="@id/rl_right" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_alignParentRight="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/rl_bottom" android:background="#7fa1a1a1" android:layout_width="match_parent" android:layout_height="44.0dp">
+        <ImageView android:id="@id/iv_play" android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/mo_ijkplayer_btn_play_normal" android:layout_centerVertical="true" />
+        <TextView android:id="@id/tv_current_progress" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5.0dp" android:text="00:00" android:layout_toRightOf="@id/iv_play" android:layout_centerVertical="true" />
+        <ImageView android:id="@id/iv_full_screen" android:visibility="gone" android:layout_width="44.0dp" android:layout_height="44.0dp" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        <TextView android:id="@id/tv_total_time" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="5.0dp" android:text="00:00" android:layout_toLeftOf="@id/iv_full_screen" android:layout_centerVertical="true" />
+        <SeekBar android:id="@id/sb_progress" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="5.0dp" android:layout_marginRight="5.0dp" android:maxHeight="2.0dp" android:progressDrawable="@drawable/mo_ijkplayer_seekbar_holo_light" android:minHeight="2.0dp" android:thumb="@drawable/mo_ijkplayer_seekbar_ratio" android:layout_toLeftOf="@id/tv_total_time" android:layout_toRightOf="@id/tv_current_progress" android:layout_centerVertical="true" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/relayout_seek_volume" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_alignParentRight="true">
+        <com.apicloud.widget.PopSeekBarView android:id="@id/seek_volume" android:layout_width="10.0dp" android:layout_height="match_parent" android:layout_marginTop="50.0dp" android:layout_marginRight="100.0dp" android:layout_marginBottom="50.0dp" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/relayout_seek_light" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_alignParentLeft="true">
+        <com.apicloud.widget.PopSeekBarView android:id="@id/seek_light" android:layout_width="10.0dp" android:layout_height="match_parent" android:layout_marginLeft="100.0dp" android:layout_marginTop="50.0dp" android:layout_marginBottom="50.0dp" />
+    </RelativeLayout>
+</RelativeLayout>

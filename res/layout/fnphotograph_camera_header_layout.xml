@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="horizontal" android:id="@id/flashLightSetting" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="20.0dp" android:layout_centerVertical="true">
+        <ImageView android:id="@id/flashAuto" android:layout_width="24.0dp" android:layout_height="24.0dp" android:layout_marginRight="20.0dp" android:src="@drawable/fnphotograph_flashmode_auto" />
+        <ImageView android:id="@id/flashOpen" android:layout_width="24.0dp" android:layout_height="24.0dp" android:layout_marginRight="20.0dp" android:src="@drawable/fnphotograph_flashmode_open" />
+        <ImageView android:id="@id/flashClose" android:layout_width="24.0dp" android:layout_height="24.0dp" android:src="@drawable/fnphotograph_flashmode_close" />
+    </LinearLayout>
+    <ImageView android:id="@id/flashModeBtn" android:layout_width="24.0dp" android:layout_height="24.0dp" android:layout_marginLeft="20.0dp" android:src="@drawable/fnphotograph_flashmode_close" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+    <ImageView android:id="@id/cancelBtn" android:clickable="true" android:layout_width="20.0dp" android:layout_height="20.0dp" android:layout_marginTop="10.0dp" android:layout_marginRight="20.0dp" android:layout_marginBottom="10.0dp" android:src="@drawable/fnphotograph_cancel_btn_selector" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+</RelativeLayout>

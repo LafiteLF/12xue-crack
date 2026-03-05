@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>答题统计</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        .content {
+            width: 100%;
+            position: relative;
+            height: 100%;
+            /* display: none; */
+        }
+
+        .top {
+            width: 50%;
+            position: absolute;
+            left: 5%;
+            top: 30px;
+            background: #e0f4f4;
+            height: 200px;
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+
+        .top2 {
+            width: 60%;
+            position: absolute;
+            left: 20%;
+            top: calc(50% - 110px);
+            background: #e0f4f4;
+            height: 200px;
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+
+        .bottom {
+            width: 50%;
+            position: absolute;
+            left: 5%;
+            top: 238px;
+            background: #fff;
+            height: calc(100% - 258px);
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+        .noanswerbottom{
+            width: 60%;
+            position: absolute;
+            left: 20%;
+            top: 238px;
+            background: #fff;
+            height: calc(100% - 258px);
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+        .ltimg, .rtimg {
+            width: 75px;
+            position: absolute;
+            top: -16px;
+        }
+
+        .ltimg {
+            left: -38px;
+        }
+
+        .rtimg {
+            right: -38px;
+        }
+
+        .lflj, .rflj {
+            width: 15px;
+            position: absolute;
+            bottom: -30px;
+            z-index: 10;
+        }
+
+        .lflj {
+            left: 90px
+        }
+
+        .rflj {
+            right: 90px
+        }
+
+        .white_circle {
+            width: 102px;
+            height: 102px;
+            border-radius: 100px;
+            border: 2px solid #fff;
+            margin: 0 auto;
+            margin-top: 13px;
+        }
+
+        .white_circle2 {
+            width: 102px;
+            height: 102px;
+            border-radius: 100px;
+            border: 2px solid #fff;
+            margin: 0 auto;
+            margin-top: 27px;
+        }
+
+        .solid_cricle {
+            width: 85px;
+            height: 85px;
+            border-radius: 100px;
+            background: #fff;
+            margin: 8px auto
+        }
+
+        .solid_cricle2 {
+            width: 82px;
+            height: 82px;
+            border-radius: 100px;
+            background: #fff;
+            margin: 5px auto;
+            border: 5px solid #4bc7c7;
+        }
+
+        .solid_cricle2 b {
+            font-size: 3.4rem;
+            color: #4bc7c7;
+            text-align: center;
+            display: inline;
+            font-weight: normal;
+            /* padding-top: 14px; */
+            height: 40px;
+            vertical-align: top;
+            padding: 0 3px;
+            /* padding-top: 54px; */
+        }
+
+        .solid_cricle2 span {
+            font-size: 1.4rem;
+            color: #000;
+            display: block;
+            line-height: 80px;
+            text-align: center;
+        }
+
+        .solid_cricle b {
+            font-size: 3.0rem;
+            color: #4bc7c7;
+            text-align: center;
+            display: block;
+            font-weight: normal;
+            padding-top: 17px;
+            height: 34px;
+        }
+
+        .solid_cricle span {
+            font-size: 1.4rem;
+            color: #000;
+            display: block;
+            text-align: center
+        }
+
+        .ranking {
+            font-size: 1.8rem;
+            color: #303030;
+            width: 100%;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        .ranking span {
+            font-size: 2.1rem;
+            color: #4bc7c7
+        }
+
+        .ranking b {
+            width: 25px;
+            display: inline-block;
+        }
+
+        .Identification {
+            text-align: center;
+            padding-top: 13px;
+        }
+
+        .Identification li {
+            display: inline-block;
+            text-align: center;
+            font-size: 1.4rem;
+            margin: 0 10px;
+        }
+
+        .Identification li span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 5px;
+            border-radius: 40px;
+            vertical-align: bottom;
+            margin-bottom: 6px;
+        }
+
+        .Identification li:nth-of-type(1) {
+            color: #4bc7c7
+        }
+
+        .Identification li:nth-of-type(1) span {
+            color: #4bc7c7;
+            background: #4bc7c7;
+        }
+
+        .Identification li:nth-of-type(2) {
+            color: #df7605
+        }
+
+        .Identification li:nth-of-type(2) span {
+            color: #df7605;
+            background: #df7605
+        }
+
+        .Identification li:nth-of-type(3) {
+            color: #ffcc00
+        }
+
+        .Identification li:nth-of-type(3) span {
+            color: #ffcc00;
+            background: #ffcc00
+        }
+
+        .Identification li:nth-of-type(4) {
+            color: #ff778c
+        }
+
+        .Identification li:nth-of-type(4) span {
+            color: #ff778c;
+            background: #ff778c
+        }
+
+        .Identification li:nth-of-type(5) {
+            color: #d5d5d5
+        }
+
+        .Identification li:nth-of-type(5) span {
+            color: #d5d5d5;
+            border: 1px solid #d5d5d5
+        }
+
+        .bottomnr {
+            margin: 25px 15px 10px 15px;
+            padding-left: 10px;
+            padding-right: 10px;
+            height: calc(100% - 35px);
+            width: calc(100% - 50px);
+            overflow-y: scroll;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #303030;
+            height: 18px;
+            line-height: 18px;
+            border-left: 4px solid #4bc7c7;
+            padding-left: 12px;
+            font-weight: normal;
+            /* margin-left: 0px; */
+            margin-top: 15px;
+        }
+
+        .classification {
+            position: relative;
+            padding-top: 5px;
+        }
+
+        .classification span {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: #9a9a9a;
+            font-size: 1.2rem
+        }
+
+        .classification span b {
+            font-weight: normal;
+            color: #4bc7c7;
+            padding: 0 3px;
+            font-size: 1.2rem
+        }
+
+        .Serial li {
+            float: left;
+            width: 30px;
+            height: 30px;
+            border-radius: 100px;
+            color: #fff;
+            background: #4bc7c7;
+            text-align: center;
+            line-height: 30px;
+            font-size: 1.4rem;
+            margin: 5px 8px
+        }
+
+        .Serial {
+            padding-bottom: 10px;
+            padding-top: 10px;
+            padding-left: 9px;
+        }
+
+        /*滚动条样式*/
+        *::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            height: 100%;
+        }
+
+        *::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        *::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+
+        .tzts {
+            font-size: 1.2rem;
+            color: #9a9a9a;
+            position: absolute;
+            display: inline-block;
+            top: 17px;
+            left: 123px;
+        }
+
+        .solid_cricle i {
+            display: inline;
+            font-size: 2rem;
+            font-style: normal
+        }
+
+        .wxts {
+            font-size: 1.4rem;
+            color: #d5d5d5;
+            text-align: center;
+            position: absolute;
+            width: 100%;
+            top: calc(50% - 16px);
+        }
+
+        .righttop {
+            width: 38%;
+            position: absolute;
+            left: 57%;
+            top: 30px;
+            background:white;
+            height: 200px;
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        /* 题目难度分析样式 */
+        .difficulty-analysis {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .difficulty-title {
+            font-size: 1.6rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            position: relative;
+        }
+
+        .difficulty-title:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: #4bc7c7;
+            border-radius: 2px;
+        }
+
+        .rightbottom{
+            width: 38%;
+            position: absolute;
+            left: 57%; 
+            top: 238px;
+            background: #fff;
+            height: calc(100% - 258px);
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+            padding: 15px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        /* 知识点分析样式 */
+        .knowledge-analysis {
+            width: 100%;
+            height: 100%;
+        }
+
+        .knowledge-title {
+            font-size: 1.6rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            position: relative;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: nowrap;
+            white-space: nowrap;/*子元素中的文本不换行*/
+            flex-direction: row; 
+        }
+
+        .knowledge-title:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: #4bc7c7;
+            border-radius: 2px;
+        }
+
+        .knowledge-subtitle {
+            font-size: 1.2rem;
+            color: #999;
+            margin-left: 8px;
+            font-weight: normal;
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .knowledge-list {
+            margin-top: 15px;
+        }
+
+        .knowledge-item {
+            margin-bottom: 15px;
+            padding: 12px 0;
+            /* border-bottom: 1px solid #f0f0f0; */
+        }
+
+        .knowledge-item:last-child {
+            border-bottom: none;
+        }
+
+        .knowledge-name {
+            font-size: 1.4rem;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            word-wrap: break-word;
+        }
+
+        .knowledge-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .knowledge-progress {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-width: 45px;
+        }
+
+        .knowledge-progress.excellent {
+            color: #4bc7c7;
+        }
+
+        .knowledge-progress.good {
+            color: #ff9500;
+        }
+
+        .knowledge-progress.poor {
+            color: #ff4663;
+        }
+
+        .knowledge-count {
+            font-size: 1.2rem;
+            color: #999;
+        }
+
+        .pie-chart-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            height: 140px; /* 调整容器高度 */
+            margin-top: 10px;
+        }
+
+        .pie-chart {
+            width: 120px; /* 饼图大小 */
+            height: 120px;
+            border-radius: 50%; /* 变成圆形 */
+            /* 背景将由 Vue 动态生成，这里给个默认值 */
+            background-image: conic-gradient(#eee 0% 100%);
+        }
+
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .pie-legend ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px; /* 增加图例项间距 */
+            font-size: 1.3rem;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        .legend-label {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <!-- 基础和拓展习题都是0-->
+    <div v-if="(data.total==0 && data.kztotal==0)|| !isShowAnswer" :style="!(data.total==0 && data.kztotal==0)&&!isShowAnswer?'top:30px':'top: calc(50% - 110px)'" class="top2">
+        <img class="ltimg" src="../../../image/stuHomePad/tjleft.png">
+        <img class="rtimg" src="../../../image/stuHomePad/tjright.png">
+        <div class="white_circle2">
+            <div class="solid_cricle2">
+                <span>第<b v-text="data.ranking"></b>名</span>
+            </div>
+        </div>
+        <p class="ranking">非常感谢，您已经完成作业</p>
+    </div>
+    <!--有习题-->
+    <div v-if="(data.total!=0 || data.kztotal!=0) && isShowAnswer" class="top">
+        <img class="lflj" src="../../../image/stuHomePad/tj.png">
+        <img class="rflj" src="../../../image/stuHomePad/tj.png">
+        <div class="white_circle">
+            <div class="solid_cricle">
+                <b v-html="is_score==0? data.accuracy+'<i>%</i>':data.score"
+                   :style="data.accuracy>=80?'color:#4bc7c7':'color:#ff4663'"></b>
+                <span v-text="is_score==0?'正确率':'分'"></span>
+            </div>
+        </div>
+        <p class="ranking">第<span v-text="data.ranking"></span>位完成作业<b></b>班级{{ is_score==0?'正确率':'平均分'}}<span
+                v-text="is_score==0?data.classAccuracy+'%':data.classScore"></span></p>
+        <ul class="Identification">
+            <li><span></span>正确</li>
+            <li><span></span>错误</li>
+            <li><span></span>半对</li>
+            <li><span></span>待批</li>
+            <li><span></span>未答</li>
+        </ul>
+    </div>
+    <div v-if="(data.total!=0 || data.kztotal!=0)&&!isShowAnswer" class="noanswerbottom">
+        <!--显示答案-->
+        <div  class="bottomnr">
+            <div  v-if="!isShowAnswer" class="classification" style="height: 200px; line-height: 200px; text-align:center;font-size: 1.4rem;   color: #d5d5d5;">温馨提示：答题统计详情将在答案显示时间后显示</div>
+        </div>
+    </div>
+    <div v-if="(data.total!=0 || data.kztotal!=0)&&isShowAnswer" class="bottom">
+        <!--显示答案-->
+        <div  class="bottomnr">
+            <div  v-if="!isShowAnswer" class="classification" style="height: 200px; line-height: 200px; text-align:center;font-size: 1.4rem;   color: #d5d5d5;">温馨提示：答题统计详情将在答案显示时间后显示</div>
+            <div v-if="data.total!=0 && isShowAnswer" class="classification">
+                <h1>基础类习题</h1>
+                <span>共<b v-text="data.total"></b>道习题</span>
+                <ul class="Serial clearfix" style="border-bottom: 1px dashed #bfbfbf;">
+                    <li v-for="(list , index) in data.materiallist" v-if="list.zyqf==2" v-text="list.index" :style="list.is_true==0?'background:#ff778c':list.is_true==2?'background:#df7605':list.is_true==3?'background:#ffcc00':list.is_true==-1?'background:#fff; border: 1px solid #cecece; color: #cccccc ;width: 28px; height: 28px;':''"  :id="list.index" :type="list.score" tapmode onclick="vm.openjcwin(this);" ></li>
+                </ul>
+            </div>
+            <div v-if="data.kztotal!=0 && isShowAnswer" class="classification">
+                <h1>拓展类习题</h1>
+                <div class="tzts">拓展类习题不统计正确率或得分</div>
+                <span>共<b v-text="data.kztotal"></b>道习题</span>
+                <ul class="Serial clearfix" style="border-bottom: 1px dashed #bfbfbf;">
+                    <li v-for="list in data.materialtzxt" v-text="list.index" :style="list.is_true==0?'background:#ff778c':list.is_true==2?'background:#df7605':list.is_true==3?'background:#ffcc00':list.is_true==-1?'background:#fff; border: 1px solid #cecece; color: #cccccc ;width: 28px; height: 28px;':''" :id="list.index" tapmode onclick="vm.opentzwin(this);" ></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="righttop" v-if="(data.total!=0 || data.kztotal!=0) && isShowAnswer">
+        <div class="difficulty-analysis">
+            <div class="difficulty-title">题目难度分布</div>
+            <!-- 饼图容器 -->
+            <div class="pie-chart-container">
+                <!-- 饼图本身，通过 :style 动态绑定背景样式 -->
+                <div class="pie-chart" :style="pieChartStyle"></div>
+                <!-- 图例 -->
+                <div class="pie-legend">
+                    <ul>
+                        <li class="legend-item">
+                            <span class="legend-color" :style="{ backgroundColor: pieColors.ry }"></span>
+                            <span class="legend-label">容易：{{ nyd.ry }} 题 ({{ getPercentage(nyd.ry) }}%)</span>
+                        </li>
+                        <li class="legend-item">
+                            <span class="legend-color" :style="{ backgroundColor: pieColors.yb }"></span>
+                            <span class="legend-label">一般：{{ nyd.yb }} 题 ({{ getPercentage(nyd.yb) }}%)</span>
+                        </li>
+                        <li class="legend-item">
+                            <span class="legend-color" :style="{ backgroundColor: pieColors.kn }"></span>
+                            <span class="legend-label">困难：{{ nyd.kn }} 题 ({{ getPercentage(nyd.kn) }}%)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="rightbottom" v-if="(data.total!=0 || data.kztotal!=0) && isShowAnswer">
+        <div class="knowledge-analysis">
+            <div class="knowledge-title">
+                知识点统计
+                <span class="knowledge-subtitle">（主观题待批习题暂时不计入统计）</span>
+            </div>
+            <div class="knowledge-list">
+                <div v-if="zsd.length === 0" class="knowledge-item" style="text-align: center; color: #999; padding: 40px 0;">
+                    暂无知识点数据
+                </div>
+                <div v-for="(item, index) in zsd" :key="item.zsdid" class="knowledge-item">
+                    <div class="knowledge-name" v-text="item.zsdmc"></div>
+                    <div class="knowledge-stats">
+                        <div class="knowledge-progress" :class="getProgressClass(item.avg)">
+                            掌握程度：{{ formatProgress(item.avg) }}
+                        </div>
+                        <div class="knowledge-count">（共{{ item.total }}题）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/wx-audio.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var arcProgress;
+    var inputType;
+    apiready = function () {
+        vue();
+        inputType = api.pageParam.inputType;
+        vm.GetAnswerV2GetHomeWorkStatistics();
+
+        api.addEventListener({
+            name: 'shuaxin_frame_answer_statics_list'
+        }, function (ret, err) {
+            vm.GetAnswerV2GetHomeWorkStatistics();
+        });
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                hwid: api.pageParam.hwid,
+                xsbjid: api.pageParam.xsbjid,
+                is_score: api.pageParam.is_score,//是否是得分
+                complete: api.pageParam.complete,
+                homeworkListData: api.pageParam.homeworkListData,
+                tongji: api.pageParam.tongji,
+                data: [],
+                isShowAnswer: false,
+                scorelist:[],
+                finish_time:api.pageParam.homeworkListData.finish_time,
+                zsd: [], // 知识点数据
+                nyd: { // 题目难易度数据
+                    ry: 0,
+                    yb: 0,
+                    kn: 0
+                },
+     
+                pieColors: {
+                    ry: '#4bc7c7', // 容易 (使用主题色)
+                    yb: '#ffc107', // 一般 (黄色)
+                    kn: '#ff4663'  // 困难 (红色)
+                }
+            },
+            updated: function () {
+            },
+            // computed 对象
+            computed: {
+                // 计算总题数
+                totalQuestions: function() {
+                    return this.nyd.ry + this.nyd.yb + this.nyd.kn;
+                },
+                // 生成饼图的 style 对象
+                pieChartStyle: function() {
+                    const total = this.totalQuestions;
+                    if (total === 0) {
+                        // 如果没有题目，显示一个灰色的圆
+                        return { backgroundImage: `conic-gradient(#eee 0% 100%)` };
+                    }
+
+                    const ryPercent = (this.nyd.ry / total) * 100;
+                    const ybPercent = (this.nyd.yb / total) * 100;
+
+                    // 计算各个颜色段的起止点
+                    const ryEnd = ryPercent;
+                    const ybEnd = ryPercent + ybPercent;
+
+                    // 使用上面定义的颜色，构建 conic-gradient 字符串
+                    const gradient = `conic-gradient(
+                        ${this.pieColors.ry} 0% ${ryEnd}%,
+                        ${this.pieColors.yb} ${ryEnd}% ${ybEnd}%,
+                        ${this.pieColors.kn} ${ybEnd}% 100%
+                    )`;
+                    
+                    return { backgroundImage: gradient };
+                }
+            },
+            methods: {
+                // 根据正确率获取样式类名
+                getProgressClass: function(zql) {
+                    var percentage = Math.round(zql * 100);
+                    if (percentage >= 80) {
+                        return 'excellent';
+                    } else if (percentage >= 60) {
+                        return 'good';
+                    } else {
+                        return 'poor';
+                    }
+                },
+                // 格式化正确率显示
+                formatProgress: function(avg) {
+                    return Math.round(avg * 100) + '%';
+                },
+                GetAnswerV2GetHomeWorkStatistics: function () {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetAnswerV2GetHomeWorkStatistics, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            classid: vm.xsbjid,
+                            hwid: vm.hwid,
+                            jcindex: vm.tongji,
+                            kzindex: 0,
+                            finish_time:vm.finish_time
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.content').show();
+                                vm.data = ret.data;
+                                // 设置知识点数据并按 avg 从高到低排序
+                                var zsdData = ret.data.zsd || [];
+                                if (zsdData.length > 0) {
+                                    zsdData.sort(function(a, b) {
+                                        return b.avg - a.avg;
+                                    });
+                                }
+                                vm.zsd = zsdData;
+                                // 设置题目难易度数据
+                                vm.nyd = ret.data.nyd || { ry: 0, yb: 0, kn: 0 };
+                                if (vm.homeworkListData.dansz !=0) {
+                                    if(vm.data.isshowanswer==1){
+                                        vm.isShowAnswer = true;
+                                    } else {
+                                        vm.isShowAnswer = false;
+                                    }
+                                } else {
+                                    vm.isShowAnswer = true;
+                                }
+                                for (var i = 0; i < vm.data.materiallist.length; i++) {
+                                    if(vm.data.materiallist[i].zyqf==2){
+                                        var list= vm.data.materiallist[i].part_score+'';
+                                        vm.scorelist[i] = list.split(',');
+                                    }else{
+                                        vm.scorelist[i] = '';
+                                    }
+                                }
+                                // if(vm.data.hascontent==1){
+                                //     vm.scorelist.unshift('');
+                                // }
+                                // if(vm.data.hasxa==1){
+                                //     vm.scorelist.unshift('');
+                                // }
+                                if ((vm.data.total > 0 || vm.data.kztotal>0)&& vm.isShowAnswer) {
+                                    arcProgress = api.require('arcProgress');
+                                    var centerX;
+                                    centerX = api.frameWidth * 0.3;
+                                    var pgcolor;
+                                    var accuracy=  vm.data.accuracy;
+                                    if (accuracy >= 80) {
+                                        pgcolor = '#4bc7c7'
+                                    } else {
+                                        pgcolor = '#ff4663'
+                                    }
+                                    arcProgress.open({
+                                        type: 'annular',
+                                        centerX: centerX + 1,
+                                        centerY: 80 + 13 + 5,
+                                        radius: 45,
+                                        loopWidth: 7,
+                                        bgColor: '#dedede',
+                                        pgColor: pgcolor,
+                                        fixed: false,
+                                        fixedOn: 'frame_answer_statics'
+                                    }, function (ret, err) {
+                                        arcProgress.setValue({
+                                            id: ret.id,
+                                            value: accuracy
+                                        });
+                                    });
+                                }
+                            }else{
+                                api.toast(
+                                    {
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        }else{
+                            api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                            )
+                        }
+                    });
+                },
+                openjcwin:function (context) {
+                    var index = $(context).attr('id');
+                    var type;
+                    if(vm.is_score==1){
+                        type = $(context).attr('type')
+                    }else{
+                        type = 'noxtzf'
+                    }
+                    if( inputType=='dati'){
+                        api.closeWin({
+                            name: 'win_detail'
+                        });
+                        api.closeFrameGroup({
+                            name: 'frame_Detail'
+                        });}
+                    api.openWin({
+                        name: 'win_detail',
+                        url: 'win_detail.html',
+                        pageParam: {
+                            detailData:vm.homeworkListData,
+                            complete:2,
+                            index:index-1,
+                            type: type,
+                            scorelist:vm.scorelist,
+                            homeworkIndex:api.pageParam.homeworkIndex//选择的作业下标
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                opentzwin:function (context) {
+                    var index = $(context).attr('id');
+                    api.openWin({
+                        name: 'win_detail_kzxt',
+                        url: 'kzxt/win_detail_kzxt.html',
+                        pageParam: {
+                            detailData: vm.homeworkListData,
+                            complete:2,
+                            index:index-1,
+                            homeworkIndex:api.pageParam.homeworkIndex//选择的作业下标
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+
+                // 计算百分比并格式化
+                getPercentage: function(count) {
+                    if (this.totalQuestions === 0) {
+                        return 0;
+                    }
+                    return Math.round((count / this.totalQuestions) * 100);
+                },
+
+            }
+        });
+    }
+
+</script>
+</html>

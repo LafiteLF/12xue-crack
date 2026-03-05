@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background: #fff;
+            padding-top: 10px;
+        }
+
+        .yzm {
+            width: 78px;
+            height: 30px;
+            background: #e0e0e0;
+            line-height: 30px;
+            text-align: center;
+            font-size: 12px;
+            border-radius: 5px;
+            color: #fff;
+            position: absolute;
+            right: 11px;
+            top: 13px;
+        }
+
+        .aui-list .aui-list-item-input {
+            padding-left: 30px !important;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list .aui-list-item:after {
+            height: 0px;
+        }
+
+        .aui-list-item-inner {
+            border-bottom: 1px solid #d5d5d5;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .juli {
+            margin-bottom: 5px;
+            border: none;
+            height: 56px;
+        }
+
+        .juli li {
+            border: none
+        }
+
+        .aui-list label {
+            margin-right: 48px;
+            line-height: 1.3rem;
+        }
+
+        input[type="button"], input[type="submit"], input[type="reset"] {
+
+            -webkit-appearance: none;
+
+        }
+
+        textarea {
+            -webkit-appearance: none;
+        }
+
+        .zh {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tubiao {
+            width: 28px;
+            display: block;
+            left: 0px;
+            bottom: 7px;
+            position: absolute
+        }
+
+        .aui-radio:checked, .aui-radio.aui-checked, .aui-checkbox:checked, .aui-checkbox.aui-checked {
+            background-color: #4bc7c7;
+            border: solid 1px #4bc7c7;
+        }
+
+        button, .aui-btn {
+            background: #4bc7c7;
+            color: #c2e9e9
+        }
+
+        .clear {
+            width: 25px;
+            position: absolute;
+            right: 0.55rem;
+            top: 21px;
+            display: none
+        }
+    </style>
+</head>
+<body>
+<form method="post" id="zc">
+    <div class="aui-content aui-margin-b-15">
+        <ul class="aui-list aui-form-list juli" style="margin-top: 5px; border: none">
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <span class="tubiao"><img src="../../image/stuHomePad/zhanghao.png" width="100%"></span>
+                    <div class="aui-list-item-input">
+                        <input type="text" placeholder="请填写5~30位帐号（首位不能为数字）" id="username" oninput='hqmima()'
+                               style="height: 56px;" class="zh">
+                        <div class="clear cuser" onclick='clearzhanghao()'><img
+                                src="../../image/stuHomePad/qingkong.png" width="100%"></div>
+                    </div>
+                </div>
+
+            </li>
+        </ul>
+        <ul class="aui-list aui-form-list juli">
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <span class="tubiao"><img src="../../image/stuHomePad/mima.png" width="100%"></span>
+                    <div class="aui-list-item-input">
+                        <input type="password" placeholder="请输入6~30位密码" id="password" oninput='hqmima()'
+                               style="height: 56px;">
+                        <div class="clear cmima" onclick='clearmima()'><img src="../../image/stuHomePad/qingkong.png"
+                                                                            width="100%"></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-form-list juli aui-hide">
+            <li class="aui-list-item" style=" height: 56px;">
+                <div class="aui-list-item-inner">
+
+                    <div class="aui-list-item-label"
+                         style="position: relative; padding-left: 30px; height: 100%;color: #a9a9a9">
+                        <span class="tubiao" style="bottom: -9px;"><img src="../../image/stuHomePad/xingbie.png"
+                                                                        width="100%"></span>
+                        请选择性别
+                    </div>
+                    <div class="aui-list-item-input">
+                        <label><input onchange="hqmima()" class="aui-radio" id="sex1" type="radio" name="demo1"
+                                      value="1"
+                                      style="margin-right: 10px;">男</label>
+                        <label><input onchange="hqmima()" class="aui-radio" id="sex2" type="radio" name="demo1"
+                                      value="2"> 女</label>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="aui-list aui-form-list juli">
+            <li class="aui-list-item">
+                <div class="aui-list-item-inner">
+                    <span class="tubiao"><img src="../../image/stuHomePad/yzm.png" width="100%"></span>
+                    <div class="aui-list-item-input">
+                        <input type="text" placeholder="请输入真实姓名" oninput='hqmima()' id="realname"
+                               style="height: 56px;">
+                        <div class="clear cname" onclick='clearname()'><img src="../../image/stuHomePad/qingkong.png"
+                                                                            width="100%"></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <p style="width: 96%; margin: 40px auto;">
+        <input type="button" value="立即注册" disabled="disabled"
+               class="aui-btn aui-btn-block" id="ljzc"
+               tapmode onclick='register()'>
+    </p>
+</form>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/login/Register.js"></script>
+<script type="text/javascript" src="../../script/login/login.js"></script>
+<script>
+    var hasPaw = false;
+    function hqmima() {//注册按钮变色
+        if ($('#username').val() != "") {
+            $('.cuser').show();
+        } else {
+            $('.cuser').hide();
+        }
+        if ($('#password').val() != "") {
+            $('.cmima').show();
+        } else {
+            $('.cmima').hide();
+        }
+        if ($('#realname').val() != "") {
+            $('.cname').show();
+        } else {
+            $('.cname').hide();
+        }
+        if ($('#username').val().length >= 5 && $.trim($('#password').val()).length >= 6 && $('#realname').val().length != "") {
+//            if ($('#sex1').is(':checked') || $('#sex2').is(':checked')) {
+                $('#ljzc').css('color', '#fff').removeAttr("disabled");
+//            }
+        } else {
+            $('#ljzc').css('color', '#c2e9e9').attr("disabled", "disabled");
+        }
+    }
+    function register() {//注册
+        var username = $('#username').val();
+//        var sex = $("input[name='demo1']:checked").val();
+        var sex = '1';
+        var password = $.trim($('#password').val());
+//
+        if(!(password.indexOf(" ") == -1)){
+            api.toast({
+                msg: '密码中不能含有空格',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+
+        if(checkPassword(password)){
+            api.toast({
+                msg: '密码设置过于简单，请重新设置',
+                duration: 2000,
+                location: 'bottom'
+            });
+            $('#password').val('');
+            $('#password').focus();
+            $('#ljzc').css('color', '#c2e9e9').attr("disabled", "disabled");
+            return;
+        }
+        var realname = $('#realname').val();
+        $api.setStorage('username', username);
+        $api.setStorage('sex', sex);
+        $api.setStorage('password', password);
+        $api.setStorage('realname', realname);
+        PostUserregister();
+    }
+    function clearzhanghao() {
+        $('#username').val('');
+        $('.cuser').hide();
+    }
+    function clearmima() {
+        $('#password').val('');
+        $('.cmima').hide();
+    }
+    function clearname() {
+//        alert('dsfsd')
+        $('#realname').val('');
+        $('.cname').hide();
+    }
+</script>
+</html>

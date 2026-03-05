@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style type="text/css">
+        body {
+        }
+        h5 {
+            margin-left: 15px;
+            margin-top: 15px;
+        }
+        .aui-content{margin: 30px;}
+        .aui-list:after{
+            height: 0px;
+        }
+        .aui-list:before{
+            height: 0px;
+        }
+        #opiniontext{overflow-y: auto}
+        .aui-list textarea {
+            height: 10rem;}
+    </style>
+</head>
+<body>
+<div class="aui-content" >
+    <ul class="aui-list" style="border: 1px solid #e4e4e8">
+        <li class="aui-list-item">
+            <div class="aui-list-item-input">
+                <textarea id="opiniontext" placeholder="请输入内容(表情除外)" class="aui-input" maxlength="500" oninput="onTextChangeListener();"></textarea>
+            </div>
+        </li>
+    </ul>
+    <h5 style="text-align: right;color: #d5d5d5">至多500字</h5>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+    };
+    function onTextChangeListener() {
+        var value = $api.dom("#opiniontext").value;
+        if (value == "") {
+        } else if (textLength(value) > 500) {
+            api.toast({
+                msg: '最多能输入500字',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else {
+
+        }
+    }
+    /**
+     * 判断文字长度
+     */
+
+    function commitOpinion() {
+        var content = clear_emoji($api.val($api.dom("#opiniontext")));//评论内容
+        content = $api.trim(content);
+        if (textLength(content)>500){
+            api.toast({
+                msg: '字数超过限制，请控制在500字内！',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        var contentText = clear_emoji($api.val($api.byId('opiniontext')));
+        if(contentText == ''){
+            api.toast({
+                msg:'意见反馈文本不能为空',
+                duration:2000,
+                location:'bottom'
+            });
+            return
+        }
+
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+//        alert($api.getStorage('token'));
+        apiObj.SetAuthToken($api.getStorage('token'));
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Post(UrlRouter.AddFeedBack,{
+            values:{
+                uid:$api.getStorage('uid'),
+                content:contentText
+            }
+        },function(ret,err){
+            if (ret) {
+                api.hideProgress();
+                if (ret.ret == 0) {
+                    api.closeWin();
+                } else {
+                    //alert(ret.msg);
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+    function textLength(text) {
+        text = text.replace(/\[([^\[\]]*)]/g, '一');
+        text = text.replace(/[^\x00-\xff]/g, '12');
+        return Math.ceil(text.length / 2);
+    }
+</script>
+</html>

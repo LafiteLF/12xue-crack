@@ -1,0 +1,66 @@
+version: 3.0.1
+apkFileName: 12xueHD_3.6.7.apk
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: 24
+  targetSdkVersion: 30
+versionInfo:
+  versionCode: 279
+  versionName: 3.6.7
+resourcesInfo:
+  packageId: 127
+doNotCompress:
+- arsc
+- gif
+- jpg
+- png
+- so
+- assets/dist/api.min.js.sec
+- assets/dist/avm.min.js.sec
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_AMS-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Caligraphic-Bold.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Caligraphic-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Fraktur-Bold.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Fraktur-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Main-Bold.woff
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Main-Bold.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Main-BoldItalic.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Main-Italic.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Main-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Math-BoldItalic.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Math-Italic.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_SansSerif-Bold.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_SansSerif-Italic.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_SansSerif-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Script-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Size1-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Size2-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Size3-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Size4-Regular.woff2
+- assets/widget/html/aiAssistant/old_bak/markdown/fonts/KaTeX_Typewriter-Regular.woff2
+- assets/widget/image/Classlimit.PNG
+- assets/widget/other/plupload/Moxie.swf
+- assets/widget/other/plupload/Moxie.xap
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_AMS-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Caligraphic-Bold.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Caligraphic-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Fraktur-Bold.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Fraktur-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Main-Bold.woff
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Main-Bold.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Main-BoldItalic.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Main-Italic.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Main-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Math-BoldItalic.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Math-Italic.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_SansSerif-Bold.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_SansSerif-Italic.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_SansSerif-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Script-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Size1-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Size2-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Size3-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Size4-Regular.woff2
+- assets/widget/script/aiAssistant/markdown/fonts/KaTeX_Typewriter-Regular.woff2

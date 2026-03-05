@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+
+        }
+
+        .aui-toolbar-title {
+            float: left;
+            display: block;
+        }
+
+        .type {
+            color: #999999 !important;
+            margin-right: 20px;
+            float: right;
+            position: relative;
+            padding-right: 20px;
+            background: url("../../../image/stuHomePad/xljt.jpg") no-repeat right center;
+            background-size: 15px;
+            font-size: 0.8rem;
+            display: block;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        .aui-iconfont {
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav aui-bar-primary">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin();'></span>评论
+    </a>
+
+    <a class="aui-pull-right">
+        <div class="type" tapmode onclick="choose()">收到的</div>
+        <!--<div class=" aui-iconfont aui-icon-unfold aui-pull-right" tapmode onclick="choose()"></div>-->
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = api.winHeight - headerH;
+        api.openFrame({
+            name: 'frame-comment-main',
+            url: 'frame-comment-main.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: padWinHeight-headerH
+            },
+            bounces: false
+        });
+    };
+    function choose() {
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = api.winHeight;
+        api.openFrame({
+            name: 'frame-comments-tab',
+            url: 'frame-comments-tab.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: padWinHeight
+            },
+            bounces: false
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>win</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css" />
+    <style>
+        .winTitle {
+            width: calc(100% - 631px);
+        }
+
+        .zyyq {
+            height: 37px;
+            width: 40px;
+            background: #fff;
+            color: #f57f17;
+            position: fixed;
+            right: 12px;
+            top: calc(50% - 170px);
+            font-size: 1.2rem;
+            text-align: center;
+            padding-top: 3px;
+            border-radius: 100px;
+            box-shadow: 0 0 10px rgba(158, 158, 158, 0.5);
+            -moz-box-shadow: 0 0 10px rgba(158, 158, 158, 0.5);
+            -webkit-box-shadow: 0 0 10px rgba(158, 158, 158, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content1">
+        <header class="clearfix">
+            <div tapmode @click="closeWin()" class="winTitle pull_left" style="width: calc(50% - 15rem)"
+                v-text="homeworkListData.title"></div>
+            <div v-if="isDisplayAiAnalysis"
+                style="position: absolute;left: 50%;transform: translateX(-50%);font-size: 1.5rem;line-height: 51px;color:#999999">
+                本月剩余AI解析次数:&nbsp;<span style="font-weight: bold;"
+                    :style="{'color': aiAnalysis.count > 0 ? '#4BC7C7': '#F82A1A'}">{{
+                    aiAnalysis.count
+                    }}</span>
+            </div>
+            <ul class="pull_right clearfix winIcon">
+                <li v-if="isEvaluate != 0" class="buttonTwo font4BC7C7 pingjia pull_right" tapmode
+                    @click="openEvaluateFrame()">
+                    <p>评价</p>
+                </li>
+                <li v-if="isUpload==1" class="buttonFour font4BC7C7 uploadfj pull_right" tapmode @click="upFilevm()">
+                    <p>
+                        上传附件</p>
+                </li>
+                <li class="buttonTwo font4BC7C7 tiwen pull_right" v-if="materiallist.length>0&&inClass" tapmode
+                    @click="opentiwenFrame()">
+                    <p>提问</p>
+                </li>
+                <li v-if="complete!=2" class="buttonFour font4BC7C7 allSubmit pull_right" tapmode
+                    @click="PostAnswerDoHomework()">
+                    <p v-text="xitiAllNum>0?'全部提交':'确认看完'"></p>
+                </li>
+                <li v-if="xitiAllNum>0 && complete!=2" class="pull_right wzxts font666">未做习题：<span
+                        v-text="wznum+'道'"></span></li>
+            </ul>
+        </header>
+        <div class="content">
+            <div class="type bg4BC7C7 fontFFF">{{ current + 1 }}/{{ zynum }}</div>
+            <ul class="scroll">
+                <li v-for="(list , index) in materiallist" v-text="index+1"
+                    :style="complete!=2 && current!=index && answeredArr[list.zyid]==true?'background:#70f0f0;border:1px solid #70f0f0;color:#fff':''"
+                    :class="current==index?'current':''" tapmode onclick="vm.itemClick(this)">
+                </li>
+            </ul>
+        </div>
+        <ul class="right_btn">
+            <li tapmode onclick="vm.winpageUpOnclick();"><img src="../../../image/up1.png"></li>
+            <li tapmode onclick="vm.winnextOnclick();"><img src="../../../image/down1.png"></li>
+        </ul>
+        <div class="zyyq" v-if="zyyq.zymc!='无'" tapmode onclick="vm.openzyyq();">作业<br>要求</div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj;
+    var vm;
+    var xtgroup;
+    var timeData;
+    var queryHomewokAnswer;
+    var params = {};// 上传附件参数
+    // 提问
+    var sort;
+    var restype;
+    var resdesc;
+    var resdescript;
+    var restitle;
+    var moduleDialog = null;//弹窗模块
+    // windowError();
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        moduleDialog = api.require('moduleDialog');
+        dismissDialog();//关模块
+        vue();
+        if (api.pageParam.type == 'zyyq') {
+            vm.openframezyyq(api.pageParam.zyyq)
+        } else {
+            vm.GetStudenthomeworkUrl(vm.hwid, vm.xsbjid);//获取作业详情
+        }
+
+        api.addEventListener({ //接收答案
+            name: 'saveAnswerHuancun'
+        }, function (ret, err) {
+            var eachxtgroup = ret.value.eachxtgroup;
+            var zyid = ret.value.zyid;
+            var frameindex = ret.value.index;
+            var use_time = ret.value.use_time;
+            // alert(vm.current+'作业用时'+use_time);
+            vm.timeHuancun(zyid, use_time, 2, ret.value.index);
+            xtgroup[zyid] = eachxtgroup;
+            vm.MonitorWZnumber(xtgroup);
+            var JsonXtgroup = JSON.stringify(xtgroup);
+            // 打开数据库
+            var db = api.require('db');
+            var ret = db.openDatabaseSync({
+                name: dbName,
+                path: 'fs://student_12xue.db'
+            });
+            if (JSON.stringify(queryHomewokAnswer) == '[]') {//如果这道题的答题数据是空 就插入一条数据
+                var INSERTret = db.executeSqlSync({//插入一条数据
+                    name: dbName,
+                    sql: "INSERT INTO NewHomeWrokAnswer(uid,xsbjid,kcid,xkid,njid,bbid,sxcid,dyid,jieid,xtgroup) VALUES (" + $api.getStorage('uid') + "," + vm.xsbjid + "," + vm.hwid + "," + vm.data.xkid + "," + vm.data.njid + "," + vm.data.bbid + "," + vm.data.sxcid + "," + vm.data.dyid + "," + vm.data.jieid + ",'" + JsonXtgroup.replace(/'/g, '&apos;') + "')"
+                });
+                // alert('插入'+JSON.stringify(INSERTret));
+                //查询作业答案
+                var returnData = db.selectSqlSync({
+                    name: dbName,
+                    sql: 'SELECT * FROM NewHomeWrokAnswer where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and jieid=' + vm.data.jieid + ' and xsbjid=' + vm.xsbjid
+                });
+                queryHomewokAnswer = returnData.data;
+                // alert('查询'+JSON.stringify(returnData));
+            } else {//如果这道题的答题数据不是空 就更新这条数据
+                var UPDATEret = db.executeSqlSync({
+                    name: dbName,
+                    sql: "UPDATE NewHomeWrokAnswer SET xtgroup='" + JsonXtgroup.replace(/'/g, '&apos;') + "' WHERE id=" + queryHomewokAnswer[0].id + ' and xsbjid=' + vm.xsbjid
+                });
+                // alert('更新'+JSON.stringify(UPDATEret));
+            }
+        });
+        api.addEventListener({
+            name: 'zytime'
+        }, function (ret, err) {
+            var zyid = ret.value.zyid;
+            var use_time;
+            if (ret.value.use_time > 0) {
+                use_time = ret.value.use_time;
+            } else {
+                use_time = 0
+            }
+            // alert(ret.value.index+'资源用时'+use_time);
+            vm.timeHuancun(zyid, use_time, 1, ret.value.index);
+        });
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            vm.closeWin()
+        });
+        api.addEventListener({
+            name: 'inputAddzytime'
+        }, function (ret, err) {
+            var zyid = ret.value.zyid;
+            var use_time;
+            if (ret.value.use_time > 0) {
+                use_time = ret.value.use_time;
+            } else {
+                use_time = 0
+            }
+            // alert(ret.value.index+'资源用时'+use_time);
+            vm.timeHuancun(zyid, use_time, 1, ret.value.index, ret.value.input);
+        });
+        var index = api.pageParam.classid.indexOf(api.pageParam.detailData.bjid);
+        vm.inClass = index == -1 ? false : true;
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content1',
+            data: {
+                hwid: api.pageParam.detailData.id,//作业id
+                xsbjid: api.pageParam.detailData.bjid,//学生班级id
+                isopen: api.pageParam.isopen,
+                homeworkListData: api.pageParam.detailData,//作业列表传过来的数据
+                complete: api.pageParam.complete,//作业完成状态
+                current: 0,//当前是第几个frame
+                xitiAllNum: 0,// 习题总数可作答部分 不包括素材 和作业要求
+                zynum: 0,//所有题的数量 包括素材 习题和作业要求
+                data: [],
+                materiallist: [],//基础习题列表
+                materialtzxt: [],//扩展习题列
+                isEvaluate: api.pageParam.detailData.remark ? api.pageParam.detailData.remark : '',//是否显示评论
+                isUpload: api.pageParam.detailData.is_attach ? api.pageParam.detailData.is_attach : '',//是否显示上传附件
+                inClass: true,//判断学生是否还在此作业的班级
+                pingyu: api.pageParam.detailData.content ? api.pageParam.detailData.content : '',
+                wznum: 0,
+                tongji: 0,
+                oldindex: 0,
+                answeredArr: {},
+                scorelist: api.pageParam.scorelist,
+                isallInput: true,
+                zyyq: {},
+                paizhaoparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 89,
+                        "h": 178,
+                        "w": 300
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "paizhao",
+                        "showText": "拍照",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 75,
+                        "y": $api.getStorage('padHeight') / 2 - 89 + 41 + 58,
+                        "h": 38,
+                        "w": 150,
+                        "clickID": "xiangce",
+                        "showText": "从相册中选择",
+                        "textSize": 14
+                    }]
+                },
+                aiAnalysis: { count: 0 },
+                isDisplayAiAnalysis: true,
+            },
+            mounted: function () {
+                this.$watch('aiAnalysis', () => {
+                    $api.setStorage('aiAnalysis', this.aiAnalysis);
+                }, { deep: true });
+
+                apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                    values: {
+                        type: 'ai_analysis',
+                        schoolid: $api.getStorage('schoolid'),
+                    }
+                }, (ret, err) => {
+                    if (ret && ret.ret === 0) {
+                        this.aiAnalysis = ret.data;
+                    } else {
+                        this.aiAnalysis = { count: 0 };
+                    }
+                })
+            },
+            updated: function () {
+            },
+            methods: {
+                openzyyq: function () {
+                    api.openFrame({
+                        name: 'homeworkRequirement',
+                        url: 'homeworkRequirement.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            zyyq: vm.zyyq
+                        },
+                        bounces: false
+                    });
+                },
+                GetStudenthomeworkUrl: function (hwid, classid) {//获取作业详情
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetStudenthomeworkUrl, {
+                        values: {
+                            hwid: hwid,
+                            classid: classid,
+                            identitytype: 3,//查看的角色信息（3学生 4家长）
+                            uid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.data = ret;
+                                vm.materiallist = vm.data.materiallist;
+                                vm.materialtzxt = vm.data.materialtzxt;
+                                for (var i = 0; i < ret.materiallist.length; i++) {//循环出所有的习题，不包括素材、作业要求、学习单
+                                    if (ret.materiallist[i].zyqf == 2) {
+                                        vm.xitiAllNum++
+                                    }
+                                }
+                                if (ret.materialdxa.length > 0) {//如果有学习单，就把学习单加到习题列表第一个
+                                    vm.materiallist.unshift(ret.materialdxa[0]);
+                                    vm.tongji++;
+                                }
+                                var zymc = ret.content;//作业要求
+                                if (ret.content) {//如果有作业要求，就把学习单加到习题列表第一个
+                                    vm.zyyq = {
+                                        'txstr': '作业要求',
+                                        'zymc': zymc,
+                                        'zyqf': 3,
+                                        'hwid': hwid,
+                                        classid: classid,
+                                        sort: 1,
+                                        id: '0',
+                                        zyid: 'zuoye'
+                                    };
+                                } else {
+                                    vm.zyyq = {
+                                        'txstr': '作业要求',
+                                        'zymc': '无',
+                                        'zyqf': 3,
+                                        'hwid': hwid,
+                                        classid: classid,
+                                        sort: 1,
+                                        id: '0',
+                                        zyid: 'zuoye'
+                                    };
+                                }
+                                vm.zynum = vm.materiallist.length;
+                                for (var i = 0; i < ret.materiallist.length; i++) {//添加默认答题状态
+                                    if (ret.materiallist[i].zyqf == 2) {
+                                        vm.answeredArr[ret.materiallist[i].zyid] = false;
+                                    } else {
+                                        vm.answeredArr[ret.materiallist[i].zyid] = true;
+                                    }
+
+                                }
+                                if (vm.complete != 2) {
+                                    //打开数据库
+                                    var db = api.require('db');
+                                    var retDatabaseSync = db.openDatabaseSync({
+                                        name: dbName,
+                                        path: 'fs://student_12xue.db'
+                                    });
+                                    //创建作业答案表格
+                                    var creatRet = db.executeSqlSync({
+                                        name: dbName,
+                                        sql: 'CREATE TABLE IF NOT EXISTS NewHomeWrokAnswer(id INTEGER PRIMARY KEY AUTOINCREMENT,uid varchar(20),xsbjid varchar(20) , kcid varchar(20),xkid varchar(20),njid varchar(20),bbid varchar(20),sxcid varchar(20),dyid varchar(20),jieid varchar(20),xtgroup text)'
+                                    });
+                                    var creattimeRet = db.executeSqlSync({//创建答题时间表格
+                                        name: dbName,
+                                        sql: 'CREATE TABLE IF NOT EXISTS NewHomeWrokTime(zyid varchar(20),uid varchar(20),xsbjid varchar(20) , kcid varchar(20),type varchar(20),time int)'
+                                    });
+                                    // alert('创建表'+JSON.stringify(creattimeRet));
+                                    //查询作业答案
+                                    var returnData = db.selectSqlSync({
+                                        name: dbName,
+                                        sql: 'SELECT * FROM NewHomeWrokAnswer where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and jieid=' + vm.data.jieid + ' and xsbjid=' + vm.xsbjid
+                                    });
+                                    queryHomewokAnswer = returnData.data;
+                                    if (JSON.stringify(queryHomewokAnswer) == '[]' || typeof (queryHomewokAnswer) == 'undefined') {
+                                        xtgroup = {};//如果缓存答案是空 就给xtgroup赋值空
+                                        vm.wznum = vm.xitiAllNum;//没有缓存 未答题数是全部习题数
+                                    } else {
+                                        xtgroup = JSON.parse(queryHomewokAnswer[0].xtgroup.replace(/&apos;/gi, "'"));
+                                        queryHomewokAnswer[0].xtgroup = queryHomewokAnswer[0].xtgroup.replace(/&apos;/gi, "'");
+                                        vm.MonitorWZnumber(xtgroup)
+
+                                    }
+                                }
+                                if (vm.materiallist.length == 0 && ret.content) {
+                                    vm.openframezyyq(vm.zyyq);
+                                } else {
+                                    vm.openFrameGroup();
+                                    if (ret.content && vm.complete != 2) {
+                                        vm.openzyyq();
+                                    }
+                                }
+
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                openframezyyq: function (zyyq) {
+                    var header = document.querySelector('header');
+                    var headerH = $api.offset(header).h;
+                    api.openFrame({
+                        name: 'zyyq',
+                        url: 'zyyq.html',
+                        rect: {
+                            x: 0,
+                            y: headerH + 8,
+                            w: api.winWidth,
+                            h: $api.getStorage('padHeight') - headerH - 10
+                        },
+                        bounces: false,
+                        pageParam: {
+                            zyyq: zyyq
+
+                        }
+                        //            bounces: true
+                    });
+                },
+                openFrameGroup: function () {
+                    var header = document.querySelector('header');
+                    var leftW = $api.offset($api.dom('.content')).w;
+                    var rightW = $api.offset($api.dom('.right_btn')).w;
+                    var headerH = $api.offset(header).h;
+                    var frameAry = [];
+                    var frameObj = {};
+                    for (var i = 0; i < vm.materiallist.length; i++) {
+                        var url;
+                        if (vm.materiallist[i].zyqf != 2) {//素材和作业要求
+                            if (vm.materiallist[i].filetype == '.mp3' || vm.materiallist[i].filetype == '.wma') {
+                                url = 'kzxt/frame_homework_voice_pad.html';
+                            } else {
+                                url = 'frame_xzt.html';
+                            }
+                        } else {
+                            switch (vm.materiallist[i].tx_code) {
+                                case '1'://单选 多选 判断 听单句话 单项选择
+                                    url = 'frame_xzt.html';
+                                    break;
+                                case '2':// 填空题 名著导读
+                                    url = 'frame_tkt.html';
+                                    break;
+                                case '3'://问答题 语言表达 默写 翻译 作文 朗读 证明 书面表达 朗读 解答 辨析 简答 计算
+                                    url = "frame_wdt.html";
+                                    break;
+                                case '4'://复合题带选项
+                                    if (vm.materiallist[i].tx == 'tdh' || vm.materiallist[i].tx == 'tdb' || vm.materiallist[i].tx == 'ttt') {//听对话 听对白
+                                        url = "frame_listen.html";
+                                    } else {//完型填空 阅读理解 材料选择题
+                                        url = "frame_wxtk.html";
+                                    }
+                                    break;
+                                case '5'://复合题不带选项 ：材料分析 解答 现代文阅读 综合探究 实验与探究 诗歌鉴赏 文言文批阅
+                                    url = "frame_sytj.html";
+                                    break
+                            }
+                        }
+                        frameObj = {
+                            name: 'frame_Detail' + (i + 1),
+                            url: url,
+                            bounces: false,
+                            bgColor: '#f2f2f2',
+                            pageParam: {
+                                index: i,
+                                material: vm.materiallist[i],
+                                homeworkListData: vm.homeworkListData,
+                                complete: vm.complete,
+                                schoolid: vm.data.schoolid,
+                                queryHomewokAnswer: queryHomewokAnswer,
+                                type: api.pageParam.type,
+                                scorelist: vm.complete == 2 ? vm.scorelist[i] : '',
+                                isConvert: vm.materiallist[i].is_convert,
+                                convertStatus: vm.materiallist[i].convert_status,
+                                filetype: vm.materiallist[i].filetype
+                            }
+                        };
+                        frameAry.push(frameObj);
+                    }
+                    api.openFrameGroup({
+                        name: 'frame_Detail',
+                        scrollEnabled: false,
+                        rect: {
+                            x: leftW + 10,
+                            y: headerH + 10,
+                            w: api.winWidth - leftW - rightW - 30,
+                            h: $api.getStorage('padHeight') - headerH - 10
+                        },
+                        index: api.pageParam.index,
+                        preload: 0,
+                        frames: frameAry,
+                        reload: true
+                    }, function (ret, err) {
+                        if (vm.materiallist[0].txstr == '作业要求' && ret.index == 0) {
+                            $('.tiwen').hide();
+                        } else {
+                            $('.tiwen').show();
+                        }
+                        vm.current = ret.index;
+                        if (vm.current > 4) {
+                            $api.dom('.scroll').scrollTop = (vm.current - 4) * 47
+                        } else {
+                            $api.dom('.scroll').scrollTop = 0;
+                        }
+                        if (vm.complete != 2) {
+                            if (vm.current == 0) {
+                                // alert('san');
+                                setTimeout(
+                                    function () {
+                                        api.sendEvent({
+                                            name: 'kshomeworkSetTimeout',
+                                            extra: { index: ret.index }
+                                        });
+                                    }, 2000);
+                            } else {
+                                api.sendEvent({
+                                    name: 'kshomeworkSetTimeout',
+                                    extra: { index: ret.index }
+                                });
+                            }
+                        }
+                        api.sendEvent({//暂停音频
+                            name: 'yinpinCLose'
+                        });
+                    });
+                },
+                winpageUpOnclick: function () {//右边上一个按钮切换
+                    if (vm.current == 0) {
+                        api.toast({
+                            msg: '已经是第一个了',
+                            duration: 2000,
+                            location: 'bottom'
+
+                        })
+                    } else {
+                        vm.current = vm.current - 1;
+                        vm.isDisplayAiAnalysis = vm.materiallist[vm.current].zyqf === 2;
+                        api.setFrameGroupIndex({
+                            name: 'frame_Detail',
+                            index: vm.current,
+                            scroll: true
+                        });
+                    }
+                },
+                winnextOnclick: function () {//右边下一个按钮切换
+                    if (vm.current == vm.zynum - 1) {
+                        api.toast({
+                            msg: '已经是最后一个了',
+                            duration: 2000,
+                            location: 'bottom'
+
+                        })
+
+                    } else {
+                        vm.current = vm.current + 1;
+                        vm.isDisplayAiAnalysis = vm.materiallist[vm.current].zyqf === 2;
+                        api.setFrameGroupIndex({
+                            name: 'frame_Detail',
+                            index: vm.current,
+                            scroll: true
+                        });
+                    }
+                },
+                itemClick: function (context) {//左边题号切换
+                    vm.current = $(context).index();
+                    vm.isDisplayAiAnalysis = vm.materiallist[vm.current].zyqf === 2;
+                    api.setFrameGroupIndex({
+                        name: 'frame_Detail',
+                        index: vm.current,
+                        scroll: true
+                    });
+                },
+                tijaoAnswer: function () {
+
+                    api.showProgress({
+                        title: '答案提交中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    var db = api.require('db');
+                    var retDatabaseSync = db.openDatabaseSync({
+                        name: dbName,
+                        path: 'fs://student_12xue.db'
+                    });
+                    var returnDatatime = db.selectSqlSync({//查询作业时间
+                        name: dbName,
+                        sql: 'SELECT * FROM NewHomeWrokTime where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and xsbjid=' + vm.xsbjid
+                    });
+                    var timeData = returnDatatime.data;
+                    var data = [];
+                    for (var i = 0; i < timeData.length; i++) {
+                        var datalist = {
+                            'zyid': timeData[i].zyid,
+                            'zyqf': timeData[i].type,
+                            'use_time': timeData[i].time
+                        };
+                        data.push(datalist);
+                    }
+                    if (vm.xitiAllNum > 0) {//有习题的需要提交完答案再提交时间
+                        apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostAnswerV2SoHomework, {
+                            body: $api.jsonToStr({
+                                uid: $api.getStorage('uid'),
+                                kcid: vm.hwid,
+                                xsbjid: vm.xsbjid,
+                                xkid: vm.data.xkid,
+                                njid: vm.data.njid,
+                                bbid: vm.data.bbid,
+                                sxcid: vm.data.sxcid,
+                                dyid: vm.data.dyid,
+                                jieid: vm.data.jieid,
+                                xtgroup: xtgroup,
+                                is_complete: 1,
+                                schoolid: vm.data.schoolid,
+                                ytlx: 1,//1基础 2拓展
+                                finish_time: vm.data.finish_time
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                if (ret.ret == 0) {
+                                    vm.isallInput = false;
+                                    api.hideProgress();
+                                    var DELETERet = db.executeSqlSync({
+                                        name: dbName,
+                                        sql: 'DELETE FROM NewHomeWrokAnswer where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and jieid=' + vm.data.jieid + ' and xsbjid=' + vm.xsbjid
+                                    });
+                                    apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostAnswerUpdateAnswerLog, {
+                                        body: $api.jsonToStr({
+                                            kclx: 1,
+                                            kcid: vm.hwid,
+                                            classid: vm.xsbjid,
+                                            data: data,
+                                            has_xts: vm.xitiAllNum,
+                                            schoolid: vm.data.schoolid,
+                                        })
+                                    }, function (ret, err) {
+                                        if (ret) {
+                                            if (ret.ret == 0) {
+                                                api.hideProgress();
+                                                var DELETEtime = db.executeSqlSync({
+                                                    name: dbName,
+                                                    sql: 'DELETE FROM NewHomeWrokTime where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and xsbjid=' + vm.xsbjid
+                                                });
+
+                                            } else {
+                                                api.hideProgress();
+                                            }
+                                        } else {
+                                            api.hideProgress();
+                                        }
+                                    });
+                                    api.openWin({
+                                        name: 'win_answer_statics',
+                                        url: 'win_answer_statics.html',
+                                        pageParam: {
+                                            hwid: vm.hwid,
+                                            xsbjid: vm.xsbjid,
+                                            is_score: vm.data.is_score,//是否是得分
+                                            complete: vm.complete,
+                                            homeworkListData: vm.homeworkListData,
+                                            tongji: vm.tongji,
+                                            inputType: 'dati',
+                                            from: api.pageParam.from,
+                                            homeworkIndex: api.pageParam.homeworkIndex//选择的作业下标
+                                        }
+                                    });
+                                } else {
+                                    api.hideProgress();
+                                    api.toast(
+                                        {
+                                            msg: ret.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        }
+                                    )
+                                }
+                            } else {
+                                api.hideProgress();
+                                api.toast(
+                                    {
+                                        msg: err.statusCode == 405 ? '网络无法连接，请检查网络配置' : err.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        })
+                    } else {//无习题的直接提交时间
+                        apiObj.Header({ 'Content-Type': 'application/json' }).Post(UrlRouter.PostAnswerUpdateAnswerLog, {
+                            body: $api.jsonToStr({
+                                kclx: 1,
+                                kcid: vm.hwid,
+                                classid: vm.xsbjid,
+                                data: data,
+                                has_xts: vm.xitiAllNum,
+                                schoolid: vm.data.schoolid,
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                if (ret.ret == 0) {
+                                    api.hideProgress();
+                                    var DELETEtime = db.executeSqlSync({
+                                        name: dbName,
+                                        sql: 'DELETE FROM NewHomeWrokTime where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and xsbjid=' + vm.xsbjid
+                                    });
+                                    api.openWin({
+                                        name: 'win_answer_statics',
+                                        url: 'win_answer_statics.html',
+                                        pageParam: {
+                                            hwid: vm.hwid,
+                                            xsbjid: vm.xsbjid,
+                                            is_score: vm.data.is_score,//是否是得分
+                                            complete: vm.complete,
+                                            homeworkListData: vm.homeworkListData,
+                                            tongji: vm.tongji,
+                                            inputType: 'dati',
+                                            from: api.pageParam.from,
+                                            homeworkIndex: api.pageParam.homeworkIndex//选择的作业下标
+                                        }
+                                    });
+                                } else {
+                                    vm.isallInput = true;
+                                    api.hideProgress();
+                                    api.toast(
+                                        {
+                                            msg: ret.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        }
+                                    )
+                                }
+                            } else {
+                                vm.isallInput = true;
+                                api.hideProgress();
+                                api.toast(
+                                    {
+                                        msg: err.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        });
+                    }
+
+
+                },
+                PostAnswerDoHomework: function () {//作业统一提交
+                    api.sendEvent({//暂停音频
+                        name: 'yinpinCLose'
+                    });
+                    if (vm.isallInput) {
+                        vm.isallInput = false;
+                        if (vm.wznum != 0) {
+                            wdTips(vm.wznum);
+                        } else {
+                            if (vm.materiallist.length > 0 && vm.complete != 2 && vm.materiallist[vm.current].zyqf == 1) {
+                                api.sendEvent({
+                                    name: 'inputTingzhizytime' + vm.current,
+                                    extra: {}
+                                });
+                            } else {
+                                // alert(2);
+                                vm.tijaoAnswer();
+                            }
+
+                        }
+                        setTimeout(function () {
+                            vm.isallInput = true;
+                        }, 3000);
+                    } else {
+                        api.toast(
+                            {
+                                msg: '正在提交，请稍后再试！',
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                        )
+                    }
+                },
+                closeWin: function () {
+                    if (vm.materiallist.length > 0 && vm.complete <= 1 && vm.materiallist[vm.current].zyqf == 1) {
+                        // api.sendEvent({
+                        //     name: 'shuaxin-frame-homework-list-pad',
+                        //     extra:{
+                        //         index:api.pageParam.homeworkIndex
+                        //     }
+                        // });
+                        api.sendEvent({
+                            name: 'closesucaihc' + vm.current
+                        });
+                        api.closeWin();
+
+                    } else {
+                        api.closeWin();
+                        // api.sendEvent({
+                        //     name: 'shuaxin-frame-homework-list-pad',
+                        //     extra:{
+                        //         index:api.pageParam.homeworkIndex
+                        //     }
+                        // });
+                    }
+
+                },
+                MonitorWZnumber: function (xtgroup) {
+                    // vm.answeredArr[ret.materiallist[i].id] = false;
+                    var material = vm.materiallist;
+                    var yzxtnum = 0;
+                    for (var i = 0; i < material.length; i++) {
+                        var listid = material[i].zyid;
+                        if (xtgroup[listid] == undefined) {
+
+                        } else {
+                            if (xtgroup[listid].tx_code == 2) {//填空
+                                var tktwdkong = 0;
+                                for (var j = 0; j < xtgroup[listid].da.length; j++) {
+                                    if (xtgroup[listid].da[j].is_unable == 0 && xtgroup[listid].da[j].descript.length == 0) {
+                                        tktwdkong++
+                                    }
+                                }
+                                if (tktwdkong == 0) {
+                                    yzxtnum++;
+                                    vm.answeredArr[listid] = true;
+                                } else {
+                                    vm.answeredArr[listid] = false;
+                                }
+                            } else if (xtgroup[listid].tx_code == 1) {//选择判断题
+                                yzxtnum++;
+                                vm.answeredArr[listid] = true;
+                            } else if (xtgroup[listid].tx_code == 3) {//问答题
+                                if (xtgroup[listid].da.length == 0 && xtgroup[listid].is_unable == 0) {
+                                    vm.answeredArr[listid] = false;
+                                } else {
+                                    yzxtnum++;
+                                    vm.answeredArr[listid] = true;
+                                }
+                            } else if (xtgroup[listid].tx_code == 4) {//完形填空
+                                var wxwd = 0;
+                                for (var j = 0; j < xtgroup[listid].children.length; j++) {
+                                    if (xtgroup[listid].children[j].da.length == 0 && xtgroup[listid].children[j].is_unable == 0) {
+                                        wxwd++
+                                    }
+                                }
+                                if (wxwd == 0) {
+                                    yzxtnum++;
+                                    vm.answeredArr[listid] = true;
+                                } else {
+                                    vm.answeredArr[listid] = false;
+                                }
+                            } else if (xtgroup[listid].tx_code == 5) {//实验探究
+                                var sytjwd = 0;
+                                for (var j = 0; j < xtgroup[listid].children.length; j++) {
+                                    if (xtgroup[listid].children[j].is_auto == 1) {//自动批阅
+                                        var sytjautowd = 0;
+                                        for (var s = 0; s < xtgroup[listid].children[j].da.length; s++) {
+                                            if (xtgroup[listid].children[j].da[s].is_unable == 0 &&
+                                                xtgroup[listid].children[j].da[s].descript.length == 0) {
+                                                sytjautowd++;
+                                            }
+                                        }
+                                        if (sytjautowd != 0) {
+                                            sytjwd++
+                                        }
+                                    } else {//手动批阅
+                                        if (xtgroup[listid].children[j].is_unable == 0 && xtgroup[listid].children[j].da.length == 0) {
+                                            sytjwd++
+                                        }
+                                    }
+                                }
+                                if (sytjwd == 0) {
+                                    yzxtnum++;
+                                    vm.answeredArr[listid] = true;
+                                } else {
+                                    vm.answeredArr[listid] = false;
+                                }
+                            }
+                        }
+                    }
+                    vm.wznum = vm.xitiAllNum - yzxtnum;
+                    if (vm.wznum < vm.xitiAllNum) {
+                        if (vm.complete != 1) {
+                            vm.PostAnswerUpdateHomeworkComplete(1);
+                        }
+                    } else {
+                        if (vm.complete != 0) {
+                            vm.PostAnswerUpdateHomeworkComplete(0);
+                        }
+                    }
+                },
+                PostAnswerUpdateHomeworkComplete: function (status) {//修改精品套题提交状态
+                    apiObj.Post(UrlRouter.PostAnswerUpdateHomeworkComplete, {
+                        values: {
+                            kcid: vm.hwid,
+                            classid: vm.xsbjid,//学生班级id
+                            yxzt: status
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                api.hideProgress();
+                            } else {
+                                api.toast(
+                                    {
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        } else {
+                            api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                            )
+                        }
+
+                    })
+                },
+                timeHuancun: function (zyid, time, type, index, input) {
+                    // alert('index'+index+'time'+time);
+                    var db = api.require('db');
+                    var ret = db.openDatabaseSync({
+                        name: dbName,
+                        path: 'fs://student_12xue.db'
+                    });
+                    var returnDatatime = db.selectSqlSync({//查询作业时间
+                        name: dbName,
+                        sql: 'SELECT * FROM NewHomeWrokTime where uid=' + $api.getStorage('uid') + ' and kcid=' + vm.hwid + ' and zyid=' + zyid + ' and xsbjid=' + vm.xsbjid
+                    });
+                    // alert('hcchaxun'+JSON.stringify(returnDatatime));
+                    timeData = returnDatatime.data;
+                    if (JSON.stringify(timeData) == '[]') {
+                        var INSERTret = db.executeSqlSync({
+                            name: dbName,
+                            sql: "INSERT INTO NewHomeWrokTime(zyid,uid,xsbjid,kcid,type,time) VALUES (" + zyid + "," + $api.getStorage('uid') + "," + vm.xsbjid + "," + vm.hwid + ",'" + type + "'," + time + ")"
+                        });
+                        // alert('插入'+JSON.stringify(INSERTret));
+                    } else {
+                        var UPDATEret = db.executeSqlSync({
+                            name: dbName,
+                            sql: "UPDATE NewHomeWrokTime SET time='" + time + "' WHERE zyid='" + zyid + "' and xsbjid='" + vm.xsbjid + "' and kcid='" + vm.hwid + "'"
+                        });
+                        // alert('更新'+JSON.stringify(UPDATEret));
+                    }
+                    // alert(input)
+                    if (input == '1') {
+                        vm.tijaoAnswer();
+                        // alert('input1')
+                    }
+                },
+                openEvaluateFrame: function (e) {
+                    api.openWin({
+                        name: 'win-evaluate-pad',
+                        url: 'win-evaluate-pad.html',
+                        pageParam: { remark: vm.isEvaluate, content: vm.pingyu },
+                    });
+                },
+                upFilevm: function () {
+                    if (!checkPermission(['camera', 'storage'])) {
+                        return;
+                    }
+                    moduleDialog.showDialog(vm.paizhaoparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'xiangce') {//相册
+                                if (api.systemType == 'ios') {
+                                    api.getPicture({
+                                        sourceType: 'photo',
+                                        encodingType: 'jpg',
+                                        mediaValue: 'pic',
+                                        destinationType: 'url',
+                                        quality: 50
+                                    }, function (ret, err) {
+                                        if (ret.data.length > 5) {
+                                            getFujianUrl(ret.data);
+                                        }
+                                    });
+                                } else {
+                                    var uiMediaScanner = api.require('UIMediaScanner');
+                                    uiMediaScanner.open({
+                                        type: 'picture',
+                                        column: 4,
+                                        classify: true,
+                                        max: 1,
+                                        sort: {
+                                            key: 'time',
+                                            order: 'desc'
+                                        }, rotation: true,
+                                        texts: {
+                                            stateText: '已选*项',
+                                            cancelText: '取消',
+                                            finishText: '完成'
+                                        },
+                                        styles: {
+                                            bg: '#fff',
+                                            mark: {
+                                                icon: '',
+                                                position: 'bottom_left',
+                                                size: 20
+                                            },
+                                            nav: {
+                                                bg: '#4bc7c7',
+                                                stateColor: '#fff',
+                                                stateSize: 18,
+                                                cancelBg: 'rgba(0,0,0,0)',
+                                                cancelColor: '#fff',
+                                                cancelSize: 18,
+                                                finishBg: 'rgba(0,0,0,0)',
+                                                finishColor: '#fff',
+                                                finishSize: 18
+                                            }
+                                        }
+                                    }, function (ret) {
+                                        if (ret.eventType == 'confirm') {
+                                            if (ret.list.length != 0) {
+                                                getFujianUrl(ret.list[0].path);
+                                            }
+                                        }
+                                    })
+                                }
+                                dismissDialog();
+                            } else if (ret.clickID == 'paizhao') {//拍照
+                                api.getPicture({
+                                    sourceType: 'camera',
+                                    encodingType: 'jpg',
+                                    mediaValue: 'pic',
+                                    destinationType: 'url',
+                                    quality: 50
+                                }, function (ret, err) {
+                                    if (ret) {//如果拍了照片
+                                        if (ret.data.length > 0) {
+                                            getFujianUrl(ret.data);
+                                        }
+                                    } else {//如果点了取消
+
+                                    }
+                                });
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+
+                    });
+                },
+                opentiwenFrame: function () {
+
+                    if ($api.getStorage('schoolid') == '1033144472591206313') {
+                        api.toast({
+                            msg: '该功能已关闭'
+                        })
+                        return;
+                    }
+
+                    var material = vm.materiallist[vm.current];
+                    sort = vm.current + 1;
+                    if (material.zyqf == 2) {
+                        restype = 1;
+                        resdesc = '【' + sort + '.' + material.txstr + '】';
+                        resdescript = '【' + material.txstr + '】';
+                    } else {
+                        restype = 2;
+                        resdesc = '【' + sort + '.' + '素材】';
+                        resdescript = '【素材】';
+                    }
+                    restitle = material.zymc;
+                    api.openWin({
+                        name: 'win-tiwen-pad',
+                        url: 'win-tiwen-pad.html',
+                        pageParam: {
+                            restype: restype,
+                            resdesc: resdesc,
+                            restitle: restitle,
+                            resdescript: resdescript,
+                            zyid: material.hwid,
+                            classid: vm.homeworkListData.bjid,
+                            resid: material.zyid,
+                            data: material,
+                            tuid: vm.homeworkListData.uid
+                        }
+                    });
+                },
+
+            }
+        })
+
+    }
+
+    function getFujianUrl(url) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        params["uid"] = $api.getStorage("uid");
+        params["classid"] = vm.xsbjid;
+        params["hwid"] = vm.hwid;
+        params["title"] = url.substr(url.lastIndexOf("/") + 1);
+        params["filetype"] = url.substr(url.lastIndexOf("."));
+        params["serverpath"] = "http://vod-qiniu.12xue.com/";
+        var imageFilter = api.require('imageFilter');
+        imageFilter.getAttr({
+            path: url
+        }, function (ret, err) {
+            if (ret.status) {
+                params["filesize"] = ret.size;
+            } else {
+                api.hideProgress();
+                //                alert(JSON.stringify(err));
+            }
+        });
+        qiniuUpfile(url);
+    }
+
+    // 上传附件到七牛
+    var QINIU_DOMAIN = "http://vod-qiniu.12xue.com/";
+
+    function qiniuUpfile(url) {
+        var fileKey = (new Date()).valueOf() + url;
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            var qiniuStorage = api.require("qiniuStorage");
+            qiniuStorage.configUploader({
+                params: {},
+                checkCrc: false,
+                mimeType: '',
+                zone: $api.getStorage('qiniuZone')
+            });
+            qiniuStorage.start({
+                token: ret.data.token,
+                path: url,
+                key: fileKey
+            });
+            qiniuStorage.addEventListener(function (ret) {
+                //                if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                //                    //上传成功后组装访问路径，或直接访问文档
+                //                    params["savename"] = ret.key;
+                //                    postHomeworkAttach();
+                //                }
+
+                if (ret.eventType == 'complete') {
+                    if ((api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                        //上传成功后组装访问路径，或直接访问文档
+                        params["savename"] = ret.key;
+                        postHomeworkAttach();
+                    } else {
+                        api.hideProgress();
+                        var msg = '上传失败！';
+                        if (api.systemType == 'ios') {
+                            msg = msg + ret.info.statusCode + ret.info.error.domain + ret.info.error.code;
+                        } else {
+                            msg = msg + ret.statusCode + ret.error.domain + ret.info.code;
+                        }
+                        api.toast({
+                            msg: msg,
+                            duration: 3000,
+                            location: 'bottom'
+                        });
+                    }
+                }
+
+            });
+        });
+    }
+
+    function postHomeworkAttach() {
+        apiObj.Post(UrlRouter.PostHomeworkAttach, {
+            values: params
+        }, function (ret, err) {
+            api.hideProgress();
+            var msg = '';
+            if (ret && ret.ret == 0) {
+                msg = "上传附件成功";
+            } else {
+                if (ret) {
+                    msg = ret.msg;
+                } else {
+                    msg = err;
+                }
+            }
+            api.toast({
+                msg: msg,
+                duration: 2000,
+                location: 'bottom'
+            });
+        })
+    }
+
+    function wdTips(wznum) {
+        var param = {
+            "data": [{
+                "viewType": 100,
+                "x": api.winWidth / 2 - 150,
+                "y": $api.getStorage('padHeight') / 2 - 75,
+                "h": 150,
+                "w": 300
+            }, {
+                "viewType": 101,
+                "x": api.winWidth / 2 - 150 + 30,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                "h": 48,
+                "w": 240,
+                "lineSpacting": 1.3,
+                "showText": "<font color='#666666'>您还有</font><font color='#ff778c'>" + wznum + "</font><font color='#666666'>道题没答，如果不会可以选择不会做 ,全部答完后才能提交噢！</font>",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 100,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "ok",
+                "showText": "确定",
+                "textSize": 14
+            }]
+        };
+        moduleDialog.showDialog(param, function (ret, err) {
+            if (ret.state == 'success' && ret.clickID) {
+                dismissDialog();
+            } else {
+                // alert(JSON.stringify(err))
+            }
+        });
+    }
+
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+
+    function postAddOperationLog() {
+        if (vm.aiAnalysis.count > 0) {
+            vm.aiAnalysis.count -= 1;
+        }
+    }
+</script>
+
+</html>

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择日期</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style type="text/css">
+        body {
+            background-color: rgba(0, 0, 0, 0.3);
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 时间选择器面板 */
+        .date-picker-panel {
+            background-color: #ffffff;
+            border-radius: 0.3rem;
+            width: 90%;
+            max-width: 12rem;
+            padding: 0.4rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 9999;
+        }
+        
+        .date-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.35rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .date-picker-title {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #212121;
+        }
+        
+        .date-picker-close {
+            font-size: 1.1rem;
+            color: #757575;
+            cursor: pointer;
+            padding: 0.1rem 0.3rem;
+            line-height: 1;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .date-picker-close:hover {
+            color: #212121;
+        }
+        
+        .date-picker-close:active {
+            opacity: 0.7;
+        }
+        
+        /* 年月导航 */
+        .date-picker-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        
+        .date-picker-nav-btn {
+            width: 1.3rem;
+            height: 1.3rem;
+            border: none;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #212121;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .date-picker-nav-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .date-picker-nav-btn:active {
+            background-color: #d0d0d0;
+        }
+        
+        .date-picker-nav-text {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #212121;
+            user-select: none;
+        }
+        
+        /* 星期标题 */
+        .date-picker-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.08rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .date-picker-weekday {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #757575;
+            padding: 0.1rem 0;
+            font-weight: 500;
+        }
+        
+        /* 日期网格 */
+        .date-picker-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.08rem;
+            margin-bottom: 0.35rem;
+        }
+        
+        .date-picker-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.2rem;
+            font-size: 0.65rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            color: #212121;
+            background-color: transparent;
+            min-height: 1.2rem;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .date-picker-day:hover:not(.disabled):not(.selected):not(.week-selected) {
+            background-color: #f0f0f0;
+        }
+        
+        .date-picker-day.other-month {
+            color: #bdbdbd;
+        }
+        
+        .date-picker-day.disabled {
+            color: #e0e0e0;
+            cursor: not-allowed;
+        }
+        
+        .date-picker-day.selected {
+            background-color: #3B82F6;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+        
+        .date-picker-day.week-selected {
+            background-color: #3B82F6 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+        
+        /* 选中状态下，移除other-month的灰色 */
+        .date-picker-day.week-selected.other-month {
+            color: #ffffff !important;
+        }
+        
+        .date-picker-day.today:not(.selected):not(.week-selected) {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
+        .date-picker-day.week-selected.other-month {
+            opacity: 0.8;
+        }
+        
+        /* 按钮区域 */
+        .date-picker-buttons {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.35rem;
+            padding-top: 0.35rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .date-picker-btn {
+            flex: 1;
+            padding: 0.3rem;
+            border: none;
+            border-radius: 0.2rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            text-align: center;
+            user-select: none;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .date-picker-btn-cancel {
+            background-color: #f5f5f5;
+            color: #212121;
+        }
+        
+        .date-picker-btn-cancel:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .date-picker-btn-confirm {
+            background-color: #3B82F6;
+            color: #ffffff;
+        }
+        
+        .date-picker-btn-confirm:hover {
+            background-color: #2563eb;
+        }
+
+        /* 针对小屏幕的进一步优化 */
+        @media (max-width: 500px) {
+            .date-picker-panel {
+                width: 95%;
+                max-width: 11rem;
+                padding: 0.35rem;
+                border-radius: 0.25rem;
+            }
+
+            .date-picker-header {
+                margin-bottom: 0.35rem;
+                padding-bottom: 0.25rem;
+            }
+
+            .date-picker-title {
+                font-size: 0.65rem;
+            }
+
+            .date-picker-close {
+                font-size: 1rem;
+                padding: 0.08rem 0.25rem;
+            }
+
+            .date-picker-nav {
+                margin-bottom: 0.25rem;
+            }
+
+            .date-picker-nav-btn {
+                width: 1.2rem;
+                height: 1.2rem;
+                font-size: 0.7rem;
+            }
+
+            .date-picker-nav-text {
+                font-size: 0.65rem;
+            }
+
+            .date-picker-weekdays {
+                gap: 0.08rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .date-picker-weekday {
+                font-size: 0.55rem;
+                padding: 0.1rem 0;
+            }
+
+            .date-picker-days {
+                gap: 0.08rem;
+                margin-bottom: 0.35rem;
+            }
+
+            .date-picker-day {
+                font-size: 0.6rem;
+                border-radius: 0.15rem;
+                min-height: 1.3rem;
+            }
+
+            .date-picker-buttons {
+                gap: 0.25rem;
+                margin-top: 0.35rem;
+                padding-top: 0.35rem;
+            }
+
+            .date-picker-btn {
+                padding: 0.3rem;
+                font-size: 0.65rem;
+                border-radius: 0.15rem;
+            }
+        }
+
+        /* 针对超小屏幕（高度小于400px）的特殊优化 */
+        @media (max-height: 400px) {
+            .date-picker-panel {
+                padding: 0.25rem;
+                max-height: 95vh;
+            }
+
+            .date-picker-header {
+                margin-bottom: 0.25rem;
+                padding-bottom: 0.15rem;
+            }
+
+            .date-picker-title {
+                font-size: 0.6rem;
+            }
+
+            .date-picker-close {
+                font-size: 0.85rem;
+                padding: 0.05rem 0.2rem;
+            }
+
+            .date-picker-nav {
+                margin-bottom: 0.2rem;
+            }
+
+            .date-picker-nav-btn {
+                width: 1rem;
+                height: 1rem;
+                font-size: 0.6rem;
+            }
+
+            .date-picker-nav-text {
+                font-size: 0.55rem;
+            }
+
+            .date-picker-weekdays {
+                gap: 0.05rem;
+                margin-bottom: 0.15rem;
+            }
+
+            .date-picker-weekday {
+                font-size: 0.5rem;
+                padding: 0.05rem 0;
+            }
+
+            .date-picker-days {
+                gap: 0.05rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .date-picker-day {
+                font-size: 0.5rem;
+                min-height: 1rem;
+                border-radius: 0.15rem;
+            }
+
+            .date-picker-buttons {
+                gap: 0.15rem;
+                margin-top: 0.25rem;
+                padding-top: 0.25rem;
+            }
+
+            .date-picker-btn {
+                padding: 0.2rem;
+                font-size: 0.55rem;
+            }
+        }
+
+        /* 针对464x300小屏幕的特殊优化 */
+        @media (max-width: 500px) and (max-height: 350px) {
+            .date-picker-panel {
+                padding: 0.2rem;
+                max-width: 10rem;
+                max-height: 95vh;
+            }
+
+            .date-picker-header {
+                margin-bottom: 0.2rem;
+                padding-bottom: 0.1rem;
+            }
+
+            .date-picker-title {
+                font-size: 0.55rem;
+            }
+
+            .date-picker-close {
+                font-size: 0.8rem;
+                padding: 0.05rem 0.15rem;
+            }
+
+            .date-picker-nav {
+                margin-bottom: 0.15rem;
+            }
+
+            .date-picker-nav-btn {
+                width: 0.9rem;
+                height: 0.9rem;
+                font-size: 0.55rem;
+            }
+
+            .date-picker-nav-text {
+                font-size: 0.5rem;
+            }
+
+            .date-picker-weekdays {
+                gap: 0.04rem;
+                margin-bottom: 0.1rem;
+            }
+
+            .date-picker-weekday {
+                font-size: 0.45rem;
+                padding: 0.04rem 0;
+            }
+
+            .date-picker-days {
+                gap: 0.04rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .date-picker-day {
+                font-size: 0.45rem;
+                min-height: 0.9rem;
+                border-radius: 0.1rem;
+            }
+
+            .date-picker-buttons {
+                gap: 0.1rem;
+                margin-top: 0.2rem;
+                padding-top: 0.2rem;
+            }
+
+            .date-picker-btn {
+                padding: 0.15rem;
+                font-size: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body onclick="handleBodyClick(event)">
+    <div class="date-picker-panel" onclick="handlePanelClick(event)">
+        <div class="date-picker-header">
+            <div class="date-picker-title">选择日期</div>
+            <div class="date-picker-close" onclick="handleCloseClick(event)">×</div>
+        </div>
+        <div class="date-picker-content">
+            <!-- 年月导航 -->
+            <div class="date-picker-nav">
+                <div class="date-picker-nav-btn" onclick="handleMonthClick(event, -1)">‹</div>
+                <div class="date-picker-nav-text" id="monthYearText"></div>
+                <div class="date-picker-nav-btn" onclick="handleMonthClick(event, 1)">›</div>
+            </div>
+            
+            <!-- 星期标题 -->
+            <div class="date-picker-weekdays">
+                <div class="date-picker-weekday">一</div>
+                <div class="date-picker-weekday">二</div>
+                <div class="date-picker-weekday">三</div>
+                <div class="date-picker-weekday">四</div>
+                <div class="date-picker-weekday">五</div>
+                <div class="date-picker-weekday">六</div>
+                <div class="date-picker-weekday">日</div>
+            </div>
+            
+            <!-- 日期网格 -->
+            <div class="date-picker-days" id="daysGrid"></div>
+        </div>
+        <div class="date-picker-buttons">
+            <div class="date-picker-btn date-picker-btn-cancel" onclick="handleCancelClick(event)">取消</div>
+            <div class="date-picker-btn date-picker-btn-confirm" onclick="handleConfirmClick(event)">确定</div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript">
+    var currentDate = new Date();
+    var displayYear = currentDate.getFullYear();
+    var displayMonth = currentDate.getMonth() + 1;
+    // 存储选中的周的开始和结束日期
+    var selectedWeekStart = null; // {year, month, day}
+    var selectedWeekEnd = null;   // {year, month, day}
+    
+    apiready = function () {
+        initDatePicker();
+    };
+    
+    // 初始化时间选择器
+    function initDatePicker() {
+        var now = new Date();
+        displayYear = now.getFullYear();
+        displayMonth = now.getMonth() + 1;
+        
+        // 不默认选中，让用户自己选择
+        selectedWeekStart = null;
+        selectedWeekEnd = null;
+        
+        renderCalendar();
+    }
+    
+    // 判断一周是否已完成（不包含未来日期）
+    function isWeekCompleted(year, month, day) {
+        var weekRange = getWeekRange(year, month, day);
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var weekEnd = new Date(weekRange.end.year, weekRange.end.month - 1, weekRange.end.day);
+        
+        // 如果周的结束日期小于等于今天，说明这周已完成
+        return weekEnd <= today;
+    }
+    
+    // 获取指定日期所在周的开始和结束日期（周一到周日）
+    function getWeekRange(year, month, day) {
+        // 创建日期对象
+        var date = new Date(year, month - 1, day);
+        var dayOfWeek = date.getDay(); // 0=周日, 1=周一, ..., 6=周六
+        
+        // 计算周一的日期（一周的开始）
+        // 如果今天是周日(0)，往前推6天；如果是周一(1)，不推；如果是周二(2)，往前推1天
+        var daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        
+        // 直接计算开始日期的年月日
+        var startDay = day - daysToMonday;
+        var startMonth = month;
+        var startYear = year;
+        
+        // 处理跨月的情况（往前推）
+        if (startDay < 1) {
+            startMonth--;
+            if (startMonth < 1) {
+                startMonth = 12;
+                startYear--;
+            }
+            // 获取上个月的天数
+            var daysInPrevMonth = new Date(startYear, startMonth, 0).getDate();
+            startDay = daysInPrevMonth + startDay;
+        }
+        
+        // 计算周日的日期（一周的结束，即开始日期+6天）
+        var endDay = startDay + 6;
+        var endMonth = startMonth;
+        var endYear = startYear;
+        
+        // 获取开始日期所在月的天数
+        var daysInStartMonth = new Date(startYear, startMonth, 0).getDate();
+        
+        // 处理跨月的情况（往后推）
+        if (endDay > daysInStartMonth) {
+            endDay = endDay - daysInStartMonth;
+            endMonth++;
+            if (endMonth > 12) {
+                endMonth = 1;
+                endYear++;
+            }
+        }
+        
+        return {
+            start: {
+                year: startYear,
+                month: startMonth,
+                day: startDay
+            },
+            end: {
+                year: endYear,
+                month: endMonth,
+                day: endDay
+            }
+        };
+    }
+    
+    // 判断日期是否在选中的周内
+    function isDateInSelectedWeek(year, month, day) {
+        if (!selectedWeekStart || !selectedWeekEnd) {
+            return false;
+        }
+        
+        var date = new Date(year, month - 1, day);
+        var startDate = new Date(selectedWeekStart.year, selectedWeekStart.month - 1, selectedWeekStart.day);
+        var endDate = new Date(selectedWeekEnd.year, selectedWeekEnd.month - 1, selectedWeekEnd.day);
+        
+        return date >= startDate && date <= endDate;
+    }
+    
+    // 渲染日历
+    function renderCalendar() {
+        var monthYearText = document.getElementById('monthYearText');
+        var daysGrid = document.getElementById('daysGrid');
+        
+        if (!monthYearText || !daysGrid) {
+            return;
+        }
+        
+        // 更新年月显示
+        var monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
+                         '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        monthYearText.textContent = displayYear + '年' + monthNames[displayMonth - 1];
+        
+        // 清空日期网格
+        daysGrid.innerHTML = '';
+        
+        // 获取当月第一天是星期几（0=周日，1=周一...）
+        var firstDayOfWeek = new Date(displayYear, displayMonth - 1, 1).getDay();
+        // 转换为周一到周日的索引（周一=0, 周二=1, ..., 周日=6）
+        var firstDay = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+        
+        // 获取当月天数
+        var daysInMonth = new Date(displayYear, displayMonth, 0).getDate();
+        
+        // 获取上个月的天数（用于显示上个月的日期）
+        var prevMonthDays = new Date(displayYear, displayMonth - 1, 0).getDate();
+        
+        var now = new Date();
+        var currentYear = now.getFullYear();
+        var currentMonth = now.getMonth() + 1;
+        var currentDay = now.getDate();
+        
+        // 填充上个月的日期（灰色显示）
+        var prevYear = displayYear;
+        var prevMonth = displayMonth - 1;
+        if (prevMonth < 1) {
+            prevMonth = 12;
+            prevYear--;
+        }
+        
+        // 从周一开始排列，所以需要填充 firstDay 个上个月的日期
+        for (var i = firstDay - 1; i >= 0; i--) {
+            var day = prevMonthDays - i;
+            var isInSelectedWeek = isDateInSelectedWeek(prevYear, prevMonth, day);
+            // 判断该日期所在周是否已完成
+            var weekCompleted = isWeekCompleted(prevYear, prevMonth, day);
+            var dayElement = createDayElement(day, true, false, false, !weekCompleted, prevYear, prevMonth, isInSelectedWeek);
+            daysGrid.appendChild(dayElement);
+        }
+        
+        // 填充当月的日期
+        for (var i = 1; i <= daysInMonth; i++) {
+            var isToday = (displayYear === currentYear && displayMonth === currentMonth && i === currentDay);
+            var isInSelectedWeek = isDateInSelectedWeek(displayYear, displayMonth, i);
+            // 判断该日期所在周是否已完成
+            var weekCompleted = isWeekCompleted(displayYear, displayMonth, i);
+            // 如果日期是未来的，或者所在周未完成，则禁用
+            var isDisabled = (displayYear === currentYear && displayMonth === currentMonth && i > currentDay) || !weekCompleted;
+            
+            var dayElement = createDayElement(i, false, isToday, false, isDisabled, displayYear, displayMonth, isInSelectedWeek);
+            daysGrid.appendChild(dayElement);
+        }
+        
+        // 根据屏幕高度决定显示5周还是6周
+        // 对于小屏幕（高度小于350px），只显示5周（35个格子）
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight;
+        var maxCells = screenHeight <= 350 ? 35 : 42; // 5周或6周
+        
+        // 填充下个月的日期（补齐到指定数量的格子）
+        var nextYear = displayYear;
+        var nextMonth = displayMonth + 1;
+        if (nextMonth > 12) {
+            nextMonth = 1;
+            nextYear++;
+        }
+        
+        var totalCells = firstDay + daysInMonth;
+        var remainingCells = maxCells - totalCells;
+        if (remainingCells > 0) {
+            for (var i = 1; i <= remainingCells; i++) {
+                var isInSelectedWeek = isDateInSelectedWeek(nextYear, nextMonth, i);
+                // 判断该日期所在周是否已完成
+                var weekCompleted = isWeekCompleted(nextYear, nextMonth, i);
+                var dayElement = createDayElement(i, true, false, false, !weekCompleted, nextYear, nextMonth, isInSelectedWeek);
+                daysGrid.appendChild(dayElement);
+            }
+        }
+    }
+    
+    // 创建日期元素
+    function createDayElement(day, isOtherMonth, isToday, isSelected, isDisabled, year, month, isInSelectedWeek) {
+        var dayElement = document.createElement('div');
+        dayElement.className = 'date-picker-day';
+        dayElement.textContent = day;
+        
+        // 存储日期信息到元素
+        dayElement.setAttribute('data-year', year);
+        dayElement.setAttribute('data-month', month);
+        dayElement.setAttribute('data-day', day);
+        
+        if (isOtherMonth) {
+            dayElement.classList.add('other-month');
+        }
+        
+        if (isToday && !isInSelectedWeek) {
+            dayElement.classList.add('today');
+        }
+        
+        if (isSelected) {
+            dayElement.classList.add('selected');
+        }
+        
+        // 如果日期在选中的周内，添加选中样式（蓝色）
+        if (isInSelectedWeek) {
+            dayElement.classList.add('week-selected');
+            // 如果同时是今天，移除today样式，优先显示选中样式
+            dayElement.classList.remove('today');
+            // 如果同时是other-month，也要确保显示蓝色
+            if (isOtherMonth) {
+                // 保持other-month类用于布局，但样式会被week-selected覆盖
+            }
+        }
+        
+        if (isDisabled) {
+            dayElement.classList.add('disabled');
+        } else {
+            // 所有日期（包括跨月的）都可以点击，只要不是禁用的
+            // 使用立即执行函数修复闭包问题
+            (function(dayValue, dayYear, dayMonth) {
+                dayElement.onclick = function(e) {
+                    e.stopPropagation();
+                    selectDay(dayValue, dayYear, dayMonth);
+                };
+            })(day, year, month);
+        }
+        
+        return dayElement;
+    }
+    
+    // 选择日期（选择整周）
+    function selectDay(day, year, month) {
+        // 判断该日期所在周是否已完成
+        if (!isWeekCompleted(year, month, day)) {
+            // 如果周未完成，不允许选择
+            return;
+        }
+        
+        // 计算这一周的开始和结束日期
+        var weekRange = getWeekRange(year, month, day);
+        selectedWeekStart = weekRange.start;
+        selectedWeekEnd = weekRange.end;
+        
+        // 如果选中的周跨越了当前显示的月份，需要切换到包含这周的月份
+        // 优先显示开始日期所在的月份
+        if (selectedWeekStart.month !== displayMonth || selectedWeekStart.year !== displayYear) {
+            displayYear = selectedWeekStart.year;
+            displayMonth = selectedWeekStart.month;
+        }
+        
+        renderCalendar();
+    }
+    
+    // 切换月份
+    function changeMonth(direction) {
+        displayMonth += direction;
+        
+        if (displayMonth > 12) {
+            displayMonth = 1;
+            displayYear++;
+        } else if (displayMonth < 1) {
+            displayMonth = 12;
+            displayYear--;
+        }
+        
+        // 限制不能超过当前年月
+        var now = new Date();
+        var currentYear = now.getFullYear();
+        var currentMonth = now.getMonth() + 1;
+        
+        if (displayYear > currentYear || (displayYear === currentYear && displayMonth > currentMonth)) {
+            displayYear = currentYear;
+            displayMonth = currentMonth;
+        }
+        
+        // 限制不能超过10年前
+        var minYear = currentYear - 10;
+        if (displayYear < minYear) {
+            displayYear = minYear;
+            displayMonth = 1;
+        }
+        
+        renderCalendar();
+    }
+    
+    // 事件处理函数
+    function handleBodyClick(e) {
+        // 点击背景时关闭
+        if (e.target === e.currentTarget) {
+            closePicker();
+        }
+    }
+    
+    function handlePanelClick(e) {
+        // 阻止事件冒泡，防止点击面板时关闭
+        e.stopPropagation();
+    }
+    
+    function handleCloseClick(e) {
+        e.stopPropagation();
+        closePicker();
+    }
+    
+    function handleMonthClick(e, direction) {
+        e.stopPropagation();
+        changeMonth(direction);
+    }
+    
+    function handleCancelClick(e) {
+        e.stopPropagation();
+        closePicker();
+    }
+    
+    function handleConfirmClick(e) {
+        e.stopPropagation();
+        confirmPicker();
+    }
+    
+    // 关闭选择器
+    function closePicker() {
+        // 返回null表示取消
+        api.sendEvent({
+            name: 'datePickerResult',
+            extra: {
+                timestamp: null,
+                cancelled: true
+            }
+        });
+        // 延迟关闭，确保事件已发送
+        setTimeout(function() {
+            if (typeof api !== 'undefined' && api.closeFrame) {
+                api.closeFrame({
+                    name: 'date-picker'
+                });
+            } else if (typeof api !== 'undefined' && api.closeWin) {
+                api.closeWin({
+                    name: 'date-picker'
+                });
+            }
+        }, 100);
+    }
+    
+    // 确认选择
+    function confirmPicker() {
+        if (!selectedWeekStart || !selectedWeekEnd) {
+            closePicker();
+            return;
+        }
+        
+        // 格式化开始日期和结束日期
+        var startDateStr = selectedWeekStart.year + '-' + 
+                          (selectedWeekStart.month < 10 ? '0' + selectedWeekStart.month : selectedWeekStart.month) + '-' + 
+                          (selectedWeekStart.day < 10 ? '0' + selectedWeekStart.day : selectedWeekStart.day);
+        
+        var endDateStr = selectedWeekEnd.year + '-' + 
+                        (selectedWeekEnd.month < 10 ? '0' + selectedWeekEnd.month : selectedWeekEnd.month) + '-' + 
+                        (selectedWeekEnd.day < 10 ? '0' + selectedWeekEnd.day : selectedWeekEnd.day);
+        
+        // 创建开始日期对象（注意：月份从0开始，所以要减1）
+        var startDate = new Date(selectedWeekStart.year, selectedWeekStart.month - 1, selectedWeekStart.day, 0, 0, 0, 0);
+        var endDate = new Date(selectedWeekEnd.year, selectedWeekEnd.month - 1, selectedWeekEnd.day, 23, 59, 59, 999);
+        
+        // 获取时间戳（秒级）
+        var startTimestamp = Math.floor(startDate.getTime() / 1000);
+        var endTimestamp = Math.floor(endDate.getTime() / 1000);
+        
+        // 格式化显示用的日期范围（YYYY.MM.DD-YYYY.MM.DD格式）
+        var displayRange = selectedWeekStart.year + '.' +
+                          (selectedWeekStart.month < 10 ? '0' + selectedWeekStart.month : selectedWeekStart.month) + '.' + 
+                          (selectedWeekStart.day < 10 ? '0' + selectedWeekStart.day : selectedWeekStart.day) + '-' +
+                          selectedWeekEnd.year + '.' +
+                          (selectedWeekEnd.month < 10 ? '0' + selectedWeekEnd.month : selectedWeekEnd.month) + '.' + 
+                          (selectedWeekEnd.day < 10 ? '0' + selectedWeekEnd.day : selectedWeekEnd.day);
+        
+        // 格式化tmPeriod参数（YYYYMMDD_YYYYMMDD格式）
+        // 确保月份和日期都是有效的数字
+        var startMonth = selectedWeekStart.month || 1;
+        var startDay = selectedWeekStart.day || 1;
+        var endMonth = selectedWeekEnd.month || 1;
+        var endDay = selectedWeekEnd.day || 1;
+        
+        // 将年份转换为字符串，避免数字相加
+        var tmPeriod = String(selectedWeekStart.year) + 
+                      (startMonth < 10 ? '0' + startMonth : String(startMonth)) + 
+                      (startDay < 10 ? '0' + startDay : String(startDay)) + '_' +
+                      String(selectedWeekEnd.year) + 
+                      (endMonth < 10 ? '0' + endMonth : String(endMonth)) + 
+                      (endDay < 10 ? '0' + endDay : String(endDay));
+        
+        // 发送事件返回时间范围
+        api.sendEvent({
+            name: 'datePickerResult',
+            extra: {
+                cancelled: false,
+                startDate: startDateStr,
+                endDate: endDateStr,
+                startTimestamp: startTimestamp,
+                endTimestamp: endTimestamp,
+                displayRange: displayRange,
+                tmPeriod: tmPeriod
+            }
+        });
+        
+        // 延迟关闭，确保事件已发送
+        setTimeout(function() {
+            if (typeof api !== 'undefined' && api.closeFrame) {
+                api.closeFrame({
+                    name: 'date-picker'
+                });
+            } else if (typeof api !== 'undefined' && api.closeWin) {
+                api.closeWin({
+                    name: 'date-picker'
+                });
+            }
+        }, 100);
+    }
+</script>
+</html>
+

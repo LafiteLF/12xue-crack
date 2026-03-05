@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>密码保护5</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        body{
+            background-color:#e5e5e5
+        }
+        .second_title{
+            width: 100%;
+            height:10%;
+            padding-top: 15px;
+            font-size: 17px;
+
+            color: #000000;
+            text-align: center;
+        }
+        .aui-pull-left{
+            height: 1px;
+            width: 30%;
+            margin-top:35px ;
+            background-color: #bdc3c7;
+        }
+        .aui-pull-right{
+            height: 1px;
+            width: 30%;
+            margin-top:35px ;
+            background-color: #bdc3c7;
+        }
+        .message{
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        .aui-btn-block{
+            width: 92%;
+            height: 50px;
+            line-height: 20px;
+            background-color:#4bc7c7;
+        }
+
+        .aui-btn-info:active {
+            color: #fff;
+            background-color: #bdc3c7;
+            border: 1px solid #bdc3c7;
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div class="aui-content">
+    <div class="aui-pull-left"></div>
+    <div class="aui-pull-right"></div>
+    <div class="second_title" style="margin-top: 15px;">请选择操作</div>
+</div>
+
+<p class="message">设置密保问题，当您忘记密码时，可以通过密保问题找回。</p>
+<div class="aui-btn aui-btn-block aui-btn-info" style="position: absolute;left: 4%;top: 30%;" onclick="settingQuestion(),id='btn'">设置密保问题</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/question/settingQuestion.js"></script>
+    <script type="text/javascript">
+
+        apiready=function () {
+        }
+
+
+    </script>
+</html>

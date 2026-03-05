@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .show {
+            position: absolute;
+            color: #666;
+            top: 0;
+            width: 40%;
+            background-color: white;
+            text-align: center;
+            margin-left: 30%;
+            /*margin-right: 15%;*/
+            margin-top: 15%;
+            padding: 1rem 0 1.5rem 0;
+            border-radius: 0.4rem;
+            font-size: 16px;
+        }
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+        .img {
+            text-align: center;
+        }
+        .reupload{
+            position: absolute;float: right;right: 10%;width: 34%;height: 40px;background-color: #4bc7c7;color: white;line-height: 40px;border-radius: 5px;
+        }
+        .cancel{
+            position: absolute;float: left;left: 10%;width: 34%;height: 40px;line-height: 40px
+        }
+    </style>
+</head>
+<body>
+<div class="backgroud"></div>
+<div class="show">
+    <div class="img">
+        <img class="active" src="../../../image/reupload.png" alt="" style="width: 100px;">
+    </div>
+    <div class="audiotext" style="font-size: 18px;color: #666">上传失败</div>
+    <div class="audiotext" style="font-size: 16px;color: #666">请您重新上传答案</div>
+    <div style="position: relative;padding: 0.5rem 0 0.8rem 0">
+        <div class="cancel" tapmode onclick="cancel()">取消上传</div>
+        <div class="reupload" tapmode onclick="reupload()">再次上传</div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+
+    apiready = function () {
+        api.parseTapmode();
+    };
+    function cancel() {
+        api.closeFrame();
+    }
+    function reupload() {
+        var jsfun3;
+        if(api.pageParam.tx == 'reading') {
+            jsfun3 = 'vm.chuanRecord()';
+            api.execScript({
+                frameName: api.pageParam.frameName,
+                script: jsfun3
+            });
+        }else if(api.pageParam.tx == 'sytj'){
+            api.sendEvent({
+                name: 'reuploadVideo',
+                extra: {}
+            });
+        }
+        api.closeFrame();
+    }
+</script>
+</html>

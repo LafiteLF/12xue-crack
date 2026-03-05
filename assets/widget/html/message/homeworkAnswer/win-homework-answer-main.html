@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+        .type {
+            color: #999999 !important;
+            margin-right: 20px;
+            float: right;
+            position: relative;
+            padding-right: 20px;
+            background: url("../../../image/stuHomePad/xljt.jpg") no-repeat right center;
+            background-size: 15px;
+            font-size: 0.7rem;
+            display: block;
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+        .aui-toolbar-title {
+            float: left;
+            display: block;
+        }
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+        [v-cloak] {
+            display: none
+        }
+
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" ></span>作业问答
+    </a>
+    <div class="aui-row">
+        <a class="aui-toolbar-title aui-pull-right titlea" style="padding-left: 0px" tapmode onclick="chooses('subject');">
+            <div class="type type-subject" tapmode >全部学科</div>
+            <!--<div class=" aui-iconfont aui-icon-unfold aui-pull-right" tapmode onclick="chooses('subject')"></div>-->
+        </a>
+        <a class="aui-toolbar-title aui-pull-right titlea" style="padding-left: 0px" tapmode onclick="chooses('is-request');">
+            <div class="type type-request" tapmode >我收到的</div>
+            <!--<div class=" aui-iconfont aui-icon-unfold aui-pull-right" tapmode onclick="chooses('is-request')"></div>-->
+        </a>
+        <!--<div class="aui-col-xs-4 aui-border-r is-request type-request" tapmode onclick="chooses('is-request');">-->
+            <!--<div class="aui-grid-label aui-ellipsis-1 type ">已回答<span class="aui-iconfont aui-icon-unfold"></span>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="aui-col-xs-8 aui-border-r subject type-subject" tapmode onclick="chooses('subject');">-->
+            <!--<div class="aui-grid-label aui-ellipsis-1 type ">全部学科<span class="aui-iconfont aui-icon-unfold"></span>-->
+            <!--</div>-->
+        <!--</div>-->
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var p = 1;
+    var isClean = true;
+    var status = 1;
+    var classid = new Array();
+    var xkid = new Array();
+    var xkmc = new Array();
+    var xkidS = '';//用来穿参数
+    var totalPage;
+    var totalP;
+    var imageList;
+    var audioList;
+    var frameH;
+    var headerH;
+    apiready = function () {
+        var header = document.querySelector('header');
+        apiObj.SetAuthToken($api.getStorage('token'));
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        getXkid();//获取xkid
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.openFrame({
+            name: 'frame-homework-answer-list',
+            url: 'frame-homework-answer-list.html',
+            bounces: false,
+            vScrollBarEnabled: false,
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: {
+                y: headerH,
+                h: frameH
+            }
+
+        });
+    };
+//    function chooses(type) {
+//
+//        api.sendEvent({
+//            name: 'myEvents',
+//            extra: {
+//                key1: type
+//            }
+//        });
+//    }
+    //获取学科列表
+    function getXkid() {
+        apiObj.Get(UrlRouter.GetQuestionxk, {
+            values: {
+                useruid: $api.getStorage('uid'),
+                identitytype: '3'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                api.hideProgress();
+                if (ret.ret == 0) {
+                    if (ret.data.length == 0) {
+                        //展示空界面
+                        $api.html($api.dom('.aui-list'), '<div class="no-data"> <img class="img-null" src="../../../image/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;position: absolute;top: 30%;left: 30%;"/> </div>');
+                        $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 3 + 'px');
+                    } else {
+                        //先清空一下
+                        xkid.length = 0;
+                        xkmc.length = 0;
+                        xkid.push('');
+                        xkmc.push('全部学科');
+                        //添加学科ID 学科名称进数组
+                        for (var i = 0; i < ret.data.length; i++) {
+                            xkid.push(ret.data[i].xkid);
+                            xkmc.push(ret.data[i].xkmc);
+                        }
+
+                    }
+                } else {
+                    alert(ret.msg);
+                }
+            } else {
+                alert(err.msg);
+            }
+
+        })
+    }
+    function chooses(type) {
+        switch (type) {
+            case 'is-request':
+                openFrame(['我发出的', '我收到的'], '', 'type-request');
+                break;
+            case 'subject':
+                openFrame(xkmc, xkid, 'type-subject');
+                break;
+
+        }
+    }
+
+    function openFrame(xkmc, xkid, item) {
+        api.openFrame({
+            name: 'frame-tab',
+            url: 'frame-tab.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: $api.getStorage('padHeight')
+            },
+            pageParam: {array: xkmc, arrayId: xkid, item: item, frameName: 'frame-homework-answer-list'},
+            bounces: false,
+            reload: true
+        });
+    }
+
+</script>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body{
+
+        }
+        header{ border-bottom:none!important; position: relative;}
+        .aui-searchbar{
+            left: 55%;
+            right: 10%;
+            background-color: transparent;
+            bottom: 0;
+            top: 11px;
+            width: 45%;
+        }
+        .aui-border-radius{
+            border-radius: 3px;
+        }
+        .aui-border{
+            border-radius: 6px;z-index: 10000;border: 1px solid #dddddd;
+            background: #f2f2f2;
+        }
+        a{
+            font-size: 1rem !important;
+        }
+        .aui-border::after {
+            border-radius: 3px;
+        }
+        .aui-border:after{ border: none}
+        .item{ width: auto; float: left; margin-left: 20px;}
+        .aui-border-l:before, .aui-border-r:after{width: 0px}
+        .aui-grid .aui-iconfont {
+            position: relative;
+            z-index: 20;
+            top: 0;
+            height: 1.4rem;
+            font-size: 0.7rem;
+            color: #666;
+            line-height: 1.4rem;
+            padding-left: 5px;
+        }
+        .aui-grid .aui-grid-label {
+            display: block;
+            font-size: 0.7rem;
+            position: relative;
+            margin-bottom: 0.25rem;
+            margin-top: 0px;
+            color: #666;
+        }
+        .aui-card-list-content-padded {
+            position: relative;
+            padding: 6px 0.75rem;
+        }
+        .aui-searchbar-input {
+            margin: 0 1rem;}
+        .aui-searchbar-input input {
+            color: #666666;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            height: 1rem;
+            min-height: 1rem;
+            line-height: 1rem;
+            margin-top: 0.2rem;
+            border: 0;
+            -webkit-appearance: none;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="api.closeWin();"></span>搜索
+    </a>
+    <div class="aui-searchbar" id="search">
+        <div class="aui-searchbar-input aui-border-radius aui-border">
+            <i class="aui-iconfont aui-icon-search" style="color: #999999"></i>
+            <form action="javascript:search();">
+                <input type="search" placeholder="输入姓名找人" style="color: #4bc6c6" id="search-input" oninput="textChange();">
+            </form>
+        </div>
+        <div class="aui-searchbar-cancel" tapmod>取消</div>
+    </div>
+</header>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        var header = document.querySelector('header');
+
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+
+        api.openFrame({
+            name: 'frame-search-user',
+            url: 'frame-search-user.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            bounces: false,
+            pageParam: {x: 0, y: headerH, w: 'auto', h: frameH}
+        });
+    };
+    function textChange(){
+        api.sendEvent({
+            name: 'refreshRealname',
+            extra: {
+                searchContent: $api.dom('#search-input').value
+            }
+        });
+    }
+    function search() {
+        api.sendEvent({
+            name: 'searchBegin'
+        }, function (ret, err) {
+
+        });
+    }
+</script>
+</html>

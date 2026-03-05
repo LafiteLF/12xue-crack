@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择地区</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <div class="area-infomation" style="color:#4bc7c7;font-size: 0.9rem; margin: 0.5rem;"><span
+            class="area-name"></span><span class="school-name"></span></div>
+    <ul class="aui-list aui-list-in">
+        <!--<li class="aui-list-item">-->
+        <!--<div class="aui-list-item-inner">-->
+        <!--<div class="aui-list-item-title">Item1</div>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="aui-list-item">-->
+        <!--<div class="aui-list-item-inner">-->
+        <!--<div class="aui-list-item-title">Item2</div>-->
+        <!--</div>-->
+        <!--</li>-->
+        <!--<li class="aui-list-item">-->
+        <!--<div class="aui-list-item-inner">-->
+        <!--<div class="aui-list-item-title">Item3</div>-->
+        <!--</div>-->
+        <!--</li>-->
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        getAreaLists('0', '全国');
+    };
+
+    var clickNum = 0;
+    var provinceCode;
+    var cityCode;
+    var areaCode;
+    var schoolid;
+    var areaName = '全国';
+    /**
+     * 获取地域信息
+     * @param pid  地域id
+     * @param name  地域名称
+     */
+    function getAreaLists(pid, name) {
+        $api.append($api.dom('.area-name'), '  ' + removeSpace(name));
+        areaName = name;
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.getAreaLists, {
+            values: {
+                pid: pid
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    clickNum++;
+                    if (clickNum == 1) {
+                    }
+                    if (clickNum == 2) {
+                        provinceCode = pid;
+                    }
+                    $api.html($api.dom('.aui-list'), '');
+                    if (clickNum == 3) {
+                        cityCode = pid;
+                        for (var i = 0; i < ret.data.length; i++) {
+                            $api.append($api.dom('.aui-list'), '<li class="aui-list-item" tapmode onclick="getAreaSchLists(\'' + ret.data[i].id + '\',\'' + ret.data[i].name + '\')"> <div class="aui-list-item-inner"> <div class="aui-list-item-title">' + ret.data[i].name + '</div> </div> </li>');
+                        }
+                    } else {
+
+                        for (var i = 0; i < ret.data.length; i++) {
+                            $api.append($api.dom('.aui-list'), '<li class="aui-list-item" tapmode onclick="getAreaLists(\'' + ret.data[i].id + '\',\'' + ret.data[i].name + '\')"> <div class="aui-list-item-inner"> <div class="aui-list-item-title">' + ret.data[i].name + '</div> </div> </li>');
+                        }
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+        })
+    }
+    /**
+     * 获取该地区下的学校列表
+     * @param area  区域id
+     * @param name  区域名称
+     */
+    function getAreaSchLists(area, name) {
+        areaCode = area;
+        $api.append($api.dom('.area-name'), '  ' + removeSpace(name));
+        areaName = name;
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.getAreaSchLists, {
+            values: {
+                area: area
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    $api.html($api.dom('.aui-list'), '');
+                    for (var i = 0; i < ret.data.length; i++) {
+                        $api.append($api.dom('.aui-list'), '<li class="aui-list-item" id="' + ret.data[i].id + '" tapmode onclick="registerIntoSch(this);"> <div class="aui-list-item-inner"> <div class="aui-list-item-title">' + ret.data[i].xxmc + '</div> </div> </li>');
+                    }
+                    if (ret.data.length == 0){
+                        alert('该区域下暂无学校！');
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+        })
+    }
+    /**
+     * 选择学校
+     * @param context  上下文
+     */
+    function registerIntoSch(context) {
+        for (var i = 0;i<$api.domAll('.aui-text-primary').length;i++){
+            $api.removeCls($api.domAll('.aui-text-primary')[i],'aui-text-primary');
+        }
+        $api.addCls($api.dom(context, '.aui-list-item-title'),'aui-text-primary');
+        schoolid = context.id;
+        $api.text($api.dom('.school-name'), '  ' + $api.text($api.dom(context, '.aui-list-item-title')));
+        areaName = $api.text($api.dom(context, '.aui-list-item-title'));
+    }
+
+    /**
+     * 传递区域信息
+     */
+    function commitInformation() {
+        api.sendEvent({
+            name: 'chooseArea',
+            extra: {province: provinceCode, city: cityCode, district: areaCode, schoolid: schoolid,areaName:areaName}
+        });
+    }
+    /**
+     * 文字去除空格
+     * @param str
+     * @returns {void|string|XML}
+     */
+    function removeSpace(str) {
+        return str.replace(/\s+/g,"");
+    }
+</script>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我的学习机</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+
+        textarea {
+            width: 96%;
+            margin-left: 2%;
+            margin-right: 2%;
+            height: 1rem;
+            border: 1px solid #cccccc;
+
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="name-content" id="app" v-cloak>
+    <p style="width: 100%;height: 0.5rem;"></p>
+    <ul class="aui-list aui-form-list" v-if="isEdit">
+        <li class="aui-list-item">
+            <div class="aui-list-item-inner">
+                <div class="aui-list-item-input">
+                    <input type="text" placeholder="请输入学习机序列号"  v-model="msg" value="" id="key" style=" height: 2rem;">
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div style="width: 100%;height: 2rem;line-height: 2rem;background-color: white" class="my-owen-cpu" v-else="isEdit">
+        <div style="float: left;padding-left: 3%;width: 85%" v-text="'序列号: '+cpuKey"></div>
+        <div style="float: right;color: #4bc7c7;padding-right: 2%;width: 12%" @click="editmyCpuKey">修改</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm = null;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        vm = new Vue({
+            el: '#app',
+            data: {
+                isEdit: '',
+                cpuKey: '',
+                msg:''
+            },
+            methods: {
+                editmyCpuKey: function () {
+                    api.confirm({
+                        title: '',
+                        msg: '你确定要修改你的学习机序列号吗?',
+                        buttons: ['取消', '确定'],
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.buttonIndex == 2) {
+                                vm.isEdit = true;
+                                api.sendEvent({
+                                    name: 'showRightBtn',
+                                    extra: {}
+                                });
+                                vm.msg = vm.cpuKey;
+                            }
+                            if (ret.buttonIndex == 1) {
+
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        if($api.getStorage('cpuCode').length == 0){
+            vm.isEdit = true;
+        }else {
+            vm.cpuKey = $api.getStorage('cpuCode');
+            vm.isEdit = false;
+        }
+    };
+    function commitKeyInfo() {
+        var cpuKey = clear_emoji($api.val($api.dom('input')));
+        cpuKey = cpuKey.replace(/\s+/g, "");
+        if (cpuKey.length == 0) {
+            api.toast({
+                msg: '请先输入序列号再提交',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else {
+            api.showProgress({
+                title: '加载中',
+                text: '请稍后...',
+                modal: false
+            });
+            apiObj.SetAuthToken($api.getStorage('token'));
+            apiObj.Post(UrlRouter.PostPadBuyConfirm, {
+                values: {
+                    code: cpuKey
+                }
+            }, function (ret, err) {
+                api.hideProgress();
+                if (ret) {
+                    if (ret.ret == 0) {
+                        api.toast({
+                            msg: '绑定成功',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        $api.setStorage('cpuCode',cpuKey);
+                        vm.isEdit = false;
+                        vm.cpuKey = cpuKey;
+                        api.sendEvent({
+                            name: 'hideRightBtn',
+                            extra: {}
+                        });
+                    }else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                }else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+    }
+</script>
+</html>

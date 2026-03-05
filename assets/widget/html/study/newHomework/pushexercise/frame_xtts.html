@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>习题列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../css/exerciseCss.css" />
+    <style>
+        .ex_content {
+            display: none
+        }
+
+        .ex_content dl {
+            padding: 0px 20px 0 20px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ex_content">
+        <dl v-if="tuisongList.length>0">
+            <dd v-for="(list,index) in tuisongList" :id="index" tapmode onclick="vm.openWinDetailTZ(this)">
+                <p v-html="index+1+'.'+getzymc(list.txstr,list.zyqf,list.tx,list.zymc)"></p>
+                <span class="ex-xiaoti" v-if=" list.xts>0"
+                    v-text="list.tx_code==2?'['+list.xts+'填空]':'['+list.xts+'小题]'"></span>
+                <span class="ex-daipi" v-if="list.is_true!=-1 && data.isshowanswer==0 && list.zyqf==2"
+                    style="color:#4bc7c7">已答</span>
+                <span class="ex-daipi" v-if="list.is_true==0 && data.isshowanswer==1">待批</span>
+                <span class="ex-daipi" v-if="list.is_true==-1" style="color: #cccccc;">未答</span>
+                <span class="ex-daipi" v-if="list.is_true!=0 && data.isshowanswer==1">
+                    <img v-if="list.is_true==1" src="../../../../image/newhomework/zhengque.png">
+                    <img v-if="list.is_true==2" src="../../../../image/newhomework/cuowu.png">
+                    <img v-if="list.is_true==3" src="../../../../image/newhomework/bandui.png">
+                </span>
+            </dd>
+        </dl>
+    </div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm; 
+    var isnew = 0;
+    var listnum;
+    apiready = function () {
+        vue();
+        listnum =api.pageParam.tuisongList.length;
+        $('.ex_content').show();
+        api.addEventListener({
+            name: 'RefreshTSXT'
+        }, function (ret, err) {
+            isnew = 1;
+            vm.getHomeworkPushExercises();
+        });
+        vm.getHomeworkPushExercises();
+
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.ex_content',
+            data: {
+                data: [],
+                tuisongList: api.pageParam.tuisongList,
+                scorelist: [],
+                zyyq: {}
+            },
+            updated: function () {
+            },
+            methods: {
+                getzymc: function (txstr, zyqf, tx, zymc) {
+                    if (tx != 'tdjh' && tx != 'tdh' && tx != 'tdb' && tx != 'ttt') {
+                        return '【' + txstr + '】' + zymc;
+                    } else {
+                        return '【' + txstr + '】' + '<img src="../../../../image/newhomework/tlbt.png">';
+                    }
+                },
+                openWinDetailTZ: function (context) {
+                    var index = $(context).attr('id');
+                    api.openWin({
+                        name: 'win_detail_kzxt',
+                        url: 'win_detail_kzxt.html',
+                        pageParam: {
+                            detailData: api.pageParam.homeworkListData,
+                            tuisongList: vm.tuisongList,
+                            complete: 2,
+                            index: index,
+                            classid: api.pageParam.classid,
+                            homeworkIndex: api.pageParam.homeworkIndex
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                getHomeworkPushExercises: function () {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetHomeworkPushExercises, {
+                        values: {
+                            resource_id: api.pageParam.hwid,
+                            classid: api.pageParam.xsbjid,
+                            identitytype: '3',//学生身份
+                            uid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        // pullRefresh.cancelLoading();
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                if(listnum < ret.data.materiallist.length){
+                                    var changenum =  ret.data.materiallist.length - listnum;
+                                    listnum = ret.data.materiallist.length;
+                                    if(isnew == 1){
+                                        alert('有'+changenum+'道新的推送习题！' );
+                                    }
+                                    vm.tuisongList = ret.data.materiallist;
+                                }
+                            }
+                        }
+                    });
+                },
+            }
+        });
+    }
+
+
+</script>
+
+</html>

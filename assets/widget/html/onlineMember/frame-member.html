@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>线上会员</title>
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+    <script src="../../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        button {
+            outline: none;
+        }
+
+        #member-container {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+        }
+
+        #member-container > :first-child {
+            content: '';
+            position: absolute;
+            background-color: black;
+            opacity: 0.5;
+            width: 100%;
+            height: 100%;
+        }
+
+        #member-container > div:last-child {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #combo-container {
+            display: flex;
+            flex-direction: column;
+            width: 44.27vw;
+            border-radius: 3vw;
+            background-color: #FFFDF9;
+            max-height: 90vh;
+            overflow-y: auto;
+            background-size: 100% 23.9vh;
+            background-repeat: no-repeat;
+            background-position: top;
+            background-attachment: local;
+        }
+
+        #combo-details {
+            z-index: 1;
+            position: relative;
+            margin: 5vh 1.77vw 0 1.77vw;
+            padding: 3vh 2vw;
+            border-radius: 1vw;
+            background: white;
+            box-shadow: 3px 0 16px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        #combo-details > :first-child {
+            position: absolute;
+            width: 100%;
+            height: 23vh;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            border-radius: 1vw 1vw 0 0;
+        }
+
+        #combo-details-counts {
+            display: grid;
+            grid-template-columns: auto auto;
+            margin-top: 3.5vh;
+            gap: 1vh 5vw;
+        }
+
+        #combo-details-counts > div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        #combo-details-counts > div > img {
+            width: 1.77vw;
+            height: 1.77vw;
+        }
+
+        #combo-details-counts > div > :nth-child(2) {
+            width: 6vw;
+            margin: 0 1vw;
+        }
+
+        #special-traffic-package {
+            margin: 2vh 1.77vw 0 1.77vw;
+            padding: 2vh 2vw;
+            background-color: white;
+            border-radius: 1vw;
+            box-shadow: 3px 0 16px 0 rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #special-traffic-package-counts {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 1vh 5vw;
+            margin-top: 1vh;
+        }
+
+    </style>
+</head>
+<body>
+<div id="member-container" v-cloak>
+    <template v-if="isLoaded">
+        <div @click.stop="close"></div>
+        <div>
+            <div id="combo-container"
+                 :style="{'background-image': `url(../../image/onlineMember/${comboData['level']}/background.png)`}">
+                <div id="combo-details">
+                    <img :style="isOnlineVersion ? {}: {'height': '100%', 'border-radius': '1vw'}"
+                         :src="`../../image/onlineMember/${comboData['level']}/gaussian-blur.png`" alt="高斯模糊">
+                    <div style="display: flex; flex-direction: row; position: relative">
+                        <div style="display: flex; flex-direction: row; align-items: center;">
+                            <div style="display: inline-block;font-size: 2vw; font-weight: bold;"
+                                 :style="comboMenuTextColorStyle">
+                                {{ comboData['taocan'][0]["menu"] }}
+                            </div>
+                            <div v-if="comboData['level'] !== 'nomal'" style="font-size: 1.2vw;margin: 0 1.5vw"
+                                 :style="{'color': comboTitleTextColor}">
+                                {{ endTime }}
+                            </div>
+                            <button v-if="isUpgradeButtonShow" @click.stop="openUpgrade"
+                                    style="display: flex;align-items: center;justify-content: center;padding: 0;border: none;border-radius: 2.5vw; color: white; font-size: 1.1vw; width: 6.4vw; height: 4.167vh;"
+                                    :style="upgradeButtonStyle">
+                                去升级
+                            </button>
+                        </div>
+                        <div style="position: absolute; right: 0; top:50%;transform: translateY(-50%)">
+                            <img style="width: 7.4vw;height: 7.4vw;border-radius: 50%;display: block"
+                                 :src="`${avatar}`" alt="头像">
+                            <img v-if="comboData['level'] !== 'nomal'"
+                                 style="position: absolute;width: 10vw;height: 10vw;left: 50%;top: 50%;transform: translate(-50%,-55%);"
+                                 :style="avatarStyle"
+                                 :src="`../../image/onlineMember/${comboData['level']}/avatar-frame.png`"
+                                 alt="头像框">
+                        </div>
+                    </div>
+                    <img :src="`../../image/onlineMember/${comboData['level']}/highlight.png`" alt="highlight"
+                         style="height: 0.3vh; width: 23vw; display: block; margin: 2vh">
+                    <div style="font-size: 1.1vw; font-weight: bold; margin-top: 3vh"
+                         :style="{'color': comboCountTextColor}">
+                        本月套餐（已用/总）次数
+                    </div>
+                    <div id="combo-details-counts">
+                        <div v-for="item in comboData['taocan'][0].info">
+                            <img :src="`../../image/onlineMember/${comboData['level']}/${item.code}.png`"
+                                 :alt="`${item.title}`">
+                            <div style="font-size: 1.1vw" :style="{'color': comboTitleTextColor}">{{ item.title }}</div>
+                            <div v-if="item.use !== undefined" style="font-size: 1.1vw; display: flex; flex-direction: row; align-items: center;"
+                                 :style="{'color': comboTitleTextColor}">
+                                <span style="font-weight: bold;" :style="{'color': comboCountUseTextColor}">
+                                {{ item.use }}
+                                </span>
+                                /{{ item.num }}
+                            </div>
+                            <div v-else style="font-size: 1.1vw; font-weight: bold;"
+                                 :style="{'color': comboCountUseTextColor}">
+                                {{ item.num }}
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="extraComboData.length > 0"
+                         style="display: grid;grid-template-columns: auto; margin-top: 2.5vh; row-gap: 2vh">
+                        <div v-for="combo in extraComboData" style="display: flex; flex-direction: column;">
+                            <div style="display: flex; flex-direction: row;">
+                                <div style="font-size: 1.1vw; font-weight: bold; margin-right: 1.5vw;"
+                                     :style="{'color': comboCountTextColor}">
+                                    {{ combo['menu'] }}套餐/月
+                                </div>
+                                <div style="font-size: 1.2vw; margin-right: 1.5vw;"
+                                     :style="{'color': comboTitleTextColor}">
+                                    {{ combo['start_time'] }}开始
+                                </div>
+                                <div style="font-size: 1.2vw;" :style="{'color': comboTitleTextColor}">
+                                    {{ combo['end_time'] }}结束
+                                </div>
+                            </div>
+                            <div style="display: grid;grid-template-columns: auto auto;gap: 1vh 5vw; margin-top: 2vh;">
+                                <div v-for="item in combo.info"
+                                     style="display: flex; flex-direction: row; align-items: center;">
+                                    <img style="width: 1.77vw;height: 1.77vw;"
+                                         :src="`../../image/onlineMember/${comboData['level']}/${item.code}.png`"
+                                         :alt="`${item.title}`">
+                                    <div style="width: 6vw;margin:0 1vw;font-size: 1.1vw"
+                                         :style="{'color': comboTitleTextColor}">
+                                        {{ item.title }}
+                                    </div>
+                                    <div v-if="item.use !== undefined" style="font-size: 1.1vw;display: flex; flex-direction: row; align-items: center;"
+                                         :style="{'color': comboTitleTextColor}">
+                                        <span style="font-weight: bold;" :style="{'color': comboCountUseTextColor}">
+                                        {{ item.use }}
+                                        </span>
+                                        /{{ item.num }}
+                                    </div>
+                                    <div v-else style="font-size: 1.1vw; font-weight: bold;"
+                                         :style="{'color': comboCountUseTextColor}">
+                                        {{ item.num }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="packetData.length > 0" id="special-traffic-package">
+                    <div style="font-weight: bold;font-size: 1.1vw;" :style="{'color': comboCountTextColor}">
+                        专项流量包剩余次数
+                    </div>
+                    <div id="special-traffic-package-counts">
+                        <div v-for="item in packetData" style="display: flex; flex-direction: row; align-items: center;">
+                            <img style="width: 1.77vw;height: 1.77vw;margin-right: 1vw;" :src="`../../image/onlineMember/${comboData['level']}/${item.type}.png`"
+                                 :alt="`${item.title}`"/>
+                            <div style="display: flex; flex-direction: column;">
+                                <div style="display: flex; flex-direction: row; font-size: 1.14vw"
+                                     :style="{'color': comboCountTextColor}">
+                                    <div style="width: 6vw;margin-right: 1vw">{{ item.title }}</div>
+                                    <div v-if="item.use !== undefined" style="font-size: 1.1vw;display: flex; flex-direction: row; align-items: center;">
+                                        <span style="font-weight: bold;" :style="{'color': comboCountUseTextColor}">
+                                        {{ item.use }}
+                                        </span>
+                                        /{{ item.num }}
+                                    </div>
+                                    <div v-else style="font-size: 1.1vw; font-weight: bold;"
+                                         :style="{'color': comboCountUseTextColor}">
+                                        {{ item.num }}
+                                    </div>
+                                </div>
+                                <div style="font-size: 1vw" :style="{'color':packageEndTimeColor}">
+                                    {{ item['end_time'] }}到期
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button @click.stop="openRules"
+                        style="display: flex;align-items: center;justify-content: center;padding: 0.3vw 1vw; border: none; border-radius: 2vw; font-size: 1.3vw;margin: 1.83vh auto;"
+                        :style="rulesButtonStyle">
+                    规则说明
+                </button>
+            </div>
+        </div>
+    </template>
+</div>
+</body>
+<script>
+    const {createApp, ref, computed} = Vue
+    createApp({
+        setup() {
+            const comboData = ref({});
+            const extraComboData = computed(() => {
+                if (comboData.value['taocan'].length > 1) {
+                    return comboData.value['taocan'].slice(1).map(item => {
+                        const startTime = new Date(Number(item['start_time']) * 1000);
+                        const endTime = new Date(Number(item['end_time']) * 1000);
+                        return {
+                            ...item,
+                            start_time: `${startTime.getFullYear()}-${(startTime.getMonth() + 1).toString().padStart(2, '0')}-${startTime.getDate().toString().padStart(2, '0')}`,
+                            end_time: `${endTime.getFullYear()}-${(endTime.getMonth() + 1).toString().padStart(2, '0')}-${endTime.getDate().toString().padStart(2, '0')}`,
+                        }
+                    });
+                } else {
+                    return [];
+                }
+            });
+            const avatar = ref($api.getStorage('head_url'));
+            const isLoaded = ref(false);
+            const isOnlineVersion = computed(() => {
+                const level = comboData.value['level'];
+                return ['nomal', 'professional', 'plus', 'max'].includes(level);
+            });
+            const apiObj = ref(new GridOpenApi(UrlDomain, source, version));
+            const isUpgradeButtonShow = ref(false);
+
+            //去激活按钮样式
+            const upgradeButtonStyle = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return {
+                            background: "linear-gradient(to right,#ED6A34,#F3B258)"
+                        }
+                    case 'professional':
+                        return {
+                            background: "linear-gradient(to right,#A33300,#CE7851)"
+                        }
+                    case 'plus':
+                        return {
+                            background: "linear-gradient(to right,#1245E7,#5179ED)"
+                        }
+                    case 'max':
+                        return {
+                            background: "linear-gradient(to right,#F18F0F,#FFA710)"
+                        }
+                    case 'offprofessional':
+                        return {
+                            background: "linear-gradient(to right,#A33300,#CE7851)"
+                        }
+                    case 'offplus':
+                        return {
+                            background: "linear-gradient(to right,#1245E7,#5179ED)"
+                        }
+                    case 'offmax':
+                        return {
+                            background: "linear-gradient(to right,#F18F0F,#FFA710)"
+                        }
+                }
+            })
+
+            //到期时间
+            const endTime = computed(() => {
+                const data = new Date(parseInt(comboData.value['taocan'][0]['end_time']) * 1000);
+                return `${data.getFullYear()}-${(data.getMonth() + 1).toString().padStart(2, '0')}-${data.getDate().toString().padStart(2, '0')}到期`;
+            });
+
+            //头像框样式
+            const avatarStyle = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'offprofessional':
+                        return {
+                            transform: 'translate(-50%,-50%)'
+                        }
+                    case 'offplus':
+                        return {
+                            transform: 'translate(-40%,-55%)'
+                        }
+                    case 'offmax':
+                        return {
+                            transform: 'translate(-50%,-50%)',
+                            width: '11vw',
+                            height: '11vw',
+                        }
+                    default:
+                        return {}
+                }
+            })
+
+            //套餐名称
+            const comboMenuTextColorStyle = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return {
+                            background: 'linear-gradient(to right,#515160 0%,#70717B 100%)',
+                            'background-clip': 'text',
+                            '-webkit-background-clip': 'text',
+                            color: 'transparent',
+                            'margin-right': '4.15vw'
+                        }
+                    case 'professional':
+                        return {color: '#8A2B00'}
+                    case 'plus':
+                        return {color: '#092477'}
+                    case 'max':
+                        return {color: '#2C251E'}
+                    case 'offprofessional':
+                        return {color: '#8A2B00'}
+                    case 'offplus':
+                        return {color: '#183AA4'}
+                    case 'offmax':
+                        return {color: '#2C251E'}
+                }
+            });
+
+            //本月剩余套餐次数文本
+            const comboCountTextColor = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return '#787A79';
+                    case 'professional':
+                        return '#C0510F';
+                    case 'plus':
+                        return '#455FB1';
+                    case 'max':
+                        return '#957638';
+                    case 'offprofessional':
+                        return '#B95012';
+                    case 'offplus':
+                        return '#2C51C2';
+                    case 'offmax':
+                        return '#957638';
+                }
+            });
+
+            //套餐详情 详情
+            const comboTitleTextColor = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return '#5C5D63'
+                    case 'professional':
+                        return '#A94522'
+                    case 'plus':
+                        return '#546CB8'
+                    case 'max':
+                        return '#7F5E21'
+                    case 'offprofessional':
+                        return '#A94522'
+                    case 'offplus':
+                        return '#314CA1'
+                    case 'offmax':
+                        return '#7F5E21'
+                }
+            })
+
+            //套餐详情 使用
+            const comboCountUseTextColor = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return '#60606E'
+                    case 'professional':
+                        return '#EC6A54'
+                    case 'plus':
+                        return '#5179ED'
+                    case 'max':
+                        return '#ED7600'
+                    case 'offprofessional':
+                        return '#B95012'
+                    case 'offplus':
+                        return '#2C51C2'
+                    case 'offmax':
+                        return '#ED7600'
+
+                }
+            })
+
+            //规则说明按钮
+            const rulesButtonStyle = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return {
+                            'background-color': '#EFE8D8',
+                            color: '#5C5D63'
+                        }
+                    case 'professional':
+                        return {
+                            'background-color': '#F7DFD2',
+                            color: '#A94522'
+                        }
+                    case 'plus':
+                        return {
+                            'background-color': '#CEE5FB',
+                            color: '#5179ED'
+                        }
+                    case 'max':
+                        return {
+                            'background-color': '#FDE192',
+                            color: '#7F5E21'
+                        }
+                    case 'offprofessional':
+                        return {
+                            'background-color': '#F7DFD2',
+                            color: '#A94522'
+                        }
+                    case 'offplus':
+                        return {
+                            'background-color': '#CBE5FF',
+                            color: '#3350A8'
+                        }
+                    case 'offmax':
+                        return {
+                            'background-color': '#FDE192',
+                            color: '#7F5E21'
+                        }
+                }
+            })
+
+            const packetData = computed(() => {
+                const data = []
+                comboData.value['packet'].forEach((item) => {
+                    const time = new Date(parseInt(item['end_time']) * 1000)
+                    data.push({
+                        ...item,
+                        "end_time": `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()}`,
+                    })
+                })
+                return data
+            })
+
+            const packageEndTimeColor = computed(() => {
+                switch (comboData.value['level']) {
+                    case 'nomal':
+                        return '#A6A6A6'
+                    case 'professional':
+                        return '#EE8A5D'
+                    case 'plus':
+                        return '#99A9DC'
+                    case 'max':
+                        return '#AA853F'
+                    case 'offprofessional':
+                        return '#EE8A5D'
+                    case 'offplus':
+                        return '#4F78ED'
+                    case 'offmax':
+                        return '#AA853F'
+                }
+            })
+
+            function close() {
+                api.closeFrame();
+            }
+
+            async function loadData() {
+                // const ret = JSON.parse($api.getStorage('comboData'));
+                const ret = await new Promise((resolve, reject) => {
+                    apiObj.value.Get(UrlRouter.GetPayfeeUserInfo, {
+                        values: {
+                            uid: $api.getStorage("uid"),
+                            schoolid: $api.getStorage("schoolid"),
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            resolve(ret)
+                        } else {
+                            reject(err)
+                        }
+                    });
+                })
+                // console.log(JSON.stringify(ret));
+                if (ret.ret !== 0) {
+                    alert(ret.msg);
+                    close();
+                }
+                comboData.value = ret.data;
+                const res = await new Promise((resolve, reject) => {
+                    apiObj.value.Get(UrlRouter.GetSchoolConfig, {
+                        values: {
+                            schoolid: $api.getStorage("schoolid"),
+                            type: 'ai_pay_tip'
+                        }
+                    }, function (res, err) {
+                        if (res) {
+                            resolve(res)
+                        } else {
+                            reject(err)
+                        }
+                    });
+                });
+                // console.log(JSON.stringify(res))
+                if ((res.data.length > 0 && (String(res.data[0].value) === "0" || String(res.data[0].value) === "")) || res.data.length === 0) {
+                    $api.setStorage('upgradeQRCode', '0');
+                    isUpgradeButtonShow.value = true;
+                } else {
+                    $api.setStorage('upgradeQRCode', '1');
+                }
+            }
+
+            apiready = async () => {
+                apiObj.value.SetAuthToken($api.getStorage('token'));
+                await loadData();
+                isLoaded.value = true;
+
+                api.addEventListener({
+                    name: 'upgrade-updateComboData'
+                }, function (event) {
+                    const ret = JSON.parse($api.getStorage('comboData'));
+                    if (ret.ret !== 0) {
+                        close();
+                    }
+                    comboData.value = ret.data;
+                });
+
+                api.addEventListener({
+                    name: 'keyback'
+                }, () => {
+                    close();
+                });
+            }
+
+            function openUpgrade() {
+                api.openWin({
+                    name: 'win-upgrade',
+                    url: './win-upgrade.html',
+                })
+            }
+
+            function openRules() {
+                api.openWin({
+                    name: 'win-rules',
+                    url: './win-rules.html',
+                })
+            }
+
+            return {
+                comboData,
+                extraComboData,
+                avatar,
+                isLoaded,
+                isOnlineVersion,
+                isUpgradeButtonShow,
+                upgradeButtonStyle,
+                endTime,
+                comboMenuTextColorStyle,
+                comboCountTextColor,
+                comboTitleTextColor,
+                comboCountUseTextColor,
+                rulesButtonStyle,
+                packetData,
+                packageEndTimeColor,
+                avatarStyle,
+                close,
+                openUpgrade,
+                openRules,
+            }
+        }
+    }).mount('#member-container')
+</script>
+</html>

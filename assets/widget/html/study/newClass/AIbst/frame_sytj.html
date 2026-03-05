@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>实验与探究</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/frameDetail.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/ErrorBookLeftBtn.css">
+    <style>
+        [v-cloak] {
+            display: none !important;
+        }
+        .all_sytj_content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="all_sytj_content" style="height: 100%;width: 100%" v-cloak>
+
+    <ul class="leftedit_btn">
+        <li id="leftedit_btn_checkanswer" tapmode onclick="vm.onCheckAnswerClick();"><img class="noImgClick"
+                                                                                          id="leftedit_btn_checkanswer_src"
+                                                                                          :src="viewAnswer?'../../../../image/check_answer_down.png':'../../../../image/check_answer_up.png'">
+        </li>
+        <li id="leftedit_btn_AI" v-if="complete||viewAnswer" tapmode @click="PostAIBtn();">
+            <img class="noImgClick" id="leftedit_btn_remove_src" src="../../../../image/newhomework/aiBtn.png"></li>
+    </ul>
+
+    <div class="tkt_content" id="tkt_content" style="margin-left: 89px;width: calc(100% - 91px)">
+        <div class="tkt_top">
+            <ul>
+                <li class="tixing" v-text="'【'+txstr+'】'"></li>
+                <li v-if="complete||viewAnswer" class="zsd" @click="alertzsd(data.zsdmc)">
+                    <span>难易度：</span><img class="noImgClick"
+                                          :src="data.nyd==1?'../../../../image/newhomework/1xing.png':data.nyd==2?'../../../../image/newhomework/2xing.png':data.nyd==3?'../../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{data.zsdmc}}
+                </li>
+            </ul>
+        </div>
+        <div class="tkt_left" id="left" style="width: calc(60% - 40px)">
+            <div style="padding-left: 14px;" class="tg_content font666" v-html="data.tg"></div>
+        </div>
+        <div class="tkt_right clearfix" id="right" style="width: calc(40% + 37px)">
+            <div class="tkt_right_content">
+                <div class="huakuai" id="huakuai"></div>
+                <!--<span v-if="viewAnswer" class="zongfen">-->
+                <!--<span v-if="data.is_true!=0" v-html="'本题正确率<em>'+data.accuracy+'%</em>'"></span>-->
+                <!--<span v-if="data.is_true==0" style="color: #ff778c">待批</span>-->
+                <!--</span>-->
+
+                <!--<span class="wxtk_xiaoti" :style="!viewAnswer?'top:40px':'top:10px'" v-text="'共'+xiaotinum+'小题'"></span>-->
+                <span class="wxtk_xiaoti" style="top:10px" v-text="'共'+xiaotinum+'小题'"></span>
+                <ul class="wxtk_content clearfix">
+                    <li v-for="(list,index) in data.children">
+                        <!--答题部分开始-->
+                        <div style="width: calc(100% - 115px)" :class="!viewAnswer?'wxtk_tg':'xiaotifenge wxtk_tg'"
+                             v-html="'('+(index+1)+')'+list.tg"></div>
+                        <!--作图题图片题干-->
+                        <ul v-if="list.is_auto==0 && list.datatype==2 " class="zttimg clearfix">
+                            <li v-for="(item ,index2) in list.attachments">
+                                <img :src="item.serverpath+item.savename">
+                                <p v-text="index2+1"></p>
+                            </li>
+                        </ul>
+                        <!--答题部分结束-->
+                        <!--答案部分开始-->
+                        <dl v-if="viewAnswer" class="wxtk_answer bgFFF clearfix" :style="list.is_auto==1?'padding-top:0px' :'' ">
+                            <dd class="wxtk_myanswer clearfix">
+                                <!--自动批阅正确答案-->
+                                <div v-if="list.is_auto==1" class="sytj_auto" :style="itemindex==0?'margin-top: 0px':''"
+                                     v-for="(item,itemindex) in list.daoptions">
+                                    <div class="sytj_kong_list" v-text="'空'+(itemindex+1)+'：'"></div>
+                                    <div class="sytj_auto_kong">
+                                        <h4 v-if="viewAnswer">【{{data.tx_tip}}】</h4>
+                                        <p v-if="viewAnswer"
+                                           v-html="list.daoptions[itemindex].description_rep==''?'无':tihuan(list.daoptions[itemindex].description_rep)"></p>
+                                    </div>
+                                </div>
+                            </dd>
+                            <!--非自动批阅正确答案-->
+                            <dd v-if="list.is_auto==0" :style="viewAnswer?'display:block':'display:none'">
+                                <h2>【{{data.tx_tip}}】</h2>
+                                <ul>
+                                    <li class="wxtkzi" v-html="list.dastr==''?'无':list.dastr"></li>
+                                </ul>
+                            </dd>
+                            <dd :style="viewAnswer?'display:block':'display:none'" class="needpic">
+                                <h2>【答案解析】</h2>
+                                <ul>
+                                    <li class="wxtkzi" v-html="list.dajx==''?'无':list.dajx"></li>
+                                </ul>
+                            </dd>
+                        </dl>
+                        <!--答案部分开始-->
+                    </li>
+                </ul> 
+                <!--答案部分结束-->
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var moduleDialog = null;//弹窗模块bhzparam
+    apiready = function () {
+        vue();
+        vm.isdt = api.pageParam.isdt;
+        vm.totalCount = api.pageParam.totalCount;
+        vm.index = api.pageParam.index;
+        vm.current_page = api.pageParam.index;//
+
+        document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchstart', function () {
+            document.getElementById('leftedit_btn_checkanswer_src').src = "../../../../image/check_answer_down.png";
+        });
+        document.getElementById('leftedit_btn_checkanswer_src').addEventListener('touchend', function () {
+            document.getElementById('leftedit_btn_checkanswer_src').src = "../../../../image/check_answer_up.png";
+        });
+        vm.getExInfo();
+        vm.huakuai();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.all_sytj_content',
+            data: {
+                current_page: 0,
+                isdt: 1,
+                important: 0,
+                index: 0,
+                totalCount: 0,
+                data: {},
+                tx_type: '',
+                complete: 0,
+                viewAnswer: 0,//查看答案
+                viewAnswerArr: [],//查看答案的数组 学生做错习题时的答案信息
+                answerStr: '',//答案字符串
+                dastr: '',//习题正确答案
+                is_true: '',//本次答题是否正确
+                xiaotinum: 0,//小题总数
+                selectAnswerArr: [],//学生在错题本选择的答案数组
+                txstr: '',
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>确认移出错题本？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+                for (var i = 0; i < $api.domAll('a').length; i++) {
+                    $api.css($api.domAll('a')[i], 'color: #666;');
+                    $api.domAll('a')[i].onclick = function () {
+                        return false;
+                    }
+                }
+            },
+            methods: {
+                videoZYPlay: function (context) {
+                    var url = $api.attr(context, 'url');
+                    var filetime = $api.attr(context, 'filetime');
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../win_video_view.html',
+                        slidBackEnabled: false,
+                        pageParam: {
+                            path: url,
+                            title: '',
+                            isMp3: false,
+                            filetime: filetime
+                        }
+                    });
+                },
+                alertzsd: function (content) {
+                    alert('知识点：' + content);
+                },
+                tihuan: function (content) {
+                    var reg = new RegExp('#', "g");
+                    return content.replace(/#/g, "<font color='#999'>或</font>");
+                },
+                onCheckAnswerClick: function () {//点击查看答案
+                    vm.viewAnswer = !vm.viewAnswer;
+                    // vm.answerArr = vm.viewAnswerArr;
+                },
+                onMakePointClick: function () {
+                    apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                        body: $api.jsonToStr({
+                            uid: $api.getStorage('uid'),
+                            type: 'is_important',
+                            sys_id: vm.data.sys_id,
+                            kc_type: vm.data.kc_type,
+                            is_important: vm.important == 1 ? 0 : 1
+                        })
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                if (vm.important === 0) {
+                                    vm.important = 1;
+                                } else {
+                                    vm.important = 0;
+                                }
+                                api.sendEvent({
+                                    name: 'editImp',
+                                    extra: {}
+                                });
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                onRemoveFromErrNoteClick: function () {
+                    moduleDialog = api.require('moduleDialog');
+                    moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'ok') {
+                                apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteStudentWrongBookUrl, {
+                                    body: $api.jsonToStr({
+                                        uid: $api.getStorage('uid'),
+                                        type: 'outbook',
+                                        sys_id: vm.data.sys_id,
+                                        kc_type: vm.data.kc_type,
+                                    })
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.ret == 0) {
+                                            //在这处理删除第一题，最后一题以及总题数是否为0
+                                            vm.totalCount = vm.totalCount - 1;
+
+                                            if (vm.totalCount == 0) {
+                                                api.closeWin();
+                                            }
+                                            else {
+                                                api.sendEvent({
+                                                    name: 'onTopIndexChange',
+                                                    extra: {index: vm.current_page},
+                                                });
+                                            }
+                                            api.sendEvent({
+                                                name: 'removeError',
+                                                extra: {}
+                                            });//刷新错题列表的frame数据
+
+                                        } else {
+                                            api.toast({
+                                                msg: ret.msg,
+                                                duration: 2000,
+                                                location: 'bottom'
+                                            });
+                                        }
+                                    } else {
+                                        api.toast({
+                                            msg: err.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                    }
+                                });
+                                dismissDialog();
+                            } else {
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+
+                    });
+                },
+                getExInfo: function () {
+                    vm.data = api.pageParam.material;
+                    vm.tx_type = vm.data.tx;
+                    vm.txstr = vm.data.txstr;
+                    vm.important = vm.data.is_important;
+                    vm.dastr = vm.data.dastr;
+                    vm.xiaotinum = vm.data.children.length;
+                    for (var i = 0; i < vm.data.children.length; i++) {//给初始化的自动填空加个默认空答案 防止报错
+                        var sytjda = [];
+                        if (vm.data.children[i].is_auto == 1) {
+                            for (var j = 0; j < vm.data.children[i].options.length; j++) {
+                                var kongda = {
+                                    'is_unable': 0,
+                                    'is_txt': 1,
+                                    'descript': ''
+                                };
+                                Vue.set(sytjda, j, kongda);
+                            }
+                        } else {
+                            sytjda = []
+                        }
+                        var kongcontent = {
+                            'topid': vm.data.id, 
+                            'is_unable': vm.data.children[i].is_unable,
+                            'is_txt': 0,
+                            'id': vm.data.children[i].id,
+                            'is_auto': vm.data.children[i].is_auto,
+                            'sort': vm.data.children[i].sort,
+                            'daoptions': vm.data.children[i].daoptions,
+                            'da': sytjda
+                        };
+                        Vue.set(vm.viewAnswerArr, i, kongcontent);
+                    }
+                    $('.all_sytj_content').css('display','block');
+                },
+                huakuai: function () {
+                    var tktcontent = document.getElementById('tkt_content'); //长线条
+                    var right = document.getElementById('right'); //小方块
+                    var left = document.getElementById('left');
+                    var huakuai = document.getElementById('huakuai');
+                    var ifBool = false; //判断鼠标是否按下
+                    //鼠标按下方块
+                    huakuai.addEventListener("touchstart", function (e) {
+                        e.stopPropagation();
+                        ifBool = true;
+                    });
+                    //拖动
+                    window.addEventListener("touchmove", function (e) {
+                        if (ifBool) {
+                            var x = e.touches[0].pageX || e.touches[0].clientX; //鼠标横坐标var x
+                            var lineDiv_left = getPosition(tktcontent).left; //长线条的横坐标
+                            var minDiv_left = x - lineDiv_left; //小方块相对于父元素（长线条）的left值
+                            if (minDiv_left >= tktcontent.offsetWidth - 15) {
+                                minDiv_left = tktcontent.offsetWidth - 15;
+                            }
+                            //设置拖动后小方块的left值
+                            var rightwidth;
+                            var leftwidth;
+
+                            var realWith = $(window).width() - 89;
+                            if ((realWith - minDiv_left) > (realWith * 0.7 + 37)) {
+                                rightwidth = realWith * 0.7 + 37;
+                                leftwidth = realWith * 0.3 - 40;
+                            } else if ((realWith - minDiv_left) < (realWith * 0.4 + 37)) {
+                                rightwidth = realWith * 0.4 + 37;
+                                leftwidth = realWith * 0.6 - 40;
+                            } else {
+                                rightwidth = realWith - minDiv_left;
+                                leftwidth = minDiv_left
+                            }
+
+                            right.style.width = rightwidth + "px";
+                            left.style.width = leftwidth + "px";
+                        }
+                    });
+                    //鼠标松开
+                    window.addEventListener("touchend", function (e) {
+                        ifBool = false;
+                    });
+
+                    //获取元素的绝对位置
+                    function getPosition(node) {
+                        var left = node.offsetLeft; //获取元素相对于其父元素的left值var left
+                        var top = node.offsetTop;
+                        current = node.offsetParent; // 取得元素的offsetParent
+                        // 一直循环直到根元素
+                        while (current != null) {
+                            left += current.offsetLeft;
+                            top += current.offsetTop;
+                            current = current.offsetParent;
+                        }
+                        return {
+                            "left": left,
+                            "top": top
+                        };
+                    }
+                },
+                PostAIBtn: async function () {
+                    const aiAnalysis = $api.getStorage('aiAnalysis');
+                    const ret = await new Promise((resolve, reject) => {
+                        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostPayfeeOperationLog, {
+                            body: $api.jsonToStr({
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_analysis',
+                                resource_id: vm.data.xtid,
+                                count: aiAnalysis.count,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null,
+                                ...(aiAnalysis.card_id !== undefined && {card_id: aiAnalysis.card_id}),
+                            })
+                        }, function (ret, err) {
+                            if (ret) {
+                                resolve(ret);
+                            } else {
+                                reject(err);
+                            }
+                        })
+                    });
+                    if ((aiAnalysis.count <= 0 && ret.ret === 0 && ret.data === 'nonumber')|| ret.ret === -1) {
+                        if ($api.getStorage('upgradeQRCode') === '1') {
+                            api.toast({
+                                msg: '本月剩余AI解析次数已耗尽',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            api.openFrame({
+                                name: 'frame-number-exhausted',
+                                url: '../../frame-number-exhausted.html',
+                            })
+                        }
+                        return
+                    }
+                    if(ret.ret === 0 && ret.data === ''){
+                        api.execScript({
+                            name: 'win_bst.html',
+                            script: 'postAiAnalysis()'
+                        });
+                    }
+                    api.showProgress({
+                        title: '正在请求AI',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    const tgContent = document.querySelector('.tg_content');
+                    const wxtk_tgs = document.querySelectorAll('.wxtk_tg');
+                    const needpics = document.querySelectorAll('.needpic');
+                    const allElements = [tgContent, ...wxtk_tgs, ...needpics];
+                    const imageUrls = [];
+                    let processedCount = 0;
+                    // 处理每个元素的截图
+                    allElements.forEach((element, index) => {
+                        if (!element) return;
+                        html2canvas(element, {
+                            backgroundColor: '#ffffff',
+                            scale: 2,
+                            useCORS: true
+                        }).then(canvas => {
+                            const imgUrl = canvas.toDataURL('image/png');
+                            // 保存图片到相册    
+                            imageUrls[index] = imgUrl;
+                            processedCount++;
+                            // 当所有图片都处理完成时
+                            if (processedCount == allElements.length) {
+                                api.hideProgress();
+                                api.openFrame({
+                                    name: 'frame_liushi',
+                                    url: '../../newHomework/frame_liushi.html',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: api.winHeight
+                                    },
+                                    pageParam: {
+                                        xtid: vm.data.xtid,
+                                        imagePaths: imageUrls,
+                                        classroom: true
+                                    },
+                                    bounces: false
+                                });
+                            }
+                        }).catch(error => {
+                            api.toast({
+                                msg: '截图失败：' + error,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        });
+                    });
+                },
+
+            }
+        });
+    }
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+</script>
+</html>

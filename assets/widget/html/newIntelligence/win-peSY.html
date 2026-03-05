@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>实验演示</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body { margin: 0; background: #000; }
+        .header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            position: relative;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .back-btn img { width: 20px; height: 20px; }
+        .title { margin-left: 12px; font-size: 16px; color: #fff; opacity: 0.9; }
+    </style>
+</head>
+
+<body>
+<div class="header">
+    <div class="back-btn" onclick="api.closeWin()">
+        <span class="aui-iconfont aui-icon-left" style="color:#fff;font-size:1rem;"></span>
+        <span>退出</span>
+    </div>
+    <div class="title">实验演示</div>
+    
+    <div id="headerHeightHook" style="position:absolute; left:0; bottom:-1px; width:1px; height:1px;"></div>
+    
+    
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var peurl = api.pageParam && api.pageParam.peurl ? api.pageParam.peurl : '';
+        var headerEl = document.querySelector('.header');
+        var headerH = headerEl ? headerEl.offsetHeight : 56;
+        api.openFrame({
+            name: 'frame-peSY',
+            url: peurl,
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: api.winHeight - headerH
+            },
+            bounces: false,
+            useWKWebView: true,
+            allowEdit: false,
+            vScrollBarEnabled: true,
+            hScrollBarEnabled: true,
+            reload: true
+        });
+        
+        // 延迟打开遮罩层frame
+        setTimeout(function() {
+            var maskWidth = 180;
+            var maskHeight = 50;
+            var maskX = api.winWidth - maskWidth;
+            var maskY = api.winHeight - maskHeight;
+            api.openFrame({
+                name: 'frame-peSY-mask',
+                url: 'win-mask.html',
+                rect: {
+                    x: maskX,
+                    y: maskY,
+                    w: maskWidth,
+                    h: maskHeight
+                },
+                bounces: false,
+                useWKWebView: false,
+                allowEdit: true,
+                vScrollBarEnabled: false,
+                hScrollBarEnabled: false,
+                reload: false
+            });
+        }, 500);
+    };
+</script>
+
+</html>
+
+

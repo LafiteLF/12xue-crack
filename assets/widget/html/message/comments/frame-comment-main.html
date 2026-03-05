@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .aui-border-b {
+            background-color: white;
+        }
+
+        .replay-status {
+            font-size: 16px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 25px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #4bc7c7;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .aui-user-view-cell .aui-img-body span > em {
+            color: #fff;
+            float: none;
+        }
+
+        .aui-user-view-cell .aui-img-body span {
+            margin-top: 0;
+        }
+
+        .content-text {
+            font-size: 14px;
+            line-height: 1.8;
+            margin: 0 0.5rem;
+        }
+        .content-text img{
+            width: 14%;
+            height: auto;!important;
+        }
+        .aui-card-list-content-padded {
+
+            padding: 0 !important;
+        }
+
+        .aui-user-view-cell p {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .content-replay {
+            font-size: 14px;
+            float: right;
+            padding: 11px 15px;
+        }
+
+        .color-gray {
+            color: #b5b5b5;
+            margin-right: 5px;
+        }
+
+        .tip {
+            text-align: center;
+            height: 30px;
+            padding-top: 7px;
+        }
+
+        .aui-card-list-user-avatar {
+            width: 3rem;
+        }
+
+        .aui-label {
+            padding: 0.1rem 0.25rem;
+            vertical-align: middle;
+            margin-bottom: 0.2rem;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .aui-card-list {
+            margin-bottom: 0;
+            min-height: 5rem;
+        }
+
+        .aui-card-list-user-avatar {
+            height: 3rem;
+            position: relative;
+        }
+
+        .sex {
+            color: dodgerblue;
+            top: 52px;
+            position: absolute;
+            right: -1px;
+            text-align: right;
+            font-size: 1.1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 52px;
+            position: absolute;
+            right: -1px;
+            text-align: right;
+            font-size: 1.1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .aui-card-list-user-avatar img {
+            height: 100%;
+            max-height: 100%;
+        }
+
+        .aui-btn {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 14px;
+        }
+
+        .img-size1 {
+            width: 80%;
+
+        }
+
+        .content-forward {
+            background-color: #f5f5f5;
+        }
+
+        .forward-school {
+            color: #757575;
+        }
+
+        .thumb-red {
+            color: #dd191b;
+        }
+        .content-text img{
+            width: 20%;
+            height: auto;!important;
+        }
+        .aui-card-list-content-padded .content-text img, .aui-card-list-content-padded .content-forward-text img, .report-content-forward-text img {
+            width: 14%;
+            height: auto;!important;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .aui-card-list-content-padded .content-exercise img, .aui-card-list-content-padded .content-forward-exercise img, .report-content-forward-exercise img {
+            width: 35px;
+            height: 35px;
+            max-width: 100%;
+            display: inline-block;
+        }
+
+        .report-block {
+            margin-bottom: 0.25rem;
+            margin-top: 0.25rem;
+        }
+
+        .little-user-name {
+            overflow: inherit;
+            font-size: 14px !important;
+            color: #4bc6c6 !important;
+        }
+
+        .school-green {
+            color: #4bc6c6 !important;
+            font-size: 14px;
+        }
+
+        .gray-btn {
+            color: #b5b5b5;
+        }
+
+        .username {
+            max-width: 6rem;
+            float: left;
+            display: block;
+        }
+
+        .aui-card-list-user-name {
+            font-size: 14px !important;
+        }
+
+        .aui-border-b {
+            border: 10px solid #f2f2f2;
+        }
+
+        *:after {
+            height: 0px !important;
+        }
+
+        *:before {
+            height: 0 !important;
+        }
+        .content-text {
+            pointer-events: none;
+        }
+        .school-green {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="aui-content">
+        <ul class="aui-list">
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar">-->
+            <!--<img src="./../../../../image/12xueStu/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">v3</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-info aui-text-default">烟台第五中学 老师</div>-->
+            <!--<small class="aui-card-list-user-info">2分钟前 来自iphone客户端</small>-->
+            <!--</div>-->
+
+            <!--<div style="background-color:white" class=" aui-padded-b-10">-->
+            <!--<div class="content-text">回复<span class="little-user-name">@我是乔帮主<div-->
+            <!--class="aui-label aui-label-info level">v3-->
+            <!--</div><a class="school-green">(淄博文化中学 老师)</a></span>:<span>谢谢你,客气!</span></div>-->
+
+            <!--<div class="aui-card-list-content-padded aui-margin-l-10 aui-margin-r-10"-->
+            <!--style="background-color: #F4F4F4;padding-bottom: 10px!important;">-->
+
+            <!--<div class="content-text">回复<span class="little-user-name">@李四<div-->
+            <!--class="aui-label aui-label-info level">v3-->
+            <!--</div><a class="school-green">(淄博文化中学 老师)</a></span>:<span>谢谢你,客气!</span></div>-->
+
+            <!--<div class="content-forward aui-margin-l-5 aui-margin-r-5"-->
+            <!--style="background: white;padding: 5px 10px;">-->
+
+            <!--<div class="aui-card-list-user-name  aui-margin-b-5">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span-->
+            <!--class="aui-label aui-label-info">v3</span><span-->
+            <!--class="aui-text-default">（烟台第五中学  老师）</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="content-forward-text ">-->
+            <!--lalalal-->
+            <!--</div>-->
+            <!--<div class="content-img aui-padded-t-5 aui-margin-l-5" style="margin-right: 5px;">-->
+            <!--&lt;!&ndash;<img class="img-size1" src="../../../../image/12xueStu/test.png"/>&ndash;&gt;-->
+            <!--</div>-->
+            <!--<div class="report-block" style="background-color: #F4F4F4">-->
+            <!--<div class="aui-card-list-user-name  aui-margin-b-5">-->
+            <!--<div class="aui-text-primary aui-margin-l-5" style="margin-top: 0.25rem">我是乔帮主 <span-->
+            <!--class="aui-label aui-label-info">v3</span><span-->
+            <!--class="aui-text-default">（烟台第五中学  老师）</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="content-forward-text aui-margin-l-5 aui-margin-b-5 report-content">-->
+            <!--上传了<span class="aui-text-primary">【教学设计】小猫钓鱼</span> <br>-->
+            <!--数学 七年级 鲁教版（新版）第四单元 估算-->
+            <!--</div>-->
+            <!--<div class="content-img aui-padded-t-5 report-content-img aui-margin-l-5"-->
+            <!--style="margin-right: 5px;">-->
+            <!--&lt;!&ndash;<img class="img-size1" src="../../../../image/12xueStu/test.png"/>&ndash;&gt;-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <!--<div class="aui-card-list-user-info">2分钟前 来自iphone客户端</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+
+            <!--<div style="line-height: 14px;height: 43px">-->
+            <!--<div class="content-replay">-->
+            <!--<span class="btn-inspectDialog"><span class="color-gray aui-iconfont aui-icon-community"></span>查看对话</span>-->
+            <!--<span class="btn-replay"><span class="color-gray aui-iconfont aui-icon-comment"></span>回复</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</section>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var pullRefresh;
+    var selectedId = "2";
+    var totalP;
+    var p = 1;
+    apiready = function () {
+        getCommentList(p);
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                $api.html($api.dom('.aui-list'), '');
+                getCommentList(p);
+            }
+        });
+
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: -100           //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            p++;
+            if (p > totalP) {
+                api.toast({
+                    msg: '已经到底啦，没有更多消息了',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                getCommentList(p);
+            }
+        });
+    };
+    var count = 0;
+    var count1 = 0;
+
+    function getCommentList(page) {
+
+        api.showProgress();
+        if (selectedId == "2") {
+            //收到的
+            apiObj.Get(UrlRouter.GetReceivedComments, {
+                values: {
+                    num: 10,
+                    p: page
+                }
+
+            }, function (ret, err) {
+                if (ret) {
+                    api.hideProgress();
+                    pullRefresh.cancelLoading();
+                    if (ret.ret == 0) {
+                        totalP = ret.totalpage;
+                        if (ret.list.length == 0) {
+                            $api.html($api.dom('.aui-list'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;position: absolute;top: 20%;left: 30%;"/> </div>');
+                            $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+                            return;
+                        }
+                        for (var i = 0; i < ret.list.length; i++) {
+                            if (ret.list[i].dynamic.status == 1) {
+                                count++;
+                            }
+                        }
+                        for (var i = 0; i < ret.list.length; i++) {
+
+                            if (ret.list[i].dynamic.status == 0) {
+                                if (count == 0) {
+                                    $api.html($api.dom('.aui-list'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;position: absolute;top: 20%;left: 30%;"/> </div>');
+                                    $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+                                }
+                            } else {
+
+
+                                var role = '';
+                                switch (ret.list[i].userinfo.identitytype) {
+                                    case 2:
+                                        role = "老师";
+                                        break;
+                                    case 3:
+                                        role = "学生";
+                                        break;
+                                    case 4:
+                                        role = "家长";
+                                        break;
+                                    default:
+                                        role = "未知";
+                                        break;
+                                }
+                                var myrole = '';
+                                switch (ret.list[i].dynamic.userinfo.identitytype) {
+                                    case 2:
+                                        myrole = "老师";
+                                        break;
+                                    case 3:
+                                        myrole = "学生";
+                                        break;
+                                    case 4:
+                                        myrole = "家长";
+                                        break;
+                                    default:
+                                        myrole = "未知";
+                                        break;
+                                }
+
+
+//                            var refRole = '';
+//                            switch (ret.list[i].ref.userinfo.identitytype) {
+//                                case "2":
+//                                    refRole = "老师";
+//                                    break;
+//                                case "3":
+//                                    refRole = "学生";
+//                                    break;
+//                                case "4":
+//                                    refRole = "家长";
+//                                    break;
+//                                default:
+//                                    refRole = "未知";
+//                                    break;
+//                            }
+
+                                var replyContent = ret.list[i].ref ? '<div class="content-text">' + ret.list[i].content + '</div>' : '<div class="content-text">' + ret.list[i].content + '</div>'
+                                var inspectDia = ret.list[i].ref ? '<span class="btn-inspectDialog" tapmode onclick="inspectDialogueClick(this)" commentId="' + ret.list[i].id + '"><span class="color-gray aui-iconfont aui-icon-community"></span>查看对话</span>' : '';
+                                if (ret.list[i].ref) {
+                                    var refRole = '';
+                                    switch (ret.list[i].ref.userinfo.identitytype) {
+                                        case 2:
+                                            refRole = "老师";
+                                            break;
+                                        case 3:
+                                            refRole = "学生";
+                                            break;
+                                        case 4:
+                                            refRole = "家长";
+                                            break;
+                                        default:
+                                            refRole = "未知";
+                                            break;
+                                    }
+                                    if (ret.list[i].userinfo.sex == 1) {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                                    } else {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                                    }
+                                    $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b"> <div class="aui-card-list-header aui-card-list-user"> <div class="aui-card-list-user-avatar">' + sexhtml + ' <img src="' + ret.list[i].userinfo.face + '" class="aui-img-round" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"/> </div> <div class="aui-card-list-user-name" style="font-size: 16px!important;"> <div class="aui-text-primary" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"><span class="username aui-ellipsis-1">' + ret.list[i].userinfo.realname + '</span> <span class="aui-label aui-label-info">' + ret.list[i].userinfo.rank + '</span></div> </div> <div class="aui-card-list-user-info aui-text-default">' + ret.list[i].userinfo.xxmc + ' ' + role + '</div> <small class="aui-card-list-user-info">' + ret.list[i].createtime + ' ' + ret.list[i].device + '</small> </div> <div style="background-color:white" class=" aui-padded-b-10">' + replyContent + ' <div class="aui-card-list-content-padded" style="background-color: #f9f9f9;padding-bottom: 10px!important;"><div class="content-text"><span class="little-user-name">@' + ret.list[i].ref.userinfo.realname + '<div class="aui-label aui-label-info level">' + ret.list[i].ref.userinfo.rank + '</div><a class="school-green">(' + ret.list[i].ref.userinfo.xxmc + ' ' + refRole + ')</a></span>:<span>' + ret.list[i].ref.content + '</span></div><div class="content-forward aui-margin-l-10 aui-margin-r-10" style="background: white;padding: 5px 10px;" dynamicid="' + ret.list[i].dynamicid + '" tapmode onclick="momentDetail(this)"> <div class="aui-card-list-user-name  aui-margin-b-5" > <div class="aui-text-primary ">' + ret.list[i].dynamic.userinfo.realname + ' <span class="aui-label aui-label-info">' + ret.list[i].dynamic.userinfo.rank + '</span><span class="aui-text-default">（' + ret.list[i].dynamic.userinfo.xxmc + '  ' + myrole + '）</span> </div> </div> <div class="content-forward-exercise "> </div><div class="content-forward-text "> </div> <div class="content-img aui-padded-t-5 aui-margin-l-5" style="margin-right: 5px;"> </div> <div class="report-block" style="background-color:white"> </div></div><div class="aui-card-list-user-info aui-padded-t-5 aui-padded-l-10">' + ret.list[i].ref.createtime + ' ' + ret.list[i].ref.device + '</div> </div> </div> <div style="line-height: 14px;height: 43px"> <div class="content-replay"> ' + inspectDia + ' <span class="btn-replay" tapmode onclick="replyClick(this)" commentId="' + ret.list[i].id + '" replyname="' + ret.list[i].userinfo.realname + '" dynamicid="' + ret.list[i].dynamicid + '"><span class="color-gray aui-iconfont aui-icon-comment"></span>回复</span> </div> </div> </li>');
+
+                                } else {
+                                    if (ret.list[i].userinfo.sex == 1) {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                                    } else {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                                    }
+                                    $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b"> <div class="aui-card-list-header aui-card-list-user"> <div class="aui-card-list-user-avatar">' + sexhtml + ' <img src="' + ret.list[i].userinfo.face + '" class="aui-img-round" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"/> </div> <div class="aui-card-list-user-name" style="font-size: 16px!important;"> <div class="aui-text-primary" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"><span class="username aui-ellipsis-1">' + ret.list[i].userinfo.realname + '</span> <span class="aui-label aui-label-info">' + ret.list[i].userinfo.rank + '</span></div> </div> <div class="aui-card-list-user-info aui-text-default">' + ret.list[i].userinfo.xxmc + ' ' + role + '</div> <small class="aui-card-list-user-info">' + ret.list[i].createtime + ' ' + ret.list[i].device + '</small> </div> <div class="aui-card-list-content-padded">' + replyContent + '<div class="content-forward" style="background: #f9f9f9;padding: 5px 10px;" dynamicid="' + ret.list[i].dynamicid + '" tapmode onclick="momentDetail(this)"> <div class="aui-card-list-user-name  aui-margin-b-5" > <div class="aui-text-primary ">' + ret.list[i].dynamic.userinfo.realname + ' <span class="aui-label aui-label-info">' + ret.list[i].dynamic.userinfo.rank + '</span><span class="aui-text-default">（' + ret.list[i].dynamic.userinfo.xxmc + '  ' + myrole + '）</span> </div> </div> <div class="content-forward-exercise "> </div><div class="content-forward-text "> </div> <div class="content-img aui-padded-t-5 aui-margin-l-5" style="margin-right: 5px;"> </div> <div class="report-block" style="background-color: #f9f9f9"> </div> <div class="aui-card-list-user-info">' + ret.list[i].dynamic.createtime + ' ' + ret.list[i].dynamic.device + '</div> </div> </div> <div style="line-height: 14px;height: 43px"> <div class="content-replay"> ' + inspectDia + ' <span class="btn-replay" tapmode onclick="replyClick(this)" commentId="' + ret.list[i].id + '" replyname="' + ret.list[i].userinfo.realname + '" dynamicid="' + ret.list[i].dynamicid + '"><span class="color-gray aui-iconfont aui-icon-comment"></span>回复</span> </div> </div> </li>');
+
+                                }
+
+                                if (ret.list[i].dynamic.content != ''||refContentIsNull(ret.list[i].dynamic.ref)) {
+                                    var content = ret.list[i].dynamic.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                                    switch (ret.list[i].dynamic.contenttype) {
+                                        case '':
+                                        case 'user':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], ret.list[i].dynamic.ref ? '转发了动态:' + content : content);
+                                            break;
+                                        case 'course':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], '制作了<span class="aui-text-primary">【课堂资源包】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc + ' ' + ret.list[i].dynamic.tag.bbmc + ' ' + ret.list[i].dynamic.tag.dymc + ' ' + ret.list[i].dynamic.tag.jmc);
+                                            break;
+                                        case 'homework':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], '布置了<span class="aui-text-primary">【作业】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc);
+                                            break;
+                                        case 'material':
+                                            var fl = ret.list[i].dynamic.fl == '1' ? '教学设计' : ret.list[i].dynamic.fl == '2' ? '自主学习单' : ret.list[i].dynamic.fl == '3' ? '精讲助学' : ret.list[i].dynamic.fl == '4' ? '影音素材' : ret.list[i].dynamic.fl == '6' ? '微课' : '其他类';
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], '上传了<span class="aui-text-primary">【' + fl + '】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc + ' ' + ret.list[i].dynamic.tag.bbmc + ' ' + ret.list[i].dynamic.tag.dymc + ' ' + ret.list[i].dynamic.tag.jmc);
+                                            break;
+                                        case 'exercise':
+                                            $api.html($api.domAll('.content-forward-exercise')[$api.domAll('.content-forward-exercise').length - 1], '编写了<span class="aui-text-primary">【习题】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc + ' ' + ret.list[i].dynamic.tag.bbmc + ' ' + ret.list[i].dynamic.tag.sxcmc + ' ' + ret.list[i].dynamic.tag.dymc + ' ' + ret.list[i].dynamic.tag.jmc);
+                                            break;
+                                    }
+                                }
+
+                                if (ret.list[i].dynamic.image_list != null) {
+                                    if (ret.list[i].dynamic.image_list.length == 1) {
+                                        if (ret.list[i].dynamic.image_list[0].indexOf('?') != -1) {
+                                            $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.image_list[0] + '/auto-orient/thumbnail/!65p"/>');
+                                        } else {
+                                            $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.image_list[0] + '?imageMogr2/auto-orient/thumbnail/!65p"/>');
+                                        }
+                                    } else if (ret.list[i].dynamic.image_list.length > 1) {
+                                        $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<div class="img-size4 aui-row aui-row-padded"> </div>');
+                                        for (var imageSize = 0; imageSize < ret.list[i].dynamic.image_list.length; imageSize++) {
+                                            if (ret.list[i].dynamic.image_list[imageSize].indexOf('?') != -1) {
+                                                $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.image_list[imageSize] + '/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                            } else {
+                                                $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.image_list[imageSize] + '?imageMogr2/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (ret.list[i].dynamic.ref != null) {
+                                    var reportrole = '';
+                                    switch (ret.list[i].dynamic.ref.userinfo.identitytype) {
+                                        case 2:
+                                            reportrole = "老师";
+                                            break;
+                                        case 3:
+                                            reportrole = "学生";
+                                            break;
+                                        case 4:
+                                            reportrole = "家长";
+                                            break;
+                                        default:
+                                            reportrole = "未知";
+                                            break;
+                                    }
+
+                                    $api.append($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '<div class="report-content-forward-exercise "> </div><div class="report-content-forward-text"> </div> <div class="aui-margin-t-5 report-content-img" style="margin-right: 5px;"> </div>');
+                                    $api.domAll('.report-block')[$api.domAll('.report-block').length - 1].id = ret.list[i].dynamic.ref.id;
+
+                                    if (ret.list[i].dynamic.ref.status == 0) {
+                                        $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '内容已被删除');
+                                    } else {
+                                        if (ret.list[i].dynamic.ref.content != '') {
+                                            var refContent = ret.list[i].dynamic.ref.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                                            switch (ret.list[i].dynamic.ref.content_type) {
+                                                case '':
+                                                case 'user':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), ret.list[i].dynamic.ref.content);
+                                                    break;
+                                                case 'course':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '制作了<span class="aui-text-primary">【课堂资源包】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc + ' ' + ret.list[i].dynamic.ref.tag.bbmc + ' ' + ret.list[i].dynamic.ref.tag.dymc + ' ' + ret.list[i].dynamic.ref.tag.jmc);
+                                                    break;
+                                                case 'homework':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '布置了<span class="aui-text-primary">【作业】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc);
+                                                    break;
+                                                case 'material':
+                                                    var fl = ret.list[i].dynamic.ref.fl == '1' ? '教学设计' : ret.list[i].dynamic.ref.fl == '2' ? '自主学习单' : ret.list[i].dynamic.ref.fl == '3' ? '精讲助学' : ret.list[i].dynamic.ref.fl == '4' ? '影音素材' : ret.list[i].dynamic.fl == '6' ? '微课' : '其他类';
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '上传了<span class="aui-text-primary">【' + fl + '】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc + ' ' + ret.list[i].dynamic.ref.tag.bbmc + ' ' + ret.list[i].dynamic.ref.tag.dymc + ' ' + ret.list[i].dynamic.ref.tag.jmc);
+                                                    break;
+                                                case 'exercise':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-exercise'), '编写了<span class="aui-text-primary">【习题】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc + ' ' + ret.list[i].dynamic.ref.tag.bbmc + ' ' + ret.list[i].dynamic.ref.tag.dymc + ' ' + ret.list[i].dynamic.ref.tag.jmc);
+                                                    break;
+                                            }
+                                        }
+                                        if (ret.list[i].dynamic.ref.image_list == null) {
+
+                                        } else if (ret.list[i].dynamic.ref.image_list.length == 1) {
+                                            if (ret.list[i].dynamic.ref.image_list[0].indexOf('?') != -1) {
+                                                $api.html($api.domAll('.report-content-img')[$api.domAll('.report-content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.ref.image_list[0] + '/auto-orient/thumbnail/!65p"/>');
+                                            } else {
+                                                $api.html($api.domAll('.report-content-img')[$api.domAll('.report-content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.ref.image_list[0] + '?imageMogr2/auto-orient/thumbnail/!65p"/>');
+                                            }
+                                        } else if (ret.list[i].dynamic.ref.image_list.length > 1) {
+                                            $api.html($api.domAll('.report-content-img')[$api.domAll('.report-content-img').length - 1], '<div class="img-size4 aui-row aui-row-padded"> </div>');
+                                            for (var imageSize1 = 0; imageSize1 < ret.list[i].dynamic.ref.image_list.length; imageSize1++) {
+                                                if (ret.list[i].dynamic.ref.image_list[imageSize1].indexOf('?') != -1) {
+                                                    $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.ref.image_list[imageSize1] + '/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                                } else {
+                                                    $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.ref.image_list[imageSize1] + '?imageMogr2/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (var j = 0; j < $api.domAll('.content-img img').length; j++) {
+                            $api.css($api.domAll('.content-img img')[j], 'height:' + $api.offset($api.domAll('.content-img img')[j]).w + 'px');
+                        }
+                        for (var j = 0; j < $api.domAll('.report-content-img img').length; j++) {
+                            $api.css($api.domAll('.report-content-img img')[j], 'height:' + $api.offset($api.domAll('.report-content-img img')[j]).w + 'px');
+                        }
+                        for (var j = 0; j < $api.domAll('.aui-img-round').length; j++) {
+                            $api.css($api.domAll('.aui-img-round')[j], 'height:' + $api.offset($api.domAll('.aui-img-round')[j]).w + 'px');
+                        }
+                    } else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+
+            })
+        } else {
+            //发出的
+            apiObj.Get(UrlRouter.GetSentComments, {
+                values: {
+                    num: 10,
+                    p: page
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    api.hideProgress();
+                    pullRefresh.cancelLoading();
+                    if (ret.ret == 0) {
+                        totalP = ret.totalpage;
+                        if (ret.list.length == 0) {
+                            $api.html($api.dom('.aui-list'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;position: absolute;top: 20%;left: 30%;"/> </div>');
+                            $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+                            return;
+                        }
+                        for (var i = 0; i < ret.list.length; i++) {
+                            if(ret.list[i].dynamic.status == 1) {
+                                count1++;
+                            }
+                        }
+                        for (var i = 0; i < ret.list.length; i++) {
+                            if (ret.list[i].dynamic.status == 0) {
+                                if(count1==0){
+                                    $api.html($api.dom('.aui-list'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;position: absolute;top: 20%;left: 30%;"/> </div>');
+                                    $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+                                }
+                            } else {
+                                var role = '';
+                                switch (ret.list[i].userinfo.identitytype) {
+                                    case 2:
+                                        role = "老师";
+                                        break;
+                                    case 3:
+                                        role = "学生";
+                                        break;
+                                    case 4:
+                                        role = "家长";
+                                        break;
+                                    default:
+                                        role = "未知";
+                                        break;
+                                }
+                                var myrole = '';
+                                switch (ret.list[i].dynamic.userinfo.identitytype) {
+                                    case 2:
+                                        myrole = "老师";
+                                        break;
+                                    case 3:
+                                        myrole = "学生";
+                                        break;
+                                    case 4:
+                                        myrole = "家长";
+                                        break;
+                                    default:
+                                        myrole = "未知";
+                                        break;
+                                }
+
+//                            var refRole = '';
+//                            switch (ret.list[i].ref.userinfo.identitytype) {
+//                                case "2":
+//                                    refRole = "老师";
+//                                    break;
+//                                case "3":
+//                                    refRole = "学生";
+//                                    break;
+//                                case "4":
+//                                    refRole = "家长";
+//                                    break;
+//                                default:
+//                                    refRole = "未知";
+//                                    break;
+//                            }
+
+                                var replyContent = ret.list[i].ref ? '<div class="content-text">' + ret.list[i].content + '</div>' : '<div class="content-text">' + ret.list[i].content + '</div>'
+                                var inspectDia = ret.list[i].ref ? '<span class="btn-inspectDialog" tapmode onclick="inspectDialogueClick(this)" commentId="' + ret.list[i].id + '"><span class="color-gray aui-iconfont aui-icon-community"></span>查看对话</span>' : '';
+
+                                if (ret.list[i].ref) {
+                                    var refRole = '';
+                                    switch (ret.list[i].ref.userinfo.identitytype) {
+                                        case 2:
+                                            refRole = "老师";
+                                            break;
+                                        case 3:
+                                            refRole = "学生";
+                                            break;
+                                        case 4:
+                                            refRole = "家长";
+                                            break;
+                                        default:
+                                            refRole = "未知";
+                                            break;
+                                    }
+                                    if (ret.list[i].userinfo.sex == 1) {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                                    } else {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                                    }
+                                    $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b"> <div class="aui-card-list-header aui-card-list-user"> <div class="aui-card-list-user-avatar">' + sexhtml + ' <img src="' + ret.list[i].userinfo.face + '" class="aui-img-round" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"/> </div> <div class="aui-card-list-user-name" style="font-size: 16px!important;"> <div class="aui-text-primary" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"><span class="username aui-ellipsis-1">' + ret.list[i].userinfo.realname + '</span> <span class="aui-label aui-label-info">' + ret.list[i].userinfo.rank + '</span></div> </div> <div class="aui-card-list-user-info aui-text-default">' + ret.list[i].userinfo.xxmc + ' ' + role + '</div> <small class="aui-card-list-user-info">' + ret.list[i].createtime + ' ' + ret.list[i].device + '</small> </div> <div style="background-color:white" class=" aui-padded-b-10">' + replyContent + ' <div class="aui-card-list-content-padded" style="background-color: #f9f9f9;padding-bottom: 10px!important;"><div class="content-text"><span class="little-user-name">@' + ret.list[i].ref.userinfo.realname + '<div class="aui-label aui-label-info level">' + ret.list[i].ref.userinfo.rank + '</div><a class="school-green">(' + ret.list[i].ref.userinfo.xxmc + ' ' + refRole + ')</a></span>:<span>' + ret.list[i].ref.content + '</span></div><div class="content-forward aui-margin-l-10 aui-margin-r-10" style="background: white;padding: 5px 10px;" dynamicid="' + ret.list[i].dynamicid + '" tapmode onclick="momentDetail(this)"> <div class="aui-card-list-user-name  aui-margin-b-5" > <div class="aui-text-primary ">' + ret.list[i].dynamic.userinfo.realname + ' <span class="aui-label aui-label-info">' + ret.list[i].dynamic.userinfo.rank + '</span><span class="aui-text-default">（' + ret.list[i].dynamic.userinfo.xxmc + '  ' + myrole + '）</span> </div> </div> <div class="content-forward-exercise "> </div><div class="content-forward-text "> </div> <div class="content-img aui-padded-t-5 aui-margin-l-5" style="margin-right: 5px;"> </div> <div class="report-block" style="background-color: white"> </div> </div><div class="aui-card-list-user-info aui-padded-t-5 aui-padded-l-10">' + ret.list[i].ref.createtime + ' ' + ret.list[i].ref.device + '</div> </div> </div> <div style="line-height: 14px;height: 43px"> <div class="content-replay"> ' + inspectDia + ' </div> </div> </li>');
+
+                                } else {
+                                    if (ret.list[i].userinfo.sex == 1) {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                                    } else {
+                                        var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                                    }
+                                    $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b"> <div class="aui-card-list-header aui-card-list-user"> <div class="aui-card-list-user-avatar">' + sexhtml + ' <img src="' + ret.list[i].userinfo.face + '" class="aui-img-round" uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"/> </div> <div class="aui-card-list-user-name" style="font-size: 16px!important;"> <div class="aui-text-primary " uid="' + ret.list[i].uid + '" tapmode onclick="clickUser(this)"><span class="username aui-ellipsis-1">' + ret.list[i].userinfo.realname + '</span> <span class="aui-label aui-label-info">' + ret.list[i].userinfo.rank + '</span></div> </div> <div class="aui-card-list-user-info aui-text-default">' + ret.list[i].userinfo.xxmc + ' ' + role + '</div> <small class="aui-card-list-user-info">' + ret.list[i].createtime + ' ' + ret.list[i].device + '</small></div> <div class="aui-card-list-content-padded">' + replyContent + '<div class="content-forward" style="background: #f9f9f9;padding: 5px 10px;" dynamicid="' + ret.list[i].dynamicid + '" tapmode onclick="momentDetail(this)"> <div class="aui-card-list-user-name  aui-margin-b-5" > <div class="aui-text-primary ">' + ret.list[i].dynamic.userinfo.realname + ' <span class="aui-label aui-label-info">' + ret.list[i].dynamic.userinfo.rank + '</span><span class="aui-text-default">（' + ret.list[i].dynamic.userinfo.xxmc + '  ' + myrole + '）</span> </div> </div> <div class="content-forward-exercise "> </div><div class="content-forward-text "> </div> <div class="content-img aui-padded-t-5 aui-margin-l-5" style="margin-right: 5px;"> </div> <div class="report-block" style="background-color: #f9f9f9"> </div> <div class="aui-card-list-user-info">' + ret.list[i].dynamic.createtime + ' ' + ret.list[i].dynamic.device + '</div> </div><div style="line-height: 14px;height: 43px"> <div class="content-replay">' + inspectDia + ' </div></div> </li>');
+
+                                }
+
+                                if (ret.list[i].dynamic.content != ''||refContentIsNull(ret.list[i].dynamic.ref)) {
+                                    var content = ret.list[i].dynamic.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                                    switch (ret.list[i].dynamic.contenttype) {
+                                        case '':
+                                        case 'user':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], ret.list[i].dynamic.ref ? '转发了动态:' + content : content);
+                                            break;
+                                        case 'course':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], '制作了<span class="aui-text-primary">【课堂资源包】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc + ' ' + ret.list[i].dynamic.tag.bbmc + ' ' + ret.list[i].dynamic.tag.dymc + ' ' + ret.list[i].dynamic.tag.jmc);
+                                            break;
+                                        case 'homework':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], '布置了<span class="aui-text-primary">【作业】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc);
+                                            break;
+                                        case 'material':
+                                            $api.html($api.domAll('.content-forward-text')[$api.domAll('.content-forward-text').length - 1], '上传了<span class="aui-text-primary">【素材】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc + ' ' + ret.list[i].dynamic.tag.bbmc + ' ' + ret.list[i].dynamic.tag.dymc + ' ' + ret.list[i].dynamic.tag.jmc);
+                                            break;
+                                        case 'exercise':
+                                            $api.html($api.domAll('.content-forward-exercise')[$api.domAll('.content-forward-exercise').length - 1], '编写了<span class="aui-text-primary">【习题】' + content + '</span> <br>' + ret.list[i].dynamic.tag.xkmc + ' ' + ret.list[i].dynamic.tag.njmc + ' ' + ret.list[i].dynamic.tag.bbmc + ' ' + ret.list[i].dynamic.tag.sxcmc + ' ' + ret.list[i].dynamic.tag.dymc + ' ' + ret.list[i].dynamic.tag.jmc);
+                                            break;
+                                    }
+                                }
+
+                                if (ret.list[i].dynamic.image_list != null) {
+                                    if (ret.list[i].dynamic.image_list.length == 1) {
+                                        if (ret.list[i].dynamic.image_list[0].indexOf('?') != -1) {
+                                            $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.image_list[0] + '/auto-orient/thumbnail/!65p"/>');
+                                        } else {
+                                            $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.image_list[0] + '?imageMogr2/auto-orient/thumbnail/!65p"/>');
+                                        }
+                                    } else if (ret.list[i].dynamic.image_list.length > 1) {
+                                        $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<div class="img-size4 aui-row aui-row-padded"> </div>');
+                                        for (var imageSize = 0; imageSize < ret.list[i].dynamic.image_list.length; imageSize++) {
+                                            if (ret.list[i].dynamic.image_list[imageSize].indexOf('?') != -1) {
+                                                $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.image_list[imageSize] + '/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                            } else {
+                                                $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.image_list[imageSize] + '?imageMogr2/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (ret.list[i].dynamic.ref != null) {
+                                    var reportrole = '';
+                                    switch (ret.list[i].dynamic.ref.userinfo.identitytype) {
+                                        case 2:
+                                            reportrole = "老师";
+                                            break;
+                                        case 3:
+                                            reportrole = "学生";
+                                            break;
+                                        case 4:
+                                            reportrole = "家长";
+                                            break;
+                                        default:
+                                            reportrole = "未知";
+                                            break;
+                                    }
+
+                                    $api.append($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '<div class="report-content-forward-exercise "> </div><div class="report-content-forward-text"> </div> <div class="aui-margin-t-5 report-content-img" style="margin-right: 5px;"> </div>');
+                                    $api.domAll('.report-block')[$api.domAll('.report-block').length - 1].id = ret.list[i].dynamic.ref.id;
+                                    if (ret.list[i].dynamic.ref.status == 0) {
+                                        $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '内容已被删除');
+                                    } else {
+                                        if (ret.list[i].dynamic.ref.content != '') {
+                                            var refContent = ret.list[i].dynamic.ref.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                                            switch (ret.list[i].dynamic.ref.content_type) {
+                                                case '':
+                                                case 'user':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), ret.list[i].dynamic.ref.content);
+                                                    break;
+                                                case 'course':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '制作了<span class="aui-text-primary">【课堂资源包】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc + ' ' + ret.list[i].dynamic.ref.tag.bbmc + ' ' + ret.list[i].dynamic.ref.tag.dymc + ' ' + ret.list[i].dynamic.ref.tag.jmc);
+                                                    break;
+                                                case 'homework':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '布置了<span class="aui-text-primary">【作业】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc);
+                                                    break;
+                                                case 'material':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-text'), '上传了<span class="aui-text-primary">【素材】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc + ' ' + ret.list[i].dynamic.ref.tag.bbmc + ' ' + ret.list[i].dynamic.ref.tag.dymc + ' ' + ret.list[i].dynamic.ref.tag.jmc);
+                                                    break;
+                                                case 'exercise':
+                                                    $api.html($api.dom($api.domAll('.report-block')[$api.domAll('.report-block').length - 1], '.report-content-forward-exercise'), '编写了<span class="aui-text-primary">【习题】' + refContent + '</span> <br>' + ret.list[i].dynamic.ref.tag.xkmc + ' ' + ret.list[i].dynamic.ref.tag.njmc + ' ' + ret.list[i].dynamic.ref.tag.bbmc + ' ' + ret.list[i].dynamic.ref.tag.dymc + ' ' + ret.list[i].dynamic.ref.tag.jmc);
+                                                    break;
+                                            }
+                                        }
+                                        if (ret.list[i].dynamic.ref.image_list == null) {
+
+                                        } else if (ret.list[i].dynamic.ref.image_list.length == 1) {
+                                            if (ret.list[i].dynamic.ref.image_list[0].indexOf('?') != -1) {
+                                                $api.html($api.domAll('.report-content-img')[$api.domAll('.report-content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.ref.image_list[0] + '/auto-orient/thumbnail/!65p"/>');
+                                            } else {
+                                                $api.html($api.domAll('.report-content-img')[$api.domAll('.report-content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].dynamic.ref.image_list[0] + '?imageMogr2/auto-orient/thumbnail/!65p"/>');
+                                            }
+                                        } else if (ret.list[i].dynamic.ref.image_list.length > 1) {
+                                            $api.html($api.domAll('.report-content-img')[$api.domAll('.report-content-img').length - 1], '<div class="img-size4 aui-row aui-row-padded"> </div>');
+                                            for (var imageSize1 = 0; imageSize1 < ret.list[i].dynamic.ref.image_list.length; imageSize1++) {
+                                                if (ret.list[i].dynamic.ref.image_list[imageSize1].indexOf('?') != -1) {
+                                                    $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.ref.image_list[imageSize1] + '/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                                } else {
+                                                    $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].dynamic.ref.image_list[imageSize1] + '?imageMogr2/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (var j = 0; j < $api.domAll('.content-img img').length; j++) {
+                            $api.css($api.domAll('.content-img img')[j], 'height:' + $api.offset($api.domAll('.content-img img')[j]).w + 'px');
+                        }
+                        for (var j = 0; j < $api.domAll('.report-content-img img').length; j++) {
+                            $api.css($api.domAll('.report-content-img img')[j], 'height:' + $api.offset($api.domAll('.report-content-img img')[j]).w + 'px');
+                        }
+                        for (var j = 0; j < $api.domAll('.aui-img-round').length; j++) {
+                            $api.css($api.domAll('.aui-img-round')[j], 'height:' + $api.offset($api.domAll('.aui-img-round')[j]).w + 'px');
+                        }
+                    } else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+
+            })
+        }
+
+    }
+
+    function inspectDialogueClick(context) {
+        api.openWin({
+            name: 'win-comment-inspect-dialogue',
+            url: '../../moments/win-comment-inspect-dialogue.html',
+            pageParam: {replyid: $api.attr(context, 'commentId')}
+        });
+    }
+
+    function replyClick(context) {
+        if ($api.getStorage('teacherSwitch') == 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能回复，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.toast({
+                    msg: '暂不允许进行回复，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            return;
+        }
+        api.openWin({
+            name: 'win-comment-reply',
+            url: '../../moments/win-comment-reply.html',
+            pageParam: {
+                dynamicid: $api.attr(context, 'dynamicid'),
+                realname: $api.getStorage('realname'),
+                replyid: $api.attr(context, 'commentId'),
+                replyName: $api.attr(context, 'replyname')
+            }
+        });
+
+    }
+
+    function momentDetail(context) {
+        api.openWin({
+            name: 'win-comment-content-original',
+            url: '../../moments/win-comment-content-original.html',
+            pageParam: {
+                id: $api.attr(context, 'dynamicid')
+            }
+        });
+    }
+
+    function clickUser(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'friendMainPage',
+            url: '../../mine/selfmainview/friendMainPage.html',
+            pageParam: {otheruid: $api.attr(context, 'uid')}
+        });
+
+    }
+    function refContentIsNull(content) {
+        if(content){
+            if(content.content != ''){
+                return true;
+            }else {
+                return false;
+            }
+        }else {
+            return false;
+        }
+    }
+    //    function openReply() {
+    //        api.openWin({
+    //            name: 'win-homework-answer-reply',
+    //            url: 'win-homework-answer-reply.html',
+    //        });
+    //    }
+</script>
+</html>

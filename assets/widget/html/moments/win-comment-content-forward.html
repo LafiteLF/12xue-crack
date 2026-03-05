@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body{
+            
+        }
+        .aui-bar-tab{
+            background-color: whitesmoke;
+            height: 45px;
+            font-size: 14px;
+            text-align: center;
+            line-height: 45px;
+        }
+        .bottom-btn{
+            padding: 0 20px;
+            width: 30%;
+            color: #8e8e93;
+        }
+        .btn-title{
+            font-size: 14px;
+            color: #5f646e;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin();'></span>正文
+    </a>
+</header>
+<footer class="aui-bar aui-bar-tab"><div><span class="aui-iconfont aui-icon-forward bottom-btn"><span class="btn-title">转发(0)</span></span><span class="aui-iconfont aui-icon-appreciate bottom-btn"><span class="btn-title">赞(0)</span></span><span class="aui-iconfont aui-icon-mark bottom-btn"><span class="btn-title">评论(0)</span></span></div>
+</footer>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var footerH = $api.offset($api.dom('.comment')).h;
+        var frameH = padWinHeight - headerH-footerH;
+        api.openFrame({
+            name: 'frame-comment-content-forward',
+            url: 'frame-comment-content-forward.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            bounces: false
+//            pageParam: {id: api.pageParam.id}
+        });
+    };
+</script>
+</html>

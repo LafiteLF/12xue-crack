@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .content {
+            width: 35%;
+            height:173px;
+            top: 30%;
+            position: absolute;
+            left: 32.5%;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 3px;
+        }
+        ul li{width: 80%; margin: 0 auto;}
+        ul li:nth-of-type(1){
+            height: 40px;
+            border: 1px solid #d6d6d6;
+            padding: 0 10px;margin-top: 35px;
+        }
+        ul li:nth-of-type(2){
+            padding-top: 25px;
+
+        }
+        ul li:nth-of-type(2) span{
+            width: 45%;
+            height: 40px;
+            background: #4bc7c7; color: #fff;
+            text-align: center;
+            line-height: 40px;
+            border-radius:3px;
+            font-size: 0.8rem;
+        }
+        ul li:nth-of-type(2) span:nth-of-type(1){
+            float: left;
+        }
+        ul li:nth-of-type(2) span:nth-of-type(2){
+            float: right;
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+        input[type="text"] {
+            min-height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="closeFrame()" ></div>
+<ul class="content">
+<li>
+    <input type="text" class="aui-input" placeholder="请输入验证码" style="" onkeyup="value=value.replace(/[^\d]/g,'')" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))">
+</li>
+    <li class="aui-clearfix">
+        <span tapmode onclick="closeFrame()">取消</span>
+        <span tapmode onclick="Confirm()">确定</span>
+    </li>
+</ul>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj;
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+    };
+    function closeFrame() {
+        api.closeFrame();
+    }
+    function Confirm() {
+//        api.openWin({
+//            name: 'win-equipment-verification-pad',
+//            url: 'win-equipment-verification-pad.html',
+//            pageParam: {schoolId: '111111111111111'}
+//        });
+        $api.dom('.aui-input').blur();
+        var password = $api.dom('.aui-input').value;
+
+        if (password == '') {
+            api.toast({
+                msg: '请输入验证码',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+
+        apiObj.Get(UrlRouter.Checkpassword, {
+            values: {
+                password: password
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.toast({
+                        msg: '验证成功',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+
+                    var schoolId = ret.data.schoolid;
+                    api.openWin({
+                        name: 'win-equipment-verification-pad',
+                        url: 'win-equipment-verification-pad.html',
+                        pageParam: {schoolId: schoolId}
+                    });
+
+                    api.closeFrame();
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+</script>

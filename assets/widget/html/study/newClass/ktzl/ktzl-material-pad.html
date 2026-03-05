@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+
+        .zymc {
+            background-color: #f2f2f2;
+            border-top: #ededed 1px solid;
+            /*border-bottom: #ededed 1px solid;*/
+            padding-left: 0.5rem;
+            padding-top: 0.8rem;
+            padding-bottom: 0.5rem;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        .containter {
+            padding-left: 0.5rem;
+        }
+
+        .swfDiv {
+            text-align: center;
+            width: 100%;
+            padding-top: 10px;
+            color: #666666;
+        }
+
+        .content {
+            width: 100%;
+            height: 90%;
+        }
+        .imgDiv,.videoDic{
+            padding-left: 0.5rem;
+        }
+        img{
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .checkDiv {
+            width: 20%;
+            height: 1.5rem;
+            background-color: #4BC7C7;
+            margin: 25% auto 0 auto;
+            text-align: center;
+            color: white;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            line-height: 1.6rem;
+        }
+        .checkDiv:active{
+            opacity:0.8;
+            /*background-color: #000000;*/
+        }
+        .videoDic {
+            width: calc(100% - 40px);
+            height: 95%;
+            /*background: #000;*/
+            text-align: center;
+            margin-left: 20px
+        }
+
+        .videoDic video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .noImgClick {
+            margin-top: 100px;
+            width: 20%;
+            margin-left: 40%;
+            text-align: center;
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <div class="zymc aui-ellipsis-1" v-text="zymc"></div>
+    <div class="imgDiv" v-if="getFileType(fileType) == 'img'">
+        <img :src="url" alt="">
+    </div>
+    <div class="containter" v-if="getFileType(fileType) == 'doc'">
+        <img  class="noImgClick" v-if="convert_status == 0" src="../../../../image/newhomework/zhuanma.gif">
+        <img  class="noImgClick" v-if="convert_status == 2" src="../../../../image/newhomework/shibai.png">
+        <div class="swfDiv" v-if="convert_status == 0|| convert_status == 2" v-text="getconvert(convert_status)"></div>
+        <div class="checkDiv" v-if="convert_status == 1" tapmode @click="openPDF(url)">点击查看内容</div>
+    </div>
+    <div class="videoDic" v-if="getFileType(fileType) == 'video'">
+        <div class="swfDiv" v-if="convert_status == 0|| convert_status == 2" v-text="getconvert(convert_status)"></div>
+        <video controls v-if="convert_status == 1" id="my-video" :src="getVideo(url)" autoplay  data-origin-x="20"
+               data-origin-y="40" poster="../../../../image/video_bg.png"></video>
+    </div>
+    <div class="videoDic" v-if="getFileType(fileType) == 'audio'">
+        <div class="swfDiv" v-if="convert_status == 0|| convert_status == 2" v-text="getconvert(convert_status)"></div>
+        <audio v-if="convert_status == 1" controls  :src="getVideo(url)" autoplay="autoplay" style="width: 100%;height: 30px;padding-top: 25%;"></audio>
+    </div>
+    <div class="containter" v-if="getFileType(fileType) == 'swf'">
+        <img class="noImgClick" src="../../../../image/newhomework/shibai.png">
+        <div class="swfDiv">swf资源暂不支持在移动端播放!</div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    function initVue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                zymc: api.pageParam.index + '.' + api.pageParam.detailInfo.title,
+                convert_status: api.pageParam.detailInfo.convert_status,
+                url: api.pageParam.detailInfo.link,
+                fileType: api.pageParam.detailInfo.filetype
+            },
+            mounted:function () {
+//                $api.css($api.dom('.content'), 'display:block;');
+            },
+            methods: {
+                getFileType:function (filetype) {
+                    if(filetype == '.png'||filetype == '.jpg'|| filetype == '.jpeg'||filetype == '.gif'||filetype == '.bmp'){
+                        return 'img'
+                    }
+                    else if(filetype == '.doc' || filetype == '.docx'|| filetype == '.ppt' || filetype == '.pptx'|| filetype == '.xls' || filetype == '.xlsx'|| filetype == '.txt' || filetype == '.pdf'){
+                        return 'doc'
+                    }
+                    else if(filetype == '.swf'){
+                        return 'swf'
+                    }else if (filetype == '.mp3'|| filetype == '.wma'){
+                        if(api.systemType == 'ios'){
+                            return 'video'
+                        }else {
+                            return 'audio'
+                        }
+                    }else {
+                        return 'video'
+                    }
+                },
+                getconvert: function (convert_status) {
+                    if (convert_status == 0) {
+                        return '资源正在转码,请三分钟后回来';
+                    }
+                    else if (convert_status == 2) {
+                        return '资源转码失败';
+                    }
+                },
+                getVideo: function (url) {
+                    return decodeURIComponent(url);
+                },
+                getdoc: function (url) {
+                    return '../../../../script/ThridJS/pdfjs/viewer.html?file=' + encodeURIComponent(url);
+                },
+                openPDF: function (url) {
+
+                    api.showProgress({
+                        style: 'default',
+                        animationType: 'fade',
+                        title: '提示',
+                        text: '正在下载素材',
+                        modal: false
+                    });
+                    var str = api.pageParam.detailInfo.title + api.pageParam.detailInfo.id;
+                    str = str.replace(/#/,'');
+                    api.download({
+                        url: url,
+                        savePath: 'fs://pdfDownload/' + str + '.pdf',
+                        report: false,
+                        cache: true,
+                        allowResume: true
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret.state == 1) {
+//                            if (api.systemType == 'ios') {
+//                                var docReader = api.require('docReader');
+//                                docReader.open({
+//                                    path: ret.savePath
+//                                }, function (ret, err) {
+//                                });
+//                            } else {
+
+                                api.openWin({
+                                    name: 'win_pdf_view',
+                                    url: '../../../win_pdf_view.html',
+                                    pageParam: {
+                                        path: ret.savePath
+                                    }
+                                });
+
+                            //}
+
+                        } else {
+                            //提示文档打开失败
+                            api.toast({
+                                msg: '文档下载失败，请检查网络，稍后再试！',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                }
+            }
+
+        })
+    }
+    apiready = function () {
+        initVue();
+        for (var i = 0; i < $api.domAll('img').length; i++) {
+            $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+        }
+        api.addEventListener({
+            name: 'pause'
+        }, function (ret, err) {
+            if (vm.getFileType(vm.fileType) == 'video') {
+                $api.dom('video').pause();
+            }else if (vm.getFileType(vm.fileType) == 'audio') {
+                $api.dom('audio').pause();
+            }
+        });
+        api.addEventListener({
+            name: 'stopVideo'
+        }, function (ret, err) {
+            if (vm.getFileType(vm.fileType) == 'video') {
+                $api.dom('video').pause();
+            }else if (vm.getFileType(vm.fileType) == 'audio') {
+                $api.dom('audio').pause();
+            }
+        });
+
+    };
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        var photoBrowser = api.require('photoBrowser');
+        photoBrowser.open({
+            images: [
+                src
+            ],
+            placeholderImg: 'widget://../image/loading_more.gif',
+            bgColor: '#fff'
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                photoBrowser.close();
+            }
+        });
+    }
+
+</script>
+</html>

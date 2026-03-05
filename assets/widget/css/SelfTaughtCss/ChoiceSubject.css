@@ -1,0 +1,64 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+    display: block;
+    margin: 0px;
+    background: #fff;
+}
+
+.XKmain_top {
+    height: 43px;
+    line-height: 39px;
+    font-size: 13px;
+    padding-left: 20px;
+    border-top: 6px solid #f0eff4;
+}
+
+.XKmain_top span {
+    color: #4bc7c7
+}
+
+.XKmain_center {
+    height: 46px;
+    line-height: 52px;
+    padding-left: 20px;
+    font-size: 14px;
+    font-family: "微软雅黑";
+    color: #999;
+    background: #f4f4f4
+}
+
+.XKmain_bottom {
+    padding: 18px;
+}
+
+.XKmain_bottom li {
+    width: 33.33%;
+    float: left;
+    list-style: none;
+    text-align: center;
+    margin-top: 14px;
+    margin-bottom: 10px;
+}
+
+.XKmain_bottom li span {
+    display: block;
+    text-align: center;
+    font-size: 16px;
+    color: #404040
+}
+
+.XKmain_bottom li img {
+    width: 59px;
+}
+
+.jiantou {
+    width: 9px;
+    float: right;
+    margin-right: 10px;
+}
+
+.jiantou img {
+    width: 9px;
+}
+

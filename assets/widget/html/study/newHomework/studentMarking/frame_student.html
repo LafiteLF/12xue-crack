@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>-->
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+
+        .content {
+            width: 700px;
+            height: 360px;
+            top: calc(50% - 180px) ;
+            position: absolute;
+            left: calc(50% - 350px) ;
+            overflow-x: scroll;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        .topContent {
+            border: none;
+
+        }
+
+        .topContent ul {
+            height: 52px;
+            background: #f6f6f6;
+            border: none
+        }
+
+        /*.topContent ul li { */
+          /**/
+            /*background: #f6f6f6*/
+        /*}*/
+
+        .scroll li {
+            position: relative;
+
+        }
+
+        .topContent ul{
+            width:10000px;
+            height: 40px;
+            background-color: #f6f6f6;
+        }
+        .topContent ul li{
+            float: left;
+            line-height: 2px;
+            text-align: center;
+            margin: 0 7px;
+            margin-top: 19px;
+            font-size: 14px !important;
+            width: 50px !important;
+            height: 20px !important;
+        }
+
+        .current{
+            color: #4bc7c7;
+            border-bottom: solid 2px #4bc7c7;
+        }
+
+
+
+        [v-cloak] {
+            display: none;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="close" tapmode onclick="vm.closeFrame();"></div>
+<div  id="app1" class="content"  v-cloak>
+    <!--<div class="topContent" v-if="answersSort.length != 0">-->
+        <!--<ul class="scroll clearfix">-->
+            <!--<li tapmode onclick="vm.itemClick(this)"  v-for="item,index in answersSort" :id='index' v-text="getName(item)" :class="current==index?'current':''">-->
+            <!--</li>-->
+        <!--</ul>-->
+    <!--</div>-->
+
+    <div class="topContent">
+        <ul class="scroll clearfix">
+            <li tapmode onclick="vm.itemClick(this)" class="item"  v-for="item,index in answersSort" :id='index' v-text="getName(item)" :class="current==index?'current':''">
+            </li>
+            <!--<li  class="current">(2)-->
+            <!--</li>-->
+            <!--<li  class="current">空2-->
+            <!--</li>-->
+            <!--<li  class="current">(2)-->
+            <!--</li>-->
+            <!--<li  class="current">空2-->
+            <!--</li>-->
+            <!--<li  class="current">(2)-->
+            <!--</li>-->
+            <!--<li  class="current">空2-->
+            <!--</li>-->
+            <!--<li  class="current">(2)-->
+            <!--</li>-->
+            <!--<li  class="current">空2-->
+            <!--</li>-->
+            <!--<li  class="current">(2)-->
+            <!--</li>-->
+            <!--<li  class="current">空2-->
+            <!--</li>-->
+            <!--<li  class="current">(2)-->
+            <!--</li>-->
+            <!--<li  class="current">空2-->
+            <!--</li>-->
+        </ul>
+    </div>
+
+
+
+
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+        vm.openFrame();
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                current: 0,
+                answersSort: api.pageParam.answersSort,
+                yipiList:api.pageParam.yipiList,
+                daipiList:api.pageParam.daipiList,
+                tx:api.pageParam.tx
+            },
+            updated: function () {
+
+            },
+            methods: {
+                getName:function (item) {
+                    if(api.pageParam.tx == 'tkt'){
+                        return '空'+item;
+                    }else {
+                        return '('+item+')';
+                    }
+                },
+                openFrame: function () {
+
+                    var x = api.winWidth/2 - 350;
+                    var y = api.winHeight/2 - 180;
+
+                    if(vm.answersSort.length ==0){
+                        $api.css($api.dom('.topContent'), 'display:none;');
+                        api.openFrame({
+                            name: 'frame_studentpage',
+                            url: 'frame_studentpage.html',
+                            rect: {
+                                x: x,
+                                y: y,
+                                w: 700,
+                                h: 360
+                            },
+                            bounces: false,
+                            pageParam: {
+                                tuid: api.pageParam.tuid,
+                                yipiList:api.pageParam.yipiList,
+                                daipiList:api.pageParam.daipiList,
+                                sortArr:vm.answersSort,
+                                hwid: api.pageParam.hwid,
+                                classid: api.pageParam.classid,
+                                xtid: api.pageParam.xtid,
+                                ytlx: api.pageParam.ytlx,
+                                index:0,
+                                tx_code:api.pageParam.tx_code,
+                                currentSort:api.pageParam.currentSort,
+                                isFenzhi: api.pageParam.isFenzhi,
+                                fz:api.pageParam.fz,
+                            }
+                        });
+                    }else {
+                        var frames = [];
+                        var j = 0;
+                        for (var i = 0; i < vm.answersSort.length; i++) {
+                            if(vm.answersSort[i] == api.pageParam.currentSort){
+                                vm.current = i;
+                            }
+                            frames.push({
+                                name: "frame_studentpage",
+                                url: 'frame_studentpage.html',
+                                pageParam: {
+                                    tuid: api.pageParam.tuid,
+                                    yipiList:api.pageParam.yipiList,
+                                    daipiList:api.pageParam.daipiList,
+                                    hwid: api.pageParam.hwid,
+                                    classid: api.pageParam.classid,
+                                    xtid: api.pageParam.xtid,
+                                    ytlx: api.pageParam.ytlx,
+                                    index:i,
+                                    sortArr:vm.answersSort,
+                                    tx_code:api.pageParam.tx_code,
+                                    currentSort:api.pageParam.currentSort,
+                                    isFenzhi: api.pageParam.isFenzhi,
+                                    fz:api.pageParam.fz,
+                                },
+                                bounces: false
+                            });
+                        }
+                        api.openFrameGroup({
+                            name: 'frame_Marking_group',
+                            url: 'frame_studentpage.html',
+                            rect: {
+                                x: x,
+                                y: y+40,
+                                w: 700,
+                                h: 320
+                            },
+                            frames: frames,
+                            index:vm.current,
+                            preload: 0,
+                        },function (ret, err) {
+                            if (ret) {
+                                vm.funActive(ret.index);
+                                var itemWidth = vm.answersSort.length * 64;
+                                if(itemWidth >= 700){
+                                    $api.css($api.dom('.scroll'), 'width:' + itemWidth + 'px;');
+                                }else {
+                                    $api.css($api.dom('.scroll'), 'width:700px;');
+                                }
+                                if (vm.current > 10) {
+                                    $api.dom('.content').scrollLeft = (vm.current - 4) * 64;
+                                } else {
+                                    $api.dom('.content').scrollLeft = 0;
+                                }
+                            }
+                        });
+                    }
+                },
+                itemClick: function (context) {
+                    var id = $api.attr(context, 'id');
+                    api.setFrameGroupIndex({
+                        name: 'frame_Marking_group',
+                        index: id
+                    });
+                },
+                funActive: function (index) {
+                    vm.current = index;
+                },
+                closeWin: function () {
+                    api.closeWin();
+                },
+                closeFrame:function () {
+                    if(vm.answersSort.length ==0){
+                        api.closeFrame({
+                            name: 'frame_studentpage'
+                        });
+                        api.closeFrame({
+                            name: 'frame_student'
+                        });
+                    }else {
+                        api.closeFrameGroup({
+                            name: 'frame_Marking_group'
+                        });
+                        api.closeFrame({
+                            name: 'frame_student'
+                        });
+                        api.closeFrame({
+                            name: 'frame_studentpage'
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    function GetcorrectAnswerOptionStudents() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetcorrectAnswerOptionStudents, {
+            values: {
+                tuid: api.pageParam.tuid, //获取hwid
+                hwid: api.pageParam.hwid, //获取hwid
+                classid: api.pageParam.classid,
+                xtid: api.pageParam.xtid,
+                ytlx: api.pageParam.ytlx,
+                leaderuid: $api.getStorage('uid'),
+                tx_code:api.pageParam.tx_code,
+                is_auto:'0',
+//                            sort: api.pageParam.sortArr[api.pageParam.index],
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.yipiList = ret.data.ypList;
+                    vm.daipiList = ret.data.dpList;
+                    vm.daipiNum = ret.data.dpList.length;
+                    vm.yipiNum = ret.data.ypList.length;
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        })
+    }
+
+
+</script>
+</html>

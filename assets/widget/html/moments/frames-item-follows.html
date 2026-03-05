@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <style>
+        .aui-card-list-user-avatar {
+            width: 3rem;
+            height: 3rem;
+            position: relative;
+        }
+        .sex {
+            color: dodgerblue;
+            top: 47px;
+            position: absolute;
+            right: 1px;
+            text-align: right;
+            font-size: 1.1rem;   width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 47px;
+            position: absolute;
+            right: 1px;
+            text-align: right;
+            font-size: 1.1rem;  width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+        .followAvatar {
+            width: 4rem;
+            height: 4rem;
+        }
+        *:after{
+            height: 0px !important;
+        }
+        *:before{
+            height: 0px !important;
+        }
+        .identitytype {
+            font-size: 0.7rem;
+            color: #a9a9a9;
+        }
+
+        .aui-label {
+            padding: 0.1rem 0.25rem;
+            vertical-align: middle;
+            margin-bottom: 0.2rem;
+        }
+
+        .aui-card-list {
+            margin-bottom: 0;
+            min-height: 5rem;
+        }
+
+        .aui-card-list-user-avatar img {
+            height: 3rem;
+            width: 3rem;
+            max-height: 3rem;
+        }
+
+        .btn-follow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .btn-unfollow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .enter-follow-mo {
+            width: 35%;
+            margin: 1rem auto;
+            height: 1.5rem;
+            line-height: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+
+        .img-size1 {
+            width: 80% !important;
+        }
+
+        .content-forward {
+            background-color: #f9f9f9;
+        }
+
+        .forward-school {
+            color: #757575;
+        }
+
+        .thumb-red {
+            color: #dd191b;
+        }
+
+        .aui-card-list-content-padded .content-text img, .aui-card-list-content-padded .forward-content-text img {
+            width: 14%;
+            height: auto;!important;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .aui-card-list-content-padded .content-exercise img, .aui-card-list-content-padded .forward-content-exercise img {
+            width: 35px;
+            height: 35px;
+            display: inline-block;
+        }
+
+        .aui-label-info {
+            background-color: #6b8fec;
+            margin-left: 5px;
+        }
+
+        .username {
+            max-width: 100px;
+            float: left;
+            display: block;
+        }
+
+        .content-text .content-exercise {
+            word-break: break-all;
+        }
+
+        .loading {
+            padding: 0.5rem;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        body {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .aui-card-list-footer {
+            margin-left: 50%;
+            width: 50%;
+        }
+        .aui-list:after{
+            height:0px;
+        }
+        .aui-list li {
+            margin-top: 10px;
+        }
+        em, em * {
+            font-style: italic;
+        }
+        em, del, strong, var, label, cite, small, time, mark, code {
+            display:inline;
+        }
+        strong {
+            display:inline !important;
+        }
+        .bugflag {
+            margin-top: -20px;
+        }
+    </style>
+</head>
+<body>
+<div class="head" style="position:absolute;width: 45%">
+    <span class="left-border aui-hide" style="position: absolute;display: block;width: 4px;height: 1rem;background-color: #f0ac0c;left: 0;top: 11px;z-index:2;"></span>
+    <div class="tips aui-card-list-content-padded aui-font-size-12 aui-hide"
+         style="width: 100%;background-color: #f5f5f5;font-size: 0.6rem">
+        推荐关注
+    </div>
+</div>
+<div class="aui-refresh-content">
+    <div class="aui-content">
+        <ul class="aui-list">
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/default_portrait.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            <!--</li>-->
+            <!--<li class="aui-card-list aui-border-b">-->
+            <!--<div class="aui-card-list-header aui-card-list-user">-->
+            <!--<div class="aui-card-list-user-avatar followAvatar">-->
+            <!--<img src="./../../image/test.png" class="aui-img-round"/>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+            <!--<div class="aui-text-primary ">我是乔帮主 <span class="aui-label aui-label-info">V3</span><span-->
+            <!--class="identitytype">（老师）</span></div>-->
+            <!--</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">初中 数学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">烟台第五中学</div>-->
+            <!--<div class="aui-card-list-content aui-text-default">关注123 粉丝1233</div>-->
+            <!--<div class="aui-btn btn-follow aui-btn-warning"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+            <!--</div>-->
+            </li>
+        </ul>
+        <!--<div class="aui-btn aui-btn-primary aui-btn-block enter-follow-mo" tapmode onclick="enterFollowMo();">进入关注人动态</div>-->
+    </div>
+    <div class="loading aui-hide">加载中...</div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../script/win-for-result.js"></script>
+<script type="text/javascript">
+    var type;
+    apiready = function () {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        getFollowUser();
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isClean = true;
+                if (type == 1) {
+                    getRecommendUsers();
+                } else {
+                    getFollowUser();
+                }
+            }
+        });
+        api.addEventListener({
+            name: 'init_user'
+        }, function (ret, err) {
+            apiObj.SetAuthToken($api.getStorage('token'));
+//            p = 1;
+//            getFollowUser();
+        });
+//        api.addEventListener({
+//            name: 'loginSuccess'
+//        }, function (ret, err) {
+//            apiObj.SetAuthToken($api.getStorage('token'));
+//            p = 1;
+//            isClean = true;
+//            getFollowUser();
+//        });
+    };
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var p = 1;
+    var totalPage;
+    var isClean = true;
+    function getFollowUser() {
+        apiObj.Get(UrlRouter.GetFollowMoment, {
+            values: {
+                uid: $api.getStorage('uid'),
+                p: p,
+                num: 20
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.list == null) {
+                        if ($api.hasCls($api.dom('.tips'), 'aui-hide')) {
+                            $api.removeCls($api.dom('.tips'), 'aui-hide');
+                            $api.addCls($api.dom('.tips'), 'aui-show');
+
+                            $api.removeCls($api.dom('.left-border'), 'aui-hide');
+                            $api.addCls($api.dom('.left-border'), 'aui-show');
+                        }
+                        type = 1;
+                        getRecommendUsers();
+                    } else {
+                        if ($api.hasCls($api.dom('.tips'), 'aui-show')) {
+                            $api.removeCls($api.dom('.tips'), 'aui-show');
+                            $api.addCls($api.dom('.tips'), 'aui-hide');
+
+                            $api.removeCls($api.dom('.left-border'), 'aui-show');
+                            $api.addCls($api.dom('.left-border'), 'aui-show');
+
+                        }
+                        type = 2;
+                        getFollowMoment();
+                    }
+                    $api.css($api.dom('.aui-refresh-pull-arrow'), 'z-index:0');
+                    $api.css($api.dom('.head'), 'z-index:999');
+                    $api.css($api.dom('.aui-refresh-content'), 'top:' + $api.offset($api.dom('.head')).h + 'px');
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+            api.hideProgress();
+        })
+    }
+
+    function getRecommendUsers() {
+        api.removeEventListener({
+            name: 'scrolltobottom'
+        });
+
+        apiObj.Get(UrlRouter.GetRecommendUsers, {
+            values: {
+                num: 10
+            }
+        }, function (ret, err) {
+            pullRefresh.cancelLoading();
+            $api.addCls($api.dom('.loading'), 'aui-hide');
+            if (ret) {
+                if (isClean) {
+                    $api.html($api.dom('.aui-list'), '');
+                }
+                if (ret.ret == 0 && ret.data.length > 0) {
+                    $api.html($api.dom('.aui-list'), '');
+                    for (var i = 0; i < ret.data.length; i++) {
+                        var identitytype = ret.data[i].identitytype == 2 ? '老师' : ret.data[i].identitytype == 3 ? '学生' : '家长';
+                        if ( ret.data[i].sex == 1) {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                        } else {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                        }
+                        var followHtml = ret.data[i].uid != $api.getStorage('uid') ? ret.data[i].follow ? '<div class="aui-btn btn-follow aui-btn-warning aui-btn-outlined" tapmode onclick="btnFollow(this)">取消关注</div> </div> </li>' : '<div class="aui-btn btn-follow aui-btn-warning" tapmode onclick="btnFollow(this)"><span class="aui-iconfont aui-icon-add"></span>关注</div> </div> </li>' : '';
+                        $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b" uid="' + ret.data[i].uid + '"> ' +
+                                '<div class="aui-card-list-header aui-card-list-user"> ' +
+                                '<div class="aui-card-list-user-avatar followAvatar">' +sexhtml+
+                                ' <img src="' + ret.data[i].face + '" class="aui-img-round aui-margin-t-10 aui-margin-l-10"/> </div>' +
+                                ' <div class="aui-card-list-user-name aui-font-size-16"> ' +
+                                '<div class="aui-text-primary aui-text-primaryDiv">' +
+                                '<span class="username aui-ellipsis-1">' + ret.data[i].realname + ' </span>' +
+                                '<span class="aui-label aui-label-info">' + ret.data[i].rank + '</span>' +
+                                '<span class="identitytype">（' + identitytype + '）</span></div> </div> ' +
+                                '<div class="aui-card-list-content aui-text-default">' + ret.data[i].xd + ' ' + ret.data[i].kmmc + '</div> ' +
+                                '<div class="aui-card-list-content aui-text-default">' + ret.data[i].xxmc + '</div> ' +
+                                '<div class="aui-card-list-content aui-text-default">关注' + ret.data[i].statistics.follownum + ' 粉丝' + ret.data[i].statistics.fansnum + '</div> ' +
+                                followHtml);
+                    }
+                    $api.append($api.dom('.aui-list'), '<div class="aui-btn aui-btn-primary aui-btn-block enter-follow-mo" tapmode onclick="enterFollowMo();">进入关注人动态</div>');
+                } else if (ret.ret == 0) {
+                    alert('暂无推荐关注人信息');
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+            api.hideProgress();
+        })
+    }
+    var pullRefresh;
+
+    function getFollowMoment() {
+        apiObj.Get(UrlRouter.GetFollowMoment, {
+            values: {
+                uid: $api.getStorage('uid'),
+                p: p,
+                num: 20
+            }
+        }, function (ret, err) {
+            pullRefresh.cancelLoading();
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (isClean) {
+                        $api.html($api.dom('.aui-list'), '');
+                        if ($api.dom('.img-null') != null) {
+                            $api.remove($api.dom('.img-null'));
+                        }
+                        if (ret.list.length != 0) {
+                            $api.html($api.dom('.aui-content'), '<ul class="aui-list"> </ul>');
+                        } else {
+//                        alert('暂无动态内容');
+                            $api.append($api.dom('body'), '<div class="no-data"> <img class="img-null" src="../../image/noDynamic.png" style="height:auto!important;width:40%;vertical-align: middle;position: absolute;left: 30%;"/></div>');
+                            $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 3 + 'px');
+                        }
+                    }
+                    for (var i = 0; i < ret.list.length; i++) {
+                        var isFollow = ret.list[i].follow == true ? 'aui-btn-outlined' : '';
+                        var isAppreciate = ret.list[i].thumb == true ? 'thumb-red' : '';
+                        var followText = ret.list[i].follow == true ? '取消关注' : '<span class="aui-iconfont aui-icon-add"></span>关注';
+                        var isMineDel = $api.getStorage('uid') != ret.list[i].uid ? 'display:none' : 'display:inline-block';
+                        var isMineFlo = $api.getStorage('uid') == ret.list[i].uid ? 'display:none' : 'display:inline-block';
+                        var rank = ret.list[i].userinfo.rank;
+                        if (ret.list[i].userinfo.offical && ret.list[i].userinfo.offical == true) {
+                            rank = "官方";
+                        }
+                        if ( ret.list[i].userinfo.sex == 1) {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                        } else {
+                            var sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                        }
+                        var Istatus = '666';
+                        if(ret.list[i].ref){
+                            if(ret.list[i].ref.status == 0){
+                                Istatus = ret.list[i].ref.status;
+                            }
+                        }
+                        $api.append($api.dom('.aui-list'), '<li class="aui-card-list aui-border-b" uid="' + ret.list[i].uid + '" id="' + ret.list[i].id + '" tapmode onclick="momentDetail(this);"> <div class="aui-card-list-header aui-card-list-user"> <div class="aui-card-list-user-avatar" tapmode onclick="userInfoClick(this);">'+sexhtml+' <img src="' + ret.list[i].userinfo.face + '" class="aui-img-round"/> </div> <div class="aui-card-list-user-name aui-font-size-16"  tapmode onclick="userInfoClick(this);"> <div class="aui-text-primary "><span class="username aui-ellipsis-1">' + ret.list[i].userinfo.realname + ' </span><span class="aui-label aui-label-info">' +' ' + rank + '</span></div> </div> <div class="aui-card-list-user-info aui-text-default">' + ret.list[i].userinfo.xxmc + ' ' + ret.list[i].userinfo.role + '</div> <small class="aui-card-list-user-info">' + ret.list[i].createtime + ' ' + ret.list[i].device + '</small> <div class="aui-btn aui-btn-warning btn-follow ' + isFollow + '" style="' + isMineFlo + '" tapmode onclick="btnFollow(this)">' + followText + '</div> </div> <div class="aui-card-list-content-padded "><div class="content-text bugflag"></div><div class="content-exercise"></div><div class="content-img aui-padded-t-5"></div> </div><div class="content-forward" status = "' + Istatus + '"  tapmode onclick="transpondContent(this);"></div> <div class="aui-card-list-footer aui-padded-t-0"> <div class="aui-font-size-12"   tapmode onclick="transpondMoment(this);"><i class="aui-iconfont aui-icon-forward aui-margin-r-0"></i>转发(<span class="forward">' + ret.list[i].forword_count + '</span>) </div> <div class="aui-font-size-12 btn-appreciate ' + isAppreciate + '" tapmode onclick="appreciate(this);"><i class="aui-iconfont aui-icon-appreciate aui-margin-r-0"></i>赞(<span class="appreciate">' + ret.list[i].thumbup_count + '</span>) </div> <div class="aui-font-size-12" tapmode onclick="commentClick(this)"><i class="aui-iconfont aui-icon-comment aui-margin-r-0"></i>评论(<span class="comment">' + ret.list[i].comment_count + '</span>) </div> <div class="aui-font-size-12" style="' + isMineDel + '" tapmode onclick="delMoment(this);"><i class="aui-iconfont aui-icon-delete aui-margin-r-0"></i> 删除</div> </div>');
+                        if (rank == "官方") {
+                            $api.css($api.domAll(".aui-label-info")[$api.domAll(".aui-label-info").length - 1], 'background-color:red');
+                            // 不显示关注按钮
+                            $api.css($api.domAll(".btn-follow")[$api.domAll(".btn-follow").length - 1], 'display:none');
+                        }
+                        if (ret.list[i].content != '') {
+                            var content = ret.list[i].content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                            switch (ret.list[i].content_type) {
+                                case '':
+                                case 'user':
+                                    $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], ret.list[i].content);
+                                    break;
+                                case 'course':
+                                    if (ret.list[i].tag) {
+                                        $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '制作了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'course\');" resId="' + ret.list[i].resourceid + '">【课堂资源包】' + content + '</span> <br>' + ret.list[i].tag.xkmc + ' ' + ret.list[i].tag.njmc + ' ' + ret.list[i].tag.bbmc + ' ' + ret.list[i].tag.dymc + ' ' + ret.list[i].tag.jmc);
+                                    } else {
+                                        $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '制作了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'course\');" resId="' + ret.list[i].resourceid + '">【课堂资源包】' + content + '</span> <br>');
+                                    }
+                                    break;
+                                case 'homework':
+                                    if (ret.list[i].tag) {
+                                        $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '布置了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'homework\');" resId="' + ret.list[i].resourceid + '">【作业】' + content + '</span> <br>' + ret.list[i].tag.xkmc + ' ' + ret.list[i].tag.njmc);
+                                    } else {
+                                        $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '布置了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'homework\');" resId="' + ret.list[i].resourceid + '">【作业】' + content + '</span> <br>');
+                                    }
+                                    break;
+                                case 'material':
+                                    var fl = ret.list[i].fl == '1' ? '教学设计' : ret.list[i].fl == '2' ? '自主学习单' : ret.list[i].fl == '3' ? '精讲助学' : ret.list[i].fl == '4' ? '影音素材' : ret.list[i].fl == '6' ? '微课': '其他类';
+                                    if (ret.list[i].tag) {
+                                        $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '上传了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'material\');" resId="' + ret.list[i].resourceid + '">【' + fl + '】' + content + '</span> <br>' + ret.list[i].tag.xkmc + ' ' + ret.list[i].tag.njmc + ' ' + ret.list[i].tag.bbmc + ' ' + ret.list[i].tag.dymc + ' ' + ret.list[i].tag.jmc);
+                                    } else {
+                                        $api.html($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '上传了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'material\');" resId="' + ret.list[i].resourceid + '">【' + fl + '】' + content + '</span> <br>');
+                                    }
+                                    break;
+                                case 'exercise':
+                                    if (ret.list[i].tag) {
+                                        $api.html($api.domAll('.content-exercise')[$api.domAll('.content-exercise').length - 1], '编写了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'exercise\');" resId="' + ret.list[i].resourceid + '">【习题】' + content + '</span> <br>' + ret.list[i].tag.xkmc + ' ' + ret.list[i].tag.njmc + ' ' + ret.list[i].tag.bbmc + ' ' + ret.list[i].tag.dymc + ' ' + ret.list[i].tag.jmc);
+                                    } else {
+                                        $api.html($api.domAll('.content-exercise')[$api.domAll('.content-exercise').length - 1], '编写了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'exercise\');" resId="' + ret.list[i].resourceid + '">【习题】' + content + '</span> <br>');
+                                    }
+                                    break;
+                            }
+                        }
+                        if (ret.list[i].image_list.length == 1) {
+                            if (ret.list[i].image_list[0].indexOf('?') != -1) {
+                                $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].image_list[0] + '/auto-orient/thumbnail/!65p"/>');
+                            } else {
+                                $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].image_list[0] + '?imageMogr2/auto-orient/thumbnail/!65p"/>');
+                            }
+                        } else if (ret.list[i].image_list.length > 1) {
+                            $api.html($api.domAll('.content-img')[$api.domAll('.content-img').length - 1], '<div class="img-size4 aui-row aui-row-padded"> </div>');
+                            for (var imageSize = 0; imageSize < ret.list[i].image_list.length; imageSize++) {
+                                if (ret.list[i].image_list[imageSize].indexOf('?') != -1) {
+                                    $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].image_list[imageSize] + '/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                } else {
+                                    $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].image_list[imageSize] + '?imageMogr2/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                }
+                            }
+                        }
+                        if (ret.list[i].ref != null) {
+                            var refRank = ret.list[i].ref.userinfo.rank;
+                            if (ret.list[i].ref.userinfo.offical && ret.list[i].ref.userinfo.offical == true) {
+                                refRank = "官方";
+                            }
+                            $api.append($api.domAll('.content-forward')[$api.domAll('.content-forward').length - 1], '<div class="aui-card-list-content-padded"  id="' + ret.list[i].ref.id + '"> <div class="aui-card-list-user-name aui-font-size-16"> <div class="aui-text-primary "><span class="username aui-ellipsis-1"> ' + ret.list[i].ref.userinfo.realname + ' </span><span class="aui-label aui-label-info">' + ' ' +refRank + '</span><span class="forward-school aui-font-size-12">（' + ret.list[i].ref.userinfo.xxmc + ' ' + ret.list[i].ref.userinfo.role + '）</span></div> </div> <div class="forward-content-text"></div> <div class="forward-content-exercise"></div><div class="forward-content-img aui-padded-t-5"> </div> <small class="aui-card-list-user-info">' + ret.list[i].ref.createtime + ' ' + ret.list[i].ref.device + '</small> </div>');
+                            if (refRank == "官方") {
+                                $api.css($api.domAll(".aui-label-info")[$api.domAll(".aui-label-info").length - 1], 'background-color:red');
+                            }
+                            if (ret.list[i].ref.content != '') {
+                                var content = ret.list[i].ref.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                                if ($api.text($api.domAll('.content-text')[$api.domAll('.content-text').length - 1]).length == 0) {
+                                    $api.prepend($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '<span >转发了动态：</span>');
+                                }
+                                if(ret.list[i].ref.status == 0){
+                                    $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], '内容已被删除');
+                                }else {
+                                    switch (ret.list[i].ref.content_type) {
+                                        case '':
+                                        case 'user':
+                                            if(ret.list[i].ref.status == 0){
+                                                $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], '内容已被删除');
+                                            }else {
+                                                $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], ret.list[i].ref.content);
+                                            }
+//                                        $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], ret.list[i].ref.content);
+                                            break;
+                                        case 'course':
+                                            $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], '制作了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'course\');" resId="' + ret.list[i].ref.resourceid + '">【课堂资源包】' + content + '</span> <br>' + ret.list[i].ref.tag.xkmc + ' ' + ret.list[i].ref.tag.njmc + ' ' + ret.list[i].ref.tag.bbmc + ' ' + ret.list[i].ref.tag.dymc + ' ' + ret.list[i].ref.tag.jmc);
+                                            break;
+                                        case 'homework':
+                                            $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], '布置了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'homework\');" resId="' + ret.list[i].ref.resourceid + '">【作业】' + content + '</span> <br>' + ret.list[i].ref.tag.xkmc + ' ' + ret.list[i].ref.tag.njmc);
+                                            break;
+                                        case 'material':
+                                            var fl = ret.list[i].ref.fl == '1' ? '教学设计' : ret.list[i].ref.fl == '2' ? '自主学习单' : ret.list[i].ref.fl == '3' ? '精讲助学' : ret.list[i].ref.fl == '4' ? '影音素材' : ret.list[i].ref.fl == '6' ? '微课': '其他类';
+                                            $api.html($api.domAll('.forward-content-text')[$api.domAll('.forward-content-text').length - 1], '上传了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'material\');" resId="' + ret.list[i].ref.resourceid + '">【' + fl + '】' + content + '</span> <br>' + ret.list[i].ref.tag.xkmc + ' ' + ret.list[i].ref.tag.njmc + ' ' + ret.list[i].ref.tag.bbmc + ' ' + ret.list[i].ref.tag.dymc + ' ' + ret.list[i].ref.tag.jmc);
+                                            break;
+                                        case 'exercise':
+                                            $api.html($api.domAll('.forward-content-exercise')[$api.domAll('.forward-content-exercise').length - 1], '编写了<span class="aui-text-primary" tapmode onclick="resourceClick(this,\'exercise\');" resId="' + ret.list[i].ref.resourceid + '">【习题】' + content + '</span> <br>' + ret.list[i].ref.tag.xkmc + ' ' + ret.list[i].ref.tag.njmc + ' ' + ret.list[i].ref.tag.bbmc + ' ' + ret.list[i].ref.tag.dymc + ' ' + ret.list[i].ref.tag.jmc);
+                                            break;
+                                    }
+                                }
+
+                            }else{
+                                var content = ret.list[i].ref.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                                if ($api.text($api.domAll('.content-text')[$api.domAll('.content-text').length - 1]).length == 0) {
+                                    $api.prepend($api.domAll('.content-text')[$api.domAll('.content-text').length - 1], '<span >转发了动态：</span>');
+                                }}
+                            if(ret.list[i].ref.status != 0){
+                              if (ret.list[i].ref.image_list == null) {
+
+                              } else if (ret.list[i].ref.image_list.length == 1) {
+                                if (ret.list[i].ref.image_list[0].indexOf('?') != -1) {
+                                    $api.html($api.domAll('.forward-content-img')[$api.domAll('.forward-content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].ref.image_list[0] + '/auto-orient/thumbnail/!65p"/>');
+                                } else {
+                                    $api.html($api.domAll('.forward-content-img')[$api.domAll('.forward-content-img').length - 1], '<img class="img-size1" src="' + ret.list[i].ref.image_list[0] + '?imageMogr2/auto-orient/thumbnail/!65p"/>');
+                                }
+                              } else if (ret.list[i].ref.image_list.length > 1) {
+                                $api.html($api.domAll('.forward-content-img')[$api.domAll('.forward-content-img').length - 1], '<div class="img-size4 aui-row aui-row-padded"> </div>');
+                                for (var imageSize = 0; imageSize < ret.list[i].ref.image_list.length; imageSize++) {
+                                    if (ret.list[i].ref.image_list[imageSize].indexOf('?') != -1) {
+                                        $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].ref.image_list[imageSize] + '/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                    } else {
+                                        $api.append($api.domAll('.img-size4')[$api.domAll('.img-size4').length - 1], '<div class="aui-col-xs-4"> <img src="' + ret.list[i].ref.image_list[imageSize] + '?imageMogr2/auto-orient/thumbnail/!65p" alt=""> </div>');
+                                    }
+                                }
+                              }
+                            }else {
+                                if(ret.list[i].ref.image_list == null){
+
+                                }else {
+                                    if(ret.list[i].ref.image_list !=0){
+                                        $api.html($api.domAll('.forward-content-img')[$api.domAll('.forward-content-img').length - 1], '<img style="width: 100px;height: 100px" class="img-size4" src="../../image/contentDel.png">');
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    for (var i = 0; i < $api.domAll('img').length; i++) {
+                        $api.css($api.domAll('img')[i], 'height:' + $api.offset($api.domAll('img')[i]).w + 'px');
+                    }
+                    p++;
+                    totalPage = ret.totalpage;
+                    for (var atIndex = 0; atIndex < $api.domAll('.valid').length; atIndex++) {
+                        $api.attr($api.domAll('.valid')[atIndex], 'onclick', 'atOnclick(this);');
+                    }
+                    for (var atVoid = 0; atVoid < $api.domAll('.invalid').length; atVoid++) {
+                        $api.attr($api.domAll('.invalid')[atVoid], 'onclick', 'atVoid(this);');
+                    }
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100           //设置距离底部多少距离时触发，默认值为0，数字类型
+                        }
+                    }, function (ret, err) {
+                        if (p > totalPage) {
+                            api.toast({
+                                msg: '已经到底啦，没有更多动态了',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            isClean = false;
+                            $api.removeCls($api.dom('.loading'), 'aui-hide');
+                            getFollowMoment();
+                            api.removeEventListener({
+                                name: 'scrolltobottom'
+                            });
+
+                        }
+                    });
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+            api.hideProgress();
+        })
+    }
+    function enterFollowMo() {
+        getFollowUser();
+    }
+    function momentDetail(context) {
+        api.openWin({
+            name: 'win-comment-content-original',
+            url: 'win-comment-content-original.html',
+            pageParam: {
+                id: context.id,
+                isFollow: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-follow'), 'aui-btn-outlined'),
+                isAppreciate: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-appreciate'), 'thumb-red')
+            }
+        });
+        detailForResult(context);
+    }
+    function commentClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        if($api.getStorage('studentSwitch')==1){
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能评论，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }else {
+                api.toast({
+                    msg: '暂不允许进行评论，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            return;
+        }
+        api.openWin({
+            name: 'win-comment-content-original',
+            url: 'win-comment-content-original.html',
+            pageParam: {
+                id: $api.closest(context, '.aui-card-list').id,
+                isFollow: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-follow'), 'aui-btn-outlined'),
+                isAppreciate: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-appreciate'), 'thumb-red')
+            }
+        });
+        detailForResult(context);
+    }
+    function transpondMoment(context) { window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        if ($api.getStorage('studentSwitch') == 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能转发，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }else {
+                api.toast({
+                    msg: '暂不允许进行转发，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            return;
+        }
+        var id;
+        var content;
+
+        if ($api.dom($api.dom($api.closest(context, '.aui-card-list'), '.content-forward'), '.aui-card-list-content-padded') == null) {
+            id = $api.closest(context, '.aui-card-list').id;
+            content = '';
+        } else {
+            id = $api.closest(context, '.aui-card-list').id;//转发是传当前id 不是第一个id
+//            id = $api.dom($api.dom($api.closest(context, '.aui-card-list'), '.content-forward'), '.aui-card-list-content-padded').id;
+            content = '@' + $api.text($api.dom($api.closest(context, '.aui-card-list'), '.username')) + ' （' + $api.text($api.dom($api.closest(context, '.aui-card-list'), '.aui-text-default')) + '） ' + $api.text($api.dom($api.closest(context, '.aui-card-list'), '.content-text'));
+        }
+        api.openWin({
+            name: 'win-moments-forward',
+            url: 'win-moments-forward.html',
+            pageParam: {
+                id: id,
+                content: content
+            }
+        });
+    }
+    function userInfoClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'friendMainPage',
+            url: '../mine/selfmainview/friendMainPage.html',
+            pageParam: {otheruid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')}
+        });
+    }
+    function atOnclick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'friendMainPage',
+            url: '../mine/selfmainview/friendMainPage.html',
+            pageParam: {otheruid: $api.attr(context, 'uid')}
+        });
+    }
+    function atVoid(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        alert('该用户不存在或您没有权限访问');
+    }
+    function resourceClick(context, type) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        switch (type) {
+            case 'course':
+                alert('亲，该资源没有对您开放，您无权查看哟~');
+                return;
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        id: $api.attr(context, 'resId'),
+                        type: 'course',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+                                name: 'win_course_list_detail',
+                                url: 'resource/win_course_list_detail.html',
+                                pageParam: {
+                                    kcid: $api.attr(context, 'resId'),
+                                    title: $api.text(context),
+                                    uid: $api.attr(context, 'uid')
+
+                                }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                });
+                break;
+            case 'homework':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        // id: '100314667363219562'
+                        id: $api.attr(context, 'resId'),
+                        type: 'homework',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+//                                name: 'win_hw_detail_list',
+//                                url: 'resource/win_hw_detail_list.html',
+//                                pageParam: {
+//                                    classId: $api.attr(context, 'resId'),
+//                                    homeworkName: $api.text(context),
+//                                    uid: $api.attr(context, 'uid')
+//
+//                                }
+                                name: 'win_exercises_list',
+                                url: 'resource/win_exercises_list.html',
+                                pageParam: {
+                                    classId: $api.attr(context, 'resId'),
+                                    homeworkName: $api.text(context),
+                                    uid: $api.attr(context, 'uid'),
+                                    detailData: ret
+                                }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                });
+
+                break;
+            case 'material':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        id: $api.attr(context, 'resId'),
+                        type: 'material',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+                                name: 'win_resource_detail',
+                                url: 'resource/win_resource_detail.html',
+                                pageParam: {
+                                    resId: $api.attr(context, 'resId'),
+                                    homeworkName: $api.text(context),
+                                    type: 'material',
+                                    uid: $api.attr(context, 'uid')
+
+                                }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                });
+
+                break;
+            case 'exercise':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        id: $api.attr(context, 'resId'),
+                        type: 'exercise',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+//                                name: 'win_resource_detail',
+//                                url: 'resource/win_resource_detail.html',
+//                                pageParam: {
+//                                    resId: $api.attr(context, 'resId'),
+//                                    homeworkName: $api.html(context),
+//                                    type: 'exercise',
+//                                    uid: $api.attr(context, 'uid')
+//
+//                                }
+                                name: 'win_detail_exercises',
+                                url: 'resource/win_detail_exercises.html',
+                                pageParam: {
+                                    resId: $api.attr(context, 'resId'),
+                                    homeworkName: $api.html(context),
+                                    type: 'exercise',
+                                    uid: $api.attr(context, 'uid'),
+                                    detailData: ret,
+                                    index: 0,
+                                    tx_code:ret.tx_code
+                                }
+                            });
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                });
+                break;
+        }
+    }
+    function btnFollow(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        var uid = $api.attr($api.closest(context, '.aui-card-list'), 'uid');
+        if ($api.hasCls(context, 'aui-btn-outlined')) {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 0,
+                    followuid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.removeCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '<span class="aui-iconfont aui-icon-add"></span>关注');
+                            }
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            });
+        } else {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 1,
+                    followuid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.addCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '取消关注');
+                            }
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            })
+        }
+    }
+
+    function appreciate(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        if ($api.hasCls(context, 'thumb-red')) {
+            $api.removeCls(context, 'thumb-red');
+            $api.text($api.dom(context, '.appreciate'), parseInt($api.text($api.dom(context, '.appreciate'))) - 1);
+            apiObj.Delete(UrlRouter.PraiseDynamic + "?dynamicid=" + $api.closest(context, '.aui-card-list').id, null,
+                    function (ret, err) {
+
+                    })
+        } else {
+            $api.addCls(context, 'thumb-red');
+            $api.text($api.dom(context, '.appreciate'), parseInt($api.text($api.dom(context, '.appreciate'))) + 1);
+            apiObj.Put(UrlRouter.PraiseDynamic, {
+                values: {
+                    dynamicid: $api.closest(context, '.aui-card-list').id
+                }
+            }, function (ret, err) {
+
+            })
+        }
+    }
+    function delMoment(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.confirm({
+            title: '提示',
+            msg: '确认删除该动态？',
+            buttons: ['确定', '取消']
+        }, function (ret, err) {
+            if (ret.buttonIndex == 1) {
+                apiObj.Delete(UrlRouter.DelDynamic + '?dynamicid=' + $api.closest(context, '.aui-card-list').id, null, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            $api.remove($api.closest(context, '.aui-card-list'));
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                })
+            }
+        });
+    }
+    function transpondContent(context) {
+        var status = $api.attr(context, 'status');
+        if(status == '0'){
+            alert('内容已被删除');
+            window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        }else {
+            window.event ? window.event.cancelBubble = true : context.stopPropagation();
+            api.openWin({
+                name: 'win-comment-content-original',
+                url: 'win-comment-content-original.html',
+                pageParam: {
+                    id: $api.dom(context, '.aui-card-list-content-padded').id,
+                    isFollow: $api.cssVal($api.dom($api.closest(context, '.aui-card-list'), '.btn-follow'), 'display') == 'none',
+                    isAppreciate: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-appreciate'), 'thumb-red')
+                }
+            });
+        }
+    }
+</script>
+</html>

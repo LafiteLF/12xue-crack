@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        .aui-content {
+            background: #F4F4F4;
+            width: 80%;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .content {
+            background-color: white;
+            border-radius: 6px;
+        }
+
+        .time {
+            text-align: center;
+            padding-top: 12px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .content .title {
+            color: #000000;
+            font: 16px bold;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .content .title .mark {
+            float: left;
+            width: 10px;
+            height: 16px;
+            background-color: #ffcd06;
+        }
+
+        .type {
+            color: #aaa;
+        }
+
+        ul > li {
+            float: left;
+            margin-right: 20px;
+        }
+
+        .padding-10 {
+            padding: 10px;;
+
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .tag {
+            margin: 10px 0;
+            color: #4bc7c7;
+        }
+
+        .no-readed .tag {
+            color: #F85307;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <div class="time">
+        今日 14:26
+    </div>
+    <div class="content">
+        <div>
+
+            <div class="title">
+                <div class="mark">
+
+                </div>
+                家长会通知
+
+            </div>
+        </div>
+        <div class="padding-10">
+            <div>
+                <span class="class">2016级三班</span> <span class="type">家长</span>
+            </div>
+            <div class="read">
+                <div class="tag">已阅<span>3</span>人</div>
+                <ul class="list">
+                    <!--<li class="list-item">张三</li>-->
+                </ul>
+                <div class="clear"></div>
+            </div>
+            <div class="no-read">
+                <div class="tag aui-text-pink">未阅<span>3</span>人</div>
+                <ul class="list">
+                    <!--<li class="list-item">张三</li>-->
+                </ul>
+                <div class="clear"></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+
+<script type="text/javascript">
+
+    apiready = function () {
+        $api.text($api.dom('.time'), api.pageParam.time);
+        $api.text($api.dom(".title"), api.pageParam.title);
+        $api.text($api.dom(".class"), api.pageParam.className);
+        if (api.pageParam.identitytype == 4) {
+            $api.text($api.dom(".type"), "家长");
+        } else {
+            $api.text($api.dom(".type"), "学生");
+        }
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetNotifyNormalnotifyusers, {
+            values: {
+                groupcode: api.pageParam.groupcode,
+                classid: api.pageParam.classid,
+                identitytype: api.pageParam.identitytype
+            }
+        }, function (ret, err) {
+            if (ret && ret.status == 1) {
+                dealData("read", ret.data.read);
+                dealData("no-read", ret.data.unread);
+            } else {
+                var msg = '';
+                if (ret) {
+                    msg = ret.info;
+                } else {
+                    msg = err;
+                }
+                api.hideProgress();
+                api.toast({
+                    msg: msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    };
+    function dealData(type, data) {
+        var containerEl = $api.dom("." + type);
+        try {
+            $api.text($api.dom(containerEl, ".tag span"), data.length);
+            //填数据之前清一下数据
+            $api.html($api.dom(containerEl, ".list"), '');
+            for (var i = 0; i < data.length; i++) {
+                $api.append($api.dom(containerEl, ".list"), '<li class="list-item">' + data[i].uid + '</li>');
+            }
+        } catch (e) {
+            //若解析出错
+            $api.text($api.dom(containerEl, ".tag span"), "0");
+            $api.text($api.dom(containerEl, ".list"), "无");
+        }
+    }
+</script>
+</html>

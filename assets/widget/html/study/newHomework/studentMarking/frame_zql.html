@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" href="../../../../css/publicCss.css">
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            padding: 0;
+            position: relative;
+        }
+
+        .show {
+            background-color: white;width: 100%;height: auto;position: fixed;bottom: 0;max-height: 210px;min-height:70px;overflow: auto;
+        }
+
+        .myli{
+            width: 32%;height: 70px;background-color: #fff;display: inline-block;margin: 0;padding: 0;
+        }
+
+        .cricle{
+            width: 40px;
+            height: 40px;
+            background-color: #ffc533;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 50%;
+            line-height: 40px;
+            /*position: absolute;*/
+            margin-top: 15px;
+            margin-left: calc(50% - 20px);
+            color: white;
+        }
+        .cricle:hover{
+            background-color: #ffa200;
+        }
+
+
+        .bacDiv{
+            position: fixed;
+            color: #000;
+            top: 0;
+            width: 100%;
+            height: 60%;
+            padding:0;
+            margin: 0;
+            left: 0;
+        }
+        [v-cloak] {
+            display: none;
+        }
+
+        .scoreSure{
+            position: fixed;
+            bottom:209px;
+            right: 0;
+            width: 150px;
+            height: 60px;
+            border-radius: 8px 8px  0px 0px;
+            display: none;
+            background-color: #f2f2f2;
+        }
+        .cricle2{
+            width: 40px;
+            height: 40px;
+            background-color: #ffc533;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 50%;
+            line-height: 30px;
+            margin-top: 10px;
+            margin-left: 24px;
+            color: white;
+            display: block;
+            box-sizing: border-box;
+            padding-top: 5px;
+            float: left;
+        }
+        .cricle3{
+            width: 40px;
+            height: 40px;
+            background-color: #e0e0e0;
+            text-align: center;
+            font-size: 12px;
+            border-radius: 50%;
+            line-height: 14px;
+            margin-top: 10px;
+            margin-left: 20px;
+            color: white;
+            display: block;
+            box-sizing: border-box;
+            padding-top: 7px;
+            float: left;
+        }
+        .sjx{
+            width: 0;
+            height: 0;
+            border-bottom: 54px solid #f2f2f2;
+            border-left: 12px solid transparent;
+            position: fixed;
+            right: 150px;
+            bottom: 209px;
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="bacDiv" onclick="api.closeFrame({name: 'frame_zql'});"></div>
+
+<div class="sjx"></div>
+<div class="scoreSure">
+    <div class="cricle2" onclick="addHalf()">+0.5</div>
+    <div class="cricle3" onclick="timeSure()">确定<br><span class="timeSpan">(3s)</span></div>
+</div>
+
+<ul class="show clearfix" v-cloak>
+    <li class="myli" v-for="item,index in data" @click="changeDc(index);">
+        <div class="cricle" :style="ysArr[index] == '1'?'background-color: #F57F17;':'background-color: #ffc533;'" v-text="item"></div>
+    </li>
+</ul>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+
+    var score = 0;
+    var isHalf = false;
+    var time = 3;
+    var dInterval;
+    var ceilscore;
+    var canHalf = true;
+    apiready = function () {
+        vue();
+        ceilscore = Math.ceil(parseFloat(api.pageParam.score));
+        vm.getList();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.show',
+            data: {
+                data: [],
+                ysArr:[],
+            },
+            methods: {
+                getList: function () {
+                    if(api.pageParam.score == '0'){
+                        vm.data = ['90%','80%','70%','60%','50%','40%','30%','20%','10%'];
+                    }else {
+                        $api.css($api.dom('.sjx'), 'display:block;');
+                        $api.css($api.dom('.scoreSure'), 'display:block;');
+                        var data = [];
+                        var ysArr = [];
+                        var score = '';
+                        for (var i = parseInt(ceilscore)-1; i >= 1; i--) {
+                            data.push(i);
+                            ysArr.push('0');
+                        }
+                        if(data.length <=3){
+                            $api.css($api.dom('.show'), 'height:70px;');
+                            $api.css($api.dom('.scoreSure'), 'bottom:69px;');
+                            $api.css($api.dom('.sjx'), 'bottom:69px;');
+                        }else if(data.length <=6){
+                            $api.css($api.dom('.show'), 'height:140px;');
+                            $api.css($api.dom('.scoreSure'), 'bottom:139px;');
+                            $api.css($api.dom('.sjx'), 'bottom:139px;');
+                        }
+                        vm.data = data;
+                        vm.ysArr =  ysArr;
+                    }
+                },
+                changeDc: function (fenzhi) {
+                    if(api.pageParam.score == '0'){
+                        api.sendEvent({
+                            name: 'fenzhiC',
+                            extra: {fenzhi: fenzhi,index: api.pageParam.index}
+                        });
+                        api.closeFrame({name: 'frame_zql'});
+                    }else {
+
+
+                        if(vm.ysArr[fenzhi] == '1'){
+                            vm.ysArr[fenzhi] = '0';
+                            score = 0;
+                            canHalf = true;
+                            if(isHalf == false){
+                                $api.css($api.dom('.cricle2'), 'background-color: #ffc533;');
+                                timeStopThree();
+                            }
+                        }else {
+                            for(var i=0; i<vm.ysArr.length;i++){
+                                if(vm.ysArr[i] == '1'){
+                                    vm.ysArr[i] = '0';
+                                }
+                            }
+                            vm.ysArr[fenzhi] = '1';
+                            score = vm.data[fenzhi];
+
+                            if(score+0.5 >= api.pageParam.score){
+                                canHalf = false;
+                                isHalf = false;
+                                $api.css($api.dom('.cricle2'), 'background-color: #e0e0e0;');
+                            }else {
+                                canHalf = true;
+                                if(isHalf == true){
+                                    $api.css($api.dom('.cricle2'), 'background-color: #f57f17;');
+                                }else {
+                                    $api.css($api.dom('.cricle2'), 'background-color: #ffc533;');
+                                }
+
+                            }
+                            retimeInterval();
+                            $api.css($api.dom('.cricle3'), 'background-color: #4bc7c7;');
+                        }
+                        this.$forceUpdate();
+
+//                        var score = vm.data[fenzhi];
+//                        api.sendEvent({
+//                            name: 'fenzhiC2',
+//                            extra: {fenzhi: score,index: api.pageParam.index}
+//                        });
+                    }
+
+                },
+            }
+        });
+    }
+
+    function addHalf() {
+
+        if(canHalf == false){
+            return;
+        }
+        if(isHalf == false){
+            isHalf = true;
+            $api.css($api.dom('.cricle2'), 'background-color:#f57f17');
+            $api.css($api.dom('.cricle3'), 'background-color: #4bc7c7;');
+            if(score == 0){
+                timeInterval();
+            }
+        }else {
+            isHalf = false;
+            $api.css($api.dom('.cricle2'), 'background-color:#ffc533');
+            if(score == 0){
+                timeStopThree();
+            }
+        }
+    }
+
+
+    function timeSure() {
+        if(isHalf == false){
+            if(score == 0){
+                return;
+            }
+            api.sendEvent({
+                name: 'fenzhiC2',
+                extra: {fenzhi: score,index: api.pageParam.index}
+            });
+        }else {
+            api.sendEvent({
+                name: 'fenzhiC2',
+                extra: {fenzhi: score+0.5,index: api.pageParam.index}
+            });
+        }
+        api.closeFrame({name: 'frame_zql'});
+    }
+
+    //重置时间为3并重新计时
+    function retimeInterval() {
+        clearInterval(dInterval);
+        $api.text($api.dom('.timeSpan'), '('+ 3 +'s)');
+        time = 3;
+        dInterval = setInterval(function(){
+            time = time-1;
+            if(time < 0){
+                clearInterval(dInterval);
+                timeSure(score);
+            }else {
+                $api.text($api.dom('.timeSpan'), '('+ time +'s)');
+            }
+        }, 1000);
+    }
+
+    //重置时间为3停止计时
+    function timeStopThree() {
+        clearInterval(dInterval);
+        time = 3;
+        $api.text($api.dom('.timeSpan'), '('+ time +'s)');
+        $api.css($api.dom('.cricle3'), 'background-color: #e0e0e0;');
+    }
+
+    //倒计时
+    function timeInterval() {
+        dInterval = setInterval(function(){
+            time = time-1;
+            if(time < 0){
+                clearInterval(dInterval);
+                timeSure(score);
+            }else {
+                $api.text($api.dom('.timeSpan'), '('+ time +'s)');
+            }
+        }, 1000);
+    }
+
+</script>
+</html>

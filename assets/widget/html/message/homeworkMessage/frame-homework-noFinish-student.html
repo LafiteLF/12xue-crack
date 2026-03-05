@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body{
+            
+        }
+        img{
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+        .user-grid{
+            background-color: whitesmoke;
+        }
+        .content{
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        .aui-img-object{
+            border-radius: 50%;
+        }
+        .student{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<section class="aui-grid user-grid">
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row aui-text-center">-->
+        <!--<div class="aui-col-xs-3">-->
+            <!--<img  src="../../../image/default_portrait.png">-->
+            <!--<p>张三</p>-->
+        <!--</div>-->
+    <!--</div>-->
+</section>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlWeibo, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function(){
+        apiObj.Get(UrlRouter.GetUncompleteStudentList, {
+            values: {
+                zyid:api.pageParam.zyid,
+                classid:api.pageParam.classid
+            }
+        }, function (ret, err) {
+            if (ret){
+                if (ret.status==1){
+                    for(var i=0;i<ret.data.length;i++){
+                        $api.append($api.dom('.user-grid'),'<div class="row aui-text-center"> <div class="aui-col-xs-3"> <img  src="'+ret.data[i].userinfo.face+'"> <p>'+ret.data[i].userinfo.realname+'</p> </div> </div>')
+                    }
+
+                }else{
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            }else{
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+            api.refreshHeaderLoadDone();
+        });
+    };
+</script>
+</html>

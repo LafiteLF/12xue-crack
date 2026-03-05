@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>学科列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+
+    <style>
+        [v-cloak] {
+            display: none
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content {
+            padding: 10px
+        }
+
+        .content ul li {
+            width: 25%;
+            float: left;
+            padding: 9px;
+            height: 180px;
+        }
+
+        .content ul li .item {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 3px
+        }
+
+        .content ul li .add-subject {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 3px;
+            background-color: #e9fefe;
+            border: 1px dashed #4bc7c7;
+            color: #4bc7c7;
+            text-align: center;
+        }
+
+        .content ul li .add-subject:active {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 3px;
+            background-color: #4bc7c7;
+            border: 1px dashed #4bc7c7;
+            color: #fff;
+        }
+
+        .content ul li .add-subject div:nth-of-type(1) {
+            background: url("../../../image/error/add-sub.png") no-repeat center center #e9fefe;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            margin-left: calc(50% - 20px);
+            top: 23%;
+        }
+
+        .content ul li .add-subject:active div:nth-of-type(1) {
+            background: url("../../../image/error/add-sub-active.png") no-repeat center center #4bc7c7;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            -moz-background-size: 100% 100%;
+            width: 40px;
+            height: 40px;
+            margin-left: calc(50% - 20px);
+            position: absolute;
+            top: 23%;
+        }
+
+        .content ul li .add-subject div:nth-of-type(2) {
+            font-size: 18px;
+            position: absolute;
+            top: 62%;
+            text-align: center;
+            width: 100%
+        }
+
+        .content ul li .item img {
+            width: 45%;
+            max-width: 220px;
+            margin: 0 auto;
+            position: absolute;
+            left: 3%;
+            top: 11%;
+        }
+
+        .content ul li .item h2 {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            bottom: 13%;
+        }
+
+        .state span b {
+            padding: 0 10px;
+        }
+
+        .subject {
+            width: 55%;
+            /*max-width: 220px;*/
+            margin: 0 auto;
+            position: absolute;
+            left: 40%;
+            text-align: right;
+            top: 18%;
+        }
+
+        .allsub {
+            margin-top: 50px;
+            width: 100%;
+            text-align: center;
+            height: 30px;
+            display: none;
+        }
+        .allsub p {
+            font-size: 22px;
+            height: 22px;
+        }
+        @media only screen and (min-width: 800px) and (max-width: 900px) {
+            .zifbl{ font-size: 0.5rem!important;}
+        }
+        .noError {
+            display: none;
+            width: 100%;
+            height: auto;
+            text-align: center;
+            position: absolute;
+        }
+        .noError img {
+            height: auto;
+            width: 26%;
+        }
+        .red {
+            display: block;
+            position: absolute;
+            background: #e64545;
+            border-radius: 50px;
+            width: 15px;
+            height: 15px;
+            border: 2px solid #fff;
+            right: -8px;
+            top: -8px;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak>
+    <div style="width: 30%; margin: 0 auto; padding-top: 12%; text-align: center" v-if="subjects.length==0&&isNull">
+        <img src="../../../image/stuHomePad/noHomework.png" style="width: 100%; max-width: 508px;">
+    </div>
+    <ul v-else class="clearfix">
+        <li v-for="subject in subjects" tapmode @click="openWin(subject)" v-if="subject.name !=undefined">
+            <div class="item"
+                 :style="{background:subjectBackground(subject.name),border:'1px solid'+subjectBorder(subject.name)}">
+                <img :src="'../../../image/stuHomePad/'+subjectImg(subject.name)+'.png'">
+
+                <div class="subject">
+                    <div style="font-size: 0.9rem;color: white" v-text="subject.name"></div>
+                    <div class="zifbl" style="font-size: 0.7rem;margin-top: 20px;color: #effaf3"
+                    >未开始{{subject.wks}}</div>
+                    <div  class="zifbl"  style="font-size: 0.7rem;color: #effaf3" >未提交{{subject.wwc}}</div>
+                </div>
+                <span class="red" v-if="subject.wks != 0 || subject.wwc !=0"></span>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+  
+
+        if($api.getStorage("padType")==='2'){
+            // 1. 调用函数，它会立即返回一个权限数组
+            const permissions = api.hasPermission({list:['camera','microphone','storage']});
+
+            // 2. 使用 some() 检查这个数组中是否“有任何一个”权限未被授予
+            const hasDeniedPermission = permissions.some(p => !p.granted);
+
+            // 3. 如果有，则弹窗一次
+            if (hasDeniedPermission) {
+                // alert("该功能涉及拍照，录音以及存储，请前往设置打开相机，麦克风和存储权限");
+                // checkPermission2();  
+                getPermission2();//小米家审核
+            }
+        }
+        else{
+            checkPermission();
+        }
+        vm.GetHomeworkXklists();
+        // api.addEventListener({
+        //     name: 'reloadSubjectList'
+        // }, function (ret, err) {
+        //     vm.GetHomeworkXklists();
+        // });
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+//            subjects: [{"xkid":"1","wks":"7","wwc":"0","name":"化学"},{"xkid":"2887","wks":"39","wwc":"0","name":"英语"},{"xkid":"3599","wks":"7","wwc":"0","name":"生物"},{"xkid":"7348","wks":"9","wwc":"0","name":"思想政治"}] ,
+            subjects:[],
+            isNull:false
+        },
+        methods: {
+            subjectBackground: function (subject) {
+                switch (subject) {
+                    case '数学':
+                        return '#00ce61';
+                        break;
+                    case '语文':
+                        return '#10d1b4';
+                        break;
+                    case '物理':
+                        return '#11c7d1';
+                        break;
+                    case '化学':
+                        return '#01b2ee';
+                        break;
+                    case '生物':
+                        return '#ffb526';
+                        break;
+                    case '英语':
+                        return '#a08aff';
+                        break;
+                    case '地理':
+                        return '#ef768a';
+                        break;
+                    case '历史':
+                        return '#96c04c';
+                        break;
+                    case '政治':
+                        return '#cb72c8';
+                        break;
+                    case '思想政治':
+                        return '#cb72c8';
+                        break;
+                    case '道德与法治':
+                        return '#cb72c8';
+                        break;
+                    case '政治/道法':
+                        return '#cb72c8';
+                        break;
+                    default:
+                        return '#8f8ac3';
+                        break;
+                }
+            },
+            subjectBorder: function (subject) {
+                switch (subject) {
+                    case '数学':
+                        return '#00b554';
+                        break;
+                    case '语文':
+                        return '#0fb89e';
+                        break;
+                    case '物理':
+                        return '#10aab8';
+                        break;
+                    case '化学':
+                        return '#01a0d4';
+                        break;
+                    case '生物':
+                        return '#f09e00';
+                        break;
+                    case '英语':
+                        return '#8b70ff';
+                        break;
+                    case '地理':
+                        return '#d66376';
+                        break;
+                    case '历史':
+                        return '#96c04c';
+                        break;
+                    case '政治':
+                        return '#ad66ab';
+                        break;
+                    case '思想政治':
+                        return '#ad66ab';
+                        break;
+                    case '道德与法治':
+                        return '#ad66ab';
+                        break;
+                    case '政治/道法':
+                        return '#ad66ab';
+                        break;
+                    default:
+                        return '#7b76aa';
+                        break;
+                }
+            },
+            subjectImg: function (subject) {
+                switch (subject) {
+                    case '数学':
+                        return 'math';
+                        break;
+                    case '语文':
+                        return 'chinese';
+                        break;
+                    case '物理':
+                        return 'physics';
+                        break;
+                    case '化学':
+                        return 'chemistry';
+                        break;
+                    case '生物':
+                        return 'biology';
+                        break;
+                    case '英语':
+                        return 'english';
+                        break;
+                    case '地理':
+                        return 'geography';
+                        break;
+                    case '历史':
+                        return 'history';
+                        break;
+                    case '政治':
+                        return 'politics';
+                        break;
+                    case '思想政治':
+                        return 'politics';
+                        break;
+                    case '道德与法治':
+                        return 'politics';
+                        break;
+                    case '政治/道法':
+                        return 'politics';
+                        break;
+                    case '艺术':
+                        return 'ys';
+                        break;
+                    case '社会':
+                        return 'shehui';
+                        break;
+                    case '探究性课程':
+                        return 'tjxkc';
+                        break;
+                    case '自然':
+                        return 'zr';
+                        break;
+                    case '生命科学':
+                        return 'smkx';
+                        break;
+                    case '信息技术':
+                    case '信息科技':
+                        return 'xxjs';
+                        break;
+                    default:
+                        return 'other';
+                        break;
+                }
+            },
+            openWin: function (subject) {
+                api.openWin({
+                    name: 'win-homework-list-pad',
+                    url: 'win-homework-list-pad.html',
+                    pageParam: {xkid: subject.xkid, classid: api.pageParam.classids, subjectname: subject.name}
+                });
+            },
+            GetHomeworkXklists: function () {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetHomeworkXklists, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        bjid: api.pageParam.classids.join(",")
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+
+                            if (ret.data.length == 0) {
+                                vm.isNull = true;
+                            } else {
+//                        GetHomeworkXklists();
+
+                                vm.subjects = ret.data;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    function checkPermission() {
+        var list = ['camera', 'microphone', 'storage'];
+        var unList = [];
+        var resultList = api.hasPermission({
+            list: list
+        });
+        for (var i = 0; i < resultList.length; i++) {
+            if (!resultList[i].granted) {
+                unList.push(resultList[i].name);
+            }
+        }
+        api.requestPermission({
+            list: unList,
+            code: 1
+        }, function (ret, err) {
+
+        });
+    }
+
+    function getPermission2() {
+        // 1. 定义一个包含所有需要权限的数组
+        var permissions = ['camera', 'microphone', 'storage']; // 例如：相机、麦克风、存储
+        // 2. 检查这些权限的状态
+        var resultList = api.hasPermission({
+            list: permissions
+        });
+
+        // 3. 使用 Array.prototype.every 检查是否所有权限都已授予
+        // every() 方法测试一个数组内的所有元素是否都能通过某个指定函数的测试。它返回一个布尔值。
+        var allGranted = resultList.every(function (permission) {
+            return permission.granted;
+        });
+
+        if (allGranted) {
+            // 所有权限都已授权，可以继续下一步操作
+            // api.alert({
+            //     msg: '所需权限均已授权'
+            // });
+        } else {
+            // 至少有一个权限未被授予，提示用户
+            api.confirm({
+                title: '授权请求',
+                msg: '应用需要您的相机、麦克风和存储权限才能正常工作。相机权限用于拍照以及扫码，麦克风权限用于音频录制，存储权限用于用户数据的保存', // 修改提示信息
+                buttons: ['取消', '去设置'],
+                
+
+            }, function (ret) {
+                if (ret.buttonIndex == 2) {
+                    // 4. 请求整个权限列表
+                    api.requestPermission({
+                        list: permissions,
+                    }, function (res) {
+                       
+                        // api.alert({
+                        //        msg:JSON.stringify(res)
+                        //     });
+
+
+
+
+                        // 5. 再次检查返回的结果，确保所有请求的权限都被授予
+                        var allRequestGranted = res.list.every(function (permission) {
+                            return permission.granted;
+                        });
+
+                        if (allRequestGranted) {
+                            // 所有请求的权限都已授权，可以继续下一步操作
+                            api.alert({
+                                msg: '授权成功'
+                            });
+                        } else {
+                            // 用户在设置中没有授予全部权限
+                            api.alert({
+                                msg: '您有部分权限未授予，可能影响应用部分功能的使用'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+
+
+</script>
+
+</html>
