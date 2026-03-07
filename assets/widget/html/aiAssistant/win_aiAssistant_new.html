@@ -409,11 +409,11 @@
         padType: $api.getStorage('padType'),
     };
     //以下为全局控制变量
-    const IS_IN_TEST_MODE = false;//测试模式，为true时，不扣次数，不使用系统提示词
+    const IS_IN_TEST_MODE = true;//测试模式，为true时，不扣次数，不使用系统提示词
     const IS_OPEN_SECOND_PROCESS = false;//是否开启二次处理，为true时，会在最新消息包含图片的情况下对ai回复进行二次处理
     const MAX_MESSAGES_LENGTH = 5;//调用ai时，取的最后消息的个数(非轮数)，因为要包括刚发送的消息，所以应是奇数
-    const MAX_IMAGES_NUM = 5;//最多5张图片
-    const IMAGE_DETAIL = "low";//high,low,auto，决定了ai理解图片的质量,关乎token消耗
+    const MAX_IMAGES_NUM = 32768;//最多5张图片
+    const IMAGE_DETAIL = "high";//high,low,auto，决定了ai理解图片的质量,关乎token消耗
     const BASIC_MODEL_NAME = "ep-m-20260105224903-gp2t7";//使用的低级模型名称（不带图片时使用）
     const ADVANCED_MODEL_NAME = "ep-m-20260105224903-gp2t7";//使用的高级模型名称（带图片时使用）
     const INIT_MESSAGE = IS_IN_TEST_MODE ? `` : `你好同学，我是AI伴学小助手，可以帮你回答学科知识 问题哦，请你发送相关的问题，我会帮你进行解答～`;
@@ -1200,6 +1200,8 @@
                                                     this.remainingTimes -= 1;//更新剩余次数
                                                 }
                                             } else {
+                                                stuInfo.count += 256;
+                                                this.remainingTimes += 256;//更新剩余次数
                                             }
                                         });
                                     }
