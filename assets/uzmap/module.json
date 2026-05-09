@@ -1,0 +1,82 @@
+{modules:[
+{
+		    name:'FNScanner',
+		    class:'com.uzmap.pkg.uzmodules.uzFNScanner.UzFNScanner'
+}
+,
+{"name":"qiniuStorage","class":"com.apicloud.qiniustorage.UzQiniuStorage","version":"1.0.4"},
+{"name":"FNImageClip","class":"com.apicloud.devlop.FNImageClip.UzImgClip","version":"1.1.1"},
+{"name":"imageRotation","class":"com.apicloud.imagerotation.ImageRotationModule","version":"1.0.0"},
+{
+	name:'ijkplayer',
+	class:'com.apicloud.ijkplayer.IJKPlayer'
+},{
+			"name":"ijkplayerApplication",
+			"class":"com.apicloud.ijkplayer.UZIJKPlayerApplication"
+		}
+,
+{"name":"mp3Recorder","class":"com.apicloud.audio.zhaofei.AudioRecordPlusModule","version":"1.1.1"},
+{"name":"fs","class":"com.uzmap.pkg.uzmodules.fs.UzFsUtils","version":"1.1.3"},
+{"name":"photoBrowser","class":"com.uzmap.pkg.uzmodules.photoBrowser.PhotoBrowser","version":"1.0.6"},
+{
+    name:'db',
+    class:'com.uzmap.pkg.uzmodules.uzdb.UzDatebaseSQL'
+}
+,
+{
+	name:'audioStreamer',
+	class:'com.apicloud.audiostreamer.UzAudioStreamer'
+}
+		
+	
+,
+{"name":"docReader","class":"com.dbc.docreader.UzDocReader","version":"1.0.7"},
+{
+    name:'mam',
+    class:'com.uzmap.pkg.uzmodules.uzmam.UzMAM'
+}
+,
+{"name":"pdfReader","class":"com.apicloud.pdfReader.PdfReader","version":"1.2.5"},
+{"name":"FNPhotograph","class":"com.apicloud.FNPhotograph.FNPhotograph","version":"1.1.4"},
+{
+		    name:'arcProgress',
+		    class:'com.uzmap.pkg.uzmodules.uzArcprogress.UzArcProgress'
+}
+,
+{
+		    name:'imageFilter',
+		    class:'com.uzmap.pkg.uzmodules.uzimageFilter.uzimageFilter'
+}
+,
+{
+		    name:'drawingBoard',
+		    class:'com.apicloud.drawingboard.UzDrawingBoard'
+}
+,
+{
+		    name:'UIActionSelector',
+			class:'com.uzmap.pkg.uzmodules.UIActionSelector.UIActionSelector'
+}
+,
+{
+	name:'downloadManager',
+	class:'com.uzmap.pkg.uzmodules.uzdownloadmanager.UzDownloadManager'
+}
+,
+{"name":"trans","class":"com.uzmap.pkg.uzmodules.uzxml.UzXml","version":"1.1.6"},
+{
+		   name:'UIMediaScanner',
+		   class:'com.uzmap.pkg.uzmodules.UIMediaScanner.UIMediaScanner'
+}
+,
+{"name":"moduleplotting","class":"apiplotting.APIPlotting","version":"1.1.8"},
+{"name":"cameraModule","class":"k12.education.camaramodule.CameraFunctions","version":"1.1.2"},
+{"name":"moduleDialog","class":"moduledialog.apidialog.APIDialog"},
+{"name":"moduleImageScale","class":"com.kukugtu.moduleutils.api.APIScaleImage"},
+{"name":"recMp3","class":"com.ezhiduo.mp3recorder.RecApi","version":"1.0.2"},
+{"name":"audioRecorder","class":"com.apicloud.audioRecorder.AudioRecorder","version":"1.0.2"},
+{
+	name:'chromeDebug',
+	class:'com.apicloud.moduleDemo.ChromeDebug'
+}
+]}

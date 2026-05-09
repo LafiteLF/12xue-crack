@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>购买</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+        [v-cloak] {
+            display: none
+        }
+        body{
+            background-color: rgba(0,0,0,0.5);
+            font-size: 14px;
+        }
+
+        .content{
+            width: 372px;
+            height: 234px;
+            background:   #fff;
+            position: relative;
+            z-index: 2;
+            border-radius: 5px;
+            top: calc(50% - 117px);
+            left:calc(50% - 186px);
+            color: #333;
+            text-align: center;
+        }
+        .content h2{
+            height: 32px; text-align: center;line-height: 32px; font-size:1.4rem;font-weight: normal ; border-bottom: 1px solid #e8e8eb;
+        }
+        .nian{ float: left; width: 126px; }
+        .yue{
+            float: right; width: 230px; height: 123px; border: 1px solid #e4e4e8; margin-top: 14px;margin-right: 14px;
+        }
+        .yue dl dt{
+            width:98px ; margin: 8px auto;
+            height: 18px; line-height: 18px; text-align: center; font-size: 1.2rem; color:#4bc7c7 ; border: 1px solid #4bc7c7; border-radius: 3px;
+        }
+        .yue dl dd{
+            float: left;width: 45px; height: 18px; line-height: 18px; text-align: center; font-size: 1.2rem; color:#d5d5d5 ; border: 1px solid #d5d5d5; border-radius: 3px; margin-left: 8px; margin-bottom: 8px;
+        }
+        .nian ul li{
+            height: 28px; text-align: center; font-size: 1.2rem;
+        }
+        .nian ul { height: 123px; overflow-y: auto; margin-top: 14px; }
+        .aniu {text-align: center; padding-top: 14px}
+        .aniu li{width: 100px; height: 37px; text-align: center; font-size: 1.4rem; line-height: 36px; border-radius: 100px; color: #fff; background: #4bc7c7; display: inline-block; margin:  0 13px;}
+        .selected{background: #4bc7c7!important; color: #fff!important;}
+        .selected2{color: #4bc7c7}
+    </style>
+</head>
+<body >
+<div class="close" onclick="api.closeFrame();"  ></div>
+    <div class="content" v-cloak>
+        <h2 >考试时间</h2>
+        <div class="time clearfix">
+            <div class="nian">
+                <ul :style="yearnum==0?'padding-top: 55px; height: 23px;':yearnum==1?' padding-top: 40px; height: 80px;':yearnum==2?' padding-top: 24px; height: 78px;':''">
+                    <li :class="chooseYear==0?'selected2':''" @click="selectYear(0)">全部</li>
+                    <li v-for="(list,index) in year"  v-text="index+'年'" :class="chooseYear==index?'selected2':''" @click="selectYear(index)"></li>
+                </ul>
+            </div>
+            <div class="yue">
+                <dl>
+                    <dt :class="chooseMonth==0?'selected':''" @click="selectMonth(0,true)">全部</dt>
+                    <dd v-for="list in month" :class="chooseMonth==list.id?'selected':''" v-text="list.id+'月'" :style="list.isshow?'border:1px solid #4bc7c7;color:#4bc7c7':''"  @click="selectMonth(list.id,list.isshow)"></dd>
+                </dl>
+            </div>
+        </div>
+        <ul class="aniu clearfix">
+            <li onclick="api.closeFrame();">取消</li>
+            <li @click="sure();">确定</li>
+        </ul>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue();
+        vm.GetPaperTimes();
+
+
+
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                year:{},
+                month:[],
+                chooseYear:api.pageParam.chooseYear,
+                chooseMonth:api.pageParam.chooseMonth,
+                sendtime:0,
+                showtime:0,
+                yearnum:0
+            },
+            methods: {
+                sure:function(){
+                    if(vm.chooseYear==0){
+                        vm.sendtime=0;
+                        vm.showtime=0
+                    }else{
+                        if(vm.chooseMonth==0){
+                            vm.sendtime =  vm.chooseYear+'-0';
+                            vm.showtime=vm.chooseYear+'年'
+                        }else{
+                            vm.sendtime =  vm.chooseYear+'-'+vm.chooseMonth;
+                            vm.showtime=vm.chooseYear+'年'+vm.chooseMonth+'月';
+                        }
+                    }
+                    api.sendEvent({
+                        name: 'selectTime',
+                        extra: {
+                            sendtime: vm.sendtime,
+                            showtime:vm.showtime,
+                            chooseYear:vm.chooseYear,
+                            chooseMonth:vm.chooseMonth,
+                        }
+                    });
+                    api.closeFrame();
+                },
+                selectYear:function(id){
+                    vm.chooseYear = id;
+                    vm.chooseMonth=0;
+                    if(id==0){
+                        vm.month=[{"id":1,"isshow":false},{"id":2,"isshow":false},{"id":3,"isshow":false},{"id":4,"isshow":false},{"id":5,"isshow":false},{"id":6,"isshow":false},{"id":7,"isshow":false},{"id":8,"isshow":false},{"id":9,"isshow":false},{"id":10,"isshow":false},{"id":11,"isshow":false},{"id":12,"isshow":false}]
+                    }else{
+                        vm.month=vm.year[id];
+                    }
+                },
+                selectMonth:function(id,isshow){
+                    if(id==0){
+                        vm.chooseMonth=0;
+                    }else{
+                        if(isshow){
+                            vm.chooseMonth=id;
+                        }
+                    }
+
+
+                },
+                GetPaperTimes: function () {//
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetPaperTimes, {
+                        values: {
+                            uid:$api.getStorage('uid'),
+                            bjid: api.pageParam.classids.join(","),
+                            xkid:api.pageParam.subject.xkid
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.year=ret.data;
+                                vm.yearnum =  Object.keys(ret.data).length;
+                                if(vm.chooseYear==0){
+                                    vm.month = [{"id":1,"isshow":false},{"id":2,"isshow":false},{"id":3,"isshow":false},{"id":4,"isshow":false},{"id":5,"isshow":false},{"id":6,"isshow":false},{"id":7,"isshow":false},{"id":8,"isshow":false},{"id":9,"isshow":false},{"id":10,"isshow":false},{"id":11,"isshow":false},{"id":12,"isshow":false}]
+                                }else{
+                                    vm.month=vm.year[vm.chooseYear];
+                                }
+
+                            }
+                            else{
+                                api.hideProgress();
+                                api.toast({
+                                    msg: ret .msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        }else{
+                            api.hideProgress();
+                            api.toast({
+                                msg: err .msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } ,'','',false);
+                },
+            }})
+    }
+</script>
+</html>

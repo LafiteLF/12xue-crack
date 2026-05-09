@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>首页弹出性别选择</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui-pull-refresh.css"/>
+    <style>
+        html, body {
+            background: rgba(0, 0, 0, 0.3) none repeat scroll 0 0 !important;
+        }
+
+        body {
+            padding-top: 150px;
+        }
+
+        .content {
+            background: #fff;
+            border-radius: 10px;
+            width: 35%;
+            top: 30%;
+            position: absolute;
+            left: 32.5%;
+        }
+
+        .top {
+            width: 100%;
+            height: 18%;
+            background: #5cc7c7;
+            text-align: left;
+            padding-left: 10px;
+            font-size: 20px;
+            color: #fff;
+            line-height: 44px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .bottom {
+            width: 100%;
+            padding: 20px;
+            height: 82%
+        }
+
+        .bottom p {
+            font-size: 14px;
+            line-height: 24px;
+            margin-bottom: 5px;
+        }
+
+        .iknow {
+            width: 150px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border: 1px solid #b8b8b8;
+            border-radius: 10px;
+            margin: 21px auto 0 auto;
+            color: #868686;
+        }
+
+        .bottom p span {
+            color: #5cc7c7
+        }
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <div class="top">选择性别</div>
+    <div class="bottom">
+        <p>请完善个人信息，有助于更好的体验</p>
+        <div class="iknow" tapmode onclick="chooseSex(1);">男</div>
+        <div class="iknow" tapmode onclick="chooseSex(2);">女</div>
+
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/aui-pull-refresh.js"></script>
+<script>
+
+    apiready = function () {
+
+    };
+
+    /**
+     * 修改性别
+     * @param code  男1  女2
+     */
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    function chooseSex(code) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Put(UrlRouter.ChangeUserInfo, {
+            values: {
+                uid: $api.getStorage('uid'),
+                sex: code
+            }
+        }, function (ret, err) {
+
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.closeFrame(api.frameName);
+                } else {
+                    //alert(ret.msg);
+                }
+            } else {
+
+            }
+        });
+    }
+</script>
+</html>

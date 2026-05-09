@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html body {
+            background-color: #f2f2f2;
+            padding-top: 50px;
+        }
+
+        table {
+            width: 100%;
+
+            /*防止表格变形*/
+            table-layout: fixed;
+            word-wrap: break-word;
+
+            /*是将表格边框的间隙去掉*/
+            border-collapse: collapse;
+            /*color: #E5E5E5;*/
+            background-color: #fff;
+
+        }
+
+        .main {
+            width: 100%;
+            border: solid thin #E5E5E5;
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 0px 27px;
+            margin-top: 30px;
+        }
+
+        td, th {
+            padding: 4px;;
+            /*overflow: hidden;*/
+            /*text-overflow: ellipsis;*/
+            /*white-space: nowrap;*/
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        tr {
+            height: 40px;
+            line-height: 40px;
+            background: #fff
+        }
+
+        tr, th {
+            font-size: 0.7rem;
+        }
+
+        th {
+            border-right: 0px;
+            border-left: 0px;
+            color: #999
+        }
+
+        tr, td {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #95d273;
+        }
+
+        tr {
+            border-bottom: 1px dashed #d5d5d5
+        }
+
+        tr td:nth-of-type(1) {
+            color: #4bc7c7;
+        }
+
+        tr td:nth-of-type(5) {
+            color: #ff778c;
+        }
+
+        td, th {
+            height: 80%;
+            margin-top: 10%
+        }
+
+        td + td {
+            background: url("../../../image/stuHomePad/xian.jpg") no-repeat left center;
+            background-size: 1px 60%;
+
+        }
+
+        th + th {
+            border-left: 0px solid #fff
+        }
+
+        .titletd {
+            color: #4bc7c7;
+        }
+
+        .left-q {
+            display: block;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: solid thin #eaeaea;
+            border-radius: 30px;
+            left: 3px;
+            top: 85px;
+            position: absolute;
+        }
+
+        .left-b {
+            display: block;
+            width: 17px;
+            height: 30px;
+            background: #fff;
+            position: absolute;
+            left: 3px;
+            top: 85px;
+            z-index: 10
+        }
+
+        .right-q {
+            display: block;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: solid thin #eaeaea;
+            border-radius: 30px;
+            right: 3px;
+            top: 85px;
+            position: absolute;
+        }
+
+        .right-b {
+            display: block;
+            width: 17px;
+            height: 30px;
+            background: #fff;
+            position: absolute;
+            right: 3px;
+            top: 85px;
+            z-index: 10
+        }
+
+        .myPointtitle {
+            margin-left: 10px;
+            line-height: 44px;
+            font-size: 0.7rem;
+        }
+
+        .aui-contentData {
+            display: block;
+            width: 100%;
+        }
+
+        .myP {
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+
+        .aui-contentP {
+            margin-left: 10px;
+            margin-top: 25px;;
+        }
+
+
+        img {
+            margin-top: 15%;
+            width: 40%;
+            margin-left: 30%;
+        }
+
+        .imgp {
+            width: 100%;
+            text-align: center;
+        }
+
+        .content {
+            width: 80%;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ffcd06;
+            padding: 20px;
+            position: relative;
+            margin-bottom: 40px;;
+        }
+
+        .jifen {
+            background: url("../../../image/stuHomePad/czz.png") no-repeat center top;
+            width: 100%;
+            position: absolute;
+            top: -20px;
+            background-size: 250px auto;
+            line-height: 35px;
+            text-align: center;
+            color: #fff;
+            height: 50px;
+        }
+        .content{
+            display: none;
+        }
+
+        .aui-contentNodata img {
+            margin-top: 0;
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-contentNodata" style=" display: none;    height: 100%;">
+    <div style="height: 35%;"></div>
+    <div style="margin: 0 auto 0px auto;text-align: center">
+        <img src="../../../image/stuHomePad/noContent.png" style="width:30%">
+    </div>
+</div>
+<div class="content">
+    <div class="aui-content jifen">
+        <h3 class="myPointtitle">当前积分：<span class="jf"></span></h3>
+    </div>
+
+    <div class="aui-contentData">
+        <div class="main">
+            <b class="left-b"></b>
+            <span class="left-q"></span>
+            <b class="right-b"></b>
+            <span class="right-q"></span>
+            <table width=95% align=center>
+                <tr class="bt">
+                    <th>日期</th>
+                    <th>获得/扣除</th>
+                    <th>详细说明</th>
+                </tr>
+                <!--<tr align=center>-->
+                <!--<td>2016-03-25<br>14:00:32</td>-->
+                <!--<td>+1</td>-->
+                <!--<td>获得签到积分</td>-->
+                <!--</tr>-->
+                <!--<tr align=center>-->
+                <!--<td>2016-03-25<br>14:00:32</td>-->
+                <!--<td>+2</td>-->
+                <!--<td>03月24日课堂答题累计109题</td>-->
+                <!--</tr>-->
+                <!--<tr align=center>-->
+                <!--<td>2016-03-25<br>14:00:32</td>-->
+                <!--<td>+2</td>-->
+                <!--<td>03月24日课堂答题累计109题</td>-->
+                <!--</tr>-->
+                <!--<tr align=center>-->
+                <!--<td>2016-03-25<br>14:00:32</td>-->
+                <!--<td>+2</td>-->
+                <!--<td>03月24日课堂答题累计109题</td>-->
+                <!--</tr>-->
+            </table>
+        </div>
+    </div>
+
+    <div class="aui-content aui-contentP">
+        <p style="    background-color: #ffcd06;  width: 5px;height: 21px;float: left; margin-top: 5px;"></p>
+        <h3 style="    padding-left: 10px;color: #4bc7c7;padding-bottom: 7px;border-bottom: 1px solid #e4e4e8;margin-bottom: 10px;">
+            积分规则:</h3>
+        <p style="margin-top:10px;color: #999">1、每天签到获得积分</p>
+        <p style="margin-top: 10px; margin-bottom:10px;color: #999">2、完成作业获得积分</p>
+
+    </div>
+
+</div>
+<div style="width: 100%;height: 1px"></div>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/store.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        GetUserstore();
+
+//        if ($api.getStorage('point') != 'undefined') {
+//            setTimeout(" $('.jf').html($api.getStorage('point'))", 500);
+//        }
+
+//        setTimeout(" $('.jf').html($api.getStorage('point'))", 500);
+        GetUsercredits();
+    };
+
+
+    function GetUsercredits() {//获取用户积分记录
+        apiObj.Get(UrlRouter.GetUsercredits, {
+            values: {
+                num: 100,
+                p: 1
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data) {
+                        if (ret.data.data == 0) {
+                            $('.aui-contentNodata').show();
+                            $('.content').hide();
+                        } else {
+                            $('.content').show();
+                            $('.aui-contentNodata').hide();
+                            var jifen = ret.data.data;
+                            var comment = [];
+                            var create_time = [];
+                            var create_time1 = [];
+                            var gold = [];
+                            for (var i = 0; i < jifen.length; i++) {
+                                comment.push(jifen[i].comment);
+                                var d = new Date(jifen[i].create_time * 1000);    //根据时间戳生成的时间对象
+                                create_time.push(d.format('yyyy-MM-dd'));
+                                create_time1.push(d.format('hh:mm:ss'));
+                                if (jifen[i].gold > 0) {
+                                    gold.push('+' + jifen[i].gold);
+                                } else {
+                                    gold.push(jifen[i].gold);
+                                }
+
+                                var htmltr = '<tr align=center>' + '<td>' + create_time[i] + ' ' + create_time1[i] + '</td>' + '<td>' + gold[i] + '</td>' + '<td>' + comment[i] + '</td>' + '</tr>';
+                                $api.append($api.dom('table'), htmltr);
+                            }
+                        }
+                    } else {
+                        api.toast(
+                                {
+                                    msg: '暂无积分记录',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                        )
+                    }
+                } else {
+                    api.toast(
+                            {
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                    )
+                }
+            } else {
+                api.toast(
+                        {
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                )
+            }
+        })
+    }
+    Date.prototype.format = function (format) {
+        var date = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in date) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
+            }
+        }
+        return format;
+    }
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ta的关注</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+
+    <style>
+
+
+
+    </style>
+
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin();'></span><b style="font-weight: normal" class="title">Ta的粉丝</b>
+    </a>
+</header>
+</body>
+
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+
+    apiready = function () {
+        var fans = api.pageParam.fans;
+
+        if(fans == 'no'){
+            $api.text($api.dom('.title'),"Ta的关注");
+        }
+
+
+        var header = document.querySelector('header');
+
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+
+        var headerH = $api.offset(header).h;
+
+        api.openFrame({
+            name: 'attention_frm',
+            url: 'attention_frm.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: 'auto'
+            },
+            pageParam: {fans: api.pageParam.fans,otheruid:api.pageParam.otheruid},
+            bounces: false
+        });
+
+    }
+
+</script>
+
+</html>

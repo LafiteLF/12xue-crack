@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <title>找回密码</title>
+    <link rel="stylesheet" href="../../css/sm.min.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <style type="text/css">
+        body {
+            background-color: #fff;
+        }
+
+        .aui-input-row {
+            height: 40px;
+            /*padding: 8px 15px;*/
+            margin-top: 10px;
+            width: 100%;
+            line-height: 10px;
+            background-color: #fff;
+        }
+
+        .aui-btn-block {
+            margin-top: 50px;
+            width: 92%;
+            height: 50px;
+            line-height: 20px;
+            background-color: #4bc7c7;
+        }
+
+        .footer {
+            position: absolute;
+            top: 98%;
+            left: 50%;
+            margin: -42px 0 0 -50%;
+            text-align: center;
+            height: 40px;
+            width: 100%;
+        }
+
+        .footer {
+            font-size: 16px;
+            color: #737373;
+        }
+
+        .aui-btn-info:active {
+            color: #fff;
+            background-color: #bdc3c7;
+            border: 1px solid #bdc3c7;
+        }
+
+        .aui-list-item-input {
+            background-color: #fff;
+            margin: 5px 0;
+            padding-left: 5px;
+            margin-left: 0.75rem;
+            border-bottom: 1px solid #d5d5d5;
+        }
+
+        .aui-btn {
+            margin-top: 40px;
+            width: 92%;
+            height: 50px;
+            background-color: #4bc7c7;
+            font-size: 20px;
+            margin-left: 4%;
+        }
+        .tubiao {
+            width:28px;
+            display: block;
+            left: 0px;
+            bottom: 7px;
+            position: absolute
+        }
+        .clear{ width: 25px; position: absolute;right: 0.55rem;top: 21px; margin-right: 10px; display: none    }
+        .aui-btn {
+            width: calc(100% - 1.5rem);
+            height: 50px;
+            background-color: #4bc7c7;
+            font-size: 20px;
+            margin: 0 auto;
+            margin-top: 30px;
+            color: #c2e9e9;
+            /* margin-left: 4%; */
+        }
+        .bottom{text-align: center; padding-top: 32%;}
+
+        .bottom span{ display: inline-block;
+            margin-bottom: 3px;
+            color: #bbbbbb;
+            font-size: 0.7rem;
+        }
+
+        .aui-btn:active {
+            color: #212121;
+            background-color: #16bebe;
+        }
+
+    </style>
+</head>
+<body>
+<div style="width: 100%;margin: 0 auto;margin-top: 0.5rem;  ">
+    <div class="aui-list-item-input" style="position: relative; padding-left: 30px;">
+        <span class="tubiao"><img src="../../image/stuHomePad/zhanghao.png" width="100%"></span>
+        <div class="clear" onclick='clearzhanghao()'><img src="../../image/stuHomePad/qingkong.png" width="100%"></div>
+        <input id="account" type="text" class="aui-input" oninput='login()' placeholder="请输入登录帐号" style="">
+    </div>
+    <p style="width: 100%; margin: 0 auto;">
+        <input type="button"  disabled="disabled" value="下一步" class="aui-btn aui-btn-block" id="btn-addclass"
+               tapmode onclick='next()'></p>
+
+    <div class="bottom">
+        <img src="../../image/stuHomePad/kefu.png" style="vertical-align: bottom; margin-right: 20px;" width="30px"><span>客服电话:</span><span class="spanTel" id="spanTel">400-690-8887</span><span>(8:00-22:00)</span>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var uid;
+    var account;
+    apiready = function () {
+        getPhone();
+    };
+    //点击下一步
+    function next() {
+        account = $api.val($api.byId('account'));
+        if (account.length == 0) {
+            api.toast({
+                msg: '请输入帐号',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else {
+            apiObj.Get(UrlRouter.CheckUserInfo, {
+                values: {
+                    client_id: '12xue_stu',
+                    client_secret: 'a6c36548b3a7c78ef5d912e1d1a1bdce',
+                    username: account
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        uid = ret.uid;
+                        checkMiBao();//检查是否设置密保问题
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } else {
+
+                }
+            });
+        }
+    }
+    function clearzhanghao() {
+//        alert('dsfsd')
+        $('#account').val('');
+        $('.clear').hide();
+    }
+    function login() {//登录按钮变色
+        if ($('#account').val() != ""){
+            $('.clear').show();
+        }else{
+            $('.clear').hide();
+        }
+        if ($('#account').val() != "") {
+            $('.aui-btn').css('color', '#fff').removeAttr("disabled");
+        } else {
+            $('.aui-btn').css('color', '#c2e9e9').attr("disabled", "disabled");
+        }
+    }
+    function checkMiBao() {
+        apiObj.Get(UrlRouter.CheckMiBao, {
+            values: {
+                uid: uid
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.status == 0) {
+                        //未设置密保问题
+                        api.alert({
+                            title: '未设置密保',
+                            msg: '请联系客服或学校管理员重置密码'
+                        });
+                    } else {
+                        api.openWin({
+                            name: 'win-forget-mibao',
+                            url: 'win-forget-mibao.html',
+                            pageParam: {uid: uid, account: account, oneWinname: api.pageParam.oneWinname}
+                        });
+                    }
+                } else {
+                    //alert(ret.msg);
+                }
+            } else {
+
+            }
+        })
+    }
+
+    function getPhone() {
+        apiObj.Get(UrlRouter.KfInfo,{
+            value:{
+
+            }
+        },function (ret,err) {
+            if (ret){
+                if (ret.ret==0){
+                    $api.text($api.byId('spanTel'), ret.data.phone);
+                }
+            }
+        });
+    }
+
+</script>
+</html>

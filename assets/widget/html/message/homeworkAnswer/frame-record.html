@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .show {
+            position: absolute;
+            color: #000;
+            top: 0;
+            width: 30%;
+            background-color: white;
+            text-align: center;
+            margin-left: 35%;
+            margin-right: 35%;
+            margin-top: 15%;
+            padding: 3rem 0 2rem 0;
+            border-radius: 0.4rem;
+        }
+
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+
+        .content {
+            width: 70%;
+        }
+
+        .img {
+            text-align: center;
+        }
+
+        .aui-btn-primary {
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+<div class="backgroud" tapmode onclick="api.closeFrame({
+    name: this.name
+});"></div>
+<div class="show">
+    <div class="img">
+        <img src="../../../image/audio.png" alt="" style="border-radius: 50%;width: 40%">
+    </div>
+    <div style="margin: 0.5rem 0;">说出你的回复内容</div>
+    <div>
+        <span class="aui-btn-primary" onclick="onClick(1,this);">开始</span>
+        <span class="aui-btn-primary" onclick="onClick(2);">说完了</span>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript">
+    var path = '';
+    var beforeload;
+    var afterload;
+    var seconds;
+    apiready = function () {
+    };
+
+    function onClick(position, context) {
+        switch (position) {
+            case 1:// 开始  取消
+                var text = $api.text(context);
+                switch (text) {
+                    case "开始":
+                        beforeload = (new Date()).getTime();
+
+                        path = "/audio/" + new Date().getTime() + ".amr";
+                        api.startRecord({
+                            path: 'fs:/' + path
+                        });
+                        var text = $api.text(context, "取消");
+                        break;
+                    case "取消":
+                        api.stopRecord(
+                                function (ret, err) {
+                                    if (ret) {
+                                        api.sendEvent({
+                                            name: 'audio',
+                                            extra: {
+                                                path: path,
+                                                seconds:0
+                                            }
+                                        });
+                                        api.closeFrame({});
+                                    }
+                                }
+                        );
+                        var text = $api.text(context, "开始");
+                        break;
+                }
+                break;
+            case 2:// 结束
+                api.stopRecord(
+                        function (ret, err) {
+                            if (ret) {
+                                afterload = (new Date()).getTime();
+                                seconds = (afterload-beforeload) / 1000;
+                                api.sendEvent({
+                                    name: 'audio',
+                                    extra: {
+                                        path: path,
+                                        seconds: seconds.toFixed(1)
+
+                                    }
+                                });
+                                api.closeFrame({});
+                            }
+                        }
+                );
+                break;
+        }
+    }
+
+</script>
+</html>

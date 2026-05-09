@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>重置密码</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+
+        }
+        .qr {
+            border: 1px solid #00c8c8;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            font-size: 0.7rem !important;
+            margin-right: 10px;
+        }
+
+        .aui-bar-nav .aui-iconfont {
+            line-height: 1.25rem
+        }
+
+        .aui-icon-check:before {
+            margin-right: 5px;
+        }
+        .qr:active{
+            background: #00c8c8;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav aui-bar-primary">
+    <!--<a class="aui-pull-left aui-btn">-->
+        <!--<span class="aui-iconfont aui-icon-back" tapmode onclick="api.closeWin();"></span>-->
+    <!--</a>-->
+    <!--<div class="aui-12xue-title" tapmode onclick="api.closeWin();">重置密码</div>-->
+
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()' ></span>重置密码
+    </a>
+    <!--<a class="aui-pull-right">-->
+        <!--<span class="aui-iconfont aui-icon-check" onclick="commitReset()"></span>-->
+    <!--</a>-->
+    <span class="aui-iconfont aui-icon-check aui-pull-right qr" tapmode onclick="commitReset()"> 确认</span>
+</header>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+
+        api.openFrame({
+            name: 'frame-reset-pwd',
+            url: 'frame-reset-pwd.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            bounces: false,
+            pageParam: {
+                uid: api.pageParam.uid,
+                account: api.pageParam.account,
+                secret: api.pageParam.secret,
+                oneWinname: api.pageParam.oneWinname
+            }
+        });
+    };
+
+    //重置密码
+    function commitReset() {
+        var jsfun = 'resetPwd();';
+        api.execScript({
+            frameName: 'frame-reset-pwd',
+            script: jsfun
+        });
+    }
+
+</script>
+</html>

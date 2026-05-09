@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            /*padding-top: 0.5rem;*/
+            font-size: 0.7rem;
+        }
+
+        .zymc {
+            padding-left: 0.5rem;
+            padding-top: 0.8rem;
+            padding-bottom: 0.5rem;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        .containter {
+            width: 100%;
+            height: 90%;
+            /*display: none;*/
+        }
+
+        .swfDiv {
+            text-align: center;
+            width: 100%;
+            padding-top: 20%;
+            display: block;
+            color: #666666;
+        }
+        .checkDiv {
+
+            width: 20%;
+            height: 1.8rem;
+            background-color: #4BC7C7;
+            margin: 0 auto;
+            text-align: center;
+            color: white;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            line-height: 1.9rem;
+            margin-top: 20%;
+        }
+    </style>
+</head>
+<body>
+<div class="containter"></div>
+<div class="zymc aui-ellipsis-1"></div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+
+        var convert_status = api.pageParam.convertStatus;
+//        alert(JSON.stringify(api.pageParam));
+        if (convert_status == 0) {
+            $api.html($api.dom(".containter"), '<div class="swfDiv">资源正在转码,请三分钟后回来</div>');
+            return;
+        } else if (convert_status == 2) {
+            $api.html($api.dom(".containter"), '<div class="swfDiv">资源转码失败</div>');
+            return;
+        } else {
+            $api.css($api.dom(".containter"), 'display:none');
+        }
+        $api.html($api.dom('.zymc'), api.pageParam.zymc);
+        var url = api.pageParam.url;
+        url = decodeURIComponent(url);
+        $api.append($api.dom("body"), '<div style="text-align: center"> <div class="checkDiv" tapmode onclick="openPdf(this);" url="' + url + '">点击查看内容</div> </div>');
+
+    };
+    function openPdf(context) {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '提示',
+            text: '正在下载素材',
+            modal: false
+        });
+        var url = $api.attr(context, 'url');
+        var str = api.pageParam.zymc;
+        str = str.replace(/#/,'');
+        api.download({
+            url: url,
+            savePath: 'fs://pdfDownload/' + str + '.pdf',
+            report: false,
+            cache: true,
+            allowResume: true
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret.state == 1) {
+                if (api.systemType == 'ios') {
+                    var docReader = api.require('docReader');
+                    docReader.open({
+                        path: ret.savePath
+                    }, function (ret, err) {
+                    });
+                } else {
+
+                    api.openWin({
+                        name: 'win_pdf_view',
+                        url: '../../win_pdf_view.html',
+                        pageParam: {
+                            path: ret.savePath
+                        }
+                    });
+
+                }
+
+            } else {
+                //提示文档打开失败
+                api.toast({
+                    msg: '文档下载失败，请检查网络，稍后再试！',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+
+    }
+
+
+</script>
+</html>

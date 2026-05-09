@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>常见问题</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        body{
+            background-color:#f2f2f2
+        }
+        .aui-list-view-cell{
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        .aui-content{width: 80%; margin: 0 auto; background: #fff; margin-top: 10px;}
+        ul{ padding: 0 0 0 20px;}
+        ul li{ height: 2.5rem; line-height: 2.5rem; font-size: 0.8rem; border-bottom: 1px solid #e5e5e9; position: relative; color: #5a5a5a}
+        .aui-list-item-arrow:before {
+            border: 1px solid #9a9a9a;
+            border-top: none;    border-right: none;}
+
+    </style>
+</head>
+<body>
+<div class="aui-content">
+<ul class="aui-list-view">
+    <!--<li  class="aui-list-view-cell aui-list-item-arrow" onclick="openInfo(this)">dfgdfgdfgdfg </li>-->
+    <!--<li  class="aui-list-view-cell aui-list-item-arrow" onclick="openInfo(this)">dfgdfgdfgdfg </li>-->
+    <!--<li  class="aui-list-view-cell aui-list-item-arrow " onclick="openInfo(this)">dfgdfgdfgdfg </li>-->
+</ul>
+</div>
+
+<!--<p class="aui-text-center">.aui-content 普通列表</p>-->
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/question/questions.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+
+        initQuestionsList();
+    }
+</script>
+
+</body>
+</html>

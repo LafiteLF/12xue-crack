@@ -1,0 +1,352 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>个人信息</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        body {
+            background-color: #f2f2f2
+        }
+
+        .aui-pull-right {
+            color: #888;
+            margin-right: 15px;
+            width: 200px;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: right;
+        }
+
+        .aui-list-item-arrow:before {
+            border: 1px solid #9a9a9a;
+            border-top: none;
+            border-right: none;
+        }
+
+        .main {
+            width: 80%;
+            margin: 0 auto;
+            margin-top: 10px;
+        }
+
+        .main ul li {
+            background: #fff;
+            height: 2.5rem;
+            border-bottom: 1px solid #e5e5e9;
+            padding: 0 20px;
+            position: relative
+
+        }
+
+        .main ul li span {
+            color: #5a5a5a;
+            font-size: 0.8rem;
+            float: left;
+            line-height: 2.5rem
+        }
+
+        .zi {
+            line-height: 2.5rem;
+            font-size: 0.8rem;
+            color: #9a9a9a;
+            float: right;
+            width: 15rem;
+            text-align: right;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding-right: 20px;
+        }
+
+        .tx {
+            width: 1.8rem;
+            height: 1.8rem;
+            overflow: hidden;
+            border-radius: 10rem;
+            float: right;
+            margin-right: 20px;
+            margin-top: 0.32rem
+        }
+
+        .tx img {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 100%;
+            max-height: 1.8rem;
+        }
+
+        .main ul li:nth-of-type(5) {
+            margin-top: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closewin()">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='closewin()'></span>个人信息
+    </a>
+</header>
+<div class="main">
+    <ul>
+        <li>
+            <span>头像</span>
+            <div class="tx">
+                <img id="img-portrait" class="aui-pull-right aui-img-object" src="../../../image/default_portrait.png"/>
+            </div>
+<!--            <b class="aui-list-item-arrow"></b>-->
+        </li>
+        <li>
+            <span>帐号</span>
+            <div class="zi" id="username">
+            </div>
+        </li>
+        <li>
+            <span>真实姓名</span>
+            <div class="zi" id="realname">
+            </div>
+        </li>
+        <li onclick="selectSex()">
+            <span>性别</span>
+            <div class="zi" id="sex">
+            </div>
+            <b class="aui-list-item-arrow"></b>
+        </li>
+        <li>
+            <span>学校</span>
+            <div class="zi" id="schoolname">
+            </div>
+        </li>
+<!--        <li onclick="openWin('address',$api.text($api.byId('address')))">-->
+<!--            <span>家庭住址</span>-->
+<!--            <div class="zi" id="address">-->
+<!--            </div>-->
+<!--            <b class="aui-list-item-arrow"></b>-->
+<!--        </li>-->
+    </ul>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/userinfo/userinfo.js"></script>
+<script type="text/javascript">
+    var sexCode;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        var systemType = api.systemType; //ios or android
+        var json = '';
+        var token = '';
+        if (systemType == 'android') {
+            json = JSON.parse(api.appParam);
+            token = json.token;
+        }
+        apiObj.SetAuthToken($api.getStorage('token'));
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        getUserInfo();
+        getPortrait();
+        //更新头像
+        api.addEventListener({
+            name: 'frame-photo-pad'
+        }, function (ret, err) {
+            if (ret.value.type == 'camera') {
+                api.getPicture({
+                    sourceType: 'camera',
+                    encodingType: 'jpg',
+                    mediaValue: 'pic',
+                    destinationType: 'url',
+                    allowEdit: true,
+                    targetWidth: 300,
+                    targetHeight: 300,
+                    quality: 80
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.data.length > 5) {
+                            updataToQiNiu(ret.data);
+                        }
+                    }
+                });
+            } else if (ret.value.type == 'photo') {
+                if (api.systemType == 'ios') {
+                    api.getPicture({
+                        sourceType: 'album',
+                        encodingType: 'jpg',
+                        mediaValue: 'pic',
+                        destinationType: 'url',
+                        allowEdit: true,
+                        targetWidth: 350,
+                        targetHeight: 350,
+                        quality: 80
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.data.length > 5) {
+                                updataToQiNiu(ret.data);
+                            }
+                        }
+                    });
+                } else {
+                    var uiMediaScanner = api.require('UIMediaScanner');
+                    uiMediaScanner.open({
+                        type: 'picture',
+                        column: 4,
+                        classify: true,
+                        max: 1,
+                        sort: {
+                            key: 'time',
+                            order: 'desc'
+                        }, rotation: true,
+                        texts: {
+                            stateText: '已选*项',
+                            cancelText: '取消',
+                            finishText: '完成'
+                        },
+                        styles: {
+                            bg: '#fff',
+                            mark: {
+                                icon: '',
+                                position: 'bottom_left',
+                                size: 20
+                            },
+                            nav: {
+                                bg: '#4bc7c7',
+                                stateColor: '#fff',
+                                stateSize: 18,
+                                cancelBg: 'rgba(0,0,0,0)',
+                                cancelColor: '#fff',
+                                cancelSize: 18,
+                                finishBg: 'rgba(0,0,0,0)',
+                                finishColor: '#fff',
+                                finishSize: 18
+                            }
+                        }
+                    }, function (ret) {
+                        if (ret.eventType == 'confirm') {
+                            if (ret.list.length != 0) {
+                                updataToQiNiu(ret.list[0].path);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        //更新昵称
+        api.addEventListener({
+            name: 'changeRealname'
+        }, function (ret, err) {
+            $api.text($api.byId('realname'), ret.value.realname);
+
+        });
+        //更新家庭住址
+        api.addEventListener({
+            name: 'changeAddress'
+        }, function (ret, err) {
+            $api.text($api.byId('address'), ret.value.address);
+        });
+        //更新性别
+        api.addEventListener({
+            name: 'frame-sex-pad'
+        }, function (ret, err) {
+            if (ret.value.type == 'boy') {
+                sexCode = '1';
+                sex = '男';
+            } else if (ret.value.type == 'girl') {
+                sexCode = '2';
+                sex = '女';
+            }
+            if (ret.value.type == 'boy' || ret.value.type == 'girl') {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Put(UrlRouter.ChangeUserInfo, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        sex: sexCode
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            getPortrait();//在修改完性别后 调用头像接口 更新头像
+                            $api.text($api.byId('sex'), sex);
+                            api.accessNative({
+                                name: 'changeSex',
+                                extra: {
+                                    sex: sex
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    getPortrait();//在修改完性别后 调用头像接口 更新头像
+                                } 
+                            });
+                        } else {
+                            api.hideProgress();
+                            //alert(ret.msg);
+                        }
+                    } else {
+                        api.hideProgress();
+
+                    }
+                });
+            }
+        })
+    };
+    function selectUploadPortrait() {
+        if (!checkPermission(['camera', 'storage'])) {
+            return;
+        }
+        api.openFrame({
+            name: 'frame-photo-pad',
+            url: 'frame-photo-pad.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: padWinHeight
+            }
+        });}
+        function selectSex() {
+            api.openFrame({
+                name: 'frame-sex-pad',
+                url: 'frame-sex-pad.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: padWinHeight
+                }});
+
+
+    }
+    function closewin() {
+        api.sendEvent({
+            name: 'reloadNum'
+        });
+        api.closeWin();
+    }
+</script>
+
+</html>

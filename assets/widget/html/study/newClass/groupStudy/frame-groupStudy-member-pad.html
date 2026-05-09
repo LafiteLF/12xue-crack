@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>小组成员</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+
+        .group-leader-div { /*组长的区域*/
+            width: 100%;
+            background-color: white;
+            padding-bottom: 1rem;
+            margin-bottom: 10px;;
+        }
+
+        .group-member-div {
+            /*padding-left: 20px;*/
+            background-color: white;
+        }
+
+        .name-back-leader { /*组长头像*/
+            background-image: url(../../../../image/xiaohongma.png);
+            background-size: 100% 100%;
+            border-radius: 50%;
+            /*border: 2px solid #4bc7c7;*/
+            width: 4rem;
+            height: 4rem;
+            display: inline-block;
+            text-align: center;
+
+        }
+
+        .name { /*名字*/
+            font-size: 14px;
+            text-align: center;
+            /*background-color: #0a8ddf;*/
+            display:block;
+            color: #fff;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: absolute;
+            bottom: -2px;
+            width: 3rem;
+            margin: 0 auto;
+            left: 0.5rem;
+        }
+
+        .zz-left {
+            background-color: #4bc7c7;
+            height: 1rem;
+            width: 2px;
+            margin-left: 20px;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .zz-title { /*“组长”二字*/
+            text-align: left;
+        }
+        .zz-title span{     display: block;
+            width: 140px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            color: #fff;
+            background: #4bc7c7;}
+
+        .member {
+            width: 3rem;
+            height: 3rem;
+            text-align: center;
+            padding-top: 5px;
+            margin: 5px;
+            font-size: 18px;
+            display: inline-block;
+        }
+
+        .member-header {
+            width: 4rem;
+            height: 4rem;
+            text-align: center;
+            border-radius: 50%;
+        }
+
+        .member-name {
+            font-size: 13px;
+            text-align: center;
+            display: inline-block;
+            color: #4bc7c7;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 3rem;
+        }
+
+        .aui-grid-label {
+            color: #4bc7c7;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .tx{ position: relative; width: 4rem; height: 4rem;            margin-top: 1rem;
+
+        }
+        .txbg{ width: 100%; height: 100%; background: url("../../../../image/stuHomePad/xftx.png") no-repeat center top; background-size: 100% 100%; position: absolute; left: -1px; top: -1px; width: 4.1rem;height: 4.1rem}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak style="    width: calc(100% - 20px);margin: 0 auto">
+    <div style="width: 100%;height: 0.4rem;background-color: #f2f2f2"></div>
+    <div class="group-leader-div" >
+        <div class="zz-title"><span>组长</span></div>
+        <div class="tx" style="margin-left:3%;">
+            <div class="txbg"></div>
+        <div class="name-back-leader" :style="{'background-image':'url('+leaderInfo.face+')'}">
+            <div class="name" v-text="leaderInfo.realname"></div>
+        </div>
+        </div>
+    </div>
+    <div class="group-member-div">
+        <div class="zz-title"><span>组员</span></div>
+        <section class="aui-grid aui-margin-b-15">
+            <div class="aui-row" style="text-align: left">
+                <div style=" width:16%; padding:1rem 0px;text-align: center; display: inline-block;" v-if="members.length != 0" v-for="item in members">
+                    <div class="tx" style="margin-top: 0px; display: inline-block">
+                        <div class="txbg"></div>
+                    <img :src="item.face" alt="" class="member-header">
+                    <div class="name" v-text="item.realname"></div>
+                    </div>
+                </div>
+                <div style="width: 100%;text-align: center;font-size: 16px;margin-top: 40px" v-if="members.length == 0">暂无小组成员</div>
+            </div>
+        </section>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm = null;
+
+    apiready = function () {
+        vm = new Vue({
+            el: '#app',
+            data: {
+                leaderInfo: '',
+                members: ''
+            }
+        });
+
+        var memberArr = api.pageParam.memberArr;
+        var leaderInfo = '';
+        var memberInfo = [];
+        for (var i = 0; i < memberArr.length; i++) {
+            if (memberArr[i].is_leader == 1) {
+                leaderInfo = memberArr[i];
+            } else {
+                memberInfo.push(memberArr[i]);
+            }
+        }
+        vm.members = memberInfo;
+        if (leaderInfo == '') {
+            leaderInfo = {
+                realname: '暂无组长',
+                face: '../../../../image/xiaohongma.png'
+            }
+        }
+        vm.leaderInfo = leaderInfo;
+
+
+    };
+</script>
+</html>

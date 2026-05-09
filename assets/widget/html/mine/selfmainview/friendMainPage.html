@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>他人主页</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        .container {
+            position: relative;
+            height: 250px;
+        }
+
+        .sex {
+            color: dodgerblue;
+            top: 65px;
+            position: absolute;
+            right: 3px;
+            text-align: right;
+            font-size: 1.2rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 65px;
+            position: absolute;
+            right: 3px;
+            text-align: right;
+            font-size: 1.2rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .close {
+            width: 40px;
+            height: 40px;;
+            float: left;
+            background-color: black;
+        }
+
+        .aui-label {
+            height: 0.7rem;
+            padding: 0.2em 0.35em;
+        }
+
+        .background {
+            height: 250px;
+        }
+
+        .aui-bar-primary {
+            background-color: transparent;
+        }
+
+        .head {
+            background-color: inherit;
+            width: 100px;
+            height: 100px;
+            margin: -60px auto 0px auto;
+            border-radius: 50px;
+            position: relative;
+        }
+
+        .headImg {
+            width: 100px;
+            height: 100px;
+            border: 3px white solid;
+            border-radius: 50px;
+        }
+
+        .textContainer {
+            height: 250px;
+            margin-top: 60px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .fansDiv {
+            width: auto;
+            height: 20px;
+            text-align: center;
+            /*display: flex;*/
+            margin-bottom: 25px;
+        }
+
+        .lineDiv {
+            background-color: grey;
+            width: 1px;
+            height: 20px;
+            display: inline-block;
+            margin: 0 10px;
+            vertical-align: bottom;
+        }
+
+        .leftDiv {
+            /*display: inline-block;*/
+            /*width: 48%;*/
+            /*text-align: right;*/
+            font-size: 14px;
+        }
+
+        .rightDiv {
+            /*display: inline-flex;*/
+            /*width: 48%;*/
+            /*text-align: left;*/
+            font-size: 14px;
+        }
+
+        .aui-btn {
+            width: 30%;
+            left: 35%;
+            right: 35%;
+            margin-top: 25px;
+            background-color: #f1c40f;
+            margin-bottom: 25px;
+        }
+
+        .primary {
+            font-weight: 600;
+            max-width: 200px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .aui-pull-left {
+            background-color: inherit;
+            margin-top: 20px;
+            margin-left: 10px;
+            float: left;
+        }
+
+        .btn-follow {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .bacimg {
+            height: 250px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        .aui-card-list-user-name {
+            margin-bottom: 20px;
+            width: 80%;
+            margin-left: 10%;
+            /*white-space:nowrap;*/
+            /*text-overflow :ellipsis;*/
+            /*overflow : hidden;*/
+        }
+
+        .aui-btn-outlined {
+            color: white !important;
+            border: 1px solid #dcdcdc !important;
+            background-color: #dcdcdc !important;
+        }
+
+        .aui-font-size-16 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!--<a class="aui-pull-left" onclick="api.closeWin()">-->
+    <!--<span class="aui-iconfont aui-icon-left"></span>-->
+    <!--</a>-->
+
+    <!--<div class="background">-->
+    <!--<img class="bacimg" style="inline-block" src="22.png" >-->
+    <!--</div>-->
+
+    <!--<div class="head">-->
+    <!--<img class="headImg" src="11.jpg" >-->
+    <!--</div>-->
+
+
+    <!--<div class="aui-btn aui-btn-warning" onclick="contern(this)">-->
+    <!--<span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+
+    <!--<div class="aui-btn btn-follow aui-btn-warning"  onclick="contern(this)"><span class="aui-iconfont aui-icon-add"></span>关注</div>-->
+
+
+</div>
+
+<div class="textContainer">
+
+    <!--<div class="aui-card-list-user-name aui-font-size-16">-->
+    <!--<div class="primary ">我是乔帮主我是乔帮主我是乔帮主我是乔帮主我是乔帮主我是乔帮主<span class="aui-label aui-label-info">V3</span></div>-->
+    <!--</div>-->
+    <!--<p>初中 语文 历史(老师)</p>-->
+    <!--<p>山东省 烟台市 烟台第十四中学</p>-->
+    <!--<div class="fansDiv" >-->
+    <!--<span class="leftDiv" >关注<span style="color: #00bbd4" onclick="guanzhu()">17</span></span>-->
+    <!--<div  class="lineDiv"></div>-->
+    <!--<span class="rightDiv">   粉丝 <span style="color: #00bbd4" onclick="fans()">12</span></span>-->
+    <!--</div>-->
+    <!--<p>个性签名:人人享有教育,人人享受教育</p>-->
+
+    <!--<div class="aui-btn" onclick="contern()"><span class="aui-iconfont aui-icon-roundcheck aui-icon-add"></span>关注</div>-->
+    <!--&lt;!&ndash;<div class="aui-btn btn-follow aui-btn-warning" onclick="contern()"><span class="aui-iconfont aui-icon-add"></span>关注</div>&ndash;&gt;-->
+
+</div>
+
+
+</body>
+
+
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="friendMainPage.js"></script>
+<script type="text/javascript">
+    var otheruid = '';
+    var sexhtml;
+    apiready = function () {
+        otheruid = api.pageParam.otheruid;
+//        getspaceinfo();
+        getHeadUrl();
+
+        api.addEventListener({
+            name: 'reloadNum'
+        }, function (ret, err) {
+            getPortrait();
+        });
+    };
+
+    function getHeadUrl() {
+        apiObj.Get(UrlRouter.GetPortrait, {
+            values: {
+                uid: otheruid,
+                size: 'b'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    //存用户头像
+                    if (ret.sex == 1) {
+                        sexhtml = '<div class= "aui-iconfont aui-icon-mail sex"></div>';
+                    } else if (ret.sex == 2) {
+                        sexhtml = '<div class= "aui-iconfont aui-icon-femail unsex"></div>';
+                    }else{
+                        sexhtml ="";
+                    }
+                    getPortrait();
+                }
+            } else {
+                getPortrait();
+            }
+        });
+    }
+
+    function guanzhu() {
+
+        api.openWin({
+            name: 'attention_win',
+            url: 'attention_win.html',
+            pageParam: {otheruid: otheruid, fans: 'no'}
+        });
+    }
+
+
+    function fans() {
+
+        api.openWin({
+            name: 'attention_win',
+            url: 'attention_win.html',
+            pageParam: {otheruid: otheruid, fans: 'yes'}
+        });
+
+
+    }
+
+
+    function contern(context) {
+        if ($api.hasCls(context, 'aui-btn-infome')) {
+
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 1,
+                    followuid: otheruid
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+
+                        $api.removeCls(context, 'aui-btn-infome');
+                        $api.removeCls(context, 'aui-btn-warning');
+                        $api.addCls(context, 'aui-btn-outlined');
+                        $api.html(context, '取消关注');
+
+
+                    } else {
+                        //alert(ret.msg);
+                    }
+                } else {
+
+                }
+            });
+        } else {
+
+
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 0,
+                    followuid: otheruid
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+
+                        $api.addCls(context, 'aui-btn-infome');
+                        $api.addCls(context, 'aui-btn-warning');
+                        $api.removeCls(context, 'aui-btn-outlined');
+                        $api.html(context, '<span class="aui-iconfont aui-icon-add"></span>关注');
+
+
+                    } else {
+                        //alert(ret.msg);
+                    }
+                } else {
+
+                }
+            })
+        }
+    }
+
+
+</script>
+
+
+</html>

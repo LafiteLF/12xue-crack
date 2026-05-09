@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>习题列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/exerciseCss.css"/>
+    <style>
+        .ex_content{ display: none}
+    </style>
+</head>
+<body>
+<div class="ex_content">
+    <dl v-if="JSON.stringify(zyyq) !='{}' || materiallist.length>0">
+        <dt class="jch1">基础类</dt>
+        <dd v-if=" JSON.stringify(zyyq)!='{}' && materiallist.length==0 " type = 'zyyq' tapmode onclick="vm.openWinDetail(this)" >
+            <p>【作业要求】{{zyyq.zymc}}</p>
+        </dd>
+        <dd v-if=" JSON.stringify(zyyq)!='{}' && materiallist.length>0" :id="0" :type="is_score==1 && materiallist[0].zyqf==2?materiallist[0].xtzf:'noxtzf'"  :isopen="1" tapmode onclick="vm.openWinDetail(this)">
+            <p>【作业要求】{{zyyq.zymc}}</p>
+        </dd>
+        <dd v-for="(list,index) in materiallist" :id="index" :type="is_score==1 && list.zyqf==2?list.xtzf:'noxtzf'" tapmode onclick="vm.openWinDetail(this)">
+           <p v-html="index+1+'.'+getzymc(list.txstr,list.zyqf,list.tx,list.zymc,list.ytlx)"></p>
+            <span  class="ex-xiaoti" v-if=" list.xts>0" v-text="list.tx_code==2?'['+list.xts+'填空]':'['+list.xts+'小题]'"></span>
+            <span  class="ex-daipi" v-if="list.is_true!=-1 && data.isshowanswer==0 && list.zyqf==2" style="color:#4bc7c7">已答</span>
+            <span  class="ex-daipi" v-if="list.is_true==0 && data.isshowanswer==1">待批</span>
+            <span  class="ex-daipi" v-if="list.is_true!=0 && data.isshowanswer==1">
+                <img v-if="list.is_true==1" src="../../../image/newhomework/zhengque.png">
+                <img v-if="list.is_true==2" src="../../../image/newhomework/cuowu.png">
+                <img v-if="list.is_true==3" src="../../../image/newhomework/bandui.png">
+            </span>
+        </dd>
+    </dl>
+    <dl v-if="materialtzxt.length>0" >
+        <dt>拓展类</dt>
+        <dd v-for="(list,index) in materialtzxt" :id="index" tapmode onclick="vm.openWinDetailTZ(this)">
+            <p v-html="index+1+'.'+getzymc(list.txstr,list.zyqf,list.tx,list.zymc,list.ytlx)"></p>
+            <span  class="ex-xiaoti" v-if=" list.xts>0" v-text="list.tx_code==2?'['+list.xts+'填空]':'['+list.xts+'小题]'"></span>
+            <span  class="ex-daipi" v-if="list.is_true!=-1 && data.isshowanswer==0 && list.zyqf==2" style="color:#4bc7c7">已答</span>
+            <span  class="ex-daipi" v-if="list.is_true==0 && data.isshowanswer==1">待批</span>
+            <span  class="ex-daipi" v-if="list.is_true==-1" style="color: #cccccc;">未答</span>
+            <span  class="ex-daipi" v-if="list.is_true!=0 && data.isshowanswer==1">
+                <img v-if="list.is_true==1" src="../../../image/newhomework/zhengque.png">
+                <img v-if="list.is_true==2" src="../../../image/newhomework/cuowu.png">
+                <img v-if="list.is_true==3" src="../../../image/newhomework/bandui.png">
+            </span>
+        </dd>
+    </dl>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    var hwid;
+    var xsbjid;
+    apiready = function () {
+        vue();
+        $('.ex_content').show();
+        hwid = api.pageParam.homeworkListData.id;
+        xsbjid = api.pageParam.homeworkListData.bjid;
+        // vm.getHomeworkList();
+        // api.addEventListener({
+        //     name: 'shuaxin-frame-homework-list-pad'
+        // }, function (ret, err) {
+        //     vm.getHomeworkList();
+        // });
+
+        vm.materiallist = api.pageParam.materiallist;
+        vm.materialtzxt = api.pageParam.materialtzxt;
+        vm.is_score = api.pageParam.is_score;
+        if (api.pageParam.data.materialdxa.length > 0) {
+            vm.materiallist.unshift(api.pageParam.data.materialdxa[0]);
+        }
+        var zymc = api.pageParam.data.content;
+        if (api.pageParam.data.content) {
+            vm.zyyq = {'txstr': '作业要求', 'zymc': zymc, 'zyqf': 3};
+        }
+        for (var i = 0; i < vm.materiallist.length; i++) {
+            if(vm.materiallist[i].zyqf==2){
+                var list= vm.materiallist[i].part_score+'';
+                vm.scorelist[i] = list.split(',');
+            }else{
+                vm.scorelist[i] = '';
+            }
+        }
+
+
+    };
+    function vue() {
+        vm= new Vue({
+            el: '.ex_content',
+            data: {
+                data:[],
+                materiallist:api.pageParam.materiallist,
+                materialtzxt:api.pageParam.materialtzxt,
+                is_score:api.pageParam.is_score,
+                scorelist:[],
+                zyyq:{}
+            },
+            updated: function () {
+            },
+            methods: {
+                getzymc: function (txstr,zyqf,tx,zymc,ytlx) {
+                    if(zyqf == 2){
+                        if(tx!='tdjh' && tx!='tdh' &&tx!='tdb'&&tx!='ttt'){
+                            return '【'+txstr+'】'+zymc;
+                        }else{
+                            return '【'+txstr+'】'+'<img src="../../../image/newhomework/tlbt.png">';
+                        }
+                    }else if(zyqf == 1){
+                        if(ytlx==3){
+                            return '【学习单】'+zymc
+                        }else{
+                            return '【素材】'+zymc
+                        }
+                    }else{
+                        return '作业要求'
+                    }
+                },
+                openWinDetail:function(context){
+                    var index = $(context).attr('id');
+                    api.openWin({
+                        name: 'win_detail',
+                        url: 'win_detail.html',
+                        pageParam: {
+                            detailData: api.pageParam.homeworkListData,
+                            complete:2,
+                            index:index,
+                            type:$(context).attr('type'),
+                            isopen:$(context).attr('isopen'),
+                            scorelist:vm.scorelist,
+                            zyyq:vm.zyyq,
+                            classid:api.pageParam.classid,
+                            homeworkIndex:api.pageParam.homeworkIndex
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                openWinDetailTZ:function(context){
+                    var index = $(context).attr('id');
+                    api.openWin({
+                        name: 'win_detail_kzxt',
+                        url: 'kzxt/win_detail_kzxt.html',
+                        pageParam: {
+                            detailData: api.pageParam.homeworkListData,
+                            complete:2,
+                            index:index,
+                            classid:api.pageParam.classid,
+                            homeworkIndex:api.pageParam.homeworkIndex
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                getHomeworkList:function() {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetStudenthomeworkUrl, {
+                        values: {
+                            hwid: hwid,
+                            classid: xsbjid,
+                            identitytype: '3',//学生身份
+                            uid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        // pullRefresh.cancelLoading();
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                               $('.ex_content').show();
+                                vm.data = ret;
+                                vm.materiallist = ret.materiallist;
+                                vm.materialtzxt = ret.materialtzxt;
+                                vm.is_score = vm.data.is_score;
+                                if (ret.materialdxa.length > 0) {
+                                    vm.materiallist.unshift(ret.materialdxa[0]);
+                                }
+                                var zymc = ret.content;
+                                if (ret.content) {
+                                    vm.zyyq = {'txstr': '作业要求', 'zymc': zymc, 'zyqf': 3};
+                                }
+                                for (var i = 0; i < vm.materiallist.length; i++) {
+                                    if(vm.materiallist[i].zyqf==2){
+                                        var list= vm.materiallist[i].part_score+'';
+                                        vm.scorelist[i] = list.split(',');
+                                    }else{
+                                        vm.scorelist[i] = '';
+                                    }
+                                }
+                            }
+                            // vm.isNull = true;
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+</script>
+</html>

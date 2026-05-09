@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>PDF Viewer</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+<iframe id="viewer"></iframe>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    var viewerEl = document.getElementById('viewer');
+    var lockTimer = null;
+    var initialScaleApplied = false;
+
+    function normalizePath(path) {
+        if (!path) return '';
+        if (path.indexOf('file://') === 0 || path.indexOf('http://') === 0 || path.indexOf('https://') === 0) {
+            return path;
+        }
+        if (path.indexOf('/storage/') === 0) {
+            return 'file://' + path;
+        }
+        return path;
+    }
+
+    function hideById(doc, id) {
+        var el = doc.getElementById(id);
+        if (!el) return;
+        el.style.display = 'none';
+        el.style.visibility = 'hidden';
+        el.setAttribute('hidden', 'hidden');
+    }
+
+    function applyInitialWidthScale(app) {
+        if (!app || !app.pdfViewer || initialScaleApplied) return;
+        try {
+            app.pdfViewer.currentScaleValue = 'page-width';
+            if (app.store && app.store.set) {
+                app.store.set('zoom', 'page-width');
+            }
+            initialScaleApplied = true;
+        } catch (e) {
+        }
+    }
+
+    function hardenViewerUi() {
+        try {
+            var win = viewerEl.contentWindow;
+            var doc = viewerEl.contentDocument || (win && win.document);
+            if (!doc) return;
+            var app = win && win.PDFViewerApplication ? win.PDFViewerApplication : null;
+
+            // Hide toolbar actions not suitable for student usage.
+            var ids = [
+                'sidebarToggle',
+                'viewFind',
+                'openFile',
+                'secondaryOpenFile',
+                'print',
+                'secondaryPrint',
+                'download',
+                'secondaryDownload',
+                'viewBookmark',
+                'secondaryViewBookmark',
+                'secondaryPresentationMode',
+                'secondaryToolbarToggle',
+                'presentationMode',
+                'documentProperties'
+            ];
+            for (var i = 0; i < ids.length; i++) {
+                hideById(doc, ids[i]);
+            }
+
+            // Force close secondary toolbar if it's open.
+            var secondaryToolbar = doc.getElementById('secondaryToolbar');
+            if (secondaryToolbar) {
+                secondaryToolbar.classList.remove('opened');
+                secondaryToolbar.style.display = 'none';
+            }
+            // Force close the left sidebar every time.
+            var outerContainer = doc.getElementById('outerContainer');
+            if (outerContainer) {
+                outerContainer.classList.remove('sidebarOpen');
+            }
+            var sidebarContainer = doc.getElementById('sidebarContainer');
+            if (sidebarContainer) {
+                sidebarContainer.classList.add('hidden');
+            }
+            if (app && app.pdfSidebar) {
+                try {
+                    // 0 == SidebarView.NONE in this viewer build.
+                    if (app.pdfSidebar.switchView) {
+                        app.pdfSidebar.switchView(0, false);
+                    }
+                    if (app.pdfSidebar.close) {
+                        app.pdfSidebar.close();
+                    }
+                    if (app.pdfSidebar.setInitialView) {
+                        app.pdfSidebar.setInitialView(0);
+                    }
+                } catch (e1) {
+                }
+            }
+            // Reset stored sidebar preference so future opens stay closed.
+            if (app && app.store && app.store.set) {
+                try {
+                    app.store.set('sidebarView', 0);
+                } catch (e2) {
+                }
+            }
+            var overlay = doc.getElementById('overlayContainer');
+            if (overlay) {
+                overlay.style.display = overlay.style.display === 'none' ? 'none' : overlay.style.display;
+            }
+
+            // Add css hard lock to ensure hidden after internal rerender.
+            var styleId = 'student-lock-style';
+            if (!doc.getElementById(styleId)) {
+                var style = doc.createElement('style');
+                style.id = styleId;
+                style.innerHTML = [
+                    '#sidebarToggle,#viewFind,',
+                    '#openFile,#secondaryOpenFile,#print,#secondaryPrint,#download,#secondaryDownload,',
+                    '#viewBookmark,#secondaryViewBookmark,#secondaryPresentationMode,#secondaryToolbarToggle,',
+                    '#presentationMode,#documentProperties{display:none !important;visibility:hidden !important;}',
+                    '#sidebarContainer{display:none !important;}',
+                    '#outerContainer.sidebarOpen #mainContainer{left:0 !important;}',
+                    '#secondaryToolbar{display:none !important;}'
+                ].join('');
+                doc.head.appendChild(style);
+            }
+
+            // Keyboard lock: prevent print/download shortcuts.
+            if (win && !win.__studentHotkeyLocked) {
+                win.addEventListener('keydown', function (e) {
+                    var key = (e.key || '').toLowerCase();
+                    var ctrl = e.ctrlKey || e.metaKey;
+                    if (ctrl && (key === 'p' || key === 's' || key === 'o')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                }, true);
+                win.__studentHotkeyLocked = true;
+            }
+            if (win && !win.__studentScaleInitBound) {
+                // Only set width-fit once after initial document render.
+                win.addEventListener('pagesloaded', function () {
+                    try {
+                        applyInitialWidthScale(win.PDFViewerApplication);
+                    } catch (e4) {
+                    }
+                }, true);
+                win.__studentScaleInitBound = true;
+            }
+        } catch (e) {
+            // Ignore cross-context lock errors in rare WebView cases.
+        }
+    }
+
+    function initViewer(path) {
+        var file = normalizePath(path);
+        if (!file) {
+            api.toast({
+                msg: '文档路径为空',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        var url = '../script/ThridJS/pdfjs/viewer.html?file=' + encodeURIComponent(file) + '#page=1&zoom=page-width,0,0';
+        viewerEl.src = url;
+        initialScaleApplied = false;
+
+        if (lockTimer) {
+            clearInterval(lockTimer);
+        }
+        // Re-apply lock periodically because pdf.js may rebuild toolbar nodes.
+        lockTimer = setInterval(function () {
+            hardenViewerUi();
+        }, 600);
+
+        viewerEl.onload = function () {
+            hardenViewerUi();
+            try {
+                var app = viewerEl.contentWindow && viewerEl.contentWindow.PDFViewerApplication ? viewerEl.contentWindow.PDFViewerApplication : null;
+                applyInitialWidthScale(app);
+            } catch (e) {
+            }
+        };
+    }
+
+    apiready = function () {
+        initViewer(api.pageParam.path || '');
+    };
+</script>
+</body>
+</html>

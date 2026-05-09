@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+
+        }
+
+        .font-mima{
+            font-size: 0.7rem;
+            color: #F58019;
+            padding: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+
+    <p class="font-mima">您的密码过于简单，建议您修改密码</p>
+
+    <ul class="aui-list aui-form-list">
+        <li class="aui-list-item">
+            <div class="aui-list-item-inner">
+                <div class="aui-list-item-input">
+                    <input id="newPsw" type="password" placeholder="新的密码（请填写6~30位密码）">
+                </div>
+            </div>
+        </li>
+        <li class="aui-list-item">
+            <div class="aui-list-item-inner">
+                <div class="aui-list-item-input">
+                    <input id="againPsw" type="password" placeholder="请再次输入密码 ">
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div class="aui-content-padded">
+    <div class="aui-btn aui-btn-primary aui-btn-block" tapmode onclick="next();" disabled="disabled">保存</div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+
+    apiready = function () {
+        api.addEventListener({
+            name: 'changPwdFrm'
+        }, function (ret, err) {
+            api.openWin({
+                name: 'win-stu-main',
+                url: '../../win-stu-main.html',
+                pageParam: {loginSuc: true}
+            });
+        });
+//        setTimeout(function () {
+//            if (api.pageParam.sex == '0') {
+//                api.sendEvent({
+//                    name: 'chooseSex'
+//                });
+//            }
+//        },300)
+    };
+
+    function next() {
+        if ($api.byId('againPsw').value == '' || $api.byId('newPsw').value == '') {
+            api.toast({
+                msg: '请输入密码',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else if(!($api.byId('againPsw').value.indexOf(" ") == -1)||!($api.byId('newPsw').value.indexOf(" ") == -1)){
+            api.toast({
+                msg: '密码中不能含有空格',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }else if ($api.byId('againPsw').value != $api.byId('newPsw').value) {
+            api.toast({
+                msg: '两次密码输入不一致',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else if (trimStr($api.byId('againPsw').value).length < 6 || trimStr($api.byId('againPsw').value).length > 30) {
+            api.toast({
+                msg: '密码位数不正确',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }  else if (checkPassword($api.byId('againPsw').value)) {
+            api.toast({
+                msg: '密码设置过于简单，请重新设置',
+                duration: 2000,
+                location: 'bottom'
+            });
+            $api.val($api.byId('newPsw'), '');
+            $api.val($api.byId('againPsw'), '');
+            $api.byId('newPsw').focus();
+        }else {
+
+            apiObj.Put(UrlRouter.ChangePsw, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    oldpassword: encodeURIComponent($api.getStorage('psw')),
+                    newpassword: encodeURIComponent($api.byId('againPsw').value)
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        $api.setStorage('psw', $api.byId('againPsw').value);
+                        api.toast({
+                            msg: '密码重置成功',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        api.closeWin();
+                    } else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            })
+        }
+    }
+
+</script>
+</html>

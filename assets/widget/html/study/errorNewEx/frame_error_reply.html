@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+
+        }
+
+        textarea {
+            border: 1px solid #eeeeee;
+            padding: 12px;
+            min-height: 97%;
+            height: 90px;
+            margin: 0;
+            border: 1px solid #d5d5d5;
+            font-size: 0.6rem;
+        }
+
+        .bottom-container {
+            height: auto;
+            position: relative;
+            /*bottom: 0px;;*/
+            width: 100%;
+            background-color: #F4F4F4;
+        }
+
+        .bottom-container i {
+            font-size: 32px;
+            padding-left: 12px;
+            color: #999999;
+        }
+
+        .border-top {
+            border-top: 1px solid #E5E5E5;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid #E5E5E5;
+        }
+
+        .display-pic {
+            height: 110px;;
+            width: 100%;
+            /*overflow-x: scroll;*/
+            /*display: none;*/
+        }
+
+        .display-pic li {
+            float: left;
+        }
+
+        .display-pic li img {
+            height: 80px;
+            width: 80px;
+            margin: 15px 0px 15px 12px;
+            border-radius: 8px;
+        }
+
+        .yitu {
+            width: 15px;
+            float: left;;
+        }
+
+        .btn-audio {
+            width: 80px;
+            margin: 10px;
+        }
+
+        .display-voice {
+            display: none;
+        }
+
+        .display-pic li {
+            position: relative;
+        }
+
+        .display-pic li img.chacha {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            width: 20px;
+            height: 20px;
+            /*border-radius: 25px;*/
+            padding: 0 0 0 0;
+            margin-top: 15px;
+        }
+
+        .tv_img {
+            margin-left: 12px;
+            font-size: 14px;
+            color: #cccccc;
+            margin-top: 8px;
+        }
+
+        .aui-list-item-input {
+            padding: 15px 15px 5px 15px;
+            font-size: 16px;
+        }
+
+        .report-check {
+            position: relative;
+            top: -24px;
+            right: 8px;
+            font-size: 0.5rem;
+        }
+
+        .seconds {
+            margin-left: 15px;
+            color: #4BC7C7;
+            float: right;
+            font-size: 0.7rem;
+            line-height: 1.8;
+        }
+
+        .aui-btn-primary {
+            width: 6rem;
+            border: 1px solid #4BC7C7 !important;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            text-align: center;
+            height: 2rem;
+        }
+
+        .aui-btn-primary.aui-active, .aui-btn-primary:active {
+            background-color: #f9f9f9;
+        }
+
+        .yitu {
+            line-height: 1
+        }
+
+        .contenttext::-webkit-input-placeholder {
+            color: #cccccc;
+        }
+
+        .addicon {
+            text-align: center;
+            border: 1px dotted #4BC7C7;
+            width: 80px;
+            height: 80px;
+            margin: 15px 12px;
+            border-radius: 8px;
+            color: #4BC7C7;
+        }
+
+        .main {
+            margin: 0 auto;
+        }
+
+        .main ul li {
+            background: #fff;
+            height: 2rem;
+            border-bottom: 1px solid #e5e5e9;
+            padding: 0 12px;
+            position: relative
+
+        }
+
+        .main ul li span {
+            color: #333;
+            font-size: 16px;
+            line-height: 2rem
+        }
+
+        .zi p {
+            width: 100%;
+            float: right;
+            text-align: right;
+            height: 45px;
+            margin: 0px;
+            background-size: 10px auto;
+            padding-right: 10px;
+
+        }
+
+        .zi p span {
+            display: inline-block;
+            /*max-width: 50%;*/
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-right: 2%;
+            color: #999 !important;
+            font-size: 0.65rem;
+            float: right;
+        }
+
+        .important {
+            border-radius: 5px;
+            border: 1px solid #ffcc00;
+            color: #ffcc00;
+            background-color: #fffae5;
+            margin-left: 12px;
+        }
+
+        .aui-list-item-arrow:before {
+            border: 1px solid #9a9a9a;
+            border-top: none;
+            border-right: none;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .zi {
+            float: right;
+            width: calc(100% - 120px);
+        }
+
+        .savedata {
+            background-color: #4bc7c7;
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px 43%;
+            border-radius: 25px;
+            text-align: center;
+            color: white
+        }
+
+        .savedata :active {
+            background-color: #35baba;
+        }
+
+        .impdisable {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container"
+     style="height: auto;width: 80%;left: 10%;position: relative;background-color: white;margin-top: 15px">
+    <div class="display-pic " style="background-color: white;padding-left: 10px;">
+        <ul style="width: 100%; display: block; height:100px">
+            <p class="preP">
+            </p>
+            <li class="addicon" id="' + index + '">
+                <div tapmode onclick="selectPic();">
+                    <img class="img" style="height: 30px;width: 30px;margin: 10px 0 0 0"
+                         src="../../../image/dianjiimp.png" alt="图片加载失败">
+                </div>
+                <div tapmode onclick="selectPic(this);" style="font-size: 0.6rem">上传错题</div>
+            </li>
+        </ul>
+    </div>
+    <div style="height: 10px;width: 100%;background-color: #f2f2f2"></div>
+    <div class="main">
+        <ul class="">
+            <li tapmode onclick="openList();">
+                <span style="margin-left: 10px;margin-right: 10px">教材筛选</span>
+                <div class="zi" id="username">
+                    <p>
+                        <span style="max-width: 72%;" v-text="bbmc"></span>
+                        <span style="max-width: 28%;" v-text="njmc"></span>
+                    </p>
+                </div>
+                <b class="aui-list-item-arrow"></b>
+            </li>
+            <li tapmode onclick="opendyList();">
+                <span style="margin-left: 10px">单元章节筛选</span>
+                <div class="zi" id="realname">
+                    <p>
+                        <span v-text="dymc"></span>
+                    </p>
+                </div>
+                <b class="aui-list-item-arrow"></b>
+            </li>
+        </ul>
+    </div>
+    <div style="height: 10px;width: 100%;background-color: #f2f2f2"></div>
+    <div class="aui-list-item-input ">
+        <div style="color: #333;margin-bottom: 10px;">习题描述</div>
+        <textarea id="content-text" class="contenttext" style="overflow-y: auto;" maxlength="140"
+                  oninput="onTextChangeListener();" placeholder="输入关于习题的描述，方便日后复习哟~"></textarea>
+        <div class="report-check"><span class="word-count aui-pull-right" style="color: #cccccc">0/140</span></div>
+    </div>
+    <!--<button class="important">-->
+    <!--标记为重点-->
+    <!--</button>-->
+    <div style="margin: 5px 20px;padding-bottom: 5px">
+        <img style="height: 30px" src="../../../image/biaoji.jpg" v-if="is_important==0" tapmode
+             @click="edtImp()">
+        <img style="height: 30px" src="../../../image/lvbj.jpg" tapmode @click="edtImp();"
+             v-if="is_important==1">
+    </div>
+
+</div>
+<div class="savedata" style="" tapmode onclick="settingGetSchoolset();">保存修改</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/textarea-delete.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var picArr = [];
+    var pImageList = [];//图片地址
+    var path = '';
+    //    var audio;
+    var pAudio = "";// 音频URL
+    var hasAudio = false;
+    var seconds; //录音时间
+    var photoBrowser;
+    var uiMediaScanner;// 选择图片
+    var imageFilter;// 压缩图片
+    var picimg = [];
+    var compressListener = {
+        allCount: 0,
+        successCount: 0
+    };
+    var count = 0;
+    var vm;
+    var bbid;
+    var njid;
+    var sxcid;
+    var dyid;
+    var sys_id;
+    var isClick = '0';
+
+    var title;
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage("token-stu"));
+    apiready = function () {
+        var header = document.querySelector('header');
+        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        photoBrowser = api.require('photoBrowser');
+        api.addEventListener({
+            name: 'deletePic'
+        }, function (ret, err) {
+            var index = ret.value.index;
+            deletePic(index);
+        });
+        api.addEventListener({
+            name: 'selectsxdata'
+        }, function (ret, err) {
+            vm.njmc = ret.value.recommend.name;
+            vm.recommend = ret.value.recommend;
+            vm.nowstatus = ret.value.nowstatus;
+            vm.bbmc = ret.value.nowstatus.name;
+            vm.dymc = '全部';
+            dyid = 0;
+            bbid = vm.nowstatus.pid;
+            sxcid = vm.nowstatus.id;
+            njid = vm.recommend.id;
+        });
+        if (api.pageParam.editct == 1) {
+            title = '保存修改';
+        } else {
+            title = '上传';
+        }
+        $api.html($api.dom('.savedata'), '<span class="aui-iconfont  " style="font-size: 18px" tapmode onclick="closeWin()"></span>' + title + '');
+        api.addEventListener({
+            name: 'selecterror-pad'
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.value.type == 'camera') {
+                    api.getPicture({
+                        sourceType: 'camera',
+                        encodingType: 'jpg',
+                        mediaValue: 'pic',
+                        destinationType: 'url',
+                        allowEdit: true,
+                        quality: 50,
+//                        saveToPhotoAlbum: api.deviceModel.match(/12xue/) ? false : true,
+                    }, function (ret, err) {
+                        if (ret.data.length > 3) {
+                            displayPic(ret.data);
+                        }
+                    });
+                }
+                if (ret.value.type == 'photo') {
+                    //换成多选的
+                    var imgAccountMax = 6 - picArr.length;//还可以选图片的数量最大值
+                    openMediaScanner(imgAccountMax);
+                }
+            }
+        });
+        api.addEventListener({
+            name: 'selectsDydata'
+        }, function (ret, err) {
+            vm.dydata = ret.value.recommend;
+            vm.dymc = ret.value.recommend.name;
+            dyid = vm.dydata.id;
+            api.pageParam.errorData.dyid = ret.value.recommend.id;
+        });
+        vm = new Vue({
+            el: ".container",
+            data: {
+                exercisesArr: '1',
+                recommend: '',
+                nowstatus: '',
+                njmc: '',
+                bbmc: '请选择',
+                dymc: '全部',
+                dydata: '',
+                is_important: '0'
+            },
+            methods: {
+                edtImp: function () {
+                    if (vm.is_important == 0) {
+                        vm.is_important = 1;
+                    } else {
+                        vm.is_important = 0;
+                    }
+                }
+            }
+        });
+        if (api.pageParam.editct == 1) {
+            $api.text($api.dom(".word-count"), api.pageParam.errorData.descript.length + '/140');
+            pImageList = api.pageParam.errorData.content;
+            bbid = api.pageParam.errorData.bbid;
+            sxcid = api.pageParam.errorData.sxcid;
+            njid = api.pageParam.errorData.njid;
+            dyid = api.pageParam.errorData.dyid;
+            sys_id = api.pageParam.errorData.sys_id;
+            displayErrorPic(api.pageParam.errorData.content);
+            vm.bjmc = api.pageParam.errorData.njname;
+            if (api.pageParam.errorData.dymc == '') {
+                vm.dymc = '全部';
+            } else {
+                vm.dymc = api.pageParam.errorData.dymc;
+            }
+            vm.bbmc = api.pageParam.errorData.njname + ' ' + api.pageParam.errorData.bbname + ' ' + api.pageParam.errorData.sxcname;
+            $api.text($api.dom('.contenttext'), api.pageParam.errorData.descript);
+            vm.is_important = api.pageParam.important;
+        } else {
+            if (api.pageParam.errorData != 0) {
+                bbid = api.pageParam.errorData.publisher.id;
+                sxcid = api.pageParam.errorData.volume.id;
+                njid = api.pageParam.errorData.grade.id;
+                dyid = 0;
+                sys_id = api.pageParam.errorData.sys_id;
+                vm.njmc = api.pageParam.errorData.grade.name;
+                vm.dymc = '全部';
+                vm.bbmc = api.pageParam.errorData.publisher.name + api.pageParam.errorData.volume.name;
+            }
+        }
+    };
+
+    function openList() {
+        if (isClick == '1') {
+            return;
+        }
+        isClick = '1';
+        apiObj.Get(UrlRouter.ExercisesWrongsUploadChapt, {
+            values: {
+                uid: $api.getStorage('uid'),
+                schoolid: $api.getStorage('newSchoolId'),
+                xkid: api.pageParam.xkid,
+                xxxz: $api.getStorage('errorxxxz'),
+                czxz: $api.getStorage('errorczxz'),
+                gzxz: $api.getStorage('errorgzxz')
+            }
+        }, function (ret, err) {
+//        api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (api.pageParam.editct == 1) {
+                        if (vm.recommend == '') {
+                            for (var i = 0; i < ret.data.length; i++) {
+                                if (api.pageParam.errorData.njid == ret.data[i].id) {
+                                    for (var j = 0; j < ret.data[i].children.length; j++) {
+                                        if (api.pageParam.errorData.sxcid == ret.data[i].children[j].id) {
+                                            vm.recommend = ret.data[i];
+                                            vm.nowstatus = ret.data[i].children[j];
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+
+                        if (api.pageParam.errorData != 0 && vm.recommend == '') {
+                            for (var i = 0; i < ret.data.length; i++) {
+                                if (api.pageParam.errorData.grade.id == ret.data[i].id) {
+                                    for (var j = 0; j < ret.data[i].children.length; j++) {
+                                        if (api.pageParam.errorData.volume.id == ret.data[i].children[j].id) {
+                                            vm.recommend = ret.data[i];
+                                            vm.nowstatus = ret.data[i].children[j];
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    api.setStatusBarStyle({
+                        style: 'light'
+                    });
+                    api.openFrame({
+                        name: 'selectEdition',
+                        url: 'selectEdition.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winwidth,
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            chaptlist: ret.data,
+                            nowstatus: vm.nowstatus,
+                            recommend: vm.recommend
+                        },
+                        bounces: false,
+                        reload: true
+                    });
+
+                    setTimeout(function () {
+                        isClick = '0';
+                    }, 2500);
+
+
+                }
+            }
+        });
+
+    }
+
+    function opendyList() {
+
+        if (isClick == '1') {
+            return;
+        }
+        isClick = '1';
+
+
+        if (vm.bbmc == '请选择') {
+//            api.toast({
+//                msg: '请先选择教材筛选',
+//                duration: 2000,
+//                location: 'bottom'
+//            });
+            var owndata = [{'name': '全部', 'id': '0'}];
+            var chaptlist = owndata;
+            api.openFrame({
+                name: 'selectDyEdition',
+                url: 'selectDyEdition.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: $api.getStorage('padHeight')
+                },
+                pageParam: {
+                    chaptlist: chaptlist,
+                    recommend: ''
+                },
+                bounces: false,
+                reload: true
+            });
+            isClick = '0';
+        } else {
+            apiObj.Get(UrlRouter.ExercisesWrongsDyChapt, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    schoolid: $api.getStorage('newSchoolId'),
+                    xxxz: $api.getStorage('errorxxxz'),
+                    czxz: $api.getStorage('errorczxz'),
+                    gzxz: $api.getStorage('errorgzxz'),
+                    id: sxcid,
+
+//                dyid: api.pageParam.dyid,
+//                is_important: api.pageParam.is_important,
+//                page: p
+                }
+            }, function (ret, err) {
+                if (ret) {
+
+                    if (api.pageParam.editct == 1) {
+                        for (var i = 0; i < ret.data.length; i++) {
+                            if (api.pageParam.errorData.dyid == ret.data[i].id) {
+                                vm.dydata = ret.data[i];
+                            }
+                        }
+                    }
+
+                    if (ret.ret == 0) {
+                        api.setStatusBarStyle({
+                            style: 'light'
+                        });
+                        var owndata = [{'name': '全部', 'id': '0'}];
+
+                        var chaptlist = owndata.concat(ret.data);
+                        api.openFrame({
+                            name: 'selectDyEdition',
+                            url: 'selectDyEdition.html',
+                            rect: {
+                                x: 0,
+                                y: 0,
+                                w: 'auto',
+                                h: $api.getStorage('padHeight')
+                            },
+                            pageParam: {
+                                chaptlist: chaptlist,
+                                recommend: vm.dydata
+                            },
+                            bounces: false,
+                            reload: true
+                        });
+                        setTimeout(function () {
+                            isClick = '0';
+                        }, 2500);
+                    }
+                }
+            });
+        }
+
+
+    }
+
+    //网络请求
+    function postReply() {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '正在保存',
+            text: '请稍后',
+            modal: true
+        });
+        var content = clear_emoji($api.val($api.dom(".container textarea")));
+        var params = {};
+        var arrays = {};
+        var reply_userinfo = {};
+        if (pImageList && pImageList != undefined && pImageList.length > 0) {
+            params["media"] = pImageList;
+        }
+        params["is_important"] = vm.is_important;
+
+        if (api.pageParam.errorData != '') {
+            params["sys_id"] = api.pageParam.errorData.sys_id;
+        } else {
+            params["sys_id"] = '';
+        }
+        params["bbid"] = bbid;
+        params["sxcid"] = sxcid;
+        params["njid"] = njid;
+        params["dyid"] = dyid;
+        params["sys_id"] = sys_id;
+        params["descript"] = content;
+
+        params["xkid"] = api.pageParam.xkid;
+        params["schoolid"] = $api.getStorage('newSchoolId');
+        params["uid"] = $api.getStorage('uid');
+
+//        alert(JSON.stringify(params))
+
+        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.UploadExercisesWrong, {
+            body: $api.jsonToStr(params)
+        }, function (ret, err) {
+
+            if (ret && ret.ret == 0) {
+                isClick = '0';
+                api.sendEvent({
+                    name: 'finishErroeReply'
+                });
+                api.sendEvent({
+                    name: "removeError"
+                });
+                api.hideProgress();
+
+                /**/
+                api.sendEvent({
+                    name: 'isImportantStatus',
+                    extra: {}
+                });
+
+
+                api.closeWin();
+            } else {
+                isClick = '0';
+                api.hideProgress();
+                var msg = '';
+                if (ret) {
+                    msg = ret.msg;
+                } else {
+                    msg = err;
+                }
+                api.toast({
+                    msg: msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+                count = 0;
+            }
+        })
+
+    }
+
+    function qiniuUpfile(index) {
+        var fileKey = (new Date()).valueOf() + picArr[index];
+
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    var qiniuStorage = api.require("qiniuStorage");
+                    qiniuStorage.configUploader({
+                        params: {},
+                        checkCrc: false,
+                        mimeType: '',
+                        zone: $api.getStorage('qiniuZone')
+                    });
+                    qiniuStorage.start({
+                        token: ret.data.token,
+                        path: picArr[index],
+                        key: fileKey
+                    });
+                    qiniuStorage.addEventListener(function (ret) {
+                        if (ret.eventType == 'complete' && (api.systemType == 'ios' ? (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) : ret.statusCode) == 200) {
+                            pImageList.push(QINIU_DOMAIN + ret.key);
+                            if (index < picArr.length - 1) {
+                                qiniuUpfile(++index);
+                            } else {
+
+                                postReply();
+                            }
+                        }
+                    });
+                } else {
+                    api.hideProgress();
+                    count++;
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+
+            } else {
+                api.hideProgress();
+                count++;
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+
+        })
+    }
+
+    function addUpfileListener() {
+        api.addEventListener({
+            name: 'selecterror-pad'
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.value.type == 'camera') {
+                    api.getPicture({
+                        sourceType: 'camera',
+                        encodingType: 'jpg',
+                        mediaValue: 'pic',
+                        destinationType: 'url',
+                        quality: 50
+                    }, function (ret, err) {
+                        if (ret.data.length > 5) {
+                            getFujianUrl(ret.data);
+                        }
+                    });
+                }
+                if (ret.value.type == 'photo') {
+                    if (api.systemType == 'ios') {
+                        api.getPicture({
+                            sourceType: 'photo',
+                            encodingType: 'jpg',
+                            mediaValue: 'pic',
+                            destinationType: 'url',
+
+                            quality: 50
+                        }, function (ret, err) {
+                            if (ret.data.length > 5) {
+                                getFujianUrl(ret.data);
+                            }
+                        });
+                    } else {
+                        if (!uiMediaScanner) {
+                            uiMediaScanner = api.require('UIMediaScanner');
+                        }
+                        uiMediaScanner.open({
+                            type: 'picture',
+                            column: 4,
+                            classify: true,
+                            max: 1,
+                            sort: {
+                                key: 'time',
+                                order: 'desc'
+                            }, rotation: true,
+                            texts: {
+                                stateText: '已选*项',
+                                cancelText: '取消',
+                                finishText: '完成'
+                            },
+                            styles: {
+                                bg: '#fff',
+                                mark: {
+                                    icon: '',
+                                    position: 'bottom_left',
+                                    size: 20
+                                },
+                                nav: {
+                                    bg: '#4bc7c7',
+                                    stateColor: '#fff',
+                                    stateSize: 18,
+                                    cancelBg: 'rgba(0,0,0,0)',
+                                    cancelColor: '#fff',
+                                    cancelSize: 18,
+                                    finishBg: 'rgba(0,0,0,0)',
+                                    finishColor: '#fff',
+                                    finishSize: 18
+                                }
+                            }
+                        }, function (ret) {
+                            if (ret.eventType == 'confirm') {
+                                if (ret.list.length != 0) {
+                                    getFujianUrl(ret.list[0].path);
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+
+
+            function getFujianUrl(url) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                params["uid"] = $api.getStorage("uid");
+                params["classid"] = classid;
+                params["hwid"] = hwid;
+                params["title"] = url.substr(url.lastIndexOf("/") + 1);
+                params["filetype"] = url.substr(url.lastIndexOf("."));
+                params["serverpath"] = "http://vod-qiniu.12xue.com/";
+                var imageFilter = api.require('imageFilter');
+                imageFilter.getAttr({
+                    path: url
+                }, function (ret, err) {
+                    if (ret.status) {
+                        params["filesize"] = ret.size;
+                    } else {
+                        api.hideProgress();
+                    }
+                });
+                qiniuUpfile(url);
+            }
+        });
+    }
+
+    function selectPic(content) {
+
+        if (!checkPermission(['camera', 'storage'])) {
+            return;
+        }
+
+        $(content).addClass('impdisable');
+        setTimeout(function () {
+            $(content).removeClass('impdisable');
+        }, 1500);
+
+        if (!checkImageCompress()) {
+            api.hideProgress();
+            return;
+        }
+        if (picArr.length >= 6) {
+            api.toast({
+                msg: '最多可选6张图片上传',
+                duration: 2000,
+                location: 'middle'
+            });
+            return;
+        }
+        window.event ? window.event.cancelBubble = true : e.stopPropagation();
+        api.openFrame({
+            name: 'frame_error_select_pad',
+            url: 'frame_error_select_pad.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: api.winHeight
+            },
+            pageParam: {name: 'pageparam'},
+            bounces: false
+        });
+    }
+
+    //选择相册图片  可多选
+    function openMediaScanner(max) {
+        if (!uiMediaScanner) {
+            uiMediaScanner = api.require('UIMediaScanner');
+        }
+        uiMediaScanner.open({
+            type: 'picture',
+            column: 4,
+            classify: true,
+            max: max ? max : 3,
+            sort: {
+                key: 'time',
+                order: 'desc'
+            }, rotation: true,
+            texts: {
+                stateText: '已选*项',
+                cancelText: '取消',
+                finishText: '完成'
+            },
+            styles: {
+                bg: '#fff',
+                mark: {
+                    icon: '',
+                    position: 'bottom_left',
+                    size: 20
+                },
+                nav: {
+                    bg: '#4bc7c7',
+                    stateColor: '#fff',
+                    stateSize: 18,
+                    cancelBg: 'rgba(0,0,0,0)',
+                    cancelColor: '#fff',
+                    cancelSize: 18,
+                    finishBg: 'rgba(0,0,0,0)',
+                    finishColor: '#fff',
+                    finishSize: 18
+                }
+            }
+        }, function (ret) {
+            if (ret) {
+                if (ret.list) {
+                    compressListener.allCount = ret.list.length;
+                    compressListener.successCount = 0;
+                    for (var i = 0; i < ret.list.length; i++) {
+                        var selectImg = ret.list[i];
+                        //获取图片路径
+                        var selectimgPath = selectImg.path;
+                        var selectimgThumbPath = selectImg.thumbPath;
+
+                        if (api.systemType == "ios") {
+                            uiMediaScanner.transPath({
+                                path: selectimgPath
+                            }, function (ret, err) {
+                                if (ret) {
+                                    compressImage(ret.path);
+                                } else {
+                                    alert("ios地址转换失败：" + JSON.stringify(err));
+                                }
+                            });
+                        } else {
+                            compressImage(selectimgPath);
+                        }
+
+//                    if (ret.list[i].size > 5242880) {
+//                        api.toast({
+//                            msg: '图片文件不能大于5MB~',
+//                            duration: 2000,
+//                            location: 'bottom'
+//                        });
+//                        compressListener.allCount--;
+//                        continue;
+//                    }
+//                    compressImage(selectimgPath);
+                    }
+                    console.log(JSON.stringify(ret));
+                }
+            }
+        })
+    }
+
+    // 图片压缩处理
+    function compressImage(url) {
+        var imageFilter = api.require('imageFilter');
+        var imgName = getUrlName(url);
+        var quality;
+        if (api.systemType == 'ios') {
+            quality = 0.2;
+        } else {
+            quality = 0.3;
+        }
+        imageFilter.compress({
+            img: url,
+            quality: quality,
+            save: {
+                imgPath: "fs://img_compress/",
+                imgName: imgName
+            }
+        }, function (ret, err) {
+            console.log("compress result : ret=" + JSON.stringify(ret) + "  err:" + JSON.stringify(err));
+            if (ret.status) {
+                compressListener.successCount++;
+                displayPic(api.fsDir + "/img_compress/" + imgName);
+                console.log("compress url:" + api.fsDir + "/" + imgName);
+            } else {
+                alert(JSON.stringify(err));
+            }
+            imageFilter = '';
+        })
+    }
+
+    //录音
+    function selectVoice() {
+        if (!checkPermission(['microphone'])) {
+            return;
+        }
+        api.openFrame({
+            name: 'frame-record',
+            url: 'frame-record.html'
+        });
+    }
+
+
+    function displayPic(url) {
+        $api.css($api.dom(".display-pic"), 'display:block;');
+        var index = $api.domAll("li").length;
+
+        if (picArr.length >= 5) {
+            $api.css($api.dom(".addicon"), 'display:none;');
+        }
+        var displayUrl = url + '?imageView2/2/h/30';
+        var html = '<li id="' + index + '"><img class="img" src="' + displayUrl + '" originalUrl="' + url + '" alt="图片加载失败" tapmode onclick="openPic(this);"><img class="chacha" src="../../../image/msgcha.png" onclick="deletePic(this)" ></li>';
+        $api.append($api.dom(".preP"), html);
+        picArr.push(url);
+        picimg.push(url);
+
+    }
+
+    function displayErrorPic(url) {
+        $api.css($api.dom(".display-pic"), 'display:block;');
+        var index = $api.domAll("li").length;
+        if (url.length > 2) {
+            $api.css($api.dom(".addicon"), 'display:none;');
+        }
+        var html;
+        for (var i = 0; i < url.length; i++) {
+            var displayUrl = url[i] + '?imageView2/2/h/30';
+            html = '<li id="' + index + '"><img class="img" src="' + displayUrl + '" originalUrl="' + url[i] + '" alt="图片加载失败" tapmode onclick="openPic(this);"><img class="chacha" src="../../../image/msgcha.png" onclick="deletePic(this)" ></li>';
+            $api.append($api.dom(".preP"), html);
+            var indx = url[i].indexOf('/storage');
+            var result = url[i].substr(indx + 1, url[i].length);
+            picimg.push('/' + result);
+            picArr.push(url[i]);
+        }
+
+
+    }
+
+    function openPic(context) {
+        var index = -1;
+        var url = $api.attr(context, 'originalUrl');
+        //计算索引 不能用id作为索引
+        for (var i = 0; i < picArr.length; i++) {
+            if (url == picArr[i]) {
+                index = i;
+            }
+        }
+        api.execScript({
+            script: "isOpenPic=true;"
+        });
+        photoBrowser.open({
+            images: picArr,
+            placeholderImg: 'widget://../image/12xueStu/loading_more.gif',
+            bgColor: '#000000',
+            activeIndex: index
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                api.execScript({
+                    script: "isOpenPic=true;"
+                });
+                photoBrowser.close();
+            }
+        });
+    }
+
+    //删除图片答案
+    function deletePic(context) {
+        var li = $api.closest(context, 'li');
+        var url = $api.attr($api.dom(li, ".img"), 'src');
+        var imgs = $api.domAll("li>.img");
+        var index = -1;
+        for (var i = 0; i < picArr.length; i++) {
+            if (url == picArr[i]) {
+                index = i;
+                break;
+            }
+        }
+        $api.remove(li);
+        picArr.splice(index, 1);//删除数据指定索引位置的url
+        picimg.splice(index, 1);//删除数据指定索引位置的url
+        pImageList.splice(index, 1);
+        $api.css($api.dom(".addicon"), 'display:block;');
+    }
+
+    function edtImp() {
+        if (vm.is_important == 0) {
+            vm.is_important == 1
+        } else {
+            vm.is_important == 0
+        }
+    }
+    function settingGetSchoolset() {
+        apiObj.Get(UrlRouter.settingGetSchoolset, {
+            values: {
+                schoolid: $api.getStorage('schoolid'),
+                type: 'wrong_book'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') {
+                    if(ret.status == 1){
+                        reply();
+                    }else {
+                        toast12xue('本校线下错题已关闭');
+                    }
+                }
+            }else {
+                toast12xue(err.msg);
+            }
+        });
+    }
+    //点击对号
+    function reply() {
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '正在保存',
+            text: '请稍后...',
+            modal: true
+        });
+        if (isClick == '1') {
+            api.hideProgress();
+            return;
+        }
+        isClick = '1';
+        if (api.pageParam.editct == 1) {
+            if (pImageList.length == 0 && picArr.length == 0) {
+                api.hideProgress();
+                toast12xue('请上传错题图片');
+                isClick = '0';
+            } else {
+
+                if (vm.bbmc == '请选择' || vm.dymc == '') {
+                    isClick = '0';
+                    api.hideProgress();
+                    api.toast({
+                        msg: '请进行教材筛选',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                } else {
+                    for (var i = 0; i < picArr.length; i++) {
+                        if (picArr[i].indexOf('http://vod-qiniu.12xue.com') != -1) {
+                            if (i == picArr.length - 1) {
+                                postReply();
+                            }
+                        } else {
+                            replydata(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            var replyTxt = clear_emoji($api.val($api.dom("#content-text")));
+            if ((replyTxt == "" || replyTxt == null) && picArr.length == 0) {
+                isClick = '0';
+                api.hideProgress();
+                api.toast({
+                    msg: '请上传错题图片',
+                    duration: 2000,
+                    location: 'middle'
+                });
+            } else {
+                if (vm.bbmc == '请选择' || vm.dymc == '') {
+                    isClick = '0';
+                    api.hideProgress();
+                    api.toast({
+                        msg: '请进行教材筛选',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                } else {
+                    replydata(0);
+                }
+            }
+        }
+    }
+
+    function replydata(index) {
+
+        var replyTxt = clear_emoji($api.val($api.dom("#content-text")));
+        if (!checkImageCompress()) {
+            api.hideProgress();
+            isClick = '0';
+            return;
+        }
+        if ((replyTxt == "" || replyTxt == null) && picArr.length == 0) {
+            isClick = '0';
+            api.hideProgress();
+            api.toast({
+                msg: '请上传错题图片',
+                duration: 2000,
+                location: 'middle'
+            });
+        } else {
+
+//            api.showProgress();
+            if (picArr && picArr.length > 0) {
+                isClick = '0';
+                qiniuUpfile(index);
+            } else {
+                isClick = '0';
+                api.hideProgress();
+                api.toast({
+                    msg: '请上传错题图片',
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        }
+    }
+
+    /**
+     * 检查图片压缩进度
+     * @returns {boolean} true 压缩完成
+     */
+    function checkImageCompress() {
+        if (compressListener.allCount != 0 && compressListener.allCount != compressListener.successCount) {
+            api.toast({
+                msg: '正在压缩图片，请稍后操作',
+                duraction: 2000,
+                location: 'middle'
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function getUrlName(url) {
+        var index = url.lastIndexOf("/");
+        var imgName;
+        if (api.systemType == 'ios') {
+            var idIndex = url.indexOf("id=");
+            if (idIndex != -1) {
+                var idStr = url.substr(idIndex);
+                var andIndex = url.indexOf("&");
+                imgName = url.substring(idIndex + 3, andIndex);
+            } else {
+                imgName = url.substring(index + 1);
+            }
+        } else {
+            imgName = url.substring(index + 1);
+        }
+        return imgName;
+    }
+</script>
+</html>

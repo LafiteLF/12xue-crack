@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+
+        .aui-bar-tab1 {
+            border-top: 1px #d5d5d5 solid;
+            width: 80%;
+            left: 10%;
+            background-color: white;
+            height: 45px;
+            font-size: 14px;
+            text-align: center;
+            line-height: 45px;
+            bottom: 0 !important;
+            position: fixed;
+            top: auto;
+            table-layout: fixed;
+            color: #757575;
+        }
+
+        .bottom-btn {
+            color: #8e8e93;
+        }
+
+        .btn-title {
+            font-size: 14px;
+            color: #5f646e;
+        }
+
+        .aui-col-xs-4 {
+            width: 33.33333333%;
+            margin-top: 7px;
+            /*color: #4bc6c6 !important;*/
+        }
+
+        .praise {
+            color: #dd191b;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-pull-left aui-btn">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="api.closeWin();api.sendEvent({
+            name: 'itemRefresh',
+            extra: {commentCount:commentCount, praiseCount:praiseCount,forwardCount:forwardCount,isThumb:$api.hasCls($api.dom('.aui-icon-appreciate'), 'praise')?true:false}
+        });"></span>
+    </a>
+    <div style="color:#333" class="aui-12xue-title" tapmode onclick="api.closeWin();api.sendEvent({
+            name: 'itemRefresh',
+            extra: {commentCount:commentCount, praiseCount:praiseCount,forwardCount:forwardCount,isThumb:$api.hasCls($api.dom('.aui-icon-appreciate'), 'praise')?true:false}
+        });">正文
+    </div>
+    <!--<div class="aui-iconfont aui-icon-share aui-pull-right" tapmode onclick="shareBtn();"></div>-->
+</header>
+<footer class="aui-bar aui-bar-tab1">
+    <div>
+        <span class="aui-iconfont aui-icon-forward bottom-btn aui-col-xs-4" tapmode onclick="transpond()">
+            <span class="btn-title forward-count">转发(0)</span>
+        </span>
+        <span class="aui-iconfont aui-icon-appreciate bottom-btn aui-col-xs-4" tapmode onclick="thumbUp()">
+            <span class="btn-title thumb">赞(0)</span>
+        </span>
+        <span class="aui-iconfont aui-icon-comment bottom-btn aui-col-xs-4" tapmode onclick="comment()">
+            <span class="btn-title comment-count">评论(0)</span>
+        </span>
+    </div>
+</footer>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var realname;
+    var school;
+    var identity;
+    var forwardContent = '';
+    var forwardId;
+    var commentCount;
+    var praiseCount;
+    var forwardCount;
+    var dynamicid;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+
+        api.addEventListener({
+            name: 'finishComment'
+        }, function (ret, err) {
+            commentCount++;
+            $api.html($api.dom('.comment-count'), '评论(' + commentCount + ')');
+        });
+
+        api.addEventListener({
+            name: 'deleteComment'
+        }, function (ret, err) {
+            commentCount--;
+            $api.html($api.dom('.comment-count'), '评论(' + commentCount + ')');
+        });
+
+        api.addEventListener({
+            name: 'finishForward'
+        }, function (ret, err) {
+            forwardCount++;
+            $api.html($api.dom('.forward-count'), '转发(' + forwardCount + ')');
+        });
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            api.closeWin();
+            api.sendEvent({
+                name: 'itemRefresh',
+                extra: {
+                    commentCount: commentCount,
+                    praiseCount: praiseCount,
+                    forwardCount: forwardCount,
+                    isThumb: $api.hasCls($api.dom('.aui-icon-appreciate'), 'praise') ? true : false
+                }
+            });
+        });
+        dynamicid = api.pageParam.id;
+        var myUid = $api.getStorage('uid');
+        apiObj.Get(UrlRouter.GetDynamicInfoById, {
+            values: {
+                dynamicid: dynamicid,
+                uid: myUid
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    realname = ret.userinfo.realname;
+                    school = ret.userinfo.xxmc;
+                    identity = ret.userinfo.role;
+                    if (ret.ref != null) {
+//                        forwardId = ret.ref.id;
+                        forwardId = dynamicid;
+                        forwardContent = ret.content.replace(/(<\/?a.*?>)|(<\/?span.*?>)/g, "");
+                    } else {
+                        forwardId = dynamicid;
+                    }
+                    commentCount = ret.comment_count;
+                    praiseCount = ret.thumbup_count;
+                    forwardCount = ret.forword_count;
+                    $api.html($api.dom('.forward-count'), '转发(' + forwardCount + ')');
+                    $api.html($api.dom('.thumb'), '赞(' + praiseCount + ')');
+                    $api.html($api.dom('.comment-count'), '评论(' + commentCount + ')');
+                    if (ret.thumbup == true) {
+
+                        $api.addCls($api.dom('.aui-icon-appreciate'), 'praise');
+                        $api.addCls($api.dom('.thumb'), 'praise');
+                    }
+                    var header = document.querySelector('header');
+//                    $api.fixStatusBar(header);
+                    api.setStatusBarStyle({
+                        style: 'light'
+                    });
+                    var headerH = $api.offset(header).h;
+                    var footerH = $api.offset($api.dom('.aui-bar-tab1')).h;
+                    var frameH = padWinHeight - headerH - footerH;
+                    api.openFrame({
+                        name: 'frame-comment-content-original',
+                        url: 'frame-comment-content-original.html',
+                        rect: {
+                            x: 0,
+                            y: headerH,
+                            w: 'auto',
+                            h: frameH
+                        },
+                        bounces: false,
+                        pageParam: {
+                            dynamicid: dynamicid,
+                            data: $api.jsonToStr(ret),
+                            uid: myUid,
+                            isFollow: api.pageParam.isFollow
+                        }
+                    });
+                } else {
+                    //alert(ret.msg);
+                }
+
+            } else {
+
+            }
+        });
+
+
+    };
+
+    function transpond() {
+        if ($api.getStorage('studentSwitch') == 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能转发，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.toast({
+                    msg: '暂不允许进行转发，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            return;
+        }
+        api.openWin({
+            name: 'win-moments-forward',
+            url: 'win-moments-forward.html',
+            pageParam: {
+                id: forwardId,
+                content: forwardContent == '' ? forwardContent : ('@' + realname + '(' + school + ' ' + identity + '): ' + forwardContent)
+            }
+        });
+    }
+
+    function thumbUp() {
+        if ($api.hasCls($api.dom('.aui-icon-appreciate'), 'praise')) {
+            $api.removeCls($api.dom('.aui-icon-appreciate'), 'praise');
+            $api.removeCls($api.dom('.thumb'), 'praise');
+            praiseCount--;
+            apiObj.Delete(UrlRouter.PraiseDynamic + '?dynamicid=' + api.pageParam.id, null, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+
+                        $api.html($api.dom('.thumb'), '赞(' + praiseCount + ')');
+                    } else {
+                        //alert(ret.msg);
+                    }
+
+                } else {
+
+                }
+            });
+        } else {
+            $api.addCls($api.dom('.aui-icon-appreciate'), 'praise');
+            $api.addCls($api.dom('.thumb'), 'praise');
+            praiseCount++;
+            apiObj.Put(UrlRouter.PraiseDynamic, {
+                values: {
+                    dynamicid: api.pageParam.id
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+
+                        $api.html($api.dom('.thumb'), '赞(' + praiseCount + ')');
+
+                    } else {
+                        //alert(ret.msg);
+                    }
+
+                } else {
+
+                }
+            });
+        }
+
+    }
+
+    function comment() {
+        if ($api.getStorage('studentSwitch') == 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能评论，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.toast({
+                    msg: '暂不允许进行评论，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            return;
+        }
+        if (realname == undefined) {
+            realname = '';
+        }
+
+        api.openWin({
+            name: 'win-comment-send',
+            url: 'win-comment-send.html',
+            pageParam: {
+                id: forwardId,
+                realname: realname,
+//                realname: realname + ' (' + school + ' ' + identity + ')',
+                content: forwardContent,
+                commentName: realname
+            }
+        });
+    }
+
+    var _description;
+
+    function shareBtn() {
+        //在当前window中找到
+        //名为frmName的frame，并在该frame中执行jsfun脚本
+        var jsfun = 'getContent();';
+        api.execScript({
+            frameName: 'frame-comment-content-original',
+            script: jsfun
+        });
+    }
+
+    function getDescription(description) {
+        _description = unescape(description);
+        api.openFrame({
+            name: 'frame-share',
+            url: '../frame-share.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            pageParam: {url: urlPre + dynamicid, contentType: 'dynamic', description: _description},
+            bounces: false
+        });
+    }
+</script>
+</html>

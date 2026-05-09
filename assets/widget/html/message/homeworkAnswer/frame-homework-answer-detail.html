@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        .tip {
+            text-align: center;
+            height: 30px;
+            padding-top: 7px;
+        }
+
+        body {
+            background-color: #f2f2f2;
+            width: 80%;
+            margin-left: 10%;
+        }
+
+        .aui-card-list-user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            position: relative;
+        }
+
+        .float-button {
+            position: fixed;
+            height: 60px;
+            width: 60px;
+            bottom: 5%;
+            right: 0.75rem;
+            padding-top: 0.65rem;
+            text-align: center;
+            background: white;
+            border-radius: 60px;
+            border: 1px solid #f2f2f2;
+            box-shadow: 0px 0px 3px 1px #aaa;
+            font-size: 0.7rem;
+            color: #4BC7C7;;
+        }
+
+        .sex {
+            color: dodgerblue;
+            top: 28px;
+            position: absolute;
+            right: -2px;
+            text-align: right;
+            font-size: 1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .aui-card-list-user-info {
+            color: #999;
+        }
+
+        .unsex {
+            color: #e91e63;
+            top: 28px;
+            position: absolute;
+            right: -2px;
+            text-align: right;
+            font-size: 1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: white;
+            line-height: 0.8rem;
+            border-radius: 60%;
+        }
+
+        .aui-label {
+            padding: 0.1rem 0.25rem;
+            vertical-align: middle;
+            margin-bottom: 0.2rem;
+        }
+
+        .aui-card-list {
+            min-height: 5rem;
+            background-color: white;
+            /*padding: 20px;*/
+            margin-top: 10px;
+        }
+
+        .aui-card-list-user-avatar img {
+            height: 100%;
+            max-height: 100%;
+        }
+
+        .btn-voice {
+            width: 40%;
+        }
+
+        .reply {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.2rem 0;
+        }
+
+        .aui-grid .aui-grid-label {
+            margin-top: 0;
+        }
+
+        .aui-grid .aui-iconfont {
+            font-size: 0.7rem;
+        }
+
+        .img-size1 {
+            width: 80% !important;
+        }
+
+        .content-forward {
+            background-color: #f5f5f5;
+            /*margin: 15px;*/
+            padding-bottom: 20px;
+            padding-top: 15px;
+            margin: 0.7rem 0.7rem 0 0.7rem;
+        }
+
+        .forward-school {
+            color: #757575;
+        }
+
+        .aui-label-info {
+            background-color: #6b8fec;
+        }
+
+        .aui-card-list-content-padded .content-text img, .aui-card-list-content-padded .forward-content-text img {
+            width: inherit;
+            display: inline-block;
+        }
+
+        .forward-content-text {
+            padding: 0 5px 0 15px;
+        }
+
+        .children-time {
+            padding: 0.15rem 0;
+        }
+
+        /*名字过长会与右侧关注重合 8-15 朱震*/
+        .aui-text-primaryDiv {
+            padding-right: 90px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .content-info {
+            padding: 0 0.75rem 0.5rem 0.75rem;;
+        }
+
+        .comiis_wrapad img {
+            width: 15px;
+            float: left;
+            height: 21px
+        }
+
+        .username {
+            max-width: 6rem;
+            float: left;
+            display: block;
+        }
+
+        .aui-list:after {
+            height: 10px;
+        }
+
+        .title {
+            margin-top: 0.65rem;
+            margin-left: 0.7rem;
+            margin-bottom: 0.5rem;
+            /*display: none;*/
+        }
+
+        .second {
+            color: #4BC7C7;
+            margin-left: 15px;
+            float: right;
+            font-size: 0.6rem;
+        }
+
+        .aui-btn-primary {
+            width: 4rem;
+            border: 1px solid #4BC7C7 !important;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            height: 1.4rem;
+        }
+
+        .aui-btn-primary.aui-active, .aui-btn-primary:active {
+            background-color: #f9f9f9;
+        }
+
+        .mark {
+            float: left;
+            width: 6px;
+            height: 24px;
+            margin-right: 0.4rem;
+            background-color: #ffc73d;
+
+        }
+
+        .box li:not(:last-of-type) {
+            border-bottom: 1px solid #eeeeee;
+            /*margin-bottom: .5rem;*/
+            /*padding-bottom: .5rem;*/
+        }
+
+        .box {
+            margin: 0 0.7rem;
+            padding-bottom: .5rem;
+        }
+
+        .plcontent {
+            position: relative;
+            padding: 0 0.75rem 0 0.75rem;
+            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+        .aui-card-list-content-padded {
+            padding: 0 0.75rem 0 0.75rem;
+
+        }
+
+        .reply-text {
+            float: left;
+            display: block;
+        }
+        .deletewd{     font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 30px;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            right: 10px;
+            -webkit-font-smoothing: antialiased;
+            color: #fff;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            background:#ff0000;
+            border-radius: 0.7rem;
+            margin-right: 10px;
+            width:60px;
+            text-align:center;
+            z-index:10
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <section class="aui-refresh-content">
+
+        <div class="aui-content aui-card-list" :uid="dataList.pubuid">
+            <div class="aui-card-list-header aui-card-list-user">
+                <div class="deletewd"  @click="deleteAnswer('all')"> 删除</div>
+                <div class="aui-card-list-user-avatar" onclick="usermyInfoClick(this)">
+                    <img :src=" getFace(dataList.pub_userinfo)" class="aui-img-round"/>
+                </div>
+                <div class="aui-card-list-user-name aui-font-size-16" style="padding-top: 5px">
+                    <div class="aui-text-primary ">
+                    <span class="username aui-ellipsis-1" v-text="dataList.pub_userinfo.realname"
+                          onclick="usermyInfoClick(this)" v-if="hfpd==1"> 我是乔帮主</span>
+                        <span class="username aui-ellipsis-1" v-text="'我'"
+                              onclick="usermyInfoClick(this)" v-if="hfpd==0"> 我是乔帮主</span>
+                        <span
+                                class="aui-label aui-label-info aui-hide">v3</span>
+                    </div>
+                </div>
+                <small class="aui-card-list-user-info" v-text="dataList.pubtime">今天 14:45</small>
+            </div>
+            <div class="aui-card-list-content-padded">
+                <div class="content-text" v-text="dataList.content">
+                    今天，我上了一趟让我终身难忘的一堂课，这不仅仅是整个学校的改革，更是整个教育界的改革，我相信，在不就的将来，12xue将带领我们所有的老师迈入一个全新的跑到哦，我们要适应全新的开始，加油！！
+                </div>
+                <div class="content-voice aui-margin-t-10" v-if="dataList.audio_list!=null">
+                    <div class="btn-voice aui-btn aui-btn-primary " tapmode onclick="palyAudio(this)"
+                         :isPlaying="0" :url="dataList.audio_list.url">
+                        <div class="comiis_wrapad" id="slideContainer"><img
+                                src="../../../image/yuyin1.png"
+                        ></div>
+                        <span class="second" v-text="getSecond(dataList.audio_list.duration)">8"</span>
+                    </div>
+
+                </div>
+                <div class="content-img aui-padded-t-5" style="margin-top: 0.5rem" v-if="dataList.image_list.length!=0">
+                    <div class="img-size4 aui-row aui-row-padded">
+                        <ul>
+                            <li class="" style="position: relative;
+    float: left;margin-right: 16px;" v-for="(item,ind) in dataList.image_list" v-if="ind<3">
+                                <img style="height: 120px;width: 120px"
+                                     :src="item+'?imageMogr2/auto-orient/thumbnail/!65p'" alt=""
+                                     :imageArr='dataList.image_list' onclick="imgClick(this);" id="ind">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--getContentLength(dataList)-->
+            </div>
+            <div class="content-forward" v-if="dataList.resid!=0&&dataList.restype==2">
+                <div class="forward-content-text " tapmode onclick="getResdatial()">
+                    <div class="aui-text-primary " style="font-size: 0.7rem;" v-html="dataList.zymc">我:</div>
+                    <div style="color: #999999;font-size: 0.7rem;">
+                        <span class="" v-html="getTg(dataList)"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="content-forward" v-if="dataList.resid!=0&&moretype==0&&dataList.restype==1"
+                 @click="getMore(dataList)">
+                <div class="forward-content-text ">
+                    <div class="aui-text-primary " style="margin: 0.5rem;font-size: 0.7rem;" v-html="dataList.zymc">我:
+                    </div>
+                    <div style="margin: 0.5rem  15px;border-radius: 5px;font-size: 0.7rem;color: #999999; overflow: hidden;
+    text-overflow: ellipsis;">
+                        <!--<span v-text="dataList.zymc">  </span>-->
+                        <div class=""
+                             style="overflow: hidden;width: 100%;height:auto; "
+                             v-html="getTg(dataList)" v-if="!getContentLength(dataList)">
+                        </div>
+                        <div style="position: relative;width: 100%;height: 6rem;" v-if="getContentLength(dataList)">
+                            <span v-html="getTg(dataList)"></span>
+                            <div style="position:absolute;width: 100%;height: 4rem;background: -webkit-linear-gradient(to top, rgba(250,250,250,0), rgba(243,243,243,1));top: 2.2rem"></div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="getContentLength(dataList)">
+                    <img class="img-null" src="../../../image/zhankai.png"
+                         style="height:auto!important;width: 16%;margin-left: 42%"/>
+                </div>
+            </div>
+            <div class="content-forward " v-if="dataList.resid!=0&&moretype==1&&dataList.restype==1"
+                 @click="getLess(dataList)">
+                <div class="forward-content-text ">
+                    <div class="aui-text-primary " style="margin: 0.5rem;font-size: 0.7rem" v-html="dataList.zymc">我:
+                    </div>
+                    <div style="margin: 0.5rem  15px;border-radius: 5px;font-size: 0.7rem;color: #999999; overflow: hidden;
+    text-overflow: ellipsis;">
+                        <!--<span v-text="dataList.zymc">  </span>-->
+                        <!--<div class=""-->
+                        <!--style="overflow: hidden;width: 100%;height:auto; "-->
+                        <!--v-html="getTg(dataList)" >-->
+                        <!--</div>-->
+                        <div style="position: relative;width: 100%;height:auto;">
+                            <span v-html="getTg(dataList)"></span>
+                            <div style="position:absolute;display: none;width: 100%;height: 6rem;background: -webkit-linear-gradient(to top, rgba(250,250,250,0), rgba(243,243,243,1));top: 0"></div>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="getContentLength(dataList)">
+                    <img class="img-null" src="../../../image/shouqi.png"
+                         style="height:auto!important;width: 16%;margin-left: 42%"/>
+                </div>
+            </div>
+            <!--<div style="height: 10px;width: 100%;background-color: #dddddd"></div>-->
+            <div style="height: 10px;width: 100%;margin-top: 0.7rem;background-color: #eeeeee"></div>
+            <div class="title ">
+                <div class="mark"></div>
+                全部回复
+            </div>
+            <!--<div class="no-data" v-if="pllist.length==0">-->
+            <!--<img class="img-null" src="../../../image/noContent.png"-->
+            <!--style="height:auto!important;width: 10%;margin-top: 3rem;margin-bottom: 3rem ;margin-left: 45%"/>-->
+            <!--</div>-->
+            <div class="no-data" v-if="pllist.length==0">
+                <img class="img-null" src="../../../image/noReplyContent.png"
+                     style="height:auto!important;width: 12%;margin-top: 3rem;margin-bottom: 3rem ;margin-left: 44%"/>
+            </div>
+            <ul class="box" v-if="pllist.length!=0">
+                <li v-for="info in pllist">
+                    <div class="aui-card-list-content-padded  plcontent" :uid="info.reply_uid">
+                        <div class=" ">
+                            <div class="deletewd"  @click="deleteAnswer(info.id)" v-if="stuid==info.reply_uid"> 删除</div>
+                            <div class="aui-card-list-user-avatar" onclick="userInfoClick(this)">
+                                <img :src="getFace(info.reply_userinfo)" class="aui-img-round"/>
+                            </div>
+                            <div class="aui-card-list-user-name aui-font-size-16" style="padding-top: 5px">
+                                <div class="aui-text-primary ">
+                                <span class="username aui-ellipsis-1" v-text="info.reply_userinfo.realname"
+                                      onclick="userInfoClick(this)"
+                                      v-if="!getIfMe(info.reply_uid)"> 我是乔帮主</span>
+                                    <span class="username aui-ellipsis-1" v-text="'我'"
+                                          onclick="userInfoClick(this)"
+                                          v-if="getIfMe(info.reply_uid)"> 我是乔帮主</span>
+                                </div>
+                            </div>
+                            <small class="aui-card-list-user-info" v-text="info.createtime">今天 14:45</small>
+                        </div>
+                        <div style="margin-left: 2.75rem ;margin-top: 10px;">
+                            <div class="aui-card-list-user-name aui-font-size-14">
+                                <div class="" style="padding-top: 10px">
+                                    <span class="aui-text-default">回复</span>
+                                    <span class="aui-text-primary" v-text="'我：'"
+                                          v-if="!getIfMe(info.reply_uid)"> 我是乔帮主</span>
+                                    <span class="aui-text-primary"
+                                          v-text="meReply(dataList)"
+                                          v-if="getIfMe(info.reply_uid)"> 我是乔帮主</span>
+                                    <span class="" style="" v-if="info.resid!=0&&getIfMe(info.reply_uid)"
+                                          v-text="info.content"> </span>
+                                    <span class="" style="" v-if="info.resid!=0&&!getIfMe(info.reply_uid)"
+                                          v-text="info.content"></span>
+                                </div>
+                            </div>
+                            <div class="content-voice aui-margin-t-10" v-if="info.audio_list!=null">
+                                <div class="btn-voice aui-btn aui-btn-primary " tapmode onclick="palyAudio(this)"
+                                     :isPlaying="0" :url="info.audio_list.url">
+                                    <div class="comiis_wrapad"><img
+                                            src="../../../image/yuyin1.png"
+                                    ></div>
+                                    <span class="second" v-text="getSecond(info.audio_list.duration)">8"</span>
+                                </div>
+                            </div>
+                            <div class="content-img aui-padded-t-5" style="margin-top: 0.5rem ;margin-bottom: 10px">
+                                <div class="img-size4 aui-row aui-row-padded">
+                                    <ul>
+                                        <li class="" style="   position: relative;
+    float: left;margin-right: 16px;border-bottom:0px solid #fff" v-for="(item,index) in info.image_list" v-if="index<3">
+                                            <img style="height: 110px;width: 110px"
+                                                 :src="item+'?imageMogr2/auto-orient/thumbnail/!65p'"
+                                                 alt="" :imageArr='info.image_list' onclick="imgClick(this);"
+                                                 id="index">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+    <div class="float-button" onclick="replyClick()" v-if="pllist.length!=0">回复</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var pullRefresh;
+    var vm;
+    var contentlist = [];
+    var uncontentlist = [];
+    var apiObj;
+    var classid = new Array();
+    var xkid = new Array();
+    var xkmc = new Array();
+    var uid;
+    var url;
+    var allRecordArr = [];
+    var moduleDialog = null;//弹窗模块bhzparam
+    apiready = function () {
+        moduleDialog = api.require('moduleDialog');
+        dismissDialog();//关模块
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        uid = $api.getStorage('uid');
+        // alert(JSON.stringify(api.pageParam.item))
+        api.addEventListener({
+            name: 'finishReply'
+        }, function (ret, err) {
+//            alert(JSON.stringify(ret.value))
+            allRecordArr = allRecordArr.concat(ret.value.arrays);
+            vm.pllist = allRecordArr;
+        });
+        vm = new Vue({
+            el: '.content',
+            data: {
+                dataList: api.pageParam.item,
+                time: '',
+                contentlist: '',
+                uncontentlist: [],
+                pllist: api.pageParam.item.children,
+                moretype: '0',
+                hfpd: api.pageParam.hfpd,//回复人的判断标志
+                stuid:$api.getStorage('uid'),
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>确定删除该条内容？</font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "确定",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "取消",
+                        "textSize": 14
+                    }]
+                },
+            },
+            methods: {
+                deleteAnswer:function(type){
+                    // var event = event || window.event;
+                    // event.stopPropagation();
+                    // alert(type)
+                    moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                        if (ret.state == 'success' && ret.clickID) {
+                            if (ret.clickID == 'ok') {
+                                if(type=='all'){
+                                    vm.PostFaqDelfaq(vm.dataList.id,type)
+                                }else{
+                                    vm.PostFaqDelfaq(type,'dt')
+                                }
+                                dismissDialog();
+                            } else {
+                                dismissDialog();
+                            }
+                        } else {
+
+                        }
+                    });
+
+
+                },
+                PostFaqDelfaq:function(id,type){
+                    api.showProgress({
+                        title: '正在删除',
+                        text: '请稍后',
+                        modal: true
+                    });
+                    var value={};
+                    if(type=='all'){
+                        value={question_id:id}
+                    }else{
+                        value={question_id:vm.dataList.id,reply_id:id}
+                    }
+                    apiObj.Header({'Content-Type': 'application/x-www-form-urlencoded'}).Post(UrlRouter.PostFaqDelfaq, {
+                        values: value
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+
+                                if(type=='all'){
+                                    api.sendEvent({
+                                        name: 'shuaxinanswer'
+                                    });
+                                    api.closeWin();
+                                }else{
+                                    api.sendEvent({
+                                        name: 'shuaxinanswer'
+                                    });
+                                    for(var i=0;i<vm.pllist.length;i++){
+                                        if(vm.pllist[i].id==id){
+                                            vm.pllist.splice(i,1);
+                                        }
+                                    }
+                                    api.toast({
+                                        msg: '删除成功！',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+
+                            }else{
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        }else{
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    })
+                },
+                getQuestionList: function (item) {
+//                    vm.hfpd = api.pageParam.hfpd;
+//                    vm.dataList = api.pageParam.item;
+//                    vm.pllist = api.pageParam.item.children;
+                    allRecordArr = api.pageParam.item.children;
+                }, getContentList: function (item) {
+                    contentlist = [];
+                    if (item.children.length > 0) {
+                        contentlist.push(item);
+                        for (var i = item.children.length - 1; i >= 0; i--) {
+                            if (item.children[i].reply_uid == item.children[item.children.length - 1].reply_uid) {
+                                contentlist.push(item.children[i]);
+                            }
+                        }
+                    } else {
+                        contentlist.push(item);
+                    }
+                    return contentlist;
+                }, getSecond: function (item) {
+
+                    return item + '″';
+                }, getMore: function (item) {
+
+                    vm.moretype = 1
+                }, meReply: function (item) {
+//                    dataList.children[dataList.children.length - 1].reply_userinfo.realname+'：'
+                    var name;
+                    for(var i=0;item.children.length;i++){
+                        if( item.children[i].reply_userinfo.realname!=item.pub_userinfo.realname){
+                            name= item.children[i].reply_userinfo.realname+'：';
+                            break;
+                        }
+                    }
+                    return name;
+
+                }, getLess: function (item) {
+                    var nrlength = item.restitle.split("");
+                    if (nrlength.length > 150) {
+                        vm.moretype = 0
+                    }
+
+                }, getUnContentList: function (item) {
+                    uncontentlist = [];
+                    if (item.children.length > 0) {
+                        for (var i = item.children.length - 1; i >= 0; i--) {
+                            if (item.children[i].reply_uid != item.children[item.children.length - 1].reply_uid) {
+                                uncontentlist.push(item.children[i]);
+                                break;
+                            }
+                        }
+
+                    } else {
+                        uncontentlist = [];
+                    }
+                    return uncontentlist;
+                }, getIfMe: function (item) {
+                    if (item == uid) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                }, getContentLength: function (item) {
+                    var nrlength = item.restitle.split("");
+                    if (nrlength.length > 150) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                }, getTg: function (item) {
+                    var string = item.restitle;
+                    //替换string里的<br>、<br/>标签
+                    string = string.replace(new RegExp("<img", "gm"), "<img style=\" width:auto;\n" +
+                        " height:auto;\n" +
+                        " max-width:100%;\n" +
+                        " max-height:100%;\"");
+
+                    return item.resdescript + string;
+                },
+                getFace: function (item) {
+                    return item.face + '?imageMogr2/auto-orient/thumbnail/!65p';
+                }
+
+            }
+        });
+        vm.getQuestionList();
+    }
+
+    function choose(type) {
+        switch (type) {
+            case 'is-request':
+                openFrame(['待回答', '已回答'], '', 'type-request');
+                break;
+            case 'subject':
+                openFrame(xkmc, xkid, 'type-subject');
+                break;
+
+        }
+    }
+
+    function replyClick(context) {
+        api.openWin({
+            name: 'win-homework-answer-reply',
+            url: 'win-homework-answer-reply.html',
+            pageParam: {id: api.pageParam.item.id, parent: 0}
+        });
+    }
+
+    function openFrame(xkmc, xkid, item) {
+        api.openFrame({
+            name: 'frame-tab',
+            url: 'frame-tab.html',
+            rect: {
+                x: 0,
+                y: api.pageParam.y + $api.offset($api.dom('.head')).h,
+                w: 'auto',
+                h: api.pageParam.h - $api.offset($api.dom('.head')).h
+            },
+            pageParam: {array: xkmc, arrayId: xkid, item: item, frameName: api.frameName},
+            bounces: false,
+            reload: true
+        });
+    }
+
+    function momentDetail(context) {
+        api.openWin({
+            name: 'win-comment-content-original',
+            url: 'win-comment-content-original.html',
+            pageParam: {
+                id: context.id,
+                isFollow: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-follow'), 'aui-btn-outlined'),
+                isAppreciate: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-appreciate'), 'thumb-red')
+            }
+        });
+    }
+
+    function getResdatial() {
+        if (api.pageParam.item.resid != 0) {
+            if (api.pageParam.item.restype == 2) {
+                apiObj.Get(UrlRouter.GetMaterialInfo, {
+                    values: {
+                        id: api.pageParam.item.resid
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            if (ret.type == 'doc') {
+                                url = ret.serverpath + ret.rootpath;
+                                api.showProgress({
+                                    style: 'default',
+                                    animationType: 'fade',
+                                    title: '提示',
+                                    text: '正在下载素材',
+                                    modal: true
+                                });
+                                var str = api.pageParam.item.restitle + api.pageParam.item.zyid;
+                                str = str.replace(/#/, '');
+                                api.download({
+                                    url: url,
+                                    savePath: 'fs://pdfDownload/' + str + '.pdf',
+                                    report: false,
+                                    cache: true,
+                                    allowResume: true
+                                }, function (ret, err) {
+                                    api.hideProgress();
+                                    if (ret.state == 1) {
+                                        if (api.systemType == 'ios') {
+                                            var docReader = api.require('docReader');
+                                            docReader.open({
+                                                path: ret.savePath
+                                            }, function (ret, err) {
+                                            });
+                                        } else {
+
+                                            api.openWin({
+                                                name: 'win_pdf_view',
+                                                url: '../../win_pdf_view.html',
+                                                pageParam: {
+                                                    path: ret.savePath
+                                                }
+                                            });
+
+                                        }
+
+                                    } else {
+                                        //提示文档打开失败
+                                        api.toast({
+                                            msg: '文档下载失败，请检查网络，稍后再试！',
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                    }
+                                });
+                            } else if (ret.type == 'video') {
+                                var videoData = ret;
+                                var isMp3 = getFileType(videoData.filetype);
+
+                                api.openWin({
+                                    name: 'win_video_view',
+                                    url: '../../win_video_view.html',
+                                    pageParam: {
+                                        path: videoData.serverpath + videoData.preview_link,
+                                        title: videoData.title,
+                                        isMp3: isMp3,
+                                        filetime: videoData.filetime
+                                    }
+                                });
+                                api.addEventListener({
+                                    name: 'backVideo'
+                                }, function (ret, err) {
+                                    api.closeToWin({
+                                        name: 'win-stu-main'
+                                    });
+                                });
+
+                            } else if (ret.type == 'photo') {
+                                var uri = ret.serverpath + ret.rootpath;
+                                var imageScr = [];
+                                imageScr.push(uri);
+                                var frameItem = [];
+                                for (var i = 0; i < imageScr.length; i++) {
+                                    var frame = {
+                                        name: 'frame' + i,
+                                        url: 'frame-image-browser.html',
+                                        pageParam: {img: imageScr[i]},
+                                        bounces: false
+                                    };
+                                    frameItem.push(frame);
+                                }
+                                api.openFrameGroup({
+                                    name: 'imageBrowser',
+                                    rect: {
+                                        x: 0,
+                                        y: 0,
+                                        w: 'auto',
+                                        h: 'auto'
+                                    },
+                                    index: 0,
+                                    frames: frameItem
+                                }, function (ret, err) {
+
+                                });
+                            } else if (ret.type == 'swf') {
+                                api.toast({
+                                    msg: 'swf资源暂不支持在移动端播放!',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            }
+        }
+    }
+
+    function getFileType(fileType) {
+        if (fileType == '.mp3' || fileType == '.wma') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function commentClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        if ($api.getStorage('teacherSwitch') == 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能评论动态，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.toast({
+                    msg: '暂不允许进行评论，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        } else {
+
+            api.openWin({
+                name: 'win-comment-content-original',
+                url: 'win-comment-content-original.html',
+                pageParam: {
+                    id: $api.closest(context, '.aui-card-list').id,
+                    isFollow: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-follow'), 'aui-btn-outlined'),
+                    isAppreciate: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-appreciate'), 'thumb-red')
+                }
+            });
+        }
+    }
+
+    function transpondMoment(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        if ($api.getStorage('teacherSwitch') == 1) {
+            if ($api.getStorage("haveclass") == 0) {
+                api.toast({
+                    msg: '您目前还不能转发动态，请等待班级老师的审核',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.toast({
+                    msg: '暂不允许进行转发，还是老老实实回去学习吧',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        } else {
+
+            var id;
+            var content;
+            if ($api.dom($api.dom($api.closest(context, '.aui-card-list'), '.content-forward'), '.aui-card-list-content-padded') == null) {
+                id = $api.closest(context, '.aui-card-list').id;
+                content = '';
+            } else {
+                id = $api.dom($api.dom($api.closest(context, '.aui-card-list'), '.content-forward'), '.aui-card-list-content-padded').id;
+                content = '@' + $api.text($api.dom($api.closest(context, '.aui-card-list'), '.username')) + ' （' + $api.text($api.dom($api.closest(context, '.aui-card-list'), '.aui-text-default')) + '） ' + $api.text($api.dom($api.closest(context, '.aui-card-list'), '.content-text'));
+            }
+            api.openWin({
+                name: 'win-moments-forward',
+                url: 'win-moments-forward.html',
+                pageParam: {
+                    id: id,
+                    content: content
+                }
+            });
+        }
+    }
+
+    function resourceClick(context, type) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        switch (type) {
+            case 'course':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        id: $api.attr(context, 'resId'),
+                        type: 'course',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+                                name: 'win_course_list_detail',
+                                url: 'resource/win_course_list_detail.html',
+                                pageParam: {
+                                    kcid: $api.attr(context, 'resId'),
+                                    title: $api.text(context),
+                                    uid: $api.attr(context, 'uid')
+
+                                }
+                            });
+                        } else {
+                            alert(ret.msg);
+                        }
+                    } else {
+                        alert(err.msg);
+                    }
+                });
+                break;
+            case 'homework':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        // id: '100314667363219562'
+                        id: $api.attr(context, 'resId'),
+                        type: 'homework',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+                                name: 'win_hw_detail_list',
+                                url: 'resource/win_hw_detail_list.html',
+                                pageParam: {
+                                    classId: $api.attr(context, 'resId'),
+                                    homeworkName: $api.text(context),
+                                    uid: $api.attr(context, 'uid')
+
+                                }
+                            });
+                        } else {
+                            alert(ret.msg);
+                        }
+                    } else {
+                        alert(err.msg);
+                    }
+                });
+
+                break;
+            case 'material':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        id: $api.attr(context, 'resId'),
+                        type: 'material',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+                                name: 'win_resource_detail',
+                                url: 'resource/win_resource_detail.html',
+                                pageParam: {
+                                    resId: $api.attr(context, 'resId'),
+                                    homeworkName: $api.text(context),
+                                    type: 'material',
+                                    uid: $api.attr(context, 'uid')
+
+                                }
+                            });
+                        } else {
+                            alert(ret.msg);
+                        }
+                    } else {
+                        alert(err.msg);
+                    }
+                });
+
+                break;
+            case 'exercise':
+                apiObj.Get(UrlRouter.GetResourceInfo, {
+                    values: {
+                        id: $api.attr(context, 'resId'),
+                        type: 'exercise',
+                        detail: 1
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.openWin({
+                                name: 'win_resource_detail',
+                                url: 'resource/win_resource_detail.html',
+                                pageParam: {
+                                    resId: $api.attr(context, 'resId'),
+                                    homeworkName: $api.html(context),
+                                    type: 'exercise',
+                                    uid: $api.attr(context, 'uid')
+
+                                }
+                            });
+                        } else {
+                            alert(ret.msg);
+                        }
+                    } else {
+                        alert(err.msg);
+                    }
+                });
+                break;
+        }
+    }
+
+    function btnFollow(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        var uid = $api.attr($api.closest(context, '.aui-card-list'), 'uid');
+        if ($api.hasCls(context, 'aui-btn-outlined')) {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 0,
+                    followuid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.removeCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '<span class="aui-iconfont aui-icon-add"></span>关注');
+                            }
+                        }
+                    } else {
+                        alert(ret.msg);
+                    }
+                } else {
+                    alert(err.msg);
+                }
+            });
+        } else {
+            apiObj.Put(UrlRouter.FollowUser, {
+                values: {
+                    type: 1,
+                    followuid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        for (var i = 0; i < $api.domAll('.aui-card-list').length; i++) {
+                            if (uid == $api.attr(($api.domAll('.aui-card-list')[i]), 'uid')) {
+                                $api.addCls($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), 'aui-btn-outlined');
+                                $api.html($api.dom($api.domAll('.aui-card-list')[i], '.btn-follow'), '取消关注');
+                            }
+                        }
+                    } else {
+                        alert(ret.msg);
+                    }
+                } else {
+                    alert(err.msg);
+                }
+            })
+        }
+    }
+
+    function appreciate(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        if ($api.hasCls(context, 'thumb-red')) {
+            apiObj.Delete(UrlRouter.PraiseDynamic + '?dynamicid=' + $api.closest(context, '.aui-card-list').id, null, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        $api.removeCls(context, 'thumb-red');
+                        $api.text($api.dom(context, '.appreciate'), parseInt($api.text($api.dom(context, '.appreciate'))) - 1);
+                    } else {
+                        alert(ret.msg);
+                    }
+                } else {
+                    alert(err.msg);
+                }
+            })
+        } else {
+            apiObj.Put(UrlRouter.PraiseDynamic, {
+                values: {
+                    dynamicid: $api.closest(context, '.aui-card-list').id
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        $api.addCls(context, 'thumb-red');
+                        $api.text($api.dom(context, '.appreciate'), parseInt($api.text($api.dom(context, '.appreciate'))) + 1);
+                    } else {
+                        alert(ret.msg);
+                    }
+                } else {
+                    alert(err.msg);
+                }
+            })
+        }
+    }
+
+    function delMoment(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.confirm({
+            title: '提示',
+            msg: '确认删除该动态？',
+            buttons: ['确定', '取消']
+        }, function (ret, err) {
+            if (ret.buttonIndex == 1) {
+                apiObj.Delete(UrlRouter.DelDynamic + '?dynamicid=' + $api.closest(context, '.aui-card-list').id, null, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            $api.remove($api.closest(context, '.aui-card-list'));
+                        } else {
+                            alert(ret.msg);
+                        }
+                    } else {
+                        alert(err.msg);
+                    }
+                });
+            }
+        });
+    }
+
+    function transpondContent(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'win-comment-content-original',
+            url: 'win-comment-content-original.html',
+            pageParam: {
+                id: $api.dom(context, '.aui-card-list-content-padded').id,
+                isFollow: $api.cssVal($api.dom($api.closest(context, '.aui-card-list'), '.btn-follow'), 'display') == 'none',
+                isAppreciate: $api.hasCls($api.dom($api.closest(context, '.aui-card-list'), '.btn-appreciate'), 'thumb-red')
+            }
+        });
+    }
+
+    function usermyInfoClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'friendMainPage',
+            url: '../../mine/selfmainview/friendMainPage.html',
+            pageParam: {
+                otheruid: $api.attr($api.closest(context, '.aui-card-list'), 'uid')
+            }
+        });
+    }
+
+    //查看个人主页
+    function userInfoClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        api.openWin({
+            name: 'friendMainPage',
+            url: '../../mine/selfmainview/friendMainPage.html',
+            pageParam: {
+                otheruid: $api.attr($api.closest(context, '.plcontent'), 'uid')
+            }
+        });
+    }
+
+
+    //    function replyClick(context) {
+    //        api.openWin({
+    //            name: 'win-homework-answer-reply',
+    //            url: 'win-homework-answer-reply.html',
+    //            pageParam: {id: context.id, parent: $api.attr(context, 'parent')}
+    //        });
+    //    }
+
+    function palyAudio(context) {
+        var isPlaying = $api.attr(context, 'isPlaying');
+        var url = $api.attr(context, 'url');
+        if (isPlaying == "1") {
+            if (isDownloading) {
+                api.cancelDownload({
+                    url: url
+                });
+                return;
+            } else {
+                api.stopPlay();
+                $(context).find('.comiis_wrapad').html('<img src="../../../image/yuyin1.png" width="15px">')
+                $api.attr(context, 'isPlaying', "0");
+            }
+        } else {
+            downloadAudio(url, context);
+        }
+    }
+
+    // 每次都要重新下载  欠优化
+    function downloadAudio(url, context) {
+        isDownloading = true;
+        var audioName = url.substring(url.lastIndexOf("/"));
+        var path = "/audio/" + audioName + ".amr";
+        api.download({
+            url: url,
+            savePath: 'fs:/' + path,
+            report: false,
+            cache: true,
+            allowResume: false
+        }, function (ret, err) {
+            if (ret && ret.state == 1) {
+                // 下载成功  ret.savePath
+                isDownloading = false;
+                api.startPlay({
+                    path: api.fsDir + path
+                }, function (ret, err) {
+                    if (ret) {
+                        $api.attr(context, 'isPlaying', "0");
+                        $(context).find('.comiis_wrapad').html('<img src="../../../image/yuyin1.png" width="15px">')
+                    }
+                });
+                $api.attr(context, 'isPlaying', "1");
+                $(context).find('.comiis_wrapad').html('<img src="../../../image/yuyin2.gif" width="15px" >')
+            }
+        });
+    }
+
+    //    //点击图片
+    //    function imgClick(context) {
+    //        var imageScr = $api.attr(context, 'imageArr').split(",");
+    //
+    //        var photoBrowser = api.require('photoBrowser');
+    //        photoBrowser.open({
+    //            images: imageScr,
+    //            placeholderImg: 'widget://image/loading_more.gif',
+    //            bgColor: '#000',
+    //            activeIndex: context.id
+    //        }, function (ret, err) {
+    //            if (ret.eventType == 'click') {
+    //                photoBrowser.close();
+    //            }
+    //        });
+    //    }
+    //点击图片
+    function imgClick(context) {
+        window.event ? window.event.cancelBubble = true : context.stopPropagation();
+        var imageScr = $api.attr(context, 'imageArr').split(",");
+        var frameItem = [];
+        for (var i = 0; i < imageScr.length; i++) {
+            var frame = {
+                name: 'frame' + i,
+                url: 'frame-image-browser.html',
+                pageParam: {img: imageScr[i]},
+                bounces: false
+            };
+            frameItem.push(frame);
+        }
+        api.openFrameGroup({
+            name: 'imageBrowser',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            index: context.id,
+            frames: frameItem
+        }, function (ret, err) {
+
+        });
+    }
+    function dismissDialog() {
+        moduleDialog.dismissDialog();
+    }
+</script>
+</html>

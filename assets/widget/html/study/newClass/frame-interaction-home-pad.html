@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>课堂</title>
+    <style>
+        html{
+            width: 100%;
+            height: 100%;
+        }
+        body{
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: grid; grid-template-rows: auto auto; width: 100%; height: 100%; align-items: center; justify-items: center; padding: 6.5vh 26vw; box-sizing: border-box;">
+        <div class="classname" style="color: #333333; font-size: 2vw;">未加入任何老师课堂</div>
+        <div style="width: 100%; margin-top: 5.8vh;">
+            <div style="position: relative;display: grid; grid-template-rows: repeat(2,1fr); grid-template-columns: repeat(2,1fr); width: 100%; gap: 3.3vh 2vw;">
+                <div tapmode onclick="clickXsdt()" style="display: flex; flex-direction: column;align-items: center; justify-content: center; background: #10D1B4; border-radius: 0.3125vw; height: 23vh;">
+                    <img src="../../../image/stuHomePad/ketang01.png" style="width: 7.9vw;" alt="限时答题">
+                    <div style="margin-top: 2.9vh; font-weight: bold; font-size: 2vw; color: white;">限时答题</div>
+                </div>
+                <div tapmode onclick="clickQd()" style="display: flex; flex-direction: column;align-items: center;justify-content: center; background: #01A0D4; border-radius: 0.3125vw; height: 23vh;">
+                    <img src="../../../image/stuHomePad/ketang02.png" style="width: 7.9vw;" alt="抢答">
+                    <div style="margin-top: 2.9vh; font-weight: bold; font-size: 2vw; color: white;">抢答</div>
+                </div>
+                <div tapmode onclick="clickFzjx()" style="display: flex; flex-direction: column;align-items: center;justify-content: center; background: #F09E00; border-radius: 0.3125vw; height: 23vh;">
+                    <img src="../../../image/stuHomePad/ketang03.png" style="width: 7.9vw;" alt="分组学习">
+                    <div style="margin-top: 2.9vh; font-weight: bold; font-size: 2vw; color: white;">分组学习</div>
+                </div>
+                <div tapmode onclick="clickXxzl()" style="display: flex; flex-direction: column;align-items: center;justify-content: center; background: #8B70FF; border-radius: 0.3125vw; height: 23vh;">
+                    <img src="../../../image/stuHomePad/ketang04.png" style="width: 7.9vw;" alt="课堂资料">
+                    <div style="margin-top: 2.9vh; font-weight: bold; font-size: 2vw; color: white;">课堂资料</div>
+                </div>
+                <img tapmode onclick="scanner()" src="../../../image/scanner/scannerclass.png" style="position: absolute; width: 9.375vw; left: 50%; top: 50%; transform: translate(-50%,-50%);" alt="扫一扫">
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2,1fr); width: 100%; gap: 0 2vw; margin-top: 3.3vh;">
+                <img onclick="openAiCompanionLearning()" src="../../../image/study/newClass/cxxc_17.png" style="width: 100%; height: auto;" alt="AI伴学">
+                <img onclick="openHomework()" src="../../../image/study/newClass/cxxc_19.png" style="width: 100%; height: auto;" alt="作业">
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vclass.js"></script>
+<script type="text/javascript">
+
+    var classid; //选择的班级id
+    var uid;
+    var tuid; //老师uid
+    var ip;
+    var teachername;
+    var connectSuccess; // 连接课堂成功
+    var ClassApiObj, ClassApiObjForCloud;
+    var connectType;
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        ip = '';
+        teachername = '';
+        classid = '';
+        uid = $api.getStorage('uid');
+        connectSuccess = false;
+        $api.setStorage('connectSuccess', '1');
+        openClass();//打开班级列表
+
+        //选择班级
+        api.addEventListener({
+            name: 'chooseClassRoom'
+        }, function (ret, err) {
+            classid = ret.value.classid;
+            ip = '';
+            teachername = ret.value.teachername;
+            tuid = ret.value.tuid;
+            ConnectClass();
+        });
+
+        api.addEventListener({ //扫码视频，解锁后回调
+            name: 'shuaxin-class'
+        }, function (ret, err) {
+            GetPracticeMicroclassinfo(hwid, videoData.sxcid, 'jiesuo');
+        });
+
+    };
+
+
+    /**
+     * 课堂连接
+     */
+    function ConnectClass() {
+
+        switch (api.connectionType.toLowerCase()) {
+            case 'wifi':
+                connectSuccess = false;
+                $api.setStorage('connectSuccess', '1');
+                connectByLan();
+
+                //            api.confirm({
+                //                title: '提示',
+                //                msg: '请选择连接方式',
+                //                buttons: ["云端课堂", "局域网课堂"]
+                //            }, function (ret, err) {
+                //                connectSuccess = false;
+                //                $api.setStorage('connectSuccess', '1');
+                //                if (ret.buttonIndex == 1) {
+                //                    connectByCloud();
+                //                } else if (ret.buttonIndex == 2) {
+                //                    connectByLan();
+                //                }
+                //            });
+
+                break;
+            case '2g':
+            case '3g':
+            case '4g':
+                connectSuccess = false;
+                $api.setStorage('connectSuccess', '1');
+                connectByCloud();
+                break;
+            case '5g':
+                connectSuccess = false;
+                $api.setStorage('connectSuccess', '1');
+                connectByCloud();
+                break;
+            default:
+                //提示并退出
+                api.toast({
+                    msg: '网络连接错误，请检查网络',
+                    duration: 1500,
+                    location: 'bottom'
+                });
+                setTimeout(function () {
+                    api.closeWin();
+                }, 1500);
+                break;
+
+        }
+    }
+
+    function connectByLan() {
+        api.showProgress({
+            title: '正在连接局域网课堂',
+            text: '请稍后...',
+            modal: false
+        });
+        api.ajax({
+            url: UrlDomain + UrlRouter.GetStuLesson,
+            method: 'get',
+            timeout: 10,
+            dataType: 'json',
+            cache: false,
+            returnAll: false,
+            data: {
+                values: {
+                    uid: uid,
+                    classid: classid
+                }
+            },
+            headers: {
+                Token: $api.getStorage('token'),
+                Source: source,
+                Version: version
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    ip = ret.ip;
+                    if (ip == '') {
+                        api.hideProgress();
+                        api.toast({
+                            msg: '老师未开启课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    } else {
+                        ips = ip.split('|');
+                        //                        ips = '192.168.183.1:45518|192.168.106.1:45518|169.254.72.149:45518|172.16.42.250:45518'.split('|');
+                        ipIndx = 0;
+                        checkIpList(ipIndx); //检测IP地址
+                    }
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: '老师未开启课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.hideProgress();
+                api.confirm({
+                    title: '局域网课堂连接失败',
+                    msg: '请检查网络后重新选择连接方式',
+                    buttons: ["云端课堂", "局域网课堂"]
+                }, function (ret, err) {
+                    connectSuccess = false;
+                    $api.setStorage('connectSuccess', '1');
+                    if (ret.buttonIndex == 1) {
+                        connectByCloud();
+                    } else if (ret.buttonIndex == 2) {
+                        connectByLan();
+                    }
+                });
+                // api.toast({
+                //     msg: '网络请求失败',
+                //     duration: 2000,
+                //     location: 'bottom'
+                // });
+            }
+        });
+    }
+
+
+
+    var ips = [];//ip数组
+    var ipIndx;//当前的ip下标
+    function checkIpList(i) {
+        var temIp = ips[i];
+        var url = 'http://' + temIp + "/tchinfo?classid=" + classid;
+        api.ajax({
+            url: url,
+            method: 'get',
+            cache: false,
+            timeout: 5,//设置5秒超时
+            dataType: 'json',
+            returnAll: false
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.status == '1') {
+
+                    api.toast({
+                        msg: '已加入局域网课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+
+                    api.hideProgress();
+                    teachername = ret.tch_info[0].name;
+                    $api.setStorage('classTN', teachername);
+                    $api.setStorage('classid', classid);
+                    $api.text($api.dom('.classname'), $api.getStorage('realname') + '已加入' + teachername + '老师的课堂');
+                    ip = temIp;
+                    $api.setStorage('ip', ip);
+                    connectSuccess = true;
+                    $api.setStorage('connectSuccess', '0');//连接课堂成功
+                    ClassApiObj = new GridOpenApi('http://' + ip, source, version);
+                    $api.setStorage('inClass', '1'); //已经进入课堂
+                    api.sendEvent({
+                        name: 'setIp'
+                    });
+                    connectType = 'Lan';
+                    $api.setStorage('connectType', 'Lan');
+                    setEnterClassMsg();
+
+                } else {
+                    if (ipIndx == ips.length - 1) {
+                        checkCloud();
+                    } else {
+                        ipIndx++;
+                        checkIpList(ipIndx)
+                    }
+                }
+            } else {
+                if (ipIndx == ips.length - 1) {
+                    checkCloud();
+                } else {
+                    ipIndx++;
+                    checkIpList(ipIndx)
+                }
+            }
+        });
+    }
+
+
+    //点击限时答题
+    function clickXsdt() {
+        if (connectSuccess) {
+            if (connectType == 'Lan') {
+                ClassApiObj.Get(UrlRouter.GetCmdToPc, {
+                    values: {
+                        cmdname: 'dtstate',
+                        classid: classid
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        ProcessRet1(ret);
+                    } else {
+                        api.toast({
+                            msg: '请重新连接老师课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+
+            } else {
+                api.addEventListener({
+                    name: 'ReceiveMessage_2'
+                }, function (ret, err) {
+                    ProcessRet1(ret.value.receive);
+                });
+                ClassApiObjForCloud.Get(UrlRouter.GetCmdToPc, {
+                    values: {
+                        cmdname: 'dtstate',
+                        classid: classid,
+                        from: 'ReceiveMessage_2',
+                        uid: uid,
+                        vclass_token: $api.getStorage('vclass_token'),
+                        private_token: $api.getStorage('private_token')
+                    }
+                }, function (ret, err) {
+                    if (ret && ret.status == 1) {
+                    } else {
+                        api.toast({
+                            msg: '请重新连接老师课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+
+                });
+            }
+
+        } else {
+            openClass();
+        }
+    }
+
+    //检查限时答题按钮状态
+    function ProcessRet1(ret) {
+        if (ret) {
+            switch (ret.status) {
+                case '-2':
+                    api.toast({
+                        msg: '你不是当前班的学生',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '1':
+                    //请求题目内容
+                    getXiList();
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    break;
+
+                case '-1':
+                    api.toast({
+                        msg: '答题未开始',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '0':
+                    api.toast({
+                        msg: '答题未开始',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '2':
+                    api.toast({
+                        msg: '答题未开始',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+
+                case '3':
+                    api.toast({
+                        msg: '习题组为空',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                default:
+                    api.toast({
+                        msg: '获取习题信息失败！',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+            }
+        } else {
+            api.toast({
+                msg: '请重新连接老师课堂',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+    //请求题目内容
+    function getXiList() {
+
+        if (connectType == 'Lan') {
+            ClassApiObj.Get(UrlRouter.GetCmdToPc, {
+                values: {
+                    cmdname: 'xtinfo',
+                    classid: classid
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    ProcessRet2(ret);
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: '请重新连接老师课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+
+        } else {
+            api.addEventListener({
+                name: 'ReceiveMessage_3'
+            }, function (ret, err) {
+                ProcessRet2(ret.value.receive);
+            });
+            ClassApiObjForCloud.Get(UrlRouter.GetCmdToPc, {
+                values: {
+                    cmdname: 'xtinfo',
+                    classid: classid,
+                    from: 'ReceiveMessage_3',
+                    uid: uid,
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+                if (ret && ret.status == 1) {
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.info,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+
+        }
+    }
+
+    function ProcessRet2(ret) {
+        api.hideProgress();
+        if (ret) {
+            if (ret.xtgroup) {
+                //是习题组
+                api.openWin({
+                    name: 'win-xsdt-xtz-main-pad',
+                    url: 'xtzFrames/win-xsdt-xtz-main-pad.html',
+                    pageParam: {
+                        xitiinfo: ret.xitiinfo,
+                        classid: classid
+                    },
+                    slidBackEnabled: false,
+                    reload: true
+                });
+            } else {
+                api.openWin({
+                    name: 'win-xsdt-dt-main-pad',
+                    url: 'answers/win-xsdt-dt-main-pad.html',
+                    pageParam: {
+                        xtinfo: ret
+                    },
+                    slidBackEnabled: false,
+                    reload: true
+                });
+            }
+        } else {
+            api.toast({
+                msg: '请重新连接老师课堂',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+
+    //点击分组学习
+    function clickFzjx() {
+        if (connectSuccess) {
+            if (connectType == 'Lan') {
+                ClassApiObj.Get(UrlRouter.GetGroup, {
+                    values: {
+                        cmd: 'info',
+                        classid: classid,
+                        uid: uid
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        ProcessRet3(ret);
+                    } else {
+                        api.toast({
+                            msg: '请重新连接老师课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+
+            } else {
+                api.addEventListener({
+                    name: 'ReceiveMessage_4'
+                }, function (ret, err) {
+                    ProcessRet3(ret.value.receive);
+                });
+                ClassApiObjForCloud.Get(UrlRouter.GetGroup, {
+                    values: {
+                        cmd: 'info',
+                        classid: classid,
+                        uid: uid,
+                        from: 'ReceiveMessage_4',
+                        vclass_token: $api.getStorage('vclass_token'),
+                        private_token: $api.getStorage('private_token')
+                    }
+                }, function (ret, err) {
+                    if (ret && ret.status == 1) {
+                    } else {
+                        api.toast({
+                            msg: '请重新连接老师课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+
+            }
+        } else {
+            openClass();
+        }
+    }
+
+
+    function ProcessRet3(ret) {
+        if (ret) {
+            if (ret.status == 1) {
+                if (ret.default != null) {
+                    api.openWin({
+                        name: 'win-groupStudy-main-pad',
+                        url: 'groupStudy/win-groupStudy-main-pad.html',
+                        pageParam: { groupInfo: ret.default[0], ip: ip }
+                    });
+                } else if (ret.custom != null) {
+                    api.openWin({
+                        name: 'win-groupStudy-main-pad',
+                        url: 'groupStudy/win-groupStudy-main-pad.html',
+                        pageParam: { groupInfo: ret.custom[0], ip: ip }
+                    });
+                }
+
+            } else {
+                if (ret.msg) {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                } else {
+                    api.toast({
+                        msg: '请确认该老师是否开启课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            }
+        } else {
+            api.toast({
+                msg: '请重新连接老师课堂',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+
+    }
+
+
+    //点击抢答
+    function clickQd() {
+        if (connectSuccess) {
+            if (connectType == 'Lan') {
+                ClassApiObj.Get(UrlRouter.GetQiangda, {
+                    values: {
+                        xsid: uid,
+                        classid: classid
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        ProcessRet4(ret);
+                    } else {
+                        api.toast({
+                            msg: '请重新连接老师课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+
+            } else {
+                api.addEventListener({
+                    name: 'ReceiveMessage_5'
+                }, function (ret, err) {
+                    ProcessRet4(ret.value.receive);
+                });
+                ClassApiObjForCloud.Get(UrlRouter.GetQiangda, {
+                    values: {
+                        xsid: uid,
+                        classid: classid,
+                        from: 'ReceiveMessage_5',
+                        uid: uid,
+                        vclass_token: $api.getStorage('vclass_token'),
+                        private_token: $api.getStorage('private_token')
+                    }
+                }, function (ret, err) {
+                    if (ret && ret.status == 1) {
+                    } else {
+                        api.toast({
+                            msg: '请重新连接老师课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+            }
+
+        } else {
+            openClass();
+        }
+    }
+
+    //点击抢答
+    function ProcessRet4(ret) {
+        if (ret) {
+            if (ret.status == '-2') {
+                api.toast({
+                    msg: '你不是当前班级的学生!',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else if (ret.status == '-1' || ret.status == '0') {
+                api.toast({
+                    msg: '抢答未开始或已结束!',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+
+            } else if (ret.status == '1') {
+                if ($api.getStorage('uid') == ret.cur_student) {
+                    //抢答成功
+                    api.openWin({
+                        name: 'win-class-qiangda-pad',
+                        url: 'win-class-qiangda-pad.html'
+                    });
+                } else {
+                    api.toast({
+                        msg: '抢答未开始或已结束!',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            }
+        } else {
+            api.toast({
+                msg: '请重新连接老师课堂',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+
+    function clickXxzl() {
+        if (connectSuccess) {
+            api.openWin({
+                name: 'win-class-ktzl-pad',
+                url: 'ktzl/win-class-ktzl-pad.html'
+            });
+        } else {
+            openClass();
+        }
+    }
+
+    function scanner() {
+        if (!checkPermission(['camera'])) {
+            return;
+        }
+        if ($api.getStorage('gzxd') == '34' && $api.getStorage('schoolid') == '1007140989450038416' && $api.getStorage('njmc') == '2020') {
+            api.toast({
+                msg: '暂时没有权限',
+                duration: 2000,
+                location: 'middle'
+            });
+            return;
+        }
+        if (connectSuccess) {
+            if (api.deviceModel != '12xue_minis') {
+                var FNScanner = api.require('FNScanner');
+                FNScanner.open({
+                    autorotation: true,
+                    isAlbum: true,
+                    isLight: true
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.eventType == "success") {
+                            scanSuccess(ret);
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                });
+            } else {
+                api.addEventListener({
+                    name: 'scanSuccessClass'
+                }, function (ret, err) {
+                    scanSuccess(ret.value);
+                });
+                api.sendEvent({
+                    name: 'openScannerForClass'
+                });
+            }
+
+
+
+
+        } else {
+            openClass();
+        }
+    }
+
+    //扫码完成后操作
+    var hwid = '';//需要二次调用 存全局变量
+    function scanSuccess(ret) {
+        $api.setStorage('scanType', 'class');
+        var content = ret.content;
+        if (content.indexOf('homework') > 0 || content.indexOf('material') > 0 || content.indexOf('videoshow') > 0) {
+            var all = content.split('?')[1].split('&');
+            var type = '';
+            var sxcid = '';
+            var dyid = '';
+            var fxfw = '';
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].split('=')[0] == 'id') {
+                    hwid = all[i].split('=')[1];
+                    //                    $api.setStorage('shwid', hwid);
+                } else if (all[i].split('=')[0] == 'type') {
+                    type = all[i].split('=')[1]
+                } else if (all[i].split('=')[0] == 'sxcid') {
+                    sxcid = all[i].split('=')[1];
+                    //                    $api.setStorage('ssxcid', sxcid);
+                } else if (all[i].split('=')[0] == 'dyid') {
+                    dyid = all[i].split('=')[1];
+                    //                    $api.setStorage('sdyid', dyid);
+                } else if (all[i].split('=')[0] == 'fxfw') {
+                    fxfw = all[i].split('=')[1];
+                    //                    $api.setStorage('fxfw', fxfw);
+                }
+            }
+            if (type == 'homework') {//智能导练
+                GetPracticePracticeinfo(hwid, sxcid, dyid);
+            } else if (type == 'material') {//精品素材
+                GetPracticeMicroclassinfo(hwid, sxcid, '')
+            } else if (type == 'videoshow') {//普通视频
+                GetSpaceResourceinfo(hwid, fxfw);
+            } else {
+                api.toast({
+                    msg: '扫描的二维码不符合规则~',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        } else {
+            api.toast({
+                msg: '扫描的二维码不符合规则~',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+    function GetSpaceResourceinfo(hwid, fxfw) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetResourceCodeMaterialInfo, {
+            values: {
+                id: hwid,
+                schoolid: $api.getStorage('schoolid'),
+                fxfw: fxfw
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+                    if (ret.type == 'video') {
+                        videoData = ret;
+                        if (ret.convert_status == 1) {//转码成功
+                            if (api.systemType == 'ios') {
+                                setTimeout(function () {
+                                    video(ret);
+                                }, 1000)
+                            } else {
+                                video(ret);
+                            }
+                        } else if (ret.convert_status == 0) {
+                            api.toast({
+                                msg: '视频正在转码，请稍后再试',
+                                duration: 3000,
+                                location: 'bottom'
+                            });
+                        } else if (ret.convert_status == 2) {
+                            api.toast({
+                                msg: '视频转码失败，暂时无法播放',
+                                duration: 3000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        api.openWin({
+                            name: 'win_sucai',
+                            url: '../../win_sucai.html',
+                            pageParam: {
+                                item: ret
+                            },
+                            slidBackEnabled: false
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+
+        });
+    }
+
+    function GetPracticeMicroclassinfo(hwid, sxcid, jiesuo) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetPracticeMicroclassinfo, {
+            values: {
+                id: hwid,
+                sxcid: sxcid,
+                mac_addr: $api.getStorage('macAdress')
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+                    videoData = ret.data;
+                    if (ret.data.paystatus == 1) {
+                        if (ret.data.type == 'video') {
+                            if (ret.data.convert_status == 1) {//转码成功
+                                if (jiesuo == 'jiesuo' || api.systemType == 'ios') {
+                                    setTimeout(function () {
+                                        video(ret.data);
+                                    }, 1000);
+                                } else {
+                                    video(ret.data);
+                                }
+
+                            } else if (ret.data.convert_status == 0) {
+                                api.toast({
+                                    msg: '视频正在转码，请稍后再试',
+                                    duration: 3000,
+                                    location: 'bottom'
+                                });
+                            } else if (ret.data.convert_status == 2) {
+                                api.toast({
+                                    msg: '视频转码失败，暂时无法播放',
+                                    duration: 3000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.openWin({
+                                name: 'win_sucai',
+                                url: '../../win_sucai.html',
+                                pageParam: {
+                                    item: ret.data
+                                },
+                                slidBackEnabled: false
+                            });
+                        }
+                    } else if (ret.data.paystatus == 0) {
+                        api.openWin({
+                            name: 'win-Intelligence-Unlock',
+                            url: '../../newIntelligence/win-Intelligence-Unlock.html',
+                            pageParam: {
+                                data: videoData,
+                                issaoma: 'shipin'
+                            },
+                            slidBackEnabled: false
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+    var videoData;
+    function video(list) {
+        var isMp3 = getFileType(videoData.filetype);
+
+        api.openWin({
+            name: 'win_video_view2',
+            url: '../../win_video_view2.html',
+            pageParam: {
+                path: videoData.serverpath + videoData.preview_link,
+                title: videoData.title,
+                isMp3: isMp3,
+                item: list
+            }
+        });
+
+    }
+
+    function getFileType(fileType) {
+        if (fileType == '.mp3' || fileType == '.wma') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    function GetPracticePracticeinfo(hwid, sxcid, dyid) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetPracticePracticeinfo, {
+            values: {
+                hwid: hwid,
+                sxcid: sxcid,
+                dyid: dyid,
+                mac_addr: $api.getStorage('macAdress'),
+                is_record: 1
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    $api.setStorage('sversion', ret.data.version);
+                    if (ret.data.paystatus == 1) {
+                        api.hideProgress();
+                        if (ret.data.complet == 4 || ret.data.complet == 0) {
+                            api.openWin({
+                                name: 'win-Intelligence-Detail',
+                                url: '../../newIntelligence/win_detail.html',
+                                pageParam: {
+                                    index: 0,
+                                    hwid: hwid,
+                                    sxcid: sxcid,
+                                    dyid: dyid,
+                                    issaoma: 'zuoye',
+                                    version: ret.data.version,
+                                    bjlist: ret.data.bjlist,
+                                    bjcheck: ret.data.bjcheck,
+                                    smxkid: ret.data.xkid
+                                },
+                                slidBackEnabled: false
+                            });
+                        } else {
+                            api.openWin({
+                                name: 'win-Intelligence-exercise-list',
+                                url: '../../newIntelligence/win_exercise_list.html',
+                                pageParam: {
+                                    hwid: hwid,
+                                    sxcid: '',
+                                    dyid: '',
+                                    issaoma: 'zuoye',
+                                    status: ret.data.complet,
+                                    version: ret.data.version,
+                                    bjlist: ret.data.bjlist,
+                                    bjcheck: ret.data.bjcheck,
+                                    smxkid: ret.data.xkid
+                                },
+                                slidBackEnabled: false
+                            });
+                        }
+                    } else {
+                        var newData = ret.data;
+                        api.openWin({
+                            name: 'win-Intelligence-Unlock',
+                            url: '../../newIntelligence/win-Intelligence-Unlock.html',
+                            pageParam: {
+                                data: newData,
+                                issaoma: 'zuoye'
+                            },
+                            slidBackEnabled: false,
+                            reload: true
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+
+        });
+    }
+
+
+
+
+
+
+    function openClass() {
+        api.openFrame({
+            name: 'frame-slect-class-pad',
+            url: 'frame-slect-class-pad.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            pageParam: { classArr: api.pageParam.classArr },
+            bounces: false
+        });
+    }
+
+
+    /**
+     * 云端课堂部分
+     */
+    function connectByCloud() {
+        api.showProgress({
+            title: '正在连接云端课堂',
+            text: '请稍后...',
+            modal: false
+        });
+
+        api.ajax({
+            url: UrlDomain + UrlRouter.GetStuLesson,
+            method: 'get',
+            timeout: 10,
+            dataType: 'json',
+            cache: false,
+            returnAll: false,
+            data: {
+                values: {
+                    uid: uid,
+                    classid: classid
+                }
+            },
+            headers: {
+                Token: $api.getStorage('token'),
+                Source: source,
+                Version: version
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    ip = ret.ip;
+                    if (ip == '') {
+                        api.hideProgress();
+                        api.toast({
+                            msg: '老师未开启课堂',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    } else {
+                        checkCloud(); //获取云端课堂相关信息
+                    }
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: '老师未开启课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: '网络请求失败，请检查网络是否通畅',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+
+    function checkCloud() {
+        api.ajax({
+            url: UrlDomain + UrlRouter.GetVirtualclass,
+            method: 'get',
+            timeout: 5,
+            dataType: 'json',
+            cache: false,
+            returnAll: false,
+            data: {
+                values: {
+                    tuid: tuid,
+                    suid: uid
+                }
+            },
+            headers: {
+                Token: $api.getStorage('token'),
+                Source: source,
+                Version: version
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0 && ret.data) {
+                    openCloudClass(ret);
+                } else {
+                    api.toast({
+                        msg: '老师未开启课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: '连接云课堂失败，请重新连接',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+
+    var vclass;
+    function openCloudClass(ret) {
+        //必须参数
+        var vclass_token = ret.data.vclass_token;
+        var private_token = ret.data.private_token;
+        var netIP = ret.data.proxyNode.netIP;
+        var netPort = ret.data.proxyNode.netPort;
+
+        $api.setStorage('vclass_token', vclass_token);
+        $api.setStorage('private_token', private_token);
+        $api.setStorage('netIP', netIP + ':' + netPort);
+        $api.setStorage('netPort', netPort);
+
+        //创建vclass
+        vclass = new VClass(netIP, netPort, uid, private_token, vclass_token); //39.106.2.190
+
+        //监听加入课堂结果
+        vclass.onJoinClass(function (data) {
+            if (data.status == 1) {
+                api.toast({
+                    msg: '已加入云端课堂',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+
+                connectType = 'Cloud';
+                $api.setStorage('connectType', 'Cloud');
+
+                $api.setStorage('classTN', teachername);
+                $api.setStorage('classid', classid);
+                $api.text($api.dom('.classname'), $api.getStorage('realname') + '已加入' + teachername + '老师的课堂');
+                connectSuccess = true;
+                $api.setStorage('connectSuccess', '0');//连接课堂成功
+                ClassApiObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+                ClassApiObjForCloud.SetAuthToken($api.getStorage('token'));
+                $api.setStorage('inClass', '1'); //已经进入课堂
+                if ($api.getStorage('deviceModel') == 1) { //联想设备 进入课堂隐藏home recent键
+                    api.sendEvent({
+                        name: 'HomeAndRecent'
+                    });
+                }
+                api.sendEvent({
+                    name: 'closeSocket'
+                });
+                setEnterClassMsg();
+            } else {
+                api.toast({
+                    msg: '加入课堂失败，请重新加入',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+
+        //监听老师发送的消息
+        vclass.onTeacherMessage(function (data) {
+            ReceiveMessage(data);
+        });
+
+        //老师掉出课堂
+        vclass.on('TeacherLeaveClass', function (data) {
+            checkClassState();
+        });
+
+        //服务器断开
+        vclass.on('disconnect', function (data) {
+            vclass.StuJoinClass();
+            $api.setStorage('connectSuccess', '1');
+        });
+
+        //进入课堂
+        vclass.StuJoinClass();
+
+    }
+
+
+    function checkClassState() {
+        var isUnline = true; //判断是否真的掉线了
+        api.addEventListener({
+            name: 'ReceiveMessage_checkclassstate'
+        }, function (ret, err) {
+            isUnline = false;
+        });
+        setTimeout(function () {
+            sendCheck();
+        }, 1000);
+        setTimeout(function () {
+            if (isUnline) {
+                sendCheck();
+            }
+        }, 3000);
+        setTimeout(function () {
+            if (isUnline) {
+                sendCheck();
+            }
+        }, 6000);
+        setTimeout(function () {
+            if (isUnline) {
+                sendCheck();
+            }
+        }, 8000);
+        setTimeout(function () {
+            if (isUnline) {
+                //关闭打分按钮
+                api.sendEvent({
+                    name: 'closeScoreBt'
+                });
+
+                $api.setStorage('connectSuccess', '1');
+                $api.setStorage('inClass', '0');
+                api.closeToWin({
+                    name: 'win-stu-main'
+                });
+            }
+        }, 10000);
+    }
+
+    function sendCheck() {
+        api.ajax({
+            url: 'http://' + $api.getStorage('netIP') + UrlRouter.GetCmdToPc,
+            method: 'get',
+            timeout: 2,
+            dataType: 'json',
+            cache: false,
+            returnAll: false,
+            data: {
+                values: {
+                    cmdname: 'dtstate',
+                    classid: classid,
+                    from: 'ReceiveMessage_checkclassstate',
+                    uid: uid,
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            },
+            headers: {
+                Source: source,
+                Version: version
+            }
+        }, function (ret, err) {
+        });
+    }
+
+
+    function setEnterClassMsg() {
+        if (connectType == 'Lan') {
+            ClassApiObj.Get(UrlRouter.GetCheckStuOnLine, {
+                values: {
+                    action: 'someoneenter',
+                    uid: uid,
+                    classid: classid
+                }
+            }, function (ret, err) {
+            });
+
+        } else {
+            ClassApiObjForCloud.Get(UrlRouter.GetCheckStuOnLine, {
+                values: {
+                    action: 'someoneenter',
+                    from: 'stuClassReceiveMessage_1',
+                    uid: uid,
+                    classid: classid,
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+            });
+        }
+    }
+
+
+
+    function ReceiveMessage(ret) {
+        var eventName = ret.msg.from;
+        api.sendEvent({
+            name: eventName,
+            extra: { receive: ret.msg }
+        });
+
+        if (eventName == 'pc_client') {
+            switch (ret.msg.action) {
+                case 'doc_push':
+                    api.openFrame({
+                        name: 'pop-frame',
+                        url: 'ktzl/pop-frame.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: api.winHeight
+                        },
+                        bounces: false
+                    });
+                    break;
+                case 'doc_withdraw':
+                    api.sendEvent({
+                        name: 'removeKtzl'
+                    });
+                    break;
+                case 'class_close':
+                    api.toast({
+                        msg: '老师已退出课堂',
+                        duration: 1500,
+                        location: 'bottom'
+                    });
+                    //关闭打分按钮
+                    api.sendEvent({
+                        name: 'closeScoreBt'
+                    });
+
+                    $api.setStorage('connectSuccess', '1');
+                    $api.setStorage('inClass', '0');
+                    setTimeout(function () {
+                        api.closeToWin({
+                            name: 'win-stu-main'
+                        });
+                    }, 1500);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    async function openAiCompanionLearning() {
+        if(!connectSuccess){
+            openClass();
+            return;
+        }
+        try{
+            const res = await new Promise((resolve, reject) => {
+                apiObj.Get(UrlRouter.GetClassSwitch,{
+                    values: {
+                        type: 'ai_study',
+                        classid: classid,
+                    }
+                },function (ret, err) {
+                    if(ret){
+                        resolve(ret);
+                    }else{
+                        reject(err);
+                    }
+                })
+            });
+            if(res.ret !== 0 || String(res.data) !== '1'){
+                api.toast({
+                    msg: '该功能已关闭'
+                })
+                return;
+            }
+        }catch (e){
+            console.error(e);
+            return;
+        }
+
+        api.openWin({
+            name: 'win-aiCompanionLearning',
+            url: '../../aiAssistant/win_aiAssistant_new.html'
+        })
+    }
+
+
+    async function openHomework() {
+        if(!connectSuccess){
+            openClass();
+            return;
+        }
+        try{
+            const res = await new Promise((resolve, reject) => {
+                apiObj.Get(UrlRouter.GetClassSwitch,{
+                    values: {
+                        type: 'homework',
+                        classid: classid,
+                    }
+                },function (ret, err) {
+                    if(ret){
+                        resolve(ret);
+                    }else{
+                        reject(err);
+                    }
+                })
+            });
+            if(res.ret !== 0 || String(res.data) !== '1'){
+                api.toast({
+                    msg: '该功能已关闭'
+                })
+                return;
+            }
+        }catch (e){
+            console.error(e);
+            return;
+        }
+
+        api.openWin({
+            slidBackEnabled: false,
+            name: 'win-subject-list-pad',
+            url: '../newHomework/win-subject-list-pad.html',
+            pageParam: {
+                classid: $api.getStorage('classidForClass')
+            }
+        })
+    }
+</script>
+
+</html>

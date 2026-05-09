@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="#fffafafa" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout android:background="#fff2f2f2" android:layout_width="match_parent" android:layout_height="50.0dp">
+        <ImageView android:id="@id/title_back" android:layout_width="60.0dp" android:layout_height="match_parent" android:src="@drawable/mo_download_mgr_back" android:scaleType="centerInside" android:layout_alignParentLeft="true" />
+        <TextView android:textSize="17.0sp" android:textColor="#ffef5e7d" android:gravity="center" android:id="@id/title_edit" android:layout_width="70.0dp" android:layout_height="match_parent" android:text="编辑" android:layout_alignParentRight="true" />
+        <TextView android:textSize="17.0sp" android:textStyle="bold" android:textColor="@android:color/black" android:gravity="center" android:id="@id/title_text" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="标题" android:layout_toLeftOf="@id/title_edit" android:layout_toRightOf="@id/title_back" android:layout_centerInParent="true" />
+        <ImageView android:background="#ffcccccc" android:layout_width="match_parent" android:layout_height="1.0dp" android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+    <FrameLayout android:layout_width="match_parent" android:layout_height="0.0dp" android:layout_weight="1.0">
+        <ListView android:id="@id/size_ordered_list" android:background="#00000000" android:fadingEdge="none" android:descendantFocusability="blocksDescendants" android:layout_width="match_parent" android:layout_height="match_parent" android:listSelector="@android:color/transparent" android:cacheColorHint="@android:color/transparent" android:divider="@drawable/mo_download_mgr_line" android:dividerHeight="2.0dp" />
+        <TextView android:textStyle="bold" android:gravity="center" android:id="@id/empty" android:layout_width="match_parent" android:layout_height="match_parent" android:text="无下载内容。" />
+    </FrameLayout>
+</LinearLayout>

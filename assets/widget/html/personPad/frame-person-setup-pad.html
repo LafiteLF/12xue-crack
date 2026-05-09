@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background: #fff
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+        .content {
+            height: 100%;
+            padding: 10px 10px 10px 10px
+        }
+
+        .content ul {
+            position: relative;
+            height: 100%
+        }
+
+        .content ul li {
+            position: absolute;
+            padding: 5px
+        }
+
+        .list {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .list img{ position: absolute}
+        .imgtwo {
+            right: 10%;
+            bottom: 10%
+        }
+
+        .content ul li:nth-of-type(1), .content ul li:nth-of-type(5), .content ul li:nth-of-type(6), .content ul li:nth-of-type(7) {
+            width: 33.33%;
+            height: 33.33%;
+        }
+
+        .content ul li:nth-of-type(2), .content ul li:nth-of-type(3), .content ul li:nth-of-type(4) {
+            width: 22.22%;
+            height: 33.33%;
+        }
+
+        .content ul li:nth-of-type(8), .content ul li:nth-of-type(9) {
+            width: 50%;
+            height: 33.33%;
+        }
+
+        .content ul li:nth-of-type(1) .list {
+            background:url("../../image/stuHomePad/setup0.png") no-repeat center center #33c697;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(2) .list {
+            background:url("../../image/stuHomePad/setup1.png") no-repeat center center #ff6783;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(3) .list {
+            background:url("../../image/stuHomePad/setup2.png") no-repeat center center #ff8538;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(4) .list {
+            background:url("../../image/stuHomePad/setup3.png") no-repeat center center #5790ef;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(5) .list {
+            background:url("../../image/stuHomePad/setup4.png") no-repeat center center #9c5ded;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(6) .list {
+            background:url("../../image/stuHomePad/setup5.png") no-repeat center center #e1a900;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(7) .list {
+            background:url("../../image/stuHomePad/setup6.png") no-repeat center center #cd50c9;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(8) .list {
+            background:url("../../image/stuHomePad/setup7.png") no-repeat center center #8f8ac3;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(9) .list {
+            background:url("../../image/stuHomePad/setup8.png") no-repeat center center #8f8ac3;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(1) {
+            left: 0px;
+            top: 0;
+        }
+
+        .content ul li:nth-of-type(2) {
+            left: 33.33%;
+            top: 0;
+        }
+
+        .content ul li:nth-of-type(3) {
+            left: 55.55%;
+            top: 0
+        }
+
+        .content ul li:nth-of-type(4) {
+            left: 77.77%;
+            top: 0
+        }
+
+        .content ul li:nth-of-type(5) {
+            left: 0;
+            top: 33.33%
+        }
+
+        .content ul li:nth-of-type(6) {
+            left: 33.33%;
+            top: 33.33%
+        }
+
+        .content ul li:nth-of-type(7) {
+            left: 66.66%;
+            top: 33.33%
+        }
+
+        .content ul li:nth-of-type(8) {
+            left: 0;
+            top: 66.66%
+        }
+
+        .content ul li:nth-of-type(9) {
+            left: 50%;
+            top: 66.66%
+        }
+        .list img{width: 100px;}
+        .content ul li:nth-of-type(1) img, .content ul li:nth-of-type(5) img, .content ul li:nth-of-type(6) img, .content ul li:nth-of-type(7) img {
+            left: 16%;
+            top: 20%;
+            width: 29%;
+        }
+        .content ul li:nth-of-type(2) img, .content ul li:nth-of-type(3) img, .content ul li:nth-of-type(4) img{
+            width: 40%;
+            left: 30%;
+            top: 11%;
+        }
+
+        .content ul li:nth-of-type(8) img, .content ul li:nth-of-type(9) img {
+            /* float: left; */
+            width: 18%;
+            /* margin-left: 30%; */
+            left: 25%;
+            position: absolute;
+            /* padding-top: 7%; */
+            top: 18%;
+        }
+        .content ul li:nth-of-type(1) span, .content ul li:nth-of-type(5) span, .content ul li:nth-of-type(6) span, .content ul li:nth-of-type(7) span {
+            font-size: 1rem;
+            color: #fff;
+            display: block;
+            top:39%;
+            right: 10%;
+            text-align: center;
+            width: 53%;
+           position: absolute;
+        }
+        .content ul li:nth-of-type(1) span{
+
+        }
+        .content ul li:nth-of-type(2) span, .content ul li:nth-of-type(3) span, .content ul li:nth-of-type(4) span{
+            font-size: 1rem;
+            color: #fff;
+            display: block;
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            top: 63%;
+        }
+        .content ul li:nth-of-type(8) span, .content ul li:nth-of-type(9) span{
+            font-size: 1rem;
+            color: #fff;
+            display: block;
+            text-align: center;
+            /* float: left; */
+            width: 30%;
+            position: absolute;
+            right: 22%;
+            top: 38%;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content" v-cloak>
+    <ul>
+        <li v-for="(list1,listindex) in 9" :id="listindex" tapmode onclick="vm.openFrame(this)">
+            <div class="list">
+                <!--<img class="imgone" :src='"../../image/stuHomePad/setup"+listindex+".png"' >-->
+                <!--<span v-text="title(listindex)"></span>-->
+            </div>
+        </li>
+
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script>
+    var isReady = false;
+    var isOpen = false;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        setTimeout("isReady = true;", 500);
+        getSettingSwitch();
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            photoHeight: ''
+        },
+        methods: {
+            openFrame: function (context) {
+
+                if (!isReady) {
+                    return;
+                }
+
+                var index=$(context).attr('id');
+                var packageName;
+                switch (index) {
+                    case '0'://系统设置
+                        if ($api.getStorage('padType') != '3') {
+                            if (newValue.item1 == 1) {
+                                packageName = 'com.android.settings';
+                                openPackage(packageName);
+                            } else {
+                                api.toast({
+                                    msg: '暂无权限打开此应用',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        }
+                        break;
+                    case '1'://音乐
+                        if (newValue.item2 == 1) {
+                            if (api.deviceModel == 'KOB2-W09HN' ||
+                                    api.deviceModel == 'AGM3-W09HN' ||
+                                    api.deviceModel == 'BZC-W00' ||
+                                    api.deviceModel == 'BZT3-W59D' ||
+                                    api.deviceModel == 'BZT3-W59' ||
+                                    api.deviceModel == 'BZI-W00' ||
+                                    api.deviceModel == 'BJS5-W00' ||
+                                    api.deviceModel == 'AGS3-W09HN'){
+                                packageName = 'com.huawei.music';
+                            } else {
+                                packageName = 'com.android.music';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '2'://下载
+                        if (newValue.item3 == 1) {
+                            packageName = 'com.android.providers.downloads.ui';
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '3'://计算器
+                        if (newValue.item4 == 1) {
+                            if (api.deviceModel == 'BZD-W00' ||
+                                    api.deviceModel == 'AGR-W09HN' ||
+                                    api.deviceModel == 'BZC-W00' ||
+                                    api.deviceModel == 'BZT3-W59D' ||
+                                    api.deviceModel == 'BZT3-W59' ||
+                                    api.deviceModel == 'BZI-W00' ||
+                                    api.deviceModel == 'BJS5-W00' ||
+                                    api.deviceModel == 'AGS3-W09HN'||
+                                    api.deviceModel == 'BXE3-W00') {
+                                packageName = 'com.huawei.calculator';
+                            } else if (api.deviceModel == 'KOB2-W09HN' || api.deviceModel == 'AGM3-W09HN' ) {
+                                packageName = 'com.hihonor.calculator';
+                            } else {
+                                packageName = 'com.android.calculator2';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '4'://电子邮件
+                        if (newValue.item5 == 1) {
+                            packageName = 'com.android.email';
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '5'://相机
+                        if (newValue.item6 == 1) {
+                            packageName = 'xiangji';
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '6'://图库
+                        if (newValue.item7 == 1) {
+                            if (api.deviceModel == 'Lenovo TB-8X04F') {
+                                packageName = 'org.codeaurora.gallery';
+                            } else if (api.deviceModel == 'AGR-W09HN' ||
+                                    api.deviceModel == 'BZC-W00' ||
+                                    api.deviceModel == 'BZT3-W59D' ||
+                                    api.deviceModel == 'BZT3-W59' ||
+                                    api.deviceModel == 'BZI-W00' ||
+                                    api.deviceModel == 'AGS3-W09HN'||
+                                    api.deviceModel == 'BJS5-W00' ||
+                                    api.deviceModel == 'BXE3-W00') {
+                                packageName = 'com.huawei.photos';
+                            } else if (api.deviceModel == 'KOB2-W09HN' || api.deviceModel == 'AGM3-W09HN' ){
+                                packageName = 'com.hihonor.photos';
+                            } else {
+                                packageName = 'com.android.gallery3d';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '7'://时钟
+                        if (newValue.item8 == 1) {
+                            if (api.deviceModel == 'AGR-W09HN' ||
+                                    api.deviceModel == 'BZC-W00' ||
+                                    api.deviceModel == 'BZT3-W59D' ||
+                                    api.deviceModel == 'BZT3-W59' ||
+                                    api.deviceModel == 'BZI-W00' ||
+                                    api.deviceModel == 'BJS5-W00' ||
+                                    api.deviceModel == 'AGS3-W09HN'||
+                                    api.deviceModel == 'BXE3-W00') {
+                                packageName = 'com.huawei.deskclock';
+                            } else if (api.deviceModel == 'KOB2-W09HN' || api.deviceModel == 'AGM3-W09HN' ){
+                                packageName = 'com.hihonor.deskclock';
+                            } else {
+                                packageName = 'com.android.deskclock';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                    case '8'://日历
+                        if (newValue.item9 == 1) {
+                            if (api.deviceModel == 'AGR-W09HN' ||
+                                    api.deviceModel == 'BZC-W00' ||
+                                    api.deviceModel == 'BZT3-W59D' ||
+                                    api.deviceModel == 'BZT3-W59' ||
+                                    api.deviceModel == 'BZI-W00' ||
+                                    api.deviceModel == 'BJS5-W00' ||
+                                    api.deviceModel == 'AGS3-W09HN'||
+                                    api.deviceModel == 'BXE3-W00') {
+                                packageName = 'com.huawei.calendar';
+                            } else if (api.deviceModel == 'KOB2-W09HN' || api.deviceModel == 'AGM3-W09HN' ){
+                                packageName = 'com.hihonor.calendar';
+                            } else {
+                                packageName = 'com.android.calendar';
+                            }
+                            openPackage(packageName);
+                        } else {
+                            api.toast({
+                                msg: '暂无权限打开此应用',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                        break;
+                }
+            }
+        }
+    });
+
+    function openPackage(packageName) {
+        if (packageName == 'xiangji') {
+            api.sendEvent({
+                name: 'openApps',
+                extra: {packageName: packageName}
+            });
+        } else {
+            api.openApp({
+                androidPkg: packageName
+            }, function(ret, err) {
+                if (ret) {
+                } else {
+                    api.toast({
+                        msg: '应用打开失败',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+    }
+
+
+    var newValue;
+    function getSettingSwitch() {
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetSchoolConfig, {
+            values: {
+                type: 'photo_switch',
+                schoolid: $api.getStorage('schoolid')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == '0') {
+                    //{"item1":1,"item2":0,"item3":0,"item4":0,"item5":0,"item6":0,"item7":0,"item8":1,"item9":1}
+                    newValue = $api.strToJson(ret.data[0].value);
+                }
+            }
+        });
+    }
+
+
+
+</script>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            /*height: 100%;*/
+            margin-bottom: 0;
+            border-radius: 0;
+            border: 0;
+            padding: 15px 10px;
+            height: calc(100% - 45px) !important;
+            min-height: calc(100% - 45px) !important;
+
+        }
+
+        .report-check {
+            background-color: white;
+            line-height: 40px;
+            position: absolute;
+            right: 10px;
+            bottom: 47px;
+            width: 100%;
+        }
+
+        .check-input {
+            margin-top: 13px;
+            margin-bottom: 13px;
+            margin-left: 15px;
+        }
+
+        .word-count {
+            margin-right: 5px;
+            font-size: 14px;
+            color: #5f646e;
+        }
+
+        .face-and-at {
+            background-color: #f2f2f2;
+            line-height: 45px;
+            position: absolute;
+            bottom: 0px;
+            width: 100%;
+        }
+
+        .icon-btn {
+            padding: 7px;
+            color: #555555;
+            font-size: 25px;
+            border-radius: 5px;
+            border: 1px #999999 solid;
+        }
+        .aui-list-view.aui-grid-view {
+            display: table;
+            width: 94%;
+            left: 3%;
+            padding: 0 10px 10px 0;
+            font-size: 0;
+            white-space: normal;
+        }
+        .bottom-container {
+            /*height: 40%;*/
+            height: calc(100% - 250px) !important;
+            width: 100%;
+            background-color: #f2f2f2;
+        }
+
+        .comment-content {
+            height: 250px;
+            width: 100%;
+            position: relative;
+        }
+
+        .aui-list-view-cell {
+            height: auto;
+        }
+
+        .aui-col-xs-1 {
+            width: 9%;
+        }
+
+        .aui-content {
+            position: fixed;
+            /*top:200px;*/
+            left: 0;
+            height: calc(100% - 250px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container"
+     style="height: 98%; width:94%; overflow-y: hidden; overflow-x:auto;margin: 0 auto;padding-top: 2%;">
+    <div class="comment-content">
+        <textarea class="comment-text" id="content-text" placeHolder="写评论..." maxlength="140"
+                  oninput="onTextChangeListener();"></textarea>
+        <div class="report-check">
+            <input class="check-input" type="checkbox">
+            <span style="padding-left: 5px;font-size: 14px">同时转发到我的动态</span>
+            <span class="word-count aui-pull-right">0/140</span>
+        </div>
+        <div class="face-and-at">
+            <i class="aui-iconfont aui-icon-emoji icon-btn" tapmode onclick="selectEmoji();"></i>
+        </div>
+    </div>
+
+    <div class="bottom-container">
+
+        <div class="aui-content emoji-icon aui-hide">
+            <ul class="aui-list-view aui-grid-view">
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/anquan.gif" tapmode
+                         onclick="emojiClick(0);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/baobao.gif" tapmode
+                         onclick="emojiClick(1);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/dengdeng.gif" tapmode
+                         onclick="emojiClick(2);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/enen.gif" tapmode onclick="emojiClick(3);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/guan.gif" tapmode onclick="emojiClick(4);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hhh.gif" tapmode
+                         onclick="emojiClick(5);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/heihei.gif" tapmode
+                         onclick="emojiClick(6);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hongbao.gif" tapmode
+                         onclick="emojiClick(7);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/jiayou.gif" tapmode
+                         onclick="emojiClick(8);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/koubi.gif" tapmode
+                         onclick="emojiClick(9);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/ku.gif" tapmode onclick="emojiClick(10);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/lihai.gif" tapmode
+                         onclick="emojiClick(11);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/mei.gif" tapmode onclick="emojiClick(12);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/qinqin.gif" tapmode
+                         onclick="emojiClick(13);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/shengqi.gif" tapmode
+                         onclick="emojiClick(14);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/shuai.gif" tapmode
+                         onclick="emojiClick(15);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/tan.gif" tapmode onclick="emojiClick(16);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/wan.gif" tapmode onclick="emojiClick(17);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/wanan.gif" tapmode
+                         onclick="emojiClick(18);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/xiaxia.gif" tapmode
+                         onclick="emojiClick(19);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/xiexie.gif" tapmode
+                         onclick="emojiClick(20);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/xin.gif" tapmode onclick="emojiClick(21);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/yiwen.gif" tapmode
+                         onclick="emojiClick(22);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/zan.gif" tapmode onclick="emojiClick(23);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/3q.gif" tapmode onclick="emojiClick(24);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/beat.gif" tapmode
+                         onclick="emojiClick(25);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/bye.gif" tapmode onclick="emojiClick(26);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/comeon.gif" tapmode
+                         onclick="emojiClick(27);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/cry.gif" tapmode onclick="emojiClick(28);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/cuole.gif" tapmode
+                         onclick="emojiClick(29);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/dance.gif" tapmode
+                         onclick="emojiClick(30);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/dance1.gif" tapmode
+                         onclick="emojiClick(31);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/goodnight.gif" tapmode
+                         onclick="emojiClick(33);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/haha.gif" tapmode
+                         onclick="emojiClick(34);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/happy.gif" tapmode
+                         onclick="emojiClick(35);">
+                </li>
+
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hot.gif" tapmode onclick="emojiClick(37);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/hug.gif" tapmode onclick="emojiClick(38);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/memeda.gif" tapmode
+                         onclick="emojiClick(40);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/miao.gif" tapmode
+                         onclick="emojiClick(41);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/missyou.gif" tapmode
+                         onclick="emojiClick(42);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/morning.gif" tapmode
+                         onclick="emojiClick(43);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/naonao.gif" tapmode
+                         onclick="emojiClick(44);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/no.gif" tapmode onclick="emojiClick(45);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/wash.gif" tapmode
+                         onclick="emojiClick(46);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/watermelon.gif" tapmode
+                         onclick="emojiClick(47);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/ishere.gif" tapmode
+                         onclick="emojiClick(39);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/heng.gif" tapmode
+                         onclick="emojiClick(36);">
+                </li>
+                <li class="aui-list-view-cell aui-img aui-col-xs-1">
+                    <img class="aui-img-object" src="../../image/biaoqing/en.gif" tapmode onclick="emojiClick(32);">
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/textarea-delete.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        api.addEventListener({
+            name: 'at'
+        }, function (ret, err) {
+            var content = $api.val($api.dom("#content-text"));
+            //@规则  拼接字符串  @+用户名+一个空格
+            content = content + "@" + ret.value.realname + " ";
+            $api.val($api.dom("#content-text"), content);
+        });
+
+        api.addEventListener({
+            name: 'tap'
+        }, function (ret, err) {
+            onTextChangeListener();
+        });
+        initTextarea()
+    };
+
+    function okBtn() {
+        var id = api.pageParam.id;//上个界面传来的动态ids
+        var content = $api.val($api.dom(".comment-text"));//评论内容
+        content = $api.trim(content);
+        if (textLength(content) > 140) {
+            api.toast({
+                msg: '字数超过限制，请控制在140字内！',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        content = finalContent(content);
+        var objs = $api.dom('.check-input').checked;//复选框  objs==true 为选中 false 未选中
+//alert(content);
+        var realSource = 'student_12xueos';
+        if (api.systemType == 'ios') {
+            realSource = '12xueoshd';
+        }
+        var apiObj = new GridOpenApi(UrlDomain, realSource, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        //先调用转发接口 调用成功后在发布，发布成功后close（）;
+        if (content == '') {
+            api.toast({
+                msg: '评论内容不能为空',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else {
+
+            if (objs == true) {
+//            alert('先转发');
+                apiObj.Post(UrlRouter.PostReprouctdynamic, {
+                    values: {
+                        dynamicid: api.pageParam.id,
+                        content: api.pageParam.content == '' ? content : (content + '//@' + api.pageParam.realname + ' :' + api.pageParam.content),
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+//                        alert('转发成功'+ret.msg);
+                            api.sendEvent({
+                                name: 'finishForward'
+                            });
+                            send();
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                });
+            } else {
+                send();
+            }
+        }
+
+        //发布
+        function send() {
+            content = $api.trim(content);
+            content = finalContent(content);
+            apiObj.Post(UrlRouter.PostDynamicReply, {
+                values: {
+                    dynamicid: api.pageParam.id,
+                    fromuid: $api.getStorage('uid'),
+                    realname: $api.getStorage('realname'),
+                    content: content
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+//                        alert('发布请求成功'+ret.msg);
+                        api.toast({
+                            msg: '发布成功!',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        api.sendEvent({
+                            name: 'finishComment'
+                        });
+                        api.closeWin();
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+
+            });
+        }
+
+    }
+
+    //@某人
+    function atFriend() {
+        api.openWin({
+            name: 'win-choose-@people',
+            url: 'win-choose-@people.html',
+            slidBackEnabled: false
+        });
+    }
+</script>
+</html>

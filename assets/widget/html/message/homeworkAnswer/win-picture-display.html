@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        .aui-title-my {
+            overflow: hidden;
+            position: absolute;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: auto;
+            max-width: 85%;
+            left: 40px;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav aui-bar-primary">
+    <a class="aui-toolbar-title aui-pull-left">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="api.closeWin()"></span>
+    </a>
+    <div class="aui-title-my" tapmode onclick="api.closeWin();">2/5</div>
+    <i class="aui-iconfont aui-icon-delete aui-pull-right" style="font-size: 18px" tapmode onclick="deletePic();"></i>
+</header>
+<div style="padding: 12px">
+    <img src="../../../image/default_portrait.png" alt="图片加载失败" style="width: 100%;">
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var index = '';
+    apiready = function () {
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        initView();
+    };
+    function initView() {
+        index = api.pageParam.index;
+        var total = api.pageParam.total;
+        var url = api.pageParam.url;
+        var position = parseInt(index) + 1;
+        $api.text($api.dom(".aui-title-my"), position + '/' + total);
+        $api.attr($api.dom("img"), 'src', url);
+    }
+    function deletePic() {
+        api.sendEvent({
+            name: 'deletePic',
+            extra: {
+                index: index
+            }
+        });
+        api.closeWin();
+    }
+</script>
+</html>

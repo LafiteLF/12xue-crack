@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            font-size: 0.7rem;
+            padding-top: 0.5rem;
+        }
+        .xt-content {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+            padding-bottom: 1rem;
+        }
+        .zymc {
+            background-color: white;
+            min-height: 3rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            font-size: 0.7rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        em, em * {
+            font-style: italic;
+        }
+        img{
+            max-width:90%;
+        }
+        em, del, strong, var, label, cite, small, time, mark, code {
+            display:inline;
+        }
+    </style>
+</head>
+<body>
+<div class="xt-content">
+    <div class="zymc"></div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        if (api.pageParam.content != null) {
+            $api.html($api.dom('.zymc'), api.pageParam.zymc + '<br>' + api.pageParam.content);
+        } else {
+            $api.html($api.dom('.zymc'), api.pageParam.zymc);
+        }
+//        if (api.pageParam.type == 'zyyq') {
+//
+//        } else {
+//            $api.append($api.dom('body'), '<div class="answer-content">正确答案：<span class="answer"></span></div><div class="analysis-content">答案解析：<span class="analysis"></span></div>');
+//            $api.html($api.dom('.answer'), api.pageParam.answer == null ? '' : api.pageParam.answer);
+//            $api.html($api.dom('.analysis'), api.pageParam.analysis);
+//        }
+        for (var i = 0; i < $api.domAll('img').length; i++) {
+            $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+        }
+    };
+    function imgClick(context) {
+        var src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        var photoBrowser = api.require('photoBrowser');
+        photoBrowser.open({
+            images: [
+                src
+            ],
+            placeholderImg: 'widget://image/loading_more.gif',
+            bgColor: '#fff'
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                photoBrowser.close();
+            }
+        });
+    }
+</script>
+</html>

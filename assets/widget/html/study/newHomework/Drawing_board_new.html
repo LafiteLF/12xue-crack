@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/drawing_board.css" />
+    <title>手写板</title>
+    <style>
+        .winTitle {
+            width: calc(100% - 631px);
+        }
+
+        #drawingCanvas {
+            border: 1px solid #e4e4e8;
+            border-radius: 3px;
+            cursor: crosshair;
+            background: #fff;
+        }
+
+        .clickbtn {
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+        }
+
+        .color-options {
+            position: absolute;
+            left: -70px;
+            top: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .color-option {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            margin: 11px 0;
+            margin-left: 16px;
+            cursor: pointer;
+            border: 3px solid #e1e1e1;
+            display: block;
+        }
+
+        .color-picker {
+            position: relative;
+        }
+
+        .thin-selector {
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+        }
+
+        /* 粗细指示器样式 */
+        .thickness-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            margin: 7px auto;
+            border: none;
+            border-radius: 3px;
+            background: transparent;
+        }
+
+        .thickness-line {
+            width: 20px;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="clearfix">
+        <div onclick="closeframe()" class="winTitle pull_left">手写板</div>
+        <ul class="pull_right clearfix winIcon" id="baocun">
+            <li class="buttonTwo font4BC7C7 baocun pull_right" onclick="save()">
+                <p>保存</p>
+            </li>
+        </ul>
+    </header>
+    <div id="wrap">
+        <div id="main">
+            <div class="inputzi">
+                <input id="pollting" value="要添加的文字" />
+                <input id="color" value="颜色" />
+                <input id="width" value="宽度" />
+            </div>
+            <div class="content" style="background: #e3e3e3;">
+                <canvas id="drawingCanvas" width="800" height="600"></canvas>
+            </div>
+            <div class="tool" :style="isRedoButton?'background: none':''">
+                <ul v-if="!isRedoButton">
+                    <li class="clickbtn3" onclick="clear1()"></li>
+                    <li class="clickbtn1" onclick="undo()"></li>
+                    <li class="clickbtn2" onclick="redo()"></li>
+                    <li onclick="vm.chooseColor()">
+                        <p :style="'background:'+color" class="choose_color"></p>
+                        <div class="colors">
+                            <span tapmode id="1" onclick="setColor(this)" style="background-color:#000"></span>
+                            <span tapmode id="2" onclick="setColor(this)" style="background-color:#4969e4"></span>
+                            <span tapmode id="3" onclick="setColor(this)" style="background-color:#e34949"></span>
+                        </div>
+                    </li>
+                    <li class="clickbtn" onclick="changethin()">
+                        <div class="thickness-indicator" id="thicknessIndicator">
+                            <div class="thickness-line" id="thicknessLine"></div>
+                        </div>
+                    </li>
+                    <li class="clickbtn" onclick="setState1()">
+                        <img
+                            :src="activeButton==1?'../../../image/newhomework/vvx_08a.png':'../../../image/newhomework/vvx_08.png'">
+                    </li>
+                    <li class="clickbtn" onclick="setState5()">
+                        <img
+                            :src="activeButton==5?'../../../image/newhomework/vvx_12a.png':'../../../image/newhomework/vvx_12.png'">
+                    </li>
+                    <li class="clickbtn" onclick="setState2()">
+                        <img
+                            :src="activeButton==2?'../../../image/newhomework/vvx_18a.png':'../../../image/newhomework/vvx_18.png'">
+                    </li>
+                    <li class="clickbtn" onclick="setState3()">
+                        <img
+                            :src="activeButton==3?'../../../image/newhomework/vvx_14a.png':'../../../image/newhomework/vvx_14.png'">
+                    </li>
+                    <li class="clickbtn" onclick="setState4()">
+                        <img
+                            :src="activeButton==4?'../../../image/newhomework/vvx_16a.png':'../../../image/newhomework/vvx_16.png'">
+                    </li>
+                </ul>
+                <ul v-if="isRedoButton" class="RedoButton">
+                    <li id="jixu" onclick="isRedoButton(this)">
+                        <img src="../../../image/newhomework/jxzt.png">
+                        <p>继续作图</p>
+                    </li>
+                    <li id="chongzuo" onclick="isRedoButton(this)">
+                        <img src="../../../image/newhomework/cxzt.png">
+                        <p>重新作图</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="../../../script/vue.js"></script>
+    <script type="text/javascript" src="../../../script/wx-audio.js"></script>
+    <script type="text/javascript" src="../../../script/common.js"></script>
+    <script type="text/javascript" src="../../../script/fastclick.js"></script>
+    <script type="text/javascript">
+
+        var canvas, ctx;
+        var type;
+        var name;
+        var imgsrc;
+        var xzcolor;
+        var lineWidth;
+        var huabanx;
+        var huabany;
+        var huabanw;
+        var huabanh;
+        var vm;
+        var state;
+        var isDrawing = false;
+        var drawingHistory = [];
+        var historyIndex = -1;
+        var startX, startY; // 记录起始点坐标
+        var endX, endY; // 记录结束点坐标
+        var isDrawingShape = false; // 是否正在绘制几何图形
+        var originalImageData; // 保存原始画布内容
+
+        apiready = function () {
+            vue();
+            type = api.pageParam.type || 'huaban';
+            name = api.pageParam.name || '手写板';
+            huabanx = 20;
+            huabany = 60;
+            huabanw = api.winWidth - 100;
+            huabanh = $api.getStorage('padHeight') - 70;
+
+            xzcolor = '#000000';
+            lineWidth = 2;
+            state = 1;
+            showView();
+
+            // Android按返回键关闭页面时结束自定义页面统计
+            api.addEventListener({
+                name: 'keyback'
+            }, function (ret, err) {
+                closeframe();
+            });
+        };
+
+        function vue() {
+            vm = new Vue({
+                el: '#wrap',
+                data: {
+                    color: '#000000',
+                    activeButton: 1,
+                    thin: 1,
+                    type: api.pageParam.type,
+                    isRedoButton: false,//是否重做按钮
+                },
+                updated: function () {
+                },
+                methods: {
+                    chooseColor: function () {
+                        if (vm.activeButton == 5) {
+                            api.toast({
+                                msg: '对不起，橡皮擦状态下无法选择颜色~',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            $('.colors').show();
+                            $('.choose_color').hide();
+                        }
+                    },
+                }
+            });
+        }
+
+        function isRedoButton(content) {
+            var ischongzuo = $(content).attr('id');
+            vm.isRedoButton = false;
+            if (ischongzuo == 'chongzuo') {
+                imgsrc = api.pageParam.imgUrl;
+                clearCanvas();
+                showView();
+            } else {
+                setState1();
+            }
+        }
+
+        function showView() {
+            // 初始化Canvas
+            canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+
+            // 设置高分辨率Canvas
+            var devicePixelRatio = window.devicePixelRatio || 1;
+            var displayWidth = huabanw;
+            var displayHeight = huabanh;
+
+            // 设置Canvas实际尺寸（高分辨率）
+            canvas.width = displayWidth * devicePixelRatio;
+            canvas.height = displayHeight * devicePixelRatio;
+
+            // 设置Canvas显示尺寸
+            canvas.style.width = displayWidth + 'px';
+            canvas.style.height = displayHeight + 'px';
+
+            // 缩放绘图上下文以匹配设备像素比
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+
+            // 设置绘图样式
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = xzcolor;
+            ctx.lineWidth = lineWidth;
+
+            // 设置白色背景
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, displayWidth, displayHeight);
+
+            // 设置初始状态
+            if (vm.isRedoButton == true) {
+                setState5()
+            } else {
+                setState1();
+            }
+            saveState();
+
+            // 初始化粗细指示器
+            updateThicknessIndicator();
+
+            // 设置事件监听器
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+
+            // 获取相对于显示尺寸的坐标
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+
+            if (state === 1) { // 画笔
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+            } else if (state === 2 || state === 3 || state === 4) { // 直线、矩形、圆形
+                isDrawingShape = true;
+                // 保存当前画布内容
+                originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            // 获取相对于显示尺寸的坐标
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+
+            switch (state) {
+                case 1: // 画笔
+                    ctx.lineTo(currentX, currentY);
+                    ctx.stroke();
+                    break;
+                case 2: // 直线
+                    if (isDrawingShape) {
+                        // 恢复原始画布内容
+                        ctx.putImageData(originalImageData, 0, 0);
+                        // 绘制预览直线
+                        ctx.beginPath();
+                        ctx.strokeStyle = vm.color;
+                        ctx.lineWidth = lineWidth;
+                        ctx.moveTo(startX, startY);
+                        ctx.lineTo(currentX, currentY);
+                        ctx.stroke();
+                        // 保存当前坐标
+                        endX = currentX;
+                        endY = currentY;
+                    }
+                    break;
+                case 3: // 矩形
+                    if (isDrawingShape) {
+                        // 恢复原始画布内容
+                        ctx.putImageData(originalImageData, 0, 0);
+                        // 绘制预览矩形
+                        ctx.beginPath();
+                        ctx.strokeStyle = vm.color;
+                        ctx.lineWidth = lineWidth;
+                        ctx.rect(startX, startY, currentX - startX, currentY - startY);
+                        ctx.stroke();
+                        // 保存当前坐标
+                        endX = currentX;
+                        endY = currentY;
+                    }
+                    break;
+                case 4: // 圆形
+                    if (isDrawingShape) {
+                        // 恢复原始画布内容
+                        ctx.putImageData(originalImageData, 0, 0);
+                        // 绘制预览椭圆
+                        ctx.beginPath();
+                        ctx.strokeStyle = vm.color;
+                        ctx.lineWidth = lineWidth;
+
+                        // 计算椭圆的外接矩形
+                        const centerX = (startX + currentX) / 2;
+                        const centerY = (startY + currentY) / 2;
+                        const radiusX = Math.abs(currentX - startX) / 2;
+                        const radiusY = Math.abs(currentY - startY) / 2;
+
+                        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
+                        ctx.stroke();
+                        // 保存当前坐标
+                        endX = currentX;
+                        endY = currentY;
+                    }
+                    break;
+                case 5: // 橡皮擦
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.lineWidth = lineWidth * 2;
+                    ctx.lineTo(currentX, currentY);
+                    ctx.stroke();
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.lineWidth = lineWidth;
+                    break;
+            }
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                ctx.beginPath();
+
+                if (isDrawingShape) {
+                    // 完成几何图形绘制
+                    // 恢复原始画布内容
+                    ctx.putImageData(originalImageData, 0, 0);
+                    // 绘制最终图形
+                    ctx.beginPath();
+                    ctx.strokeStyle = vm.color;
+                    ctx.lineWidth = lineWidth;
+
+                    switch (state) {
+                        case 2: // 直线
+                            ctx.moveTo(startX, startY);
+                            ctx.lineTo(endX, endY);
+                            break;
+                        case 3: // 矩形
+                            ctx.rect(startX, startY, endX - startX, endY - startY);
+                            break;
+                        case 4: // 椭圆
+                            // 计算椭圆的外接矩形
+                            const centerX = (startX + endX) / 2;
+                            const centerY = (startY + endY) / 2;
+                            const radiusX = Math.abs(endX - startX) / 2;
+                            const radiusY = Math.abs(endY - startY) / 2;
+
+                            ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
+                            break;
+                    }
+                    ctx.stroke();
+
+                    isDrawingShape = false;
+                    // 几何图形绘制完成后保存状态
+                    saveState();
+                } else {
+                    // 非几何图形（画笔、橡皮擦）直接保存状态
+                    saveState();
+                }
+            }
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' :
+                e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            canvas.dispatchEvent(mouseEvent);
+        }
+
+        function changethin() {
+            if (vm.thin == '1') {
+                vm.thin = '2';
+                lineWidth = 4;
+            } else if (vm.thin == '2') {
+                vm.thin = '3';
+                lineWidth = 6;
+            } else if (vm.thin == '3') {
+                vm.thin = '4';
+                lineWidth = 12;
+            } else if (vm.thin == '4') {
+                vm.thin = '5';
+                lineWidth = 18;
+            } else if (vm.thin == '5') {
+                vm.thin = '1';
+                lineWidth = 2;
+            }
+            ctx.lineWidth = lineWidth;
+            vm.activeButton = state;
+            updateThicknessIndicator();
+        }
+
+        function updateThicknessIndicator() {
+            var indicator = document.getElementById('thicknessIndicator');
+            var line = document.getElementById('thicknessLine');
+            if (indicator && line) {
+                line.style.height = lineWidth + 'px';
+                line.style.backgroundColor = vm.color;
+            }
+        }
+
+
+        function setState1() {
+            state = 1;
+            ctx.strokeStyle = vm.color;
+            ctx.lineWidth = lineWidth;
+            ctx.globalCompositeOperation = 'source-over';
+            vm.activeButton = 1;
+        }
+
+        function setState2() {
+            state = 2;
+            ctx.strokeStyle = vm.color;
+            ctx.lineWidth = lineWidth;
+            ctx.globalCompositeOperation = 'source-over';
+            vm.activeButton = 2;
+        }
+
+        function setState3() {
+            state = 3;
+            ctx.strokeStyle = vm.color;
+            ctx.lineWidth = lineWidth;
+            ctx.globalCompositeOperation = 'source-over';
+            vm.activeButton = 3;
+        }
+
+        function setState4() {
+            state = 4;
+            ctx.strokeStyle = vm.color;
+            ctx.lineWidth = lineWidth;
+            ctx.globalCompositeOperation = 'source-over';
+            vm.activeButton = 4;
+        }
+
+        function setState5() {
+            state = 5;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = 10;
+            vm.activeButton = 5;
+            $('.colors').hide();
+            $('.choose_color').show();
+        }
+
+        function setColor(context) {
+            if ($(context).attr('id') == '1') {
+                vm.color = '#000000'
+            } else if ($(context).attr('id') == '2') {
+                vm.color = '#4969e4'
+            } else if ($(context).attr('id') == '3') {
+                vm.color = '#e34949'
+            }
+            $('.colors').hide();
+            $('.choose_color').show();
+            ctx.strokeStyle = vm.color;
+            updateThicknessIndicator();
+        }
+
+        function clear1() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 清空所有历史记录
+            drawingHistory = [];
+            historyIndex = -1;
+
+            // 保存初始空白状态
+            saveState();
+        }
+
+        function redo() {
+            if (historyIndex < drawingHistory.length - 1) {
+                historyIndex++;
+                restoreState();
+            }
+        }
+
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                restoreState();
+            }
+        }
+
+        function saveState() {
+            historyIndex++;
+            if (historyIndex < drawingHistory.length) {
+                drawingHistory.length = historyIndex;
+            }
+            drawingHistory.push(canvas.toDataURL());
+        }
+
+        function restoreState() {
+            if (drawingHistory[historyIndex]) {
+                const img = new Image();
+                img.onload = function () {
+                    const devicePixelRatio = window.devicePixelRatio || 1;
+                    const displayWidth = huabanw;
+                    const displayHeight = huabanh;
+
+                    // 清除画布
+                    ctx.clearRect(0, 0, displayWidth, displayHeight);
+                    // 绘制历史状态
+                    ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+                };
+                img.src = drawingHistory[historyIndex];
+            }
+        }
+
+        function save() {
+            api.showProgress({
+                title: '加载中',
+                text: '请稍后...',
+                modal: false
+            });
+            // 获取Canvas的base64数据
+            var dataURL = canvas.toDataURL('image/png');
+            console.log('Canvas base64数据长度:', dataURL.length);
+            var trans = api.require('trans');
+            imgName = "plotting_file_"+Date.now()+".png";
+            imgUrl = "/storage/emulated/0/DCIM/Doodle/";
+            trans.saveImage({
+                base64Str: dataURL,
+                imgPath: imgUrl,
+                imgName: imgName
+            }, function (ret, err) {
+                console.log(JSON.stringify(ret));
+                console.log(JSON.stringify(err));
+                if (ret.status) {
+                    api.sendEvent({
+                        name: 'DrawingBoardImg',
+                        extra: {
+                            name: api.pageParam.name,
+                            type: api.pageParam.type,
+                            imgsrc: imgUrl+imgName, 
+                            tkindex: api.pageParam.tkindex,
+                            ztimgindex: api.pageParam.ztimgindex,
+                        }
+                    });
+                    
+                } else {
+
+                }
+                api.hideProgress();
+            });
+        }
+
+
+        function closeframe() {
+            api.confirm({
+                title: '退出将无法保存写画内容，请问是否退出？',
+                buttons: ['退出', '不退出']
+            }, function (ret, err) {
+                if (ret.buttonIndex == 1) {
+                    api.closeWin();
+                }
+            });
+        }
+
+    </script>
+</body>
+
+</html>

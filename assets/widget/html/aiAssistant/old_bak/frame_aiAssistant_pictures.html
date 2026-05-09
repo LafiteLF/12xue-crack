@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body style="background-color: white;">
+    <div class="content">
+        <img :src="picture" alt="" v-for="picture in pictures" style="width: 100%;" @click="openPicture(picture)">
+    </div>
+</body>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script>
+    let vm = null;
+    function initVue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                pictures: [],
+            },
+            methods: {
+                logData: function () {
+                    return
+                },
+                setPictures: function (pictures) {
+                    this.pictures = pictures;
+                },
+                openPicture: function (src) {
+                    // api.openWin({
+                    //     name: 'win_aiAssistant_picture',
+                    //     url: './win_aiAssistant_picture.html',
+                    //     pageParam: {
+                    //         src: src
+                    //     }
+                    // })
+                    var photoBrowser = api.require('photoBrowser');
+                    photoBrowser.open({
+                        images: [
+                            src
+                        ],
+                        placeholderImg: 'widget://../image/loading_more.gif',
+                        bgColor: '#fff'
+                    }, function (ret, err) {
+                        if (ret.eventType == 'click') {
+                            photoBrowser.close();
+                        }
+                    });
+                }
+            },
+        });
+    }
+    apiready = function () {
+        initVue();
+        vm.setPictures(api.pageParam.pictures);
+    };
+
+</script>
+
+</html>

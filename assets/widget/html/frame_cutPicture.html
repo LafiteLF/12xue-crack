@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>裁剪图片</title>
+    <link rel="stylesheet" type="text/css" href="../css/publicCss.css" />
+</head>
+<style>
+    /*[v-cloak] {*/
+    /*display: none*/
+    /*}*/
+    .content {
+        width: 100%;
+        height: 100%;
+        background: #000;
+    }
+
+    ul {
+        width: 80px;
+        position: fixed;
+        right: 0;
+    }
+
+    ul li {
+        width: 60px;
+        height: 30px;
+        border-radius: 100px;
+        text-align: center;
+        color: #fff;
+        font-size: 1.4rem;
+        line-height: 30px;
+        margin-top: 35px;
+    }
+</style>
+
+<body>
+    <div class="content">
+        <ul>
+            <li style="background: #4bc7c7" onclick="save()">确定</li>
+            <li style="background:#ff778c " onclick="close2()">取消</li>
+            <li style="background: #4bc764" onclick="rotate()" id="rotate">旋转</li>
+        </ul>
+
+    </div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../script/vue.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/fastclick.js"></script>
+<script>
+    var FNImageClip = null;
+    var rotateSrc = '';
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        if ($api.getStorage('padType') === '1') {//如果是老版本，不采用新的
+            document.getElementById('rotate').style.display = 'none';
+        }
+        rotateSrc = api.pageParam.src;
+        FNImageClip = api.require('FNImageClip');
+        FNImageClip.open({
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth - 80,
+                h: api.winHeight
+            },
+            srcPath: api.pageParam.src,
+            mode: 'clip',
+            style: {
+                mask: 'rgba(0, 0, 0, 0.5)',
+                clip: {
+                    w: api.winWidth - 180,
+                    h: api.winHeight - 100,
+                    x: 50,
+                    y: 50,
+                    borderColor: '#0f0',
+                    borderWidth: 1,
+                    appearance: 'rectangle'
+                }
+            },
+            fixedOn: api.frameName
+        }, function (ret, err) {
+            if (ret) {
+                // alert(JSON.stringify(ret));
+            } else {
+                // alert(JSON.stringify(err));
+            }
+        });
+    };
+    function rotate() {
+        var imageRotation = api.require('imageRotation');
+        imageRotation.rotateImage({
+            path: rotateSrc,
+            orientation: 'left'
+        }, function (ret) {
+            let oldPath = rotateSrc;
+            rotateSrc = ret.path;
+            FNImageClip.close();
+            FNImageClip.open({
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth - 80,
+                    h: api.winHeight
+                },
+                srcPath: ret.path,
+                mode: 'clip',
+                style: {
+                    mask: 'rgba(0, 0, 0, 0.5)',
+                    clip: {
+                        w: api.winWidth - 180,
+                        h: api.winHeight - 100,
+                        x: 50,
+                        y: 50,
+                        borderColor: '#0f0',
+                        borderWidth: 1,
+                        appearance: 'rectangle'
+                    }
+                },
+                fixedOn: api.frameName
+            }, function (ret, err) {
+                if (ret) {
+                    // alert(JSON.stringify(ret));
+                    var fs = api.require('fs');
+                    fs.remove({
+                        path: oldPath
+                    }, function (ret, err) {
+                        if (ret.status) {
+                            console.log('删除成功');
+                        }
+                    });
+                } else {
+                    // alert(JSON.stringify(err));
+                }
+            });
+
+        })
+    }
+    function save() {
+        api.showProgress({
+            title: '正在保存图片',
+            text: '请稍后',
+            modal: true
+        });
+        FNImageClip.save({
+            destPath: 'fs://imageClip/result' + new Date().valueOf() + '.jpg',
+            copyToAlbum: false,
+            quality: 1
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                api.sendEvent({
+                    name: 'cutPicture' + api.pageParam.frameName,
+                    extra: { src: ret.destPath, tkindex: api.pageParam.tkindex }
+                });
+
+            } else {
+                alert(JSON.stringify(err));
+            }
+        });
+    }
+    function close2() {
+        FNImageClip.close();
+        api.closeFrame({
+            name: 'frame_cutPicture'
+        });
+    }
+</script>
+
+</html>

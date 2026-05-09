@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html body {
+            background-color: white;
+        }
+
+        .myPointtitle {
+            margin-left: 10px;
+            margin-top: 10px;
+
+        }
+
+        .aui-content p {
+            margin-bottom: 18px;
+        }
+
+        .left {
+            width: 16px;
+            height: 388px;
+            float: left;
+            margin-left: 10%;
+            background: url('../../../image/myRankImage/hq.png') no-repeat;
+            background-size: 16px 455px;
+        }
+
+        .now {
+            width: 16px;
+            /*height: 439px;*/
+            background: url('../../../image/myRankImage/cq.png') no-repeat;
+            background-size: 16px 455px;
+            position: relative
+        }
+
+        .now .point {
+            display: block;
+            width: 24px;
+            height: 17px;
+            background: url('../../../image/myRankImage/dq.png') no-repeat;
+            background-size: 24px 17px;
+            position: absolute;
+            left: -18px;
+            bottom: -7px;
+        }
+
+        .right {
+            width: 200px;
+            height: 629px;
+            float: left;
+            background-color: white;
+            margin-left: 16px;
+        }
+
+        .dengjiP {
+            font-size: 24px;
+        }
+
+        .dj {
+            margin-bottom: 37px;
+        }
+
+    </style>
+</head>
+<body>
+<div style="background-color: #EEEEEE;width: 100%;height: 5px"></div>
+<div class="aui-content">
+    <h3 class="myPointtitle">我的成长值：<span class="cz" style="color:#4bc7c7 "></span></h3>
+
+    <p class="myPointtitle"> 距离下一个等级还有<span class="nextcz"></span>成长值</p>
+</div>
+<div class="left">
+    <div class="now gaodu"><i class="point"></i></div>
+</div>
+<div class="right">
+    <div class="dj"><span class="dengjiP zero"><img src="../../../image/myRankImage/v00.png" width="25px"></span>
+    <span>0成长值</span></div>
+    <div class="dj"><span class="dengjiP one"><img src="../../../image/myRankImage/v1h.png" width="25px"></span>
+    <span>3000成长值</span></div>
+    <div class="dj"><span class="dengjiP two"><img src="../../../image/myRankImage/v2h.png" width="25px"></span>
+    <span>5000成长值</span></div>
+    <div class="dj"><span class="dengjiP three"><img src="../../../image/myRankImage/v3h.png" width="25px"></span>
+    <span>8000成长值</span></div>
+    <div class="dj"><span class="dengjiP four"><img src="../../../image/myRankImage/v4h.png" width="25px"></span>
+    <span>15000成长值</span></div>
+    <div class="dj"><span class="dengjiP five"><img src="../../../image/myRankImage/v5h.png" width="25px"></span>
+    <span>30000成长值</span></div>
+
+
+</div>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<!--<script type="text/javascript" src="../../../script/mineJS/myRank/myRank.js"></script>-->
+
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+
+    apiready = function () {
+        GetUserstore();
+    };
+
+    function GetUserrank(prestige) {
+        apiObj.Get(UrlRouter.GetUserrank, {
+            values: {}
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    var data = ret.data;
+                    var level;
+                    var baifenbi;
+                    for (var k = 0; k < data.length; k++) {
+                        var html;
+                        prestige = parseInt(prestige);
+                        if (prestige >= data[k].experience && prestige <= data[k + 1].experience) {
+                            level = data[k].alias;
+                            if (k <= 2) {
+                                for (var j = 0; j < 6; j++) {
+                                    html = '<div class="dj"><span class="dengjiP zero">V' + data[j].rank + '</span>' + '   <span style="color: #4bc7c7">' + data[j].experience + '成长值</span></div>';
+                                    baifenbi = (k * 20 + ((prestige - parseInt(data[k].experience)) / (parseInt(data[k + 1].experience) - parseInt(data[k].experience)) * 0.2 * 100)) + '%';
+                                    $api.append($api.dom('.right'), html);
+                                }
+                            } else if (k > 2 && k < data.length - 3) {
+                                for (var j = k - 2; j < k + 4; j++) {
+                                    html = '<div class="dj"><span class="dengjiP zero">V' + data[j].rank + '</span>' + '   <span style="color: #4bc7c7">' + data[j].experience + '成长值</span></div>';
+                                    baifenbi = (2 * 20 + ((prestige - parseInt(data[k].experience)) / (parseInt(data[k + 1].experience) - parseInt(data[k].experience)) * 0.2 * 100)) + '%';
+                                    $api.append($api.dom('.right'), html);
+                                }
+                            } else if (k > data.length - 3) {
+                                for (var j = data.length - 6; j < data.length; j++) {
+                                    html = '<div class="dj"><span class="dengjiP zero">V' + data[j].rank + '</span>' + '   <span style="color: #4bc7c7">' + data[j].experience + '成长值</span></div>';
+                                    baifenbi = ((k - data.length + 6) * 20 + ((prestige - parseInt(data[k].experience)) / (parseInt(data[k + 1].experience) - parseInt(data[k].experience)) * 0.2 * 100)) + '%';
+                                    $api.append($api.dom('.right'), html);
+                                }
+                            }
+                            $api.html($api.dom('.nextcz'), parseInt(data[k + 1].experience - prestige));
+                            $(".now").css("height", baifenbi);
+                            return;
+                        }
+                    }
+                } else {
+                    //alert(ret.msg);
+                }
+            } else {
+
+                api.toast(
+                        {
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                )
+            }
+        })
+
+    }
+    function GetUserstore() {//获取用户的学币/积分/威望/经验详情
+        apiObj.Get(UrlRouter.GetUserstore, "", function (ret, err) {
+
+            if (ret) {
+                if (ret.ret == 0) {
+
+                    $api.setStorage('point', ret.point);
+                    $api.setStorage('prestige', ret.prestige);
+                    $api.setStorage('experience', ret.experience);
+                    $api.html($api.dom('.cz'), ret.prestige);
+
+                    GetUserrank(ret.prestige);
+                } else {
+                    api.toast(
+                            {
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            }
+                    )
+
+                }
+            } else {
+                api.toast(
+                        {
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                )
+            }
+
+        });
+
+    }
+
+</script>
+</body>
+</html>

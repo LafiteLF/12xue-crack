@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }     .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .show {
+            width: 35%;
+            top: 25%;
+            position: absolute;
+            left: 32.5%;
+            background: #fff;
+            border-radius: 5px;
+            height: 50%;
+            padding-top: 50px;
+            padding-bottom: 30px;
+            overflow-y: auto;
+        }
+        .item {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #fff;
+            width: 60%;
+            height: 46px;
+            line-height: 46px;
+            margin: 0 auto;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background: #4bc7c7;
+        }
+        .item:active{
+            background: #3fa6a6;
+        }
+
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="backgroud" tapmode onclick="api.closeFrame({
+    name: api.frameName
+});"></div>
+<div class="show">
+    <!--<p id="3" class="item aui-border-b" tapmode onclick="itemClick(this)">全部</p>-->
+    <!--<p id="2" class="item aui-border-b" tapmode onclick="itemClick(this)">未发送</p>-->
+    <!--<p id="1" class="item aui-border-b" tapmode onclick="itemClick(this)">发送过</p>-->
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var array = api.pageParam.array;
+        for (var i = 0; i < array.length; i++) {
+            $api.append($api.dom('.show'), '<p id="' + i + '" class="item aui-border-b" tapmode onclick="itemClick(this,\'' + api.pageParam.item + '\')">' + array[i] + '</p>');
+        }
+    };
+
+    function itemClick(context, item) {
+        var js;
+        var sex;
+        var identitytype;
+        switch (item) {
+            case 'type-sex':
+                switch (context.id) {
+                    case '0':
+                        sex = 0;
+                        break;
+                    case '1':
+                        sex = 1;
+                        break;
+                    case '2':
+                        sex = 2;
+                        break;
+                }
+                js = 'sex = ' + sex + ';p = 1;changCondition();api.showProgress({modal: false});';
+
+                break;
+            case 'type-identitytype':
+                switch (context.id) {
+                    case '0':
+                        identitytype = 2;
+                        break;
+                    case '1':
+                        identitytype = 3;
+                        break;
+                    case '2':
+                        identitytype = 4;
+                        break;
+                }
+                js = 'identitytype = ' + identitytype + ';p = 1;changCondition();api.showProgress();';
+                break;
+        }
+        var func = "$api.html($api.dom($api.dom('." + item + "'),'.type'), '" + $api.text(context) + '<span class="aui-iconfont aui-icon-unfold"></span>' + "');api.closeFrame({name: 'frame-tab-search'});";
+        api.execScript({
+            frameName: api.pageParam.frameName,
+            script: func
+        });
+        api.execScript({
+            frameName: api.pageParam.frameName,
+            script: js
+        })
+    }
+</script>
+</html>

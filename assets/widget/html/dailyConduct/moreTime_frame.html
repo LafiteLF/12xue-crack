@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .myContentDiv {
+            width: 30%;
+            /*height: 30%;*/
+            background-color: white;
+            /*float: right;*/
+            margin-bottom: 0px;
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            /*box-shadow: 1px 1px 2px rgb(248, 248, 248);*/
+        }
+
+        .myContentDiv span {
+            font-size: 14px;
+        }
+
+        .leftDiv {
+            height: 100%;
+            width: 100%;
+            float: left;
+            /*background-color: white;*/
+            position: relative;
+        }
+
+        .rightDiv {
+            height: 70%;
+            width: 30%;
+            margin-top: 0px;
+            /*background-color: red;*/
+            float: right;
+        }
+
+        .caogaozhiDiv {
+            height: 20px;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .wendaDiv {
+            height: 20px;
+            margin-top: 10px
+        }
+
+        .fujianDiv {
+            height: 20px;
+            margin-top: 10px;
+            /*display: none;*/
+        }
+    </style>
+</head>
+<body>
+<div class="leftDiv" onclick="closeSelFrame()">
+    <div class="aui-content myContentDiv">
+        <div class="caogaozhiDiv" onclick="thisWeek()">
+            <span style="margin-top: 3px;margin-left: 3px;position: absolute;">本周</span>
+        </div>
+        <p style="background-color: #EEEEEE;height: 1px"></p>
+
+        <div class="wendaDiv" onclick="lastWeek()">
+            <span style="margin-top: 1px;margin-left: 3px;position: absolute;">上周</span>
+        </div>
+        <p style="background-color: #EEEEEE;height: 1px"></p>
+
+        <div class="fujianDiv" onclick="thisMonth()">
+            <span style="margin-top: 1px;margin-left: 3px;position: absolute;">本月</span>
+        </div>
+        <p style="background-color: #EEEEEE;height: 1px"></p>
+        <div class="caogaozhiDiv" onclick="lastMonth()">
+            <span style="margin-top: 3px;margin-left: 3px;position: absolute;">上月</span>
+        </div>
+        <p style="background-color: #EEEEEE;height: 1px"></p>
+        <div class="caogaozhiDiv" onclick="thisSemester()">
+            <span style="margin-top: 3px;margin-left: 3px;position: absolute;">本学期</span>
+        </div>
+        <p style="background-color: #EEEEEE;height: 1px"></p>
+        <div class="caogaozhiDiv" onclick="lastSemester()">
+            <span style="margin-top: 3px;margin-left: 3px;position: absolute;">上学期</span>
+        </div>
+        <p style="background-color: #EEEEEE;height: 1px"></p>
+    </div>
+</div>
+
+<!--<div class="rightDiv" onclick="closeSelFrame()"></div>-->
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var isInitDrawing = false;//是否已经初始化画板
+    var drawingBoard;//画板
+    apiready = function () {
+        var is_attach = api.pageParam.is_attach;
+        if (is_attach == 1) {
+            $api.css($api.dom('.fujianDiv'), 'display:block');
+        }
+        if(api.systemType == 'ios'){
+            api.setScreenOrientation({
+                orientation: 'landscape_left'
+            });
+        }else {
+            api.setScreenOrientation({
+                orientation: 'landscape_left'
+            });
+        }
+    };
+    function thisWeek() {
+    }
+    function lastWeek() {
+    }
+    function thisMonth(e) {
+    }
+    function lastMonth() {
+    }
+    function thisSemester() {
+    }
+    function lastSemester() {
+    }
+    function closeSelFrame() {
+        api.closeFrame({
+            name: 'moreTime_frame'
+        });
+    }
+</script>
+</html>

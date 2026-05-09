@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>应用市场</title>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>学科列表</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <style>
+        body{background: #f2f2f2}
+        [v-cloak] {
+            display: none
+        }
+        /*.content{ padding-top: 20px;}*/
+
+        .appIcon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
+            border-radius: 20%;
+        }
+
+        .aui-col-xs-my {
+            width: 12.5%;
+            position: relative;
+            float: left;
+            text-align: center;
+        }
+        ul li{ width: 90px; margin: 10px 0px}
+
+        .list-item {
+            padding-top: 20px;
+            position: relative;
+            width: 120px;
+        }
+
+        .app-name {
+            width: 100%;
+            text-align: center;
+            font-size: 0.6rem;
+            color: #666666;
+        }
+
+        .aui-content-padded {
+             margin: 0rem !important;
+        }
+        .aui-progress { height: 0.8rem !important; overflow: hidden}
+        .aui-content-padded {
+          position: relative;
+            border: 1px solid #4BC7C7;
+            border-radius: 300px;
+            overflow: hidden;
+            width: 70px;
+            margin: 10px auto !important;
+        }
+        .jx1{ position: absolute; width: 70px; height: 0.8rem ; line-height:0.9rem; font-size: 0.5rem; text-align: center;  left: 0px ; z-index: 10; color: #4bc7c7}
+        .jx2{ position: absolute; width: 70px; height: 0.8rem ;  font-size: 0.5rem; text-align: center;     left: 0px;
+            color: #fff;
+            top: -2.5px;z-index: 30}
+        .aui-progress-bar{ position:absolute; left:0px; top: 0px;z-index: 20; overflow: hidden}
+
+        .noApps {
+            width: 40%;
+            margin: 0 auto;
+            padding-top: 10%;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <section class="aui-refresh-content">
+        <div class="content" v-cloak>
+            <ul v-if="apps.length > 0">
+
+                <!--<li class="list-item aui-col-xs-my" v-for="list in 20">-->
+                <!--<div class="appInfo">-->
+                <!--<img class="appIcon" src="../../icon/icon150x150.png"/>-->
+                <!--<p class=" app-name">学生端</p>-->
+                <!--</div>-->
+                <!--<div class="aui-content-padded">-->
+                <!--<div class="aui-progress">-->
+                <!--<div class="aui-progress-bar" style="width: 60%;">-->
+                <!--<span class="jx2">继续</span>-->
+                <!--</div>-->
+                <!--<span class="jx1">继续</span>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</li>-->
+
+
+                <li class="list-item aui-col-xs-my" v-for="app in apps">
+                    <div class="downloadInfo"  :url="app.downloadurl" :id="app.id">
+                        <img :src="app.ico" class="appIcon" onerror="ErrIcon(this)"/>
+                        <p class="aui-ellipsis-1 app-name" v-text="app.app_name"></p>
+                    </div>
+
+                    <div class="aui-content-padded">
+                        <div class="aui-progress" :url="app.downloadurl" :id="app.id" :appName="app.app_name"  tapmode onclick="itemClick(this)">
+                            <div class="aui-progress-bar" style="width: 0;">
+                                <span class="jx2">下载</span>
+                            </div>
+                            <span class="jx1">下载</span>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+
+            <div class="noApps aui-hide">
+                <img src="../../image/noApps.png" style="width: 60%; max-width: 508px;">
+                <p style="font-size: 1rem">暂无应用</p>
+            </div>
+
+        </div>
+    </section>
+</body>
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script>
+    var downloadManager;
+    var timer;
+    var downLoadState = 0; // 0 初始状态  1 正在下载 2 暂停下载  3 下载完成
+    var schoolId = '';
+    var pullRefresh;
+    var refreshId = 0;
+    apiready = function () {
+        vm.getSchoolId();
+        downloadManager = api.require('downloadManager');
+
+        //下拉刷新
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                if (schoolId == '') {
+                    vm.getSchoolId();
+                } else {
+                    vm.refreshAppLists();
+                }
+            }
+        });
+
+    };
+
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            apps:[],
+            errIcon: '../../icon/icon_moren.png'
+        },
+        methods: {
+            getAppLists: function () {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                var apiObj = new GridOpenApi(UrlDomain, source, version);
+                apiObj.Get(UrlRouter.PadApps, {
+                    values: {
+                        schoolid: schoolId
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            vm.apps = ret.data;
+                            if (ret.data.length == 0) {
+                                $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                            $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                    }
+                    api.hideProgress();
+                });
+            },
+
+            getSchoolId: function () {
+                var apiObj = new GridOpenApi(UrlDomain, source, version);
+                apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                    values: {
+                        uid: $api.getStorage('uid')
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            if (ret.data == '' || ret.data == null) {
+                                vm.apps = [];
+                                schoolId = '';
+                                $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                            } else {
+                                schoolId = ret.data[0].id;
+                                vm.getAppLists();
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                            $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                    }
+                    pullRefresh.cancelLoading();
+                });
+            },
+
+            refreshAppLists: function () {
+                var apiObj = new GridOpenApi(UrlDomain, source, version);
+                apiObj.Get(UrlRouter.PadApps, {
+                    values: {
+                        schoolid: schoolId
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            vm.apps = ret.data;
+                            if (ret.data.length == 0) {
+                                $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                            } else {
+                                $api.addCls($api.dom('.noApps'), 'aui-hide');
+                            }
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                            $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        $api.removeCls($api.dom('.noApps'), 'aui-hide');
+                    }
+                    pullRefresh.cancelLoading();
+                });
+            }
+        }
+    });
+
+    var appId = '';
+    var newContext;
+    function itemClick(context) {
+        if (downLoadState == 1) {
+            api.toast({
+                msg: '正在下载安装，请稍后',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        api.download({
+            url: $api.attr(context, 'url'),
+            savePath: 'file:///storage/emulated/0/UZMap/A6919706055886/download/'+$api.attr(context, 'appName'),
+            report: true,
+            cache: true,
+            allowResume: true
+        }, function(ret, err) {
+            if (ret) {
+                setText(context, '下载中');
+                downLoadState = 1;
+                if (ret.state == 1) {
+                    downLoadState = 0;
+                    api.installApp({
+                        appUri: ret.savePath
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+
+
+
+//        if (downLoadState == 1 && ($api.text($api.last(context)) == '下载' || $api.text($api.last(context)) == '继续')) {
+//            api.toast({
+//                msg: '正在下载其他应用，请稍后',
+//                duration: 2000,
+//                location: 'bottom'
+//            });
+//        } else {
+//            newContext = context;
+//            if ($api.text($api.last(context)) == '下载') {
+//
+//                downloadManager.enqueue({
+//                    url: $api.attr(context, 'url'),
+//                    savePath: 'file:///storage/emulated/0/UZMap/A6919706055886/download/'+$api.attr(context, 'appName'),
+//                    cache: true,
+//                    allowResume: true,
+//                    networkTypes: 'all'
+//                }, function (ret, err) {
+//                    var newContext = context;
+//                    if (ret) {
+//                        downLoadState = 1;
+//                        $api.attr(context, 'appId', ret.id);
+//                        timer = setInterval("checkDownLoad(newContext)", 1000);
+//                    } else {
+//                        api.toast({
+//                            msg: err.msg,
+//                            duration: 2000,
+//                            location: 'bottom'
+//                        });
+//                    }
+//                });
+//            } else if ($api.text($api.last(context)) == '点击安装') {
+//                itemClick1(context, $api.attr(context, 'appId')); // 下载id
+//            } else if ($api.text($api.last(context)) == '继续') {
+//                downLoadState = 1;
+//                downloadManager.resume({
+//                    id: $api.attr(context, 'appId')
+//                }, function(ret, err) {
+//                });
+//                timer = setInterval("checkDownLoad(newContext)", 1000);
+//            } else {
+//                downLoadState = 2;
+//                clearInterval(timer);
+//                downloadManager.pause({
+//                    id: $api.attr(context, 'appId')
+//                }, function(ret, err) {
+//                });
+////                $api.text($api.last(context), '继续');
+//                setText(context, '继续');
+//            }
+//        }
+    }
+
+    function itemClick1(context, id) {
+
+        downloadManager.openDownloadedFile({
+            id: id
+        }, function (ret, err) {
+            if (!ret.status) {
+                downloadManager.enqueue({
+                    url: $api.attr(context, 'url'),
+                    savePath: 'file:///storage/emulated/0/UZMap/A6919706055886/download/'+$api.attr(context, 'appName'),
+                    cache: true,
+                    allowResume: true,
+                    networkTypes: 'all'
+                }, function (ret, err) {
+                    var newContext = context;
+                    if (ret) {
+                        downLoadState = 1;
+                        $api.attr(context, 'appId', ret.id);
+                        timer = setInterval("checkDownLoad(newContext)", 1000);
+                    } else {
+                        alert(err);
+                    }
+                });
+            }
+        });
+    }
+
+    function checkDownLoad(context) {
+        downloadManager.query({
+            ids: [
+                $api.attr(context, 'appId')
+            ]
+        }, function(ret, err) {
+            if (ret) {
+                if (ret.data && ret.data.length != 0) {
+                    if (ret.data[0].finishSize == ret.data[0].totalSize) {
+                        $api.attr($api.first(context), 'style', 'width: 100%');
+
+                        setText(context, '点击安装');
+//                        $api.text($api.last(context), '点击安装');
+//                        $api.text($api.dom($api.first(context), 'jx2'), '点击安装');
+                        downLoadState = 3;
+                        clearInterval(timer);
+                    } else {
+                        if (downLoadState != 2) {
+                            var progress = (Math.round(ret.data[0].finishSize/ret.data[0].totalSize * 100) + "%");
+                            $api.attr($api.first(context), 'style', 'width:' + progress);
+//                            $api.text($api.last(context), progress);
+                            setText(context, progress);
+                            downLoadState = 1;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function setText(context, str) {
+        $api.text($api.dom(context, '.jx1'), str);
+        $api.text($api.dom(context, '.jx2'), str);
+    }
+
+    function ErrIcon(context) {
+        refreshId++;
+        context.src = vm.errIcon;
+        if (refreshId > 6) {  //连续刷新6此以上 onerror事件自动去掉
+            context.onerror = null;
+        }
+    }
+
+
+</script>
+
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码</title>
+    <link rel="stylesheet" href="../../css/sm.min.css">
+    <link rel="stylesheet" href="../../css/common.css">
+    <link rel="stylesheet" href="../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <style type="text/css">
+        body {
+            background-color: #e5e5e5;
+        }
+
+        .account {
+            padding: 0.5rem 0.5rem;
+            font-size: 18px;
+        }
+
+        .aui-input-row {
+            height: 40px;
+            /*padding: 8px 15px;*/
+            margin-top: 10px;
+            width: 100%;
+            line-height: 10px;
+            margin-left: 10px;
+        }
+        .aui-list-item-input{
+            background-color: #fff;
+            margin: 5px 5px;
+            padding-left: 15px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="account"><span>帐号：</span> <span id="account" class="account"></span></div>
+
+<div class="aui-list-item-input">
+    <input id="answer" type="password" class="new-pwd " placeholder="请输新密码" style="">
+</div>
+<div class="aui-list-item-input">
+    <input id="answerAgain" type="password" class="again-pwd" placeholder="请再次输入新密码" style="">
+</div>
+
+
+</body>
+<footer>
+</footer>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var newPwd;
+    var newPwdAgain;
+    apiready = function () {
+        $api.text($api.byId('account'), api.pageParam.account);
+    };
+    //重置密码
+    function resetPwd() {
+        var answer = $api.dom('#answer');
+        answer.blur();
+        var answerAgain = $api.dom('#answerAgain');
+        answerAgain.blur();
+
+        newPwd = $api.val($api.byId('answer'));
+        newPwdAgain = $api.val($api.byId('answerAgain'));
+        if (newPwd == '') {
+            api.toast({
+                msg: '请输入新密码',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }else if(!(newPwd.indexOf(" ") == -1)||!(newPwdAgain.indexOf(" ") == -1)){
+            api.toast({
+                msg: '密码中不能含有空格',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else if (trimStr(newPwd).length > 30 || trimStr(newPwd).length < 6) {
+            api.toast({
+                msg: '请输入6~30位新密码',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else if (newPwdAgain == '') {
+            api.toast({
+                msg: '请确认新密码',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }else if (newPwd != newPwdAgain) {
+            api.toast({
+                msg: '新密码不一致',
+                duration: 2000,
+                location: 'bottom'
+            });
+        } else if(checkPassword(newPwd)){
+            api.toast({
+                msg: '密码设置过于简单，请重新设置',
+                duration: 2000,
+                location: 'bottom'
+            });
+            $api.val($api.byId('answer'), '');
+            $api.val($api.byId('answerAgain'), '');
+            $api.byId('answer').focus();
+        } else {
+            apiObj.Put(UrlRouter.PutSecurityPassword, {
+                values: {
+                    uid: api.pageParam.uid,
+                    secret: api.pageParam.secret,
+                    password: encodeURIComponent(newPwdAgain)
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        api.toast({
+                            msg: '密码更换成功,请重新登录',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        setTimeout('closetowin()',1500);
+
+                    } else {
+                        //alert(ret.msg);
+                    }
+                } else {
+
+                }
+            })
+        }
+    }
+    function closetowin() {
+        api.closeToWin({
+            name: 'root',
+            animation: {
+                type: 'reveal',
+                subType: 'from_left',
+                duration: 300
+            }
+        });
+    }
+</script>
+</html>

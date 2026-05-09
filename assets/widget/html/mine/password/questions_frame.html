@@ -1,0 +1,85 @@
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>密保问题列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body{
+            background-color: #f2f2f2;
+
+
+        }
+        .aui-content{width: 80%; margin: 0 auto; background: #fff; margin-top: 10px;}
+        ul{ padding: 0 5px;}
+        .aui-list:before{height: 0px;}
+        .aui-list:after{ height: 0px;}
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <ul  class="aui-list aui-list-in">
+        <!--<li class="aui-list-item">-->
+        <!--<div class="aui-list-item-inner">-->
+        <!--你爸爸叫啥-->
+        <!--</div>-->
+        <!---->
+        <!--</li>-->
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<!--<script type="text/javascript" src="../../../script/mineJS/password/protectPwdPlanB.js"></script>-->
+<script type="text/javascript">
+    var data;
+    var id;//第几个问题
+    var questionIdsss = new Array(10);
+    var qArr=[];
+    var tagIdOne;
+    var tagIdTwo;
+    var tagIdThree;
+    apiready=function () {
+        data= api.pageParam.questions;
+        id= api.pageParam.id;
+        tagIdOne= api.pageParam.tagIdOne;
+        tagIdTwo= api.pageParam.tagIdTwo;
+        tagIdThree= api.pageParam.tagIdThree;
+
+        for(var i=0;i<data.length;i++){
+            if (tagIdOne==data[i].id||tagIdTwo==data[i].id||tagIdThree==data[i].id){
+
+            }else {
+                qArr.push(data[i]);
+            }
+        }
+
+        if (qArr.length > 0) {
+            data = qArr;
+        }
+        for (var n=0;n<data.length;n++){
+            var html='<li class="aui-list-item" id="'+data[n].id+'" onclick="clicked(this)">'+'<div class="aui-list-item-inner">'+data[n].question+'</div>'+'</li>'
+            var ul= $api.dom( '.aui-list');
+            $api.append(ul,html);
+        }
+    };
+    function clicked(context) {
+        questionIdsss[id] =$api.attr(context,'id');
+//        alert(questionIdsss[id]);
+
+        var questionText=$api.text($api.dom(context,'.aui-list-item-inner'));
+//        alert(questionText);
+        api.sendEvent({
+            name: 'clickItem',
+            extra: {itemQuestion: questionText,questionIds:questionIdsss[id],id:id}//问题详情  问题id  第几个问题  012
+        });
+        api.closeFrame({
+            name: ''
+        });
+    }
+
+</script>
+</html>

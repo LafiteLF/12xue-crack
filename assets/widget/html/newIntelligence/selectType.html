@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>选择班级</title>
+    <link rel="stylesheet" href="../../css/publicCss.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+
+        .main {
+            width: 250px;
+            height: 172px;
+            position: absolute;
+            top: calc(50% - 64px);
+            left: calc(50% - 125px);
+
+
+            overflow: hidden;
+            z-index: 2;
+
+        }
+        .main ul{
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .main ul li {
+            height: 42px;
+            line-height: 42px;
+            text-align: center;
+            font-size: 1.4rem;
+            background: #fff;
+        }
+
+        .main ul li + li {
+            border-top: 1px solid #e4e4e8;
+        }
+
+        .active {
+            color: #4bc7c7;
+        }
+    </style>
+</head>
+<body>
+<div class="close" onclick="api.closeFrame();"></div>
+<div class="main">
+    <ul>
+        <li :class="type=='practice'?'active':''" @click="choose('practice')">12xue精品</li>
+        <li :class="type=='self'?'active':''" @click="choose('self')">我老师创作的</li>
+        <li :class="type=='school'?'active':''" @click="choose('school')">校本共享的</li>
+        <li v-if="isshowqt" :class="type=='other'?'active':''" @click="choose('other')">其他</li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue();
+        vm.GetSchoolConfig();
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.main',
+            data: {
+                type: api.pageParam.type,
+                isshowqt:false
+            },
+            updated: function () {
+
+            },
+            methods: {
+                GetSchoolConfig: function () {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetSchoolConfig, {
+                        values: {
+                            schoolid:$api.getStorage('schoolid'),
+                            type:'resource_share ',
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                api.hideProgress();
+                                if(ret.data&&ret.data.length>0&& ret.data[0].value==1){
+                                    vm.isshowqt=true;
+                                }else{
+                                    vm.isshowqt=false;
+                                }
+                            } else {
+                                api.toast(
+                                    {
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                                )
+                            }
+                        } else {
+                            api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                            )
+                        }
+
+                    })
+                },
+                choose: function (type) {
+                    vm.type =type;
+                    api.sendEvent({
+                        name: 'selectType1',
+                        extra: {
+                            type: type,
+                        }
+                    });
+                    api.closeFrame();
+                },
+
+            }
+        });
+    }
+</script>
+</html>

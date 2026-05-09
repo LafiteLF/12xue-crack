@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>智能导练解锁</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e5e5
+        }
+        a{ display: inline-block; float: left}
+        span b{color: #333333!important; font-weight: normal;font-size: 0.8rem}
+
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='closeWin()' ><b>智能导练解锁</b></span>
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var issaoma;
+    apiready = function () {
+        issaoma = api.pageParam.issaoma;
+        var header = document.querySelector('header');
+       // $api.fixStatusBar(header);
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.openFrame({
+            name: 'frame-Intelligence-Unlock',
+            url: 'frame-Intelligence-Unlock.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: {
+                data:api.pageParam.data,
+                issaoma:issaoma,
+            },
+            bounces: false
+        });
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin()
+        });
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            subjects: []
+        },
+        methods: {
+        }
+    });
+    function closeWin() {
+        api.closeWin();
+    }
+</script>

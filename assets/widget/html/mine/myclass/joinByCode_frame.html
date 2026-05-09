@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>添加班级</title>
+
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css" />
+    <style type="text/css">
+        body{
+            background-color: #f2f2f2;
+        }
+        .aui-input-row{
+            height: 40px;
+            /*padding: 8px 15px;*/
+            margin-top: 10px;
+            width: 100%;
+            line-height: 10px;
+            background-color: #fff;
+        }.aui-input-row:last-child:after {
+             border-bottom: 1px solid #fff;
+         }
+
+        .aui-btn-block{
+            margin-top: 10px;
+            width: 30%;
+            height: 50px;
+            line-height: 20px;
+            background-color:#4bc7c7;
+        }
+        ul{width: 80%; margin: 0 auto}
+        .aui-input-row:first-child:after{
+             border-top: 1px solid #fff;
+        }
+    </style>
+</head>
+<body><ul>
+<li class="aui-input-row">
+    <input id="classCode" type="text" class="aui-input" placeholder="输入班级代码（请从学校老师获取）">
+</li>
+</ul>
+<!--<div class="aui-btn aui-btn-block aui-btn-info" id="btn-addclass" onclick="joinClass()">加入班级</div>-->
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/mineJS/myclass/addClass.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+//        apiobj.SetAuthToken($api.getStorage('token'));
+        var header=document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+    }
+
+
+</script>
+</html>

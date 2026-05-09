@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>填空题</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>
+    <style>
+        .tkt_content{ display: none}
+    </style>
+</head>
+<body>
+<div class="kong_bg">
+    <div class="cxjz">
+        <div class="cxjztop clearfix">
+            <img src="../../../image/newhomework/cxjz.png">
+            <p>您的网络开小差了<br>请检查网络环境并点击重新加载吧～</p>
+        </div>
+        <div class="cxjz_button" onclick="cxjz()">重新加载</div>
+    </div>
+</div>
+<div class="tkt_content" id="tkt_content">
+    <div class="tkt_top">
+        <ul>
+            <li class="tixing clearfix">
+                <div class="tihao" v-text="(index+1)+'.'"> </div>
+                <div class="tixingzi" v-text="'【'+material.txstr+'】'"></div>
+            </li>
+            <li  class="zsd" @click="alertzsd(data.zsdmc)">
+                <span>难易度：</span><img  class="noImgClick" :src="data.nyd==1?'../../../image/newhomework/1xing.png':data.nyd==2?'../../../image/newhomework/2xing.png':data.nyd==3?'../../../image/newhomework/3xing.png':''"><span> 知识点：</span>{{data.zsdmc}}
+            </li>
+        </ul>
+    </div>
+    <div class="tkt_left" id="left" style="width: calc(60% - 53px);">
+        <div class="tg_content font666" v-html="data.tg"></div>
+    </div>
+    <div class="tkt_right clearfix" id="right" style="width: calc(40% + 37px)">
+        <div class="tkt_right_content">
+            <div class="huakuai" id="huakuai"></div>
+            <span  v-if="data.sys_id!= undefined || data.sys_id" class="tktZongfen">
+                  <span v-if="data.is_true!=0"
+                        v-html="'本题正确率<em>'+data.accuracy+'%</em>'"></span>
+            </span>
+            <!--答案部分开始-->
+            <dl v-for="(list ,index) in data.xsdaobj"  class="tkt_answer bgFFF">
+                <dt v-text="'空'+(index+1)+'：'"></dt>
+                <div class="defen" v-if="data.sys_id!= undefined || data.sys_id">
+                    <img  class="noImgClick"  v-if="list.is_true!=0"
+                          :src="list.is_true==1?' ../../../image/newhomework/zhengque.png':list.is_true==2?'../../../image/newhomework/cuowu.png':list.is_true==3?'../../../image/newhomework/bandui.png':''">
+                    <span :style="list.is_true==1?'color: #4bc7c7':list.is_true==2?'color: #df7605':list.is_true==3?'color: #ffcd06':''"
+                          v-text="list.is_true==1?'正确':list.is_true==2?'错误':list.is_true==3?'正确率'+list.accuracy+'%':''"></span>
+                </div>
+                <dd v-if="data.sys_id!= undefined || data.sys_id">
+                    <h2 class="tkth2">【我的答案】</h2>
+                    <ul class="clearfix wendawdda tkt_answer_left">
+                        <li v-for="item in list.value" :class="item.is_txt==1?'tktzi':'tktanswer_img'"
+                            v-html="list.is_unable==1?'未答':list.is_unable==0 && item.is_txt==0?item.thumbnail:item.descript"></li>
+                    </ul>
+                </dd>
+                <dd  class="tktzqda">
+                    <h2 class="tkth2" v-text="'【'+material.tx_tip+'】'"> </h2>
+                    <ul class="tkt_answer_left">
+                        <li class="tktzi"
+                            v-html="data.daoption[index].description==''?'无':data.daoption[index].description_rep"></li>
+                    </ul>
+                </dd>
+            </dl>
+            <dl  class="tkt_dajx"  v-if="!data.xsdaobj||data.xsdaobj.length==0">
+                <dd>
+                    <h2 class="tktjxh2" v-text="'【'+material.tx_tip+'】'"></h2>
+                    <ul>
+                        <li class="wendazi" v-html="data.dastr==''?'无':data.dastr"></li>
+                    </ul>
+                </dd>
+            </dl>
+            <dl  class="tkt_dajx" >
+                <dd>
+                    <h2 class="tktjxh2">【答案解析】</h2>
+                    <ul>
+                        <li class="wendazi" v-html="data.dajx==''?'无':data.dajx"></li>
+                    </ul>
+                </dd>
+            </dl>
+            <!--答案部分结束-->
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue();
+        vm.huakuai();
+        vm.GetParentexercisesUrl();//获取作业习题详情及答题结果
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.tkt_content',
+            data: {
+                index: api.pageParam.index,//当前frame的索引
+                material: api.pageParam.detailInfo,//当前习题资料
+                bjid: api.pageParam.bjid,//作业列表传过来的数据
+                hwid:api.pageParam.hwid,
+                data: [],//作业详情
+                schoolid: api.pageParam.schoolid,//学校id
+                xiaotinum:0,//小题总数
+            },
+            updated: function () {
+                for (var i = 0; i < $api.domAll('img').length; i++) {
+                    if (!$api.hasCls($api.domAll('img')[i], 'noImgClick')) {
+                        $api.attr($api.domAll('img')[i], 'onclick', 'imgClick(this);');
+                    }
+                }
+            },
+            methods: {
+                tihuan:function(content){
+                    var reg = new RegExp( '#' , "g" );
+                    return content.replace( reg , "<font color='#999'>或</font>" );
+                },
+                alertzsd:function(content){
+                    alert('知识点：'+content);
+                },
+                huakuai: function () {
+                    var tktcontent = document.getElementById('tkt_content'); //长线条
+                    var right = document.getElementById('right'); //小方块
+                    var left = document.getElementById('left');
+                    var huakuai = document.getElementById('huakuai');
+                    var ifBool = false; //判断鼠标是否按下
+//鼠标按下方块
+                    huakuai.addEventListener("touchstart", function (e) {
+                        e.stopPropagation();
+                        ifBool = true;
+                    });
+//拖动
+                    window.addEventListener("touchmove", function (e) {
+                        if (ifBool) {
+                            var x = e.touches[0].pageX || e.touches[0].clientX; //鼠标横坐标var x
+                            var lineDiv_left = getPosition(tktcontent).left; //长线条的横坐标
+                            var minDiv_left = x - lineDiv_left; //小方块相对于父元素（长线条）的left值
+                            if (minDiv_left >= tktcontent.offsetWidth - 43) {
+                                minDiv_left = tktcontent.offsetWidth - 43;
+                            }
+//设置拖动后小方块的left值
+                            var rightwidth;
+                            var leftwidth;
+                            if (($(window).width() - minDiv_left) > ($(window).width() * 0.7 + 37)) {
+                                rightwidth = $(window).width() * 0.7 + 37;
+                                leftwidth = $(window).width() * 0.3 - 25;
+                            } else if (($(window).width() - minDiv_left) < ($(window).width() * 0.4 + 37)) {
+                                rightwidth = $(window).width() * 0.4 + 37;
+                                leftwidth = $(window).width() * 0.6 - 25;
+                            } else {
+                                rightwidth = $(window).width() - minDiv_left;
+                                leftwidth = minDiv_left -14
+                            }
+                            right.style.width = rightwidth + "px";
+                            left.style.width = leftwidth + "px";
+                        }
+                    });
+//鼠标松开
+                    window.addEventListener("touchend", function (e) {
+                        ifBool = false;
+                    });
+
+//获取元素的绝对位置
+                    function getPosition(node) {
+                        var left = node.offsetLeft; //获取元素相对于其父元素的left值var left
+                        var top = node.offsetTop;
+                        current = node.offsetParent; // 取得元素的offsetParent
+                        // 一直循环直到根元素
+                        while (current != null) {
+                            left += current.offsetLeft;
+                            top += current.offsetTop;
+                            current = current.offsetParent;
+                        }
+                        return {
+                            "left": left,
+                            "top": top
+                        };
+                    }
+                },
+                GetParentexercisesUrl: function () {//获取作业习题详情及答题结果
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: true
+                    });
+                    apiObj.Get(UrlRouter.GetParentexercisesUrl, {
+                        values: {
+                            hwid:vm.hwid,
+                            uid: $api.getStorage('uid'),
+                            xtid: vm.material.zyid,
+                            classid: vm.bjid,
+                            ytlx: 1,
+                            schoolid: vm.schoolid,
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.tkt_content').show();
+                                $('.kong_bg').hide();
+                                vm.data = ret;
+                            } else {
+                                $('.tkt_content').hide();
+                                $('.kong_bg').show();
+                            }
+                        } else {
+                            $('.tkt_content').hide();
+                            $('.kong_bg').show();
+                        }
+                    })
+                },
+            }
+        });
+    }
+
+    function imgClick(context) {
+        var src;
+        src = $api.attr(context, 'src');
+        if (src.indexOf('data:image/png;base64,') != -1) {
+            return;
+        }
+        if (src.substring(src.length - 3) == 'gif') {
+        } else {
+            var photoBrowser = api.require('photoBrowser');
+            photoBrowser.open({
+                images: [
+                    src
+                ],
+                placeholderImg: 'widget://../image/loading_more.gif',
+                bgColor: '#fff'
+            }, function (ret, err) {
+                if (ret.eventType == 'click') {
+                    photoBrowser.close();
+                }
+            });
+        }
+    }
+    function cxjz() {
+        vm.GetParentexercisesUrl()
+    }
+</script>
+</html>

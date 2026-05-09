@@ -1,0 +1,18 @@
+.class public interface abstract Lcom/deepe/c/j/e/b$a;
+.super Ljava/lang/Object;
+
+
+# annotations
+.annotation system Ldalvik/annotation/EnclosingClass;
+    value = Lcom/deepe/c/j/e/b;
+.end annotation
+
+.annotation system Ldalvik/annotation/InnerClass;
+    accessFlags = 0x609
+    name = "a"
+.end annotation
+
+
+# virtual methods
+.method public abstract a(Ljava/lang/String;Ljava/lang/String;Lcom/deepe/c/j/e/a;)Z
+.end method

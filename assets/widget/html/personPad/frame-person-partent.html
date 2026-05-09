@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background: #f2f2f2
+        }
+
+        .content {
+            width: 80%;
+            padding-top: 20px;
+            margin: 0 auto;
+        }
+
+        ul {
+            width: 100%;
+            background: #fff;
+            padding: 0 30px;
+        }
+
+        ul li {
+            height: 60px;
+            line-height: 60px;
+            border-bottom: 1px solid #d9d9d9;
+            position: relative
+        }
+
+        ul li p {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .name {
+            width: 84px;
+            margin-right: 20px
+        }
+
+        .pass {
+            display: inline-block;
+            position: absolute;
+            top: 15px;
+            right: 0px;
+            height: 30px;
+            width: 70px;
+            text-align: center;
+            line-height: 30px;
+            color: #fff;
+            background: #4bc7c7;
+            font-size: 16px;
+            border-radius: 3px;
+        }
+
+        .no-pass {
+            display: inline-block;
+            position: absolute;
+            top: 15px;
+            right: 90px;
+            height: 30px;
+            width: 70px;
+            text-align: center;
+            line-height: 30px;
+            color: #000;
+            background: #f8f8f8;
+            font-size: 16px;
+            border-radius: 3px;
+            border: 1px solid #f2f2f2;
+        }
+
+        .bind {
+            display: inline-block;
+            position: absolute;
+            top: 15px;
+            right: 0px;
+            height: 30px;
+            width: 70px;
+            text-align: center;
+            line-height: 30px;
+            color: #4bc7c7;
+            background: #fff;
+            font-size: 16px;
+            border-radius: 3px;
+            border: 1px solid #4bc7c7;
+        }
+
+        .phone {
+            color: #4bc7c7
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <ul class="aui-user-view">
+        <li v-for="item in list">
+            <p class="name" v-text="item.realname"></p>
+            <p class="phone" v-text="getPhone(item)"></p>
+            <span class="no-pass" v-if='item.unbind ==1&&item.is_verify ==0' @click="nopass(item)">不通过</span>
+            <span class="pass" v-if='item.unbind ==1&&item.is_verify ==0' @click="pass(item)">通过</span>
+<!--            <span class="bind" v-if='item.unbind ==1&&item.is_verify ==1' @click="jiebang(item)">解绑</span>-->
+        </li>
+    </ul>
+
+    <div class="no-data" style="height: 100%;margin-top: 20%;display: none;">
+        <div style="height: 35%;"></div>
+        <div style="margin: 0 auto 0px auto;text-align: center">
+            <img src="../../image/no_data.png" style="width:20%">
+        </div>
+        <div style="text-align: center;color: #2F2F2F;padding: 0.3rem;">暂无数据</div>
+    </div>
+
+
+
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var page = 1;
+    apiready = function () {
+        getParentList();
+    };
+    vm = new Vue({
+        el: '.content',
+        data: {
+            list: '',
+        },
+        methods: {
+            getPhone: function (item) {
+                var phoneNum = item.telephone ? item.telephone : '暂无';
+                var phone = "（手机:" + phoneNum + "）";
+                return phone;
+            },
+            jiebang: function (item) {
+                jiebangplay(item);
+            },
+            nopass: function (item) {
+                nopassplay(item);
+            },
+            pass: function (item) {
+                passplay(item);
+            },
+        }
+    });
+
+    function getParentList() {
+
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetStudentAllparents, {
+            values: {
+                cuid: $api.getStorage("uid")
+            }
+        }, function (ret, err) {
+            if (ret && ret.ret == 0) {
+                if(ret.data.length == 0){
+                    $api.css($api.dom('.no-data'), 'display:block;');
+                    $api.css($api.dom('.aui-user-view'), 'display:none;');
+                }else {
+                    $api.css($api.dom('.no-data'), 'display:none;');
+                    $api.css($api.dom('.aui-user-view'), 'display:block;');
+                    vm.list = ret.data;
+                }
+
+            } else {
+                api.toast({
+                    msg: ret.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        });
+    }
+
+    function nopassplay(item) {
+// v
+        api.confirm({
+            title: '提示',
+            msg: '确定不通过该家长？',
+            buttons: ["取消", "确定"]
+        }, function (ret, err) {
+            switch (ret.buttonIndex) {
+                case 1:
+                    break;
+                case 2:
+
+                    var apiObj = new GridOpenApi(UrlDomain, source, version);
+                    apiObj.SetAuthToken($api.getStorage("token"));
+                    apiObj.Get(UrlRouter.GetStudentVerifyParent, {
+                        values: {
+                            cuid: $api.getStorage("uid"),
+                            puid: item.uid,
+                            status: '-1'
+                        }
+                    }, function (ret, err) {
+                        if (ret && ret.ret == 0) {
+                            getParentList();
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    });
+
+
+                    break;
+            }
+        });
+    }
+
+    function passplay(item) {
+
+        api.confirm({
+            title: '提示',
+            msg: '确定通过该家长？',
+            buttons: ["取消", "确定"]
+        }, function (ret, err) {
+            switch (ret.buttonIndex) {
+                case 1:
+                    break;
+                case 2:
+
+                    var apiObj = new GridOpenApi(UrlDomain, source, version);
+                    apiObj.SetAuthToken($api.getStorage("token"));
+                    apiObj.Get(UrlRouter.GetStudentVerifyParent, {
+                        values: {
+                            cuid: $api.getStorage("uid"),
+                            puid: item.uid,
+                            status: '1'
+                        }
+                    }, function (ret, err) {
+                        if (ret && ret.ret == 0) {
+
+                            getParentList();
+
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    });
+
+
+                    break;
+            }
+        });
+    }
+
+    function jiebangplay(item) {
+
+        api.confirm({
+            title: '提示',
+            msg: '确定解绑该家长？',
+            buttons: ["取消", "确定"]
+        }, function (ret, err) {
+            switch (ret.buttonIndex) {
+                case 1:
+                    break;
+                case 2:
+
+                    var apiObj = new GridOpenApi(UrlDomain, source, version);
+                    apiObj.SetAuthToken($api.getStorage("token"));
+                    apiObj.Post(UrlRouter.PostSyudentunbindparent, {
+                        values: {
+                            cuid: $api.getStorage("uid"),
+                            puid: item.uid,
+                        }
+                    }, function (ret, err) {
+                        if (ret && ret.ret == 0) {
+
+                            getParentList();
+
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    });
+
+
+                    break;
+            }
+        });
+    }
+</script>
+</html>

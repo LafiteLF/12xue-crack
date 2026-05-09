@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        body {
+
+        }
+
+        .aui-list-view-cell {
+            font-size: 14px;
+            line-height: 50px;
+            height: 50px;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+        .li_content{
+            width: 80%;
+            line-height: 50px;
+            height: 50px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding-left: 20px;
+        }
+        .xts_show{
+            width: 20%;
+            line-height: 50px;
+            height: 50px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: #4bc7c7;
+            text-align: center;
+        }
+        li img {
+            height: 30px !important;
+            width: 50px !important;
+        }
+        em, em * {
+            font-style: italic;
+        }
+        em, del, strong, var, label, cite, small, time, mark, code {
+            display:inline;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content">
+    <ul class="aui-list-view" id="listView">
+        <!--<li class="aui-list-view-cell aui-ellipsis-1">单行列表标题效果</li>-->
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        getData();
+    };
+    var num = 0, num1 = 0, num2 = 0, num3 = 0;
+    var tx = "", content = null;
+    var idx = 0;
+    var zyUrl = '';
+    var xtUrl = '';
+    var xtInfo = {};
+    var zyInfo = {};
+    var jcxt = [];
+    var kzxt = [];
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+
+    function getData() {
+//        var cdn = '';
+//        if (api.connectionType == 'wifi' || api.connectionType == 'unknown') {
+//            cdn = $api.getStorage('SchoolIp');
+//            api.ajax({
+//                url: "http://" + cdn + "/config",
+//                method: 'get',
+//                timeout: 3,
+//                returnAll: false
+//            }, function (ret, err) {
+//                if (ret) {
+//                    if (ret.id != $api.getStorage('station_id')) {
+//                        cdn = '';
+//                    }
+//                } else {
+//                    cdn = '';
+//                }
+//                getDetailLists(cdn);
+//            });
+//        } else {
+//            getDetailLists(cdn);
+//        }
+        getDetailLists();
+    }
+    function getDetailLists() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetResourceInfo, {
+            values: {
+                id: api.pageParam.kcid,
+                type: 'course',
+//                cdn: cdn,
+                detail:1
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+                    if (ret.materiallist.jksc.length == 0) {
+                        $api.html($api.dom('.aui-content'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width: 40%;vertical-align: middle;position: absolute;top: 30%;left: 30%;"/> </div>');
+                    } else {
+                        for (var i = 0; i < ret.materiallist.jksc.length; i++) {
+                            var string = ret.materiallist.jksc[i].xsmc;
+                            //替换string里的<br>、<br/>标签
+                            string = string.replace(new RegExp("<br>", "gm"), "");
+                            string = string.replace(new RegExp("<br/>", "gm"), "");
+                            string = string.replace(new RegExp("<p>", "gm"), "");
+                            string = string.replace(new RegExp("</p>", "gm"), "");
+                            tx = '';
+//                            if (ret.materiallist.jksc[i].tx == "danxt") {
+//                                tx = "【单选】";
+//                            } else if (ret.materiallist.jksc[i].tx == "duoxt") {
+//                                tx = "【多选】";
+//                            } else if (ret.materiallist.jksc[i].tx == "pdt") {
+//                                tx = "【判断】";
+//                            } else if (ret.materiallist.jksc[i].tx == "wendt") {
+//                                tx = "【问答】";
+//                            } else if (ret.materiallist.jksc[i].tx == "tkt") {
+//                                tx = "【填空】";
+//                            } else {
+//                                tx = "";
+//                            }
+                            if(ret.materiallist.jksc[i].zyqf == 2){
+                                //tx = '【'+ret.materiallist.jksc[i].txstr.substr(0,2)+'】';
+                                tx = '【'+ret.materiallist.jksc[i].txstr+'】';
+                            }else {
+                                tx = '';
+                            }
+                            var xts = ret.materiallist.jksc[i].xts;
+                            var tx_code = ret.materiallist.jksc[i].tx_code;
+                            var xts_show = '';
+                            if(xts > 0){
+                                if(tx_code == 2){
+                                    xts_show = '['+ret.materiallist.jksc[i].xts+'填空]';
+                                }
+                                else {
+                                    xts_show = '['+ret.materiallist.jksc[i].xts+'小题]';
+                                }
+                            }
+
+                            $api.append($api.dom("#listView"),
+                                '<li class="aui-list-view-cell" index = "' + i + '" tapmode onclick="openJcxtMaterial(this);"><span class="aui-ellipsis-1 li_content">' + (i + 1) + '. ' + tx + string + '</span><span class="xts_show">' + xts_show + '</span></li>'
+                            );
+                            if (ret.materiallist.jksc[i].zyqf == 1) {
+                                zyUrl = ret.materiallist.jksc[i].serverpath + ret.materiallist.jksc[i].rootpath;
+//                                if (ret.materiallist.jksc[i].type == 'doc') {
+//                                    zyUrl = ret.materiallist.jksc[i].PreTemp + encodeURIComponent(zyUrl);
+//                                }
+                                zyInfo = {
+                                    name: (i + 1 ) + '.' + '【素材】' + ret.materiallist.jksc[i].xsmc,
+                                    type: 'zy',
+                                    url: zyUrl,
+                                    is_convert: ret.materiallist.jksc[i].is_convert,
+                                    zytype: ret.materiallist.jksc[i].type,
+                                    convert_status: ret.materiallist.jksc[i].convert_status,
+                                    filetype: ret.materiallist.jksc[i].filetype,
+                                    zyid: ret.materiallist.jksc[i].zyid,
+                                    zyqf: ret.materiallist.jksc[i].zyqf,
+                                };
+                            } else {
+                                zyInfo = {
+                                    name: (i + 1 ) + '. ' + tx + ret.materiallist.jksc[i].xsmc,
+                                    type: 'xt',
+                                    filetype: '',
+                                    answer: ret.materiallist.jksc[i].dastr,
+                                    analysis: ret.materiallist.jksc[i].dajx
+                                };
+                            }
+                            jcxt.push(zyInfo);
+                        }
+                        api.parseTapmode();
+                    }
+
+                } else {
+                    api.hideProgress();
+                    //alert(ret.msg);
+                }
+            } else {
+                api.hideProgress();
+
+            }
+        })
+    }
+    function openJcxtMaterial(context) {
+        api.openWin({
+            name: 'win_course_detail',
+            url: 'win_course_detail.html',
+            pageParam: {list: jcxt, index: $api.attr(context, 'index'), homeworkName: api.pageParam.homeworkName}
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>抢答成功</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin()">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="closeWin();"></span>抢答
+    </a>
+</header>
+<!--<header class="aui-bar aui-bar-nav aui-bar-primary">-->
+    <!--<a class="aui-pull-left aui-btn">-->
+        <!--<span class="aui-iconfont aui-icon-back" tapmode onclick="closeWin();"></span>-->
+    <!--</a>-->
+    <!--<div class="aui-12xue-title" tapmode onclick="closeWin();">抢答成功</div>-->
+
+    <!--</a>-->
+<!--</header>-->
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/class_score.js"></script>
+<script type="text/javascript">
+    var apiReady=false;
+    apiready = function () {
+        var header = document.querySelector('header');
+        //$api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+
+        api.openFrame({
+            name: 'frame-class-qiangda-pad',
+            url: 'frame-class-qiangda-pad.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            bounces: false
+        });
+        apiReady=true;
+
+        //接收打开打分的事件
+        api.addEventListener({
+            name: api.winName
+        }, function (ret, err) {
+            stuScorePublicFunction(ret.value.scoreData, ret.value.type);
+        });
+
+    };
+    function closeWin() {
+        if (apiReady){
+            api.closeWin();
+        }
+    }
+</script>
+</html>

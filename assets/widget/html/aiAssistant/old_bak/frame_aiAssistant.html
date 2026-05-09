@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>AI伴学</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #F5F5F5;
+            /* 添加浅灰色背景 */
+        }
+
+        html {
+            -webkit-touch-callout: none;
+            /* 系统默认菜单被禁用 */
+            -webkit-user-select: none;
+            /* Webkit浏览器 */
+            -khtml-user-select: none;
+            /* 早期浏览器 */
+            -moz-user-select: none;
+            /* 火狐 */
+            -ms-user-select: none;
+            /* IE10及以上 */
+            user-select: none;
+            /* 标准语法 */
+        }
+
+        html,
+        body {
+            overflow-x: hidden !important;
+            width: 100vw;
+            max-width: 100vw;
+        }
+
+        .top-section {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .left-image {
+            width: 45%;
+            height: 45vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: calc((100vh - 60px) / 2);
+            /* 减去bottom-section高度后居中 */
+            transform: translate(-100%, -50%);
+            left: 50%;
+            padding-right: 20px;
+        }
+
+        .left-image img {
+            max-width: 100%;
+            max-height: 100%;
+            position: absolute;
+            width: 100%;
+            object-fit: contain;
+            /* 确保图片保持比例 */
+        }
+
+        .right-list {
+            width: 55%;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            padding: 10px;
+            margin-left: calc(45% + 40px);
+            /* 调整右侧列表的位置，考虑左侧的间距 */
+        }
+
+        .bottom-section {
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            z-index: 100;
+            background-color: transparent;
+            /* 不加 position: relative;，只在追问时加 */
+        }
+
+        .bottom-section-relative {
+            position: relative;
+        }
+
+        /* 普通模式下 .bottom-section 保持原样 */
+        .bottom-section {
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            background-color: transparent;
+            /* 其它原有样式 */
+        }
+
+        /* 追问模式下，底部输入栏和图片列表都固定悬浮 */
+        .bottom-section-ask {
+            position: fixed !important;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            background-color: transparent;
+        }
+
+        .pic-list-container-ask {
+            position: fixed !important;
+            right: 20px;
+            bottom: 70px;
+            z-index: 200;
+            background: transparent;
+            margin: 0;
+        }
+
+        .top-section {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            padding-bottom: 70px;
+            /* 相应调整底部内边距 */
+        }
+
+        .voice-button {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            min-height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            background: transparent;
+            margin-right: 7px;
+            margin-left: 7px;
+        }
+
+        .voice-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .input-box {
+            flex: 1;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            padding: 0 0px;
+            margin: 0 0px;
+            margin-right: 10px;
+            /* 修改左右间距为30px */
+            background-color: #FFFFFF !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .send-button {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            min-height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            background: transparent;
+            padding: 0;
+        }
+
+        .send-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .send-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .odd-layout .left-image {
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        .fixed-text {
+            color: #999;
+            font-size: 15px;
+            margin-bottom: 0px;
+        }
+
+        .message-content {
+            font-size: 15px;
+        }
+
+        .even-layout .avatar-right {
+            text-align: right;
+            margin-bottom: 2px;
+        }
+
+        .even-layout .avatar-right img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .odd-layout {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .ai-image {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .right-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* 使文字垂直居中 */
+        }
+
+        .ai-image {
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            /* 改为相对定位 */
+            height: auto;
+        }
+
+        .even-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .even-layout .message-content {
+            text-align: right;
+            margin-top: 2px;
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        /* 在 style 标签内添加以下样式 */
+        .message-content a {
+            color: inherit;
+            text-decoration: none;
+            pointer-events: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: text;
+            user-select: text;
+            /* 添加标准属性 */
+        }
+
+        .odd-layout .right-content {
+            margin-right: 20px;
+            /* 添加右侧间隔 */
+        }
+
+        .loading-text {
+            color: #999;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .left-content-item {
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid #00ffd0;
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .left-content-item.active {
+            background: #00ffd0;
+        }
+
+        .left-content-item-text {
+            font-size: 14px;
+            color: #00ffd0;
+            transition: all 0.3s ease;
+        }
+
+        .left-content-item.active .left-content-item-text {
+            color: white;
+        }
+
+        /* 新增的布局样式 */
+        .pic-list-container {
+            width: fit-content;
+            max-width: 100%;
+            border-radius: 8px;
+            background-color: transparent;
+            flex-shrink: 0;
+            margin: 0;
+        }
+
+        .pic-list {
+            display: flex;
+            flex-wrap: wrap;
+            /* gap: 8px; */
+            background-color: #F5F5F5;
+            padding-right: 8px;
+            border-radius: 8px;
+        }
+
+        .pic-item {
+            display: inline-block;
+            padding-top: 8px;
+            padding-left: 8px;
+            position: relative;
+        }
+
+        .pic-remove {
+            position: absolute;
+            top: 4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            line-height: 1;
+        }
+
+        .input-controls {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            width: 100%;
+            flex-shrink: 0;
+            background-color: #F5F5F5;
+        }
+
+        .add-pic-button {
+            margin: 0 0px;
+            margin-left: 5px;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            min-height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            background: transparent;
+            padding: 0;
+        }
+
+        .add-pic-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .add-pic-button-text {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .add-pic-button-text.disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .message-images {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 5px;
+            overflow-x: auto;
+            margin-left: -80px;
+        }
+
+        .message-images img {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .pic-list-container-right {
+            position: absolute;
+            right: 0;
+            bottom: 60px;
+            z-index: 200;
+            margin-right: 20px;
+            background: transparent;
+        }
+
+        .input-controls-ask {
+            padding-left: 10px;
+        }
+
+        .input-controls-ask .send-button {
+            margin-right: 25px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content" v-cloak>
+        <div class="top-section">
+            <div class="left-image">
+                <img src="../../image/aiAssistant/_03_copy.png"
+                    style="max-width: 100%; max-height: 100%; position: absolute; width: 100%;">
+                <img src="../../image/aiAssistant/s_03.png" @click="logMessageData"
+                    style="max-width: 100%; max-height: 100%; position: absolute;;">
+            </div>
+            <div class="right-list">
+                <div v-for="(message, index) in messages" :key="message" class="message-item"
+                    :class="{'odd': !(index % 2), 'even': index % 2}">
+                    <div v-if="!(index % 2)" class="odd-layout">
+                        <div class="ai-image">
+                            <img src="../../image/aiAssistant/_03.png" @click="logMessageData"
+                                style="width: 50px; height: 50px; margin-right: 10px;">
+                        </div>
+                        <div class="right-content">
+                            <div class="fixed-text">AI伴学小助手</div>
+                            <div v-if="isLoading && index === messages.length - 1" class="loading-text">
+                                正在思考中...已用时 {{ loadingTime }} 秒
+                            </div>
+                            <div class="message-content" @click="report(message)" v-html="markdown(message)"></div>
+                        </div>
+                    </div>
+                    <div v-else class="even-layout">
+                        <!-- <div class="avatar-right">
+                            <img src="../../image/aiAssistant/_03.png" style="width: 70px; height: 70px;">
+                        </div> -->
+                        <div class="message-content" v-html="markdown(message)"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-section" :class="{ 'bottom-section-ask': isFromAsk }">
+            <!-- 图片列表区域 -->
+            <div class="pic-list-container" v-if="curPicList.length > 0"
+                :class="{ 'pic-list-container-ask': isFromAsk }">
+                <div class="pic-list">
+                    <div v-for="(pic, index) in curPicList" :key="pic" class="pic-item">
+                        <img :src="pic" style="width: 50px; height: 50px; border-radius: 4px;"
+                            @click="openPicture(pic)">
+                        <div class="pic-remove" @click="removePic(index)">×</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 输入控件区域 -->
+            <div class="input-controls" :class="{ 'input-controls-ask': isFromAsk }">
+                <div class="add-pic-button">
+                    <img src="../../image/aiAssistant/_takePhoto10.png" alt="" style="width: 100%; height: 100%;"
+                        @click="addPic">
+                </div>
+                <div class="voice-button">
+                    <img :src="isSpeaking ? '../../image/aiAssistant/z_10.png' : '../../image/aiAssistant/_10.png'"
+                        style="width: 100%; height: 100%;" @mouseup="speakOver" @touchstart="speakStart"
+                        @touchend="speakOver">
+                </div>
+                <input type="text" class="input-box" placeholder="发消息或按住说话" v-model="content">
+
+                <div class="send-button">
+                    <img :src="content === ''||isLoading||aiStudy.count <= 0 ? '../../image/aiAssistant/_13.png' : '../../image/aiAssistant/z_13.png'"
+                        style="width: 100%; height: 100%;" onclick="getStudentAINum()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    window.MathJax = {
+        loader: {
+            load: ['input/tex', 'output/chtml']
+        },
+        tex: {
+            inlineMath: [['$', '$']],
+            displayMath: [['$$', '$$']],
+            processEscapes: true
+        },
+        startup: {
+            ready: () => {
+                MathJax.startup.defaultReady();
+            }
+        }
+    };
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/marked.min.js"></script>
+<script type="text/javascript" src="./crypto-js.js"></script>
+<script type="text/javascript" src="./iat.js"></script>
+<script type="text/javascript" src="./dist/index.umd.js"></script>
+<link rel="stylesheet" href="../../css/swiper-bundle.min.css">
+<script src="../../script/aijs/swiper-bundle.min.js"></script>
+<script type="text/javascript" id="MathJax-script" async src="../../script/tex-chtml.js"></script>
+<script type="text/javascript" src="../../script/12xueUpload.js"></script>
+<script type="text/javascript" src="../../script/ThridJS/qiniu.min.js"></script>
+
+<script>
+    let vm = null;
+    let db = null;
+    let result = '';
+    var FNPhotograph = null;
+    var trans = null;
+    var apiObj = null;
+    function saveMessageHistory(chatId, messageHistory, flag = 1) {//1为新对话，2为关闭对话
+        if (vm.messages.length > 2 && vm.chatId !== -1) {
+            if (vm.messageHistory.length === 0) {
+                api.sendEvent({
+                    name: 'aiAssistantWinClose',
+                });
+            }
+            let subject = vm.messageHistory[0].content;
+            let messages = JSON.stringify(vm.messageHistory).replace(/"/g, '""'); // 双引号转义
+            api.closeFrame({
+                name: 'frame_aiAssiatant_pictures',
+            })
+            if (vm.chatId === 0) {//当前为新对话
+                db.executeSql({
+                    name: 'aiAssistants',
+                    sql: 'INSERT INTO chats (subject,messages) VALUES ("' + subject + '","' + messages + '")'
+                }, function (ret, err) {
+                    if (ret.status) {
+                        // api.alert({
+                        //     msg: JSON.stringify(ret)
+                        // })
+                    } else {
+                        // api.alert({
+                        //     msg: JSON.stringify(err)
+                        // })
+                        console.log(JSON.stringify(err));
+
+                    }
+                    if (flag === 2) {
+                        api.sendEvent({
+                            name: 'aiAssistantWinClose',
+                        });
+                    } else {
+                        vm.setChat(chatId, messageHistory)
+                        api.sendEvent({
+                            name: 'aiAssistantFrameTryToSaveOk',
+                        });
+                    }
+                })
+
+            } else {
+
+                db.executeSql({
+                    name: 'aiAssistants',
+                    sql: 'UPDATE chats SET messages = "' + messages + '" WHERE id = ' + vm.chatId
+                }, function (ret, err) {
+                    if (ret.status) {
+
+                    } else {
+                        // api.alert({
+                        //     msg: JSON.stringify(err)
+                        // })
+                        console.log(JSON.stringify(err));
+                    }
+
+                    if (flag === 2) {
+                        api.sendEvent({
+                            name: 'aiAssistantWinClose',
+                        });
+                    } else {
+                        vm.setChat(chatId, messageHistory)
+                        api.sendEvent({
+                            name: 'aiAssistantFrameTryToSaveOk',
+                        });
+                    }
+                })
+            }
+        } else {
+            console.log('不保存');
+
+            if (flag === 2) {
+                api.sendEvent({
+                    name: 'aiAssistantWinClose',
+                });
+            } else {
+                vm.setChat(chatId, messageHistory)
+            }
+        }
+    }
+
+    function deleteChat() {
+        db.executeSql({
+            name: 'aiAssistants',
+            sql: 'DELETE FROM chats WHERE id = ' + vm.chatId
+        }, function (ret, err) {
+            if (ret.status) {
+
+            } else {
+                // api.alert({
+                //     msg: JSON.stringify(err)
+                // })
+                console.log(JSON.stringify(err));
+            }
+            vm.setChat(0, [])
+            api.toast({
+                msg: '删除成功',
+                duration: 1000,
+                location: 'bottom'
+            })
+            api.closeFrame({
+                name: 'frame_aiAssiatant_pictures',
+            })
+            api.sendEvent({
+                name: 'aiAssistantFrameTryToSaveOk',
+            });
+        })
+    }
+
+    apiready = function () {
+        initVue();
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        db = api.require('db');
+        trans = api.require('trans');
+        FNPhotograph = api.require('FNPhotograph');
+        // 阻止长按事件
+        document.addEventListener('contextmenu', function (e) {
+            // 允许输入框的右键菜单（复制粘贴等）
+            if (e.target.classList.contains('input-box')) {
+                return true;
+            }
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('selectstart', function (e) {
+            // 允许输入框的文本选择
+            if (e.target.classList.contains('input-box')) {
+                return true;
+            }
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('dragstart', function (e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 阻止触摸长按事件
+        let pressTimer = null;
+        document.addEventListener('touchstart', function (e) {
+            // 如果是输入框，不阻止长按
+            if (e.target.classList.contains('input-box')) {
+                return;
+            }
+            pressTimer = setTimeout(function () {
+                // 长按时阻止默认行为
+                e.preventDefault();
+            }, 500);
+        });
+
+        document.addEventListener('touchend', function (e) {
+            clearTimeout(pressTimer);
+        });
+
+        document.addEventListener('touchmove', function (e) {
+            clearTimeout(pressTimer);
+        });
+        api.addEventListener({
+            name: 'aiAssistantWinWantToChange'
+        }, function (ret, err) {
+            saveMessageHistory(ret.value.chatId, ret.value.messageHistory, 1)
+        });
+        api.addEventListener({
+            name: 'aiAssistantWinWantToClose'
+        }, function (ret, err) {
+            saveMessageHistory(ret.value.chatId, ret.value.messageHistory, 2)
+        });
+        api.addEventListener({
+            name: 'aiAssistantWinWantToDelete'
+        }, function (ret, err) {
+            deleteChat();
+        });
+        //如果从ai解析"追问"按钮进入该页面
+        if (api.pageParam.xtid && api.pageParam.xtid !== '' && api.pageParam.xtid !== 'undefined' && api.pageParam.xtid !== 'null') {
+            // console.log(api.pageParam.xtid);
+            // console.log(api.pageParam.xtTextContent);
+            // console.log(api.pageParam.answer);
+            // console.log(JSON.stringify(api.pageParam.pictures));
+            setTimeout(() => {//等待vue初始化完毕
+                vm.chatLimit = 999;//放开条数限制，避免ai忘记题目内容
+                vm.isFromAsk = true;
+            }, 100);
+            api.showProgress();
+            request();
+        }
+    };
+    function processContent(content) {
+        // 只做latex兼容性转换，不破坏latex语法
+        // 1. 把 \(...\) 转成 $...$
+        content = content.replace(/\\\((.+?)\\\)/g, '$$$1$');
+        // 2. 把 \\[...\\] 转成 $$...$$
+        content = content.replace(/\\\[(.+?)\\\]/g, '$$$${1}$$$$');
+        return content;
+    }
+
+    // 触发MathJax重新渲染
+    function renderMathJax() {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise().catch(function (err) {
+                console.log('MathJax typeset error:', err);
+            });
+        }
+    }
+    // initVue();
+    async function request() {
+        // 生成唯一key
+        function getBase64Key(base64) {
+            let pure = base64.replace(/^data:image\/\w+;base64,/, '');
+            return CryptoJS.MD5(pure).toString();
+        }
+        let base64Arr = api.pageParam.pictures || [];
+        let urlArr = [];
+        for (let i = 0; i < base64Arr.length; i++) {
+            let base64 = base64Arr[i];
+            let key = getBase64Key(base64);
+            let cacheKey = 'ai_pic_url_' + key;
+            let cachedUrl = localStorage.getItem(cacheKey);
+            if (cachedUrl) {
+                urlArr.push(cachedUrl);
+            } else {
+                try {
+                    let url = await vm.qiniuUpfile(base64);
+                    urlArr.push(url);
+                    localStorage.setItem(cacheKey, url);
+                } catch (e) {
+                    api.toast({ msg: '图片上传失败', duration: 2000 });
+                    api.hideProgress();
+                    return;
+                }
+            }
+        }
+        let messageHistory = [
+            {
+                role: 'user',
+                content: '请帮我解析一下这道题目',
+                images: urlArr
+            },
+            {
+                role: 'assistant',
+                content: api.pageParam.answer // 只存原始字符串
+            }
+        ];
+        api.hideProgress();
+        vm.setChat(-1, messageHistory);
+        setTimeout(() => {
+            const rightList = document.querySelector('.right-list');
+            rightList.scrollTop = rightList.scrollHeight;
+        }, 300);
+    }
+    function openPicture(src) {
+        var photoBrowser = api.require('photoBrowser');
+        photoBrowser.open({
+            images: [
+                src
+            ],
+            placeholderImg: 'widget://../image/loading_more.gif',
+            bgColor: '#fff'
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                photoBrowser.close();
+            }
+        });
+    }
+    function initVue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                messages: ['同学你好，我是AI伴学小助手，可以帮你回答学科知识问题哦，请发送相关的问题，我会帮你进行解答～'],
+                content: '', // 输入框内容
+                isSpeaking: false,
+                messageHistory: [],  // 添加消息历史记录数组
+                isLoading: false,
+                loadingTime: 0,
+                loadingTimer: null,
+                iat: null,
+                chatId: 0,
+                selectionPosition: 0, // 记录光标位置
+                chatLimit: 8, // 消息历史记录限制
+                curPicList: [],//输入框里的图片,base64编码，用于左下角展示
+                urlPicList: [],//输入框里的图片,url,该列表用于上传完毕后，存储图片url，以发送给ai，并且存储在数据库中
+                isFromAsk: false, // 新增：判断是否从追问场景进入
+                aiStudy: JSON.parse($api.getStorage('aiStudy')),
+            },
+            methods: {
+                report: function (message) {
+                    if ($api.getStorage('padType') != '2' || message == '同学你好，我是AI伴学小助手，可以帮你回答学科知识问题哦，请发送相关的问题，我会帮你进行解答～') {//如果不是应用商店的包
+                        return;
+                    }
+                    api.openFrame({//打开一个应付检查的举报页面
+                        name: 'frame_report_ai_content',
+                        url: '../frame_report_ai_content.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winWidth,
+                            h: api.winHeight
+                        },
+                        pageParam: {
+                            block: 'AI伴学',
+                            content: message
+                        }
+                    });
+                },
+                openPicture: function (src) {
+                    if ($api.getStorage('padType') == '1') {
+                        return;
+                    }
+                    openPicture(src);
+                },
+                logMessageData: function () {
+                    // console.log('chatId:', this.chatId);
+                    console.log('message', JSON.stringify(this.messages));
+                    console.log('messageHistory:', JSON.stringify(this.messageHistory));
+
+                    // const inputBox = document.querySelector('.input-box');
+                    // console.log(inputBox.selectionStart, inputBox.selectionEnd);
+                    // console.log(this.content.length);
+
+                },
+                processUrlContent: function (content) {
+                    // 分步骤处理，先去除协议部分
+                    let processedContent = content
+                        .replace(/https?:\/\//g, '') // 去除协议
+                        .replace(/www\./g, '') // 去除所有的www.
+                        .replace(/\.com/g, '') // 去除所有的.com
+                        .replace(/\.cn/g, '') // 去除.cn
+                        .replace(/\.org/g, '') // 去除.org
+                        .replace(/\.net/g, '') // 去除.net
+                        .replace(/\.edu/g, '') // 去除.edu
+                        .replace(/\.gov/g, '') // 去除.gov
+                        .replace(/\.info/g, '') // 去除.info
+                        .replace(/\.biz/g, '') // 去除.biz
+                        .replace(/\.co/g, '') // 去除.co
+                        .replace(/\/[^\s]*/g, ''); // 去除路径部分
+
+                    return processedContent.trim();
+                },
+                markdown: function (mes) {
+                    const processedContent = processContent(mes);
+                    const markdownResult = marked.parse(processedContent);
+                    // 延迟触发MathJax渲染
+                    setTimeout(() => {
+                        renderMathJax();
+                    }, 100);
+                    return markdownResult;
+                },
+                speakStart: function () {
+                    if ($api.getStorage('padType') == '1') {
+                        api.toast({
+                            msg: '当前设备暂不支持语音转文字功能，请输入文字问答。'
+                        })
+                        return;
+                    }
+                    if (this.isSpeaking) return;
+                    console.log('start');
+                    api.notification({
+                        vibrate: [0, 100]
+                    });
+                    this.isSpeaking = true;
+                    this.iat = new Iat()
+                    const inputBox = document.querySelector('.input-box');
+                    let contentBakLeft = this.content.substring(0, inputBox.selectionStart)
+                    let contentBakRight = this.content.substring(inputBox.selectionEnd)
+                    this.selectionPosition = this.content.length - inputBox.selectionEnd;
+                    this.iat.start((result) => {
+                        this.content = contentBakLeft + result + contentBakRight;
+                    })
+
+                },
+                speakOver: function () {
+                    if (!this.isSpeaking) return;
+                    console.log('over');
+                    api.notification({
+                        vibrate: [0, 100]
+                    });
+                    this.iat.over()
+                    const inputBox = document.querySelector('.input-box');
+                    setTimeout(() => {
+                        this.isSpeaking = false;
+                        this.iat.over()
+                        inputBox.setSelectionRange(this.content.length - this.selectionPosition, this.content.length - this.selectionPosition);
+                    }, 500);
+                },
+                startLoading: function () {
+                    this.isLoading = true;
+                    this.loadingTime = 0;
+                    setTimeout(() => {
+                        console.log('scrollToBottom1');
+                        const rightList = document.querySelector('.right-list');
+                        rightList.scrollTop = rightList.scrollHeight;
+                    }, 2000);
+
+                    this.loadingTimer = setInterval(() => {
+                        this.loadingTime += 1;
+                    }, 1000);
+                },
+                stopLoading: function () {
+                    this.isLoading = false;
+                    clearInterval(this.loadingTimer);
+                },
+                qiniuUpfile: function (imgurl) {//上传图片，此处imgurl实际上就是该页面base64编码的图片，方法从其他文件复制得来，所以不改变量名了
+                    return new Promise((resolve, reject) => {
+                        api.showProgress();
+                        var fileKey = (new Date()).valueOf() + 'aiAssistantImg_uid' + $api.getStorage('uid');
+                        console.log('GetQiNiuToken:', UrlRouter.GetQiNiuToken);
+
+                        apiObj.Get(UrlRouter.GetQiNiuToken, {
+                            values: {
+                                uid: $api.getStorage('uid'),
+                                bucket: 'vodresource',
+                                key: fileKey
+                            }
+                        }, function (ret, err) {
+                            if (ret) {
+                                console.log('ret:', JSON.stringify(ret));
+                                console.log('err:', JSON.stringify(err));
+
+                                if (ret.ret == 0) {
+                                    var token = ret.data.token;
+                                    var file = b64ImgToBlob(imgurl);
+                                    // var observable = qiniu.upload(file, fileKey, token, qiniuPutExtra, qiniuConfig);
+                                    var observable = qiniu.upload(file, fileKey, token);
+                                    observable.subscribe({
+                                        next(res) {
+                                            //进度
+                                        },
+                                        error(err) {
+                                            // 失败报错信息
+                                            api.toast({
+                                                msg: '图片上传失败' + err.message + err.code,
+                                                duration: 2000,
+                                                location: 'middle'
+                                            });
+                                            reject(err);
+                                        },
+                                        complete(res) {
+                                            vm.urlPicList.push(QINIU_DOMAIN + res.key);
+                                            resolve(QINIU_DOMAIN + res.key);
+                                            // api.hideProgress();//在这里先不隐藏了，等全部上传完再隐藏
+                                        }
+                                    })
+
+                                } else {
+                                    api.hideProgress();
+                                    api.toast({
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                    reject(new Error(ret.msg));
+                                }
+
+                            } else {
+                                console.log('ret:', JSON.stringify(ret));
+                                console.log('err:', JSON.stringify(err));
+
+                                api.hideProgress();
+                                api.toast({
+                                    msg: '图片上传失败,请稍后重试',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                                reject(err);
+                            }
+
+                        }
+                        );
+                    });
+                },
+                sendMessageToAI: async function () {
+                    console.log('sendMessageToAI called');
+                    if (this.content === '' || this.isLoading) {
+                        console.log('Message empty or loading, returning');
+                        return;
+                    }
+                    let contentBak = this.content;
+                    // 处理网址内容，提取主要域名
+                    let processedContent = this.processUrlContent(this.content);
+
+                    //逐个处理图片
+                    for (let i = 0; i < this.curPicList.length; i++) {
+                        await this.qiniuUpfile(this.curPicList[i]);
+                    }
+                    api.hideProgress();
+                    console.log('urlPicList:', this.urlPicList);
+                    // api.hideProgress();//没必要在这里解开
+                    // return;//先测试前面的代码
+
+                    // 构建显示内容，包含文本和图片
+                    let displayContent = processedContent;
+                    if (this.urlPicList.length > 0) {
+                        displayContent += '<div class="message-images">';
+                        for (let i = 0; i < this.urlPicList.length; i++) {
+                            displayContent += '<img src="' + this.urlPicList[i] + '" style="width: 100px; height: 100px; margin: 5px; border-radius: 4px;" onclick="openPicture(\'' + this.urlPicList[i] + '\')">';
+                        }
+                        displayContent += '</div>';
+                    }
+
+                    this.messages.push(displayContent);
+                    // 发送消息显示后自动滚动到底部
+                    setTimeout(() => {
+                        const rightList = document.querySelector('.right-list');
+                        rightList.scrollTop = rightList.scrollHeight;
+                    }, 100);
+
+                    this.startLoading();
+                    console.log('Started loading');
+
+                    // 构建消息历史（保存文本和图片到数据库）
+                    this.messageHistory.push({
+                        role: 'user',
+                        content: processedContent,
+                        images: this.urlPicList.slice() // 深拷贝图片数组
+                    });
+                    // 限制历史记录长度，保留最近的4轮对话（8条消息）
+                    let tempMessageHistory = JSON.parse(JSON.stringify(this.messageHistory));
+                    if (tempMessageHistory.length > this.chatLimit) {
+                        // this.messageHistory = this.messageHistory.slice(this.chatLimit * -1);
+                        tempMessageHistory = tempMessageHistory.slice(this.chatLimit * -1);
+                    }
+                    console.log('tempMessageHistory:', JSON.stringify(tempMessageHistory));
+                    const aiSystemPrompt = `
+你是专为K12学生设计的学习助手，仅回答课程学习相关问题。核心规则：
+### 一、服务范围
+✅ 支持：小学至高中必修课程
+✅ 内容：知识点解析、解题思路、学习方法、官方资源推荐
+❌ 禁止：作业代做、暴力色情、隐私信息、虚假信息、网络游戏
+### 二、交互规范
+1. 以"同学"称呼用户，语言通俗易懂
+2. 你是学生的小助手，不要以"老师"自称
+3. 模糊提问时需追问明确信息
+4. 只要问题中存在有关于游戏的关键词或者游戏的代称即为违规内容
+5. 回答学生问题时精简回答
+6. 不能生成小说,但有关于经典名著的问题可以解答
+7. 发现违规内容立即回复：
+   "【安全提醒】你的提问涉及禁止内容，请重新提问。"
+### 三、输出要求
+1. 知识点：用类比或思维导图形式
+2. 解题：分步骤拆解，不直接给答案
+3. 资源：仅推荐教育部认证平台
+4. 格式：不可直接输出网页链接
+### 四、特殊情况处理
+- 超纲问题：提示"目前知识范围集中在XX学段"
+- 求答案请求：引导用户先分享思路
+`;
+
+                    // 构建请求消息数组，支持图片
+                    const messages = [];
+
+                    // 添加系统提示
+                    messages.push({ type: "text", text: aiSystemPrompt });
+
+                    // 添加历史消息（包含文本和图片）
+                    for (var i = 0; i < tempMessageHistory.length; i++) {
+                        const historyItem = tempMessageHistory[i];
+                        // 添加文本
+                        if (historyItem.content && historyItem.content.trim() !== '') {
+                            messages.push({ type: "text", text: historyItem.content });
+                        }
+                        // 添加图片
+                        if (historyItem.images && historyItem.images.length > 0) {
+                            for (let j = 0; j < historyItem.images.length; j++) {
+                                messages.push({
+                                    type: 'image_url',
+                                    image_url: historyItem.images[j]
+                                });
+                            }
+                        }
+                    }
+
+                    // 添加当前用户消息（文本+图片）
+                    if (this.urlPicList.length > 0) {
+                        // 如果有图片，先添加文本
+                        if (processedContent.trim() !== '') {
+                            messages.push({ type: "text", text: processedContent });
+                        }
+                        // 添加图片
+                        for (let i = 0; i < this.urlPicList.length; i++) {
+                            messages.push({
+                                type: 'image_url',
+                                image_url: this.urlPicList[i]
+                            });
+                        }
+                    } else {
+                        // 只有文本
+                        messages.push({ type: "text", text: processedContent });
+                    }
+
+                    console.log('messages:', JSON.stringify(messages));
+                    console.log('this.messageHistory:', JSON.stringify(this.messageHistory));
+
+                    // 保存当前图片列表的副本
+                    const currentImages = this.urlPicList.slice();
+                    console.log('保存的图片数量:', currentImages.length);
+
+                    this.messageHistory.pop();
+                    this.content = '';
+                    // 清空图片列表
+                    this.curPicList = [];
+                    this.urlPicList = [];
+                    let result = '';
+                    apiObj.Post(UrlRouter.PostPayfeeOperationLog, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            type: 'ai_study',
+                            schoolid: $api.getStorage('schoolid'),
+                            card_type: vm.aiStudy.card_type,
+                            card_id: vm.aiStudy.card_id,
+                            count: vm.aiStudy.count,
+                            // count: 0//不扣次数
+                        }
+                    }, function (ret, err) {
+                        console.log('retwithcount', JSON.stringify(ret));
+                        if(ret && ret.ret === 0){
+                            vm.aiStudy.count -=1;
+                            api.execScript({
+                                name: 'win_aiAssistant',
+                                script: 'postAiStudy()'
+                            });
+                        }
+                    });
+                    try {
+                        // 请求的 URL
+                        var API_URL = UrlDomain + UrlRouter.PostsendAiMessage;
+                        messages.pop();
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'token': $api.getStorage('token'),
+                            },
+                            body: JSON.stringify({
+                                stream: true,
+                                message: messages,
+                                type: 'Ai_liushi'
+                            })
+                        });
+
+                        console.log('API response received:', response.status);
+                        // 新增：判断500错误
+                        console.log('API返回response:', JSON.stringify(response));
+                        console.log('response.status:', response.status);
+                        console.log('response.statusText:', response.statusText);
+                        if (response.status === 413) {
+                            api.toast({
+                                msg: '请求内容过大，请减少图片数量或压缩图片',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                            this.stopLoading();
+                            return;
+                        }
+                        this.messages.push('');
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) {
+                                console.log('Stream completed');
+                                this.messageHistory.push({
+                                    role: 'user',
+                                    content: processedContent,
+                                    images: currentImages // 使用保存的图片副本
+                                });
+                                this.messageHistory.push({
+                                    role: 'assistant',
+                                    content: result
+                                });
+                                break;
+                            }
+                            const chunk = decoder.decode(value);
+                            chunk.split('\n').forEach(line => {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        const data = JSON.parse(line.slice(6));
+                                        const content = data.choices[0].delta.content || '';
+                                        if (content !== '') {
+                                            result += content;
+                                            // 只保留处理后内容的渲染
+                                            this.messages.pop();
+                                            this.messages.push(this.markdown(result));
+                                            setTimeout(() => {
+                                                renderMathJax();
+                                            }, 100);
+                                            setTimeout(() => {
+                                                const rightList = document.querySelector('.right-list');
+                                                rightList.scrollTop = rightList.scrollHeight;
+                                            }, 150);
+                                        }
+                                    } catch (e) {
+                                        console.error('Parse error:', e);
+                                    }
+                                }
+                            });
+                        }
+                        // 在流式响应完全结束后才停止loading状态
+                        this.stopLoading();
+                        // AI回复完成后自动滚动到底部
+                        setTimeout(() => {
+                            const rightList = document.querySelector('.right-list');
+                            rightList.scrollTop = rightList.scrollHeight;
+                        }, 200);
+                        // 最终渲染MathJax
+                        setTimeout(() => {
+                            renderMathJax();
+                        }, 200);
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.stopLoading();
+                        this.messages.push('抱歉，我现在无法回答，请稍后再试。');
+                        this.messageHistory.pop();
+                        // 清空图片列表，因为发送失败
+                        this.curPicList = [];
+                        this.urlPicList = [];
+                        // 渲染错误消息中的数学公式
+                        setTimeout(() => {
+                            renderMathJax();
+                        }, 100);
+                    }
+                },
+                setChat: function (chatId, messageHistory = []) {
+                    this.curPicList = [];
+                    this.urlPicList = [];
+                    this.chatId = chatId;
+                    // 通知win页面更新当前对话ID
+                    api.sendEvent({
+                        name: 'aiAssistantFrameChatChanged',
+                        extra: {
+                            chatId: chatId
+                        }
+                    });
+                    if (chatId === 0) {
+                        this.messages = ['同学你好，我是AI伴学小助手，可以帮你回答学科知识问题哦，请发送相关的问题，我会帮你进行解答～'];
+                        this.messageHistory = [];
+                        return;
+                    }
+                    // else if (chatId === -1) {
+                    //     this.messages = [processContent(messageHistory[messageHistory.length - 1].content)];
+                    //     //删除第一个
+                    //     // messageHistory.shift();
+                    //     this.messageHistory = messageHistory;
+                    //     this.chatId = -1;//修改为0即可保存文本对话，修改为-1即可不保存文本对话
+                    //     return;
+                    // } 
+                    else if (chatId === -1) {
+                        this.messageHistory = messageHistory;
+                        // 构建显示消息，包含文本和图片
+                        let displayMessages = [this.messages[0]];
+                        for (let i = 0; i < this.messageHistory.length; i++) {
+                            const message = this.messageHistory[i];
+                            let displayContent = processContent(message.content);
+
+                            console.log('消息', i, '图片数量:', message.images ? message.images.length : 0);
+
+                            // 不添加图片
+
+                            displayMessages.push(displayContent);
+                        }
+                        this.messages = displayMessages;
+                    }
+                    else {
+                        this.messageHistory = messageHistory;
+                        // 构建显示消息，包含文本和图片
+                        let displayMessages = [this.messages[0]];
+                        for (let i = 0; i < this.messageHistory.length; i++) {
+                            const message = this.messageHistory[i];
+                            let displayContent = processContent(message.content);
+
+                            console.log('消息', i, '图片数量:', message.images ? message.images.length : 0);
+
+                            // 如果有图片，添加图片显示
+                            if (message.images && message.images.length > 0) {
+                                displayContent += '<div class="message-images">';
+                                for (let j = 0; j < message.images.length; j++) {
+                                    displayContent += '<img src="' + message.images[j] + '" style="width: 100px; height: 100px; margin: 5px; border-radius: 4px;" onclick="openPicture(\'' + message.images[j] + '\')">';
+                                }
+                                displayContent += '</div>';
+                            }
+
+                            displayMessages.push(displayContent);
+                        }
+                        this.messages = displayMessages;
+                    }
+                    // setChat设置完毕后自动滚动到底部
+                    setTimeout(() => {
+                        const rightList = document.querySelector('.right-list');
+                        rightList.scrollTop = rightList.scrollHeight;
+                    }, 100);
+                    // console.log('messages:' + this.messages);
+                    // console.log('messageHistory:' + JSON.stringify(this.messageHistory));
+                },
+                addPic: function () {
+                    // 检查图片数量是否已达到上限
+                    if (this.curPicList.length >= 5) {
+                        api.toast({
+                            msg: '最多只能添加5张图片',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        return;
+                    }
+
+                    var self = this; // 保存Vue实例的引用
+                    api.getPicture({
+                        sourceType: 'camera',
+                        encodingType: 'jpg',
+                        destinationType: 'base64',
+                        //targetWidth: 100,
+                        //targetHeight: 100,
+                        quality: 50
+                    }, function (ret, err) {
+                        console.log('添加图片，base64长度:', ret.base64Data.length);
+                        if (ret.base64Data.length > 0) {
+                            // self.curPicList.push(ret.base64Data);
+                            api.addEventListener({
+                                name: 'aiAssistant_cutPicture'
+                            }, function (ret, err) {
+                                let base64 = ret.value;
+                                if (!base64.startsWith('data:image')) {
+                                    base64 = 'data:image/jpeg;base64,' + base64;
+                                }
+                                self.curPicList.push(base64);
+                            });
+                            api.openWin({
+                                name: 'win_aiAssistant_cutPicture',
+                                url: './win_aiAssistant_cutPicture.html',
+                                pageParam: {
+                                    src: ret.data
+                                }
+                            });
+                        }
+                    });
+                },
+                removePic: function (index) {
+                    this.curPicList.splice(index, 1);
+                },
+            },
+        });
+    }
+
+    function getStudentAINum() {
+        if (vm.isLoading || vm.content === '') return;
+        if (vm.aiStudy.count <= 0) {
+            if ($api.getStorage('upgradeQRCode') === '1') {
+                api.toast({
+                    msg: '本月剩余问答次数已耗尽',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.openFrame({
+                    name: 'frame-number-exhausted',
+                    url: '../study/frame-number-exhausted.html',
+                })
+            }
+            return;
+        }
+        vm.sendMessageToAI();
+        // apiObj.Get(UrlRouter.GetDeepSeekAiLimit, {
+        //     values: {
+        //         type: 'Ai_Assistant'
+        //     }
+        // }, function (ret, err) {
+        //     if (ret.ret == 0) {
+        //         //开关
+        //         api.hideProgress();
+        //         vm.sendMessageToAI();// 调用原有的流式请求
+        //     } else {
+        //         api.toast({
+        //             msg: '今日调用AI解析次数已达上限！'
+        //         })
+        //         api.hideProgress();
+        //     }
+        // });
+    }
+
+
+</script>
+
+</html>

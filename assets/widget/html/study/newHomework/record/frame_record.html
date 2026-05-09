@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <title></title>
+    <style type="text/css">
+        body {
+            background-color: #F2F2F2;
+            padding-top: 5%;
+        }
+
+        .middleDiv{
+            width: 80%;
+            margin-left: 10%;
+            border: 1px solid inherit;
+            height: 85%;
+            box-shadow: 0px 0px 10px #cecece;
+            position: relative;
+            background-color: white;
+        }
+
+        .toplightGreen {
+            width: 100%;
+            height: 65%;
+            background-color: #F1FFFD;
+            position: relative;
+        }
+
+        .topp {
+            text-align: center;
+            color: #4DC5C5;
+            font-size: 20px;
+            line-height: 20%;
+            padding-top:  30px;
+        }
+
+        .toptime {
+            text-align: center;
+            padding-top: 4%;
+            font-size: 28px;
+            color: #4DC5C5;
+        }
+
+        .greenline {
+            width: 100%;
+            height: 6px;
+            background-color: green;
+            position: absolute;
+            bottom: 0;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: #E0FAF9;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #4bc7c7;
+        }
+
+        .imageDiv{
+            height: 60%;
+            position: absolute;
+            bottom: 3%;
+        }
+
+
+        .image {
+            width: 43%;
+            margin-left: 6%;
+            margin-top: 3%;
+            height: 82%;
+            display: inline-block;
+        }
+        .image1 {
+            width: 43%;
+            margin-left: 1%;
+            margin-top: 3%;
+            height: 82%;
+            display: inline-block;
+        }
+
+        /*.btn {*/
+        /*width: 12%;*/
+        /*height: auto;*/
+        /*margin-left: calc(37% - 30px);*/
+        /*margin-top: 2%;*/
+        /*border-radius: 50%;*/
+        /*}*/
+        .btn:active{
+
+        }
+
+        .btn {
+            width: 12%;
+            height: auto;
+            margin-left: 44%;
+            margin-top: 2%;
+            border-radius: 50%;
+        }
+
+        .cancil {
+            width: 8%;
+            margin-top: 5%;
+            margin-left: 21%;
+            height: auto;
+            float: left;
+            display: none;
+        }
+
+        .over {
+            width: 8%;
+            margin-top: 5%;
+            margin-right: 21%;
+            height: auto;
+            float: right;
+            display: none;
+        }
+        .centerText{
+            text-align: center;
+            color:#4bc7c7;
+            opacity:0.76;
+        }
+
+        .cancilText{
+            width: 50%;
+            text-align: center;
+            color: #c6c6c6;
+            display: none;
+        }
+
+        .overText{
+            width: 50%;
+            text-align: center;
+            color:#c6c6c6;
+            display: none;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="middleDiv">
+    <div class="toplightGreen">
+
+        <p class="topp">音频录制</p>
+        <p class="toptime">00:00</p>
+        <div class="imageDiv">
+            <img class="image" src="../../../../image/homework/xxc_03.png" alt="">
+            <img class="image1" src="../../../../image/homework/xxc_03.png" alt="">
+        </div>
+        <progress max="300" value="0" class="greenline"></progress>
+    </div>
+    <img class="cancil" onclick="cancilRecode();"  src="../../../../image/homework/co_06.png" alt="">
+    <img class="btn" onclick="record();" src="../../../../image/homework/xc_03.png" alt="">
+    <img class="over" onclick="chuanRecord();" src="../../../../image/homework/co_09.png" alt="">
+    <p class="centerText">点击开始录音</p>
+    <div style="clear: both"></div>
+    <div class="cancilText">重录</div><div class="overText">使用</div>
+</div>
+
+<!--<input type="range" min="1" max="100">-->
+
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script>
+
+    var beforeload;
+    var afterload;
+    var seconds;
+    var path;
+    var isRecord = 0;
+    var timer;
+    var duration = 0;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+
+    };
+
+
+    function record() {
+
+
+        if (isRecord == 0) {
+            isRecord = 1;
+            //音频录制变成正在录音
+            $api.text($api.dom('.topp'), '正在录音');
+            $api.text($api.dom('.centerText'), '最长可录制5分钟');
+            $api.attr($api.dom('.btn'), 'src', '../../../../image/homework/stopLy.png');
+            $api.attr($api.dom('.image'), 'src', '../../../../image/homework/move.gif');
+            $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/move.gif');
+            var second = 0;
+            var min = 0;
+            var greenline = $api.dom('.greenline');
+            timer = setInterval(function (e) {
+                if (greenline.value != 300) greenline.value++;
+                else greenline.value = 0;
+                duration = duration + 1;
+                if (min == 4 && second == 59) {
+                    alert('语音最多只能录制五分钟');
+                    min = 5;
+                    second = 0;
+                    clearInterval(timer);
+                    isRecord = 2;
+                    $api.text($api.dom('.topp'), '录音完成');
+                    $api.attr($api.dom('.image'), 'src', '../../../../image/homework/xxc_03.png');
+                    $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/xxc_03.png');
+                    $api.css($api.dom('.cancil'), 'display:block;');
+                    $api.css($api.dom('.over'), 'display:block;');
+                    $api.css($api.dom('.cancilText'), 'display:inline-block;');
+                    $api.css($api.dom('.overText'), 'display:inline-block;');
+                    $api.css($api.dom('.btn'), 'display:none;');
+                    $api.css($api.dom('.centerText'), 'display:none;');
+                    overrecord();
+                } else {
+                    if (second != 59) {
+                        second = second + 1;
+                    } else {
+                        second = 0;
+                        min = min + 1;
+                    }
+                }
+                $api.text($api.dom('.toptime'), min + ':' + second);
+            }, 1000);
+            startRecord();
+        } else if( isRecord == 1){
+            isRecord = 2;
+            clearInterval(timer);
+            $api.text($api.dom('.topp'), '录音完成');
+            $api.attr($api.dom('.image'), 'src', '../../../../image/homework/xxc_03.png');
+            $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/xxc_03.png');
+            $api.css($api.dom('.cancil'), 'display:block;');
+            $api.css($api.dom('.over'), 'display:block;');
+            $api.css($api.dom('.cancilText'), 'display:inline-block;');
+            $api.css($api.dom('.overText'), 'display:inline-block;');
+            $api.css($api.dom('.btn'), 'display:none;');
+            $api.css($api.dom('.centerText'), 'display:none;');
+            overrecord();
+        }else {
+            alert('录音已结束，请上传');
+        }
+    }
+
+
+
+    function startRecord() {
+        beforeload = (new Date()).getTime();
+        path = '/'+new Date().getTime() + ".amr";
+        api.startRecord({
+            path: 'fs:/' + path
+        });
+    }
+
+    function cancilRecode() {
+
+        $api.css($api.dom('.cancil'), 'display:none;');
+        $api.css($api.dom('.over'), 'display:none;');
+        $api.css($api.dom('.cancilText'), 'display:none;');
+        $api.css($api.dom('.overText'), 'display:none;');
+        $api.css($api.dom('.btn'), 'display:block;');
+        $api.css($api.dom('.centerText'), 'display:block;');
+        $api.text($api.dom('.topp'), '音频录制');
+        $api.text($api.dom('.centerText'), '点击开始录音');
+        $api.text($api.dom('.toptime'), '00:00');
+        $api.attr($api.dom('.btn'), 'src', '../../../../image/homework/xc_03.png');
+        isRecord = 0;
+        var greenline = $api.dom('.greenline');
+        greenline.value = 0;
+
+    }
+
+    function overrecord() {
+        api.stopRecord(
+                function (ret, err) {
+                    if (ret) {
+                        afterload = (new Date()).getTime();
+                        seconds = (afterload - beforeload) / 1000;
+                        var path = ret.path;
+
+//                        duration = ret.duration.toString();
+//                        alert(ret.duration +' ' +duration);
+                    } else {
+                        api.hideProgress();
+                    }
+                }
+        );
+    }
+
+    function chuanRecord() {
+        if (duration == 0 || duration == "0") {
+            alert('录音时间过短,请重新录制');
+            cancilRecode();
+            api.hideProgress();
+        } else {
+            qiniuUpSound();
+        }
+    }
+
+    // 上传音频
+    function qiniuUpSound() {
+        var fileKey = (new Date()).valueOf() + api.fsDir + path;
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            var qiniuStorage = api.require("qiniuStorage");
+            qiniuStorage.configUploader({
+                params: {},
+                checkCrc: false,
+                mimeType: '',
+                zone: $api.getStorage('qiniuZone')
+            });
+            qiniuStorage.start({
+                token: ret.data.token,
+                path: api.fsDir + path,
+                key: fileKey
+            });
+            qiniuStorage.addEventListener(function (ret) {
+                if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                    //上传成功后组装访问路径，或直接访问文档
+                    var qiniuUrl = QINIU_DOMAIN + ret.key;
+                    // 图片音频都上传完毕 调12xue接口
+//                    var giveData = 'vm.giveData('+ ret.key +','+ duration +','+ api.fsDir + path +');';
+//                    api.execScript({
+//                        name: 'win-homeworkDetail-pad',
+//                        frameName: 'frame-homeworkDetail-pad'+ index,
+//                        script: giveData
+//                    });
+
+                    api.sendEvent({
+                        name: 'giveRecoreData',
+                        extra: {index: api.pageParam.index,savename:ret.key,filetime:duration,Local_address:api.fsDir + path,isfrom: api.pageParam.isform}
+                    });
+
+//                    api.closeWin();
+
+                }
+            });
+        });
+    }
+
+</script>
+</html>

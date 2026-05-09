@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .main
+        {
+            width:234px;
+            height:237px;
+            background:url("../image/qdcg.png") no-repeat ;
+            background-size: 100%;
+            animation:myfirst 3.5s;
+            -moz-animation:myfirst 3.5s; /* Firefox */
+            -webkit-animation:myfirst 3.5s; /* Safari and Chrome */
+            -o-animation:myfirst 3.5s; /* Opera */
+            opacity: 0;
+            overflow: hidden;
+            position: fixed;
+            left: calc(50% - 117px);
+            top:calc(50% - 119px);
+            text-align: center;
+        }
+        p{
+            font-size: 14px;
+            padding-bottom: 5px;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+        .gxhd{
+            font-size: 14px;
+            margin-top: 44%;
+            margin-bottom: 5px;
+        }
+        .jf{
+            color: #fd5039;
+        }
+        .jf span{
+            font-size: 19px; font-weight: bold;margin-right: 5px;
+        }
+        @keyframes myfirst
+        {
+            0%   {width:0; height:0; opacity: 1;left: 50%;
+                top: 50%;}
+            11%  {width:306px; height:309px;opacity: 1; left: calc(50% - 153px);
+                top:  calc(50% - 155px);}/*从中心点开始放大到最大*/
+            15%  {width:190px; height:192px;opacity: 1;left: calc(50% - 95px);
+                top:  calc(50% - 96px);}/*从最大点缩小到视图大小*/
+            18%  {width:260px; height:264px;opacity: 1;left: calc(50% - 130px);
+                top:  calc(50% - 132px);}/*变大*/
+            21%  {width:218px; height:220px;opacity: 1;left: calc(50% - 109px);
+                top:  calc(50% - 110px);}/*缩小*/
+            25%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            29%  {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            33%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            38%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            40%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            42%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            /*42%  {width:40px; height:40px}!*反复弹动弹动动作幅度每次逐渐变小  4次弹动动作*!*/
+            86%  {width:234px; height:237px;opacity: 1;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*签到弹窗正常显示时间*/
+            100% {width:234px; height:237px;opacity: 0;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*消失*/
+        }
+
+        @-moz-keyframes myfirst /* Firefox */
+        {
+            0%   {width:0; height:0; opacity: 1;left: 50%;
+                top: 50%;}
+            11%  {width:306px; height:309px;opacity: 1; left: calc(50% - 153px);
+                top:  calc(50% - 155px);}/*从中心点开始放大到最大*/
+            15%  {width:190px; height:192px;opacity: 1;left: calc(50% - 95px);
+                top:  calc(50% - 96px);}/*从最大点缩小到视图大小*/
+            18%  {width:260px; height:264px;opacity: 1;left: calc(50% - 130px);
+                top:  calc(50% - 132px);}/*变大*/
+            21%  {width:218px; height:220px;opacity: 1;left: calc(50% - 109px);
+                top:  calc(50% - 110px);}/*缩小*/
+            25%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            29%  {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            33%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            38%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            40%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            42%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            /*42%  {width:40px; height:40px}!*反复弹动弹动动作幅度每次逐渐变小  4次弹动动作*!*/
+            86%  {width:234px; height:237px;opacity: 1;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*签到弹窗正常显示时间*/
+            100% {width:234px; height:237px;opacity: 0;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*消失*/
+        }
+
+        @-webkit-keyframes myfirst /* Safari and Chrome */
+        {
+            0%   {width:0; height:0; opacity: 1;left: 50%;
+                top: 50%;}
+            11%  {width:306px; height:309px;opacity: 1; left: calc(50% - 153px);
+                top:  calc(50% - 155px);}/*从中心点开始放大到最大*/
+            15%  {width:190px; height:192px;opacity: 1;left: calc(50% - 95px);
+                top:  calc(50% - 96px);}/*从最大点缩小到视图大小*/
+            18%  {width:260px; height:264px;opacity: 1;left: calc(50% - 130px);
+                top:  calc(50% - 132px);}/*变大*/
+            21%  {width:218px; height:220px;opacity: 1;left: calc(50% - 109px);
+                top:  calc(50% - 110px);}/*缩小*/
+            25%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            29%  {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            33%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            38%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            40%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            42%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            /*42%  {width:40px; height:40px}!*反复弹动弹动动作幅度每次逐渐变小  4次弹动动作*!*/
+            86%  {width:234px; height:237px;opacity: 1;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*签到弹窗正常显示时间*/
+            100% {width:234px; height:237px;opacity: 0;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*消失*/
+        }
+
+        @-o-keyframes myfirst /* Opera */
+        {
+            0%   {width:0; height:0; opacity: 1;left: 50%;
+                top: 50%;}
+            11%  {width:306px; height:309px;opacity: 1; left: calc(50% - 153px);
+                top:  calc(50% - 155px);}/*从中心点开始放大到最大*/
+            15%  {width:190px; height:192px;opacity: 1;left: calc(50% - 95px);
+                top:  calc(50% - 96px);}/*从最大点缩小到视图大小*/
+            18%  {width:260px; height:264px;opacity: 1;left: calc(50% - 130px);
+                top:  calc(50% - 132px);}/*变大*/
+            21%  {width:218px; height:220px;opacity: 1;left: calc(50% - 109px);
+                top:  calc(50% - 110px);}/*缩小*/
+            25%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            29%  {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            33%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            38%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            40%  {width:243px; height:246px;;opacity: 1;left: calc(50% - 121px);
+                top:  calc(50% - 123px);}/*变大*/
+            42%   {width:228px; height:231px;opacity: 1;left: calc(50% - 114px);
+                top:  calc(50% - 116px);}/*缩小*/
+            /*42%  {width:40px; height:40px}!*反复弹动弹动动作幅度每次逐渐变小  4次弹动动作*!*/
+            86%  {width:234px; height:237px;opacity: 1;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*签到弹窗正常显示时间*/
+            100% {width:234px; height:237px;opacity: 0;left: calc(50% - 117px);
+                top:  calc(50% - 119px);}/*消失*/
+        }
+    </style>
+</head>
+<body>
+<div class="main" tapmode onclick="api.closeFrame();">
+    <p class="gxhd">恭喜获得</p>
+    <p class="jf"><span v-text="points"></span>积分</p>
+    <p class="jf"><span v-text="prestige"></span>个成长值</p>
+</div>
+<!--<div v-cloak="" class="pop-content">-->
+    <!--<img src="../image/img_signed.png">-->
+    <!--<div class="txt-div">-->
+        <!--<div style="font-size: 20px; color: #333333; text-align: center; padding-top: 20px;">签到成功</div>-->
+        <!--<div style="font-size: 16px; color: #999999; text-align: center; padding-top: 15px; padding-bottom: 25px;">-->
+            <!--<span>恭喜获得</span>-->
+            <!--<span style="color: #4bc7c7;" v-text="' ' + points + ' '"></span>-->
+            <!--<span>积分，</span>-->
+            <!--<span style="color: #4bc7c7;" v-text="prestige + ' '"></span>-->
+            <!--<span>个成长值</span>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    apiready = function () {
+        initVue();
+        setTimeout(function () {
+            api.closeFrame();
+        }, 2000);
+    };
+
+    function initVue() {
+        vm = new Vue({
+            el: '.main',
+            data: {
+                points: api.pageParam.points,
+                prestige: api.pageParam.prestige
+            },
+            methods: {
+            }
+        });
+    }
+
+</script>

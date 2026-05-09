@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>文章详情</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: rgb(242, 242, 242);
+            width: 100%;
+        }
+
+        .aui-bar-nav .aui-btn .aui-iconfont1 {
+            color: #ffffff;
+            padding: 15px;
+            font-size: 0.8rem;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content">
+    <header class="aui-bar aui-bar-nav aui-bar-primary">
+        <a class="aui-pull-left" tapmode onclick="closeWin();">
+            <span class="aui-iconfont aui-icon-left"></span>缴费详情
+        </a>
+    </header>
+
+</div>
+
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var headerH;
+    var frameH;
+    apiready = function () {
+        var header = document.querySelector('header');
+        headerH = $api.offset(header).h;
+        frameH = api.winHeight - headerH;
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+        api.openFrame({
+            name: 'frame_renew_detail',
+            url: 'frame_renew_detail.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam:{
+                ret: api.pageParam.ret
+            },
+            bounces: false
+        });
+    };
+
+    function closeWin() {
+        api.closeWin();
+    }
+</script>
+</html>

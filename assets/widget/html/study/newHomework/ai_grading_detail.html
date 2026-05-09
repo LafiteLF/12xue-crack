@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>主观题AI批阅详情</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <link rel="stylesheet" href="../../../script/aiAssistant/markdown/katex-0.16.9.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            background-color: #f5f7fa;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-height: calc(100vh - 50px);
+            overflow-y: hidden;
+            margin: 0 auto;
+        }
+
+        header {
+            position: relative;
+            z-index: 100;
+            overflow-y: hidden;
+        }
+
+        /* 头部标题 */
+        .header {
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 500;
+            color: #333;
+            padding: 20px 120px 20px 120px;
+            position: sticky;
+            top: 0;
+            background-color: #f5f7fa;
+            z-index: 10;
+
+        }
+
+        .ai-icon {
+            position: absolute;
+            left: 0;
+            top: -10px;
+            width: 60px;
+            height: auto;
+        }
+
+        /* 正确率进度条 */
+        .accuracy-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: none;
+
+            z-index: 999;
+
+        }
+
+        .accuracy-title {
+            font-size: 1.6rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 12px;
+            background: #e6f7f7;
+            border-radius: 6px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4bc7c7;
+            border-radius: 6px;
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes progressPulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .progress-fill.animating {
+            animation: progressPulse 1.5s ease-in-out infinite;
+        }
+
+        .accuracy-value {
+            font-size: 2.2rem;
+            color: #4bc7c7;
+            font-weight: bold;
+        }
+
+        /* 主内容区域 */
+        .content-wrapper {
+            display: flex;
+            align-items: flex-start;
+            z-index: 999;
+        }
+
+        /* 左侧内容独立滚动 */
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+            padding-right: 10px;
+            position: relative;
+            z-index: 10;
+            margin-right: 20px;
+        }
+
+        /* 右侧内容独立滚动 */
+        .right-section {
+            flex: 1;
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        /* 滚动条样式和图片一致 */
+        .left-section::-webkit-scrollbar,
+        .right-section::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .left-section::-webkit-scrollbar-track,
+        .right-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .left-section::-webkit-scrollbar-thumb,
+        .right-section::-webkit-scrollbar-thumb {
+            background-color: #4bc7c7;
+            border-radius: 2px;
+        }
+
+
+        /* 卡片通用样式 */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 习题卡片 */
+        .exercise-card .exercise-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .exercise-card span {
+            font-size: 1.2vw;
+        }
+
+
+
+        .exercise-card .exercise-header>*:not(:last-child) {
+            margin-right: 15px;
+        }
+
+        .exercise-number {
+            font-size: 1.0vw;
+            color: #333;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .exercise-type {
+            font-size: 1.0vw;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .exercise-difficulty {
+            font-size: 1.0vw;
+            color: #4bc7c7;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .exercise-difficulty img {
+            margin-left: 4px;
+        }
+
+        .difficulty-star {
+            height: 1.6rem;
+            width: auto;
+        }
+
+        .exercise-content {
+            font-size: 1.3rem;
+            line-height: 2.4;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .reference-answer {
+            border: 2px solid #4bc7c7;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f8fdfd;
+        }
+
+        .reference-title {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .reference-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        /* 我的答案卡片 */
+        .my-answer-card .card-title {
+            font-size: 1.6rem;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .my-answer-card .card-title img {
+            margin-right: 8px;
+        }
+
+        .answer-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .answer-list>*:not(:last-child) {
+            margin-bottom: 20px;
+        }
+
+        .answer-item {
+            font-size: 1.4rem;
+            line-height: 2.0;
+            color: #333;
+            padding-left: 10px;
+        }
+
+        /* 批阅详情卡片 */
+        .grading-detail-card {
+            min-height: 100%;
+            height: auto;
+
+
+        }
+
+        .grading-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .grading-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .grading-title {
+            font-size: 1.8rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .knowledge-points {
+            font-size: 1.3rem;
+
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .section-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4bc7c7;
+            margin-right: 10px;
+        }
+
+        .section-content {
+            padding-left: 20px;
+        }
+
+        .analysis-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analysis-list>*:not(:last-child) {
+            margin-bottom: 25px;
+        }
+
+        .analysis-item {
+            display: flex;
+        }
+
+        .analysis-item>*:not(:last-child) {
+            margin-right: 15px;
+        }
+
+        .analysis-content {
+            flex: 1;
+            font-size: 1.4rem;
+            line-height: 2.0;
+            color: #333;
+        }
+
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .status-correct {
+            color: #4bc7c7;
+        }
+
+        .status-partial {
+            color: #ffcc00;
+        }
+
+        .status-wrong {
+            color: #ff778c;
+        }
+
+        .strong {
+            font-family: Microsoft YaHei;
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #64748B;
+            line-height: 2.0;
+            display: inline-block;
+            align-self: flex-start;
+        }
+
+        .analysis-item .analysis-content {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .analysis-item .analysis-content>*:not(:last-child) {
+            margin-right: 4px;
+        }
+
+        .analysis-item .analysis-content .strong {
+            flex-shrink: 0;
+        }
+
+        .analysis-item .analysis-content .analysis-text {
+            flex: 1;
+            text-indent: 0;
+        }
+
+        .error-item {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .error-item>*:not(:last-child) {
+            margin-right: 4px;
+        }
+
+        .error-item .strong {
+            flex-shrink: 0;
+        }
+
+        .error-item .error-text {
+            flex: 1;
+            text-indent: 0;
+        }
+
+        /* LaTeX公式样式 */
+        .katex-display {
+            text-align: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            width: 100%;
+            max-width: 100%;
+            padding: 5px 0;
+        }
+
+        .katex {
+            font-size: 1.1em !important;
+        }
+
+        .reference-answer img {
+            max-width: 100%;
+        }
+
+        /* 答案图片容器样式 */
+        .answer-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .answer-images .answer-image-item {
+            flex: 0 0 calc(50% - 5px);
+        }
+
+        .answer-image-group {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .answer-image-item {
+            flex: 0.5;
+            min-width: 0;
+        }
+
+        .answer-images img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        /* tx为3时，图片直接横向排列，最多一行两个 */
+        .answer-images-horizontal {
+            display: flex;
+            flex-direction: row;
+
+            flex-wrap: wrap;
+        }
+
+        .answer-images-horizontal .answer-image-item {
+            flex: 0 0 calc(50% - 5px);
+            margin-bottom: 10px;
+        }
+
+        .transAI {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            z-index: 101;
+            width: 100px;
+            height: auto;
+        }
+
+        /* 图片预览弹窗 */
+        .image-preview {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .image-preview img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        /* 错误状态样式 */
+        .grading-detail-card {
+            min-height: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .errorM {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .errorM img {
+
+            margin-bottom: 30px;
+        }
+
+        .errorM p {
+            font-size: 1.6rem;
+            color: #ff4757;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        header {
+            /* 原有样式 */
+            opacity: 0;
+            /* 初始隐藏 */
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .katex-display {
+            text-align: left !important;
+            overflow-x: auto;
+            /* 横向滚动 */
+            overflow-y: hidden;
+            width: 100%;
+            max-width: 100%;
+            padding: 8px 0;
+            margin: 10px 0 !important;
+            /* 关键：允许内部元素换行 */
+            white-space: normal !important;
+        }
+
+        .katex {
+            white-space: normal;
+        }
+
+
+
+        /* 公式容器强制适配父元素宽度 */
+        .exercise-content .katex,
+        .analysis-content .katex,
+        .error-text .katex,
+        .section-content .katex {
+            max-width: 100%;
+            /* 防止公式超出容器 */
+            box-sizing: border-box;
+            padding: 0 2px;
+        }
+
+        /* 为包含公式的容器添加内边距和溢出控制 */
+        .exercise-content,
+        .analysis-content,
+        .error-text,
+        .section-content {
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            /* 增加底部内边距，避免滚动条遮挡内容 */
+            padding-bottom: 8px;
+        }
+
+        /* 优化滚动条样式 */
+        .exercise-content::-webkit-scrollbar,
+        .analysis-content::-webkit-scrollbar,
+        .error-text::-webkit-scrollbar,
+        .section-content::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .exercise-content::-webkit-scrollbar-thumb,
+        .analysis-content::-webkit-scrollbar-thumb,
+        .error-text::-webkit-scrollbar-thumb,
+        .section-content::-webkit-scrollbar-thumb {
+            background-color: #4bc7c7;
+            border-radius: 3px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        /* AI声明样式 */
+        .ai-disclaimer {
+            text-align: right;
+            padding: 10px 10px 15px 0;
+            margin-top: 15px;
+        }
+
+        .ai-disclaimer-text {
+            font-size: 1.0rem;
+            color: #999999;
+        }
+
+        .unique {
+            background-color: #f8fdfd;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <div class="container">
+            <!-- 关闭按钮 -->
+            <header v-if="dataLoaded">
+                <div style=" position: absolute; top: 20px; right: 20px; z-index: 102;" tapmode onclick="closeFrame()">
+                    <img style="width: 3vw;" src="../../../image/closeselect.png" alt="">
+                </div>
+
+                <!-- 头部 -->
+                <span class="transAI"><img style="width:100%" src="../../../image/transAI.png" alt="" srcset=""></span>
+                <div class="header">
+                    主观题AI批阅详情
+                </div>
+
+            </header>
+
+
+
+
+            <!-- 主内容 -->
+            <div class="content-wrapper" style="padding: 0 20px 40px 20px;" v-if="dataLoaded">
+                <!-- 左侧内容 -->
+
+                <div class="left-section">
+
+
+                    <!-- 正确率进度条 -->
+                    <div class="accuracy-section">
+                        </span>
+                        <span class="accuracy-title">习题正确率</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" :class="{ 'animating': animationPlayed }"
+                                :style="{ width: accuracyValue }"></div>
+                        </div>
+                        <span class="accuracy-value">{{accuracyValue}}</span>
+                    </div>
+                    <!-- 习题内容 -->
+
+                    <div class="card exercise-card">
+                        <div class="exercise-header">
+                            <span class="exercise-number">{{IDX+1}}.</span>
+                            <span class="exercise-type">【{{transData.tx}}】</span>
+                            <span class="exercise-difficulty">
+                                <span>难易度：</span>
+                                <img class="difficulty-star"
+                                    :src="transData.nyd==1?'../../../image/newhomework/1xing.png':transData.nyd==2?'../../../image/newhomework/2xing.png':transData.nyd==3?'../../../image/newhomework/3xing.png':''"
+                                    alt="难度星级">
+                            </span>
+                        </div>
+
+                        <div class="exercise-content" v-html="formatExerciseContent(transData.tg)"></div>
+                        <div v-if="transData.children && transData.children.length > 0" style="margin-top: 20px;">
+                            <div v-for="(child, index) in transData.children" :key="index"
+                                style="margin-bottom: 15px; padding-left: 20px; ">
+                                <div v-html="formatExerciseContent(child.tg)"
+                                    style="font-size: 1.3rem; line-height: 2.4; color: #333;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 我的答案 -->
+                    <div style="margin-top: 20px;" class="card my-answer-card">
+                        <div class="card-title" style="display: flex; align-items: center;">
+                            <img src="../../../image/myAnswer.png" alt="" style="height: 1.6rem; width: auto;">
+                            我的答案
+                        </div>
+
+
+
+                        <div v-if="transData.tx_code!='3'" v-for="(item, outerIndex) in parsedAnswer" :key="outerIndex"
+                            style="margin-bottom: 20px;">
+                            <div style="margin-bottom: 10px;">
+                                <template v-if="transData">
+                                    <span class="strong">第{{outerIndex+1}}题 </span>
+                                </template>
+                                <div v-if="item.type==='text'" class="answer-item" 
+                                    style="margin: 0; padding: 0;">
+                                   {{ item.content.replace(/<\/?p[^>]*>/gi, '') }}
+                                </div>
+                                <div v-if="item.type==='image'" class="answer-images">
+                                    <div v-for="(img, imgIndex) in item.images" :key="imgIndex"
+                                        class="reference-answer answer-image-item">
+                                        <img :src="img" alt="答案图片" class="clickable-image" @click="previewImage(img)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 20px;" v-else>
+                            <div style="margin-bottom: 10px;">
+                                <div v-if="parsedAnswer[0].type==='text'" class="answer-item"
+                                    style="margin: 0; padding: 0;">
+                                   {{ parsedAnswer[0].content.replace(/<\/?p[^>]*>/gi, '') }}
+                                </div>
+                                <div v-if="parsedAnswer[0].type==='image'" class="answer-images">
+                                    <div v-for="(img, imgIndex) in parsedAnswer" :key="imgIndex"
+                                        class="reference-answer answer-image-item">
+                                        <img :src="img.images[0]" alt="答案图片" class="clickable-image"
+                                            @click="previewImage(img.images[0])">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <!-- 右侧批阅详情 -->
+                <div class="right-section">
+                    <div class="card grading-detail-card">
+                        <div class="grading-header">
+                            <img class="grading-icon" src="../../../image/newhomework/ai_grading_icon.png" alt="批阅图标">
+                            <span class="grading-title">批阅详情</span>
+                        </div>
+
+                        <main class="errorM" v-if="errorM">
+                            <div>
+                                <img style="width:10vw" src="../../../image/errorM.png" alt="图片暂未加载">
+                                <p>请完整展示你的答题内容哦～缺少关键信息，AI 没法正常批阅， 请认真答题，把所有内容补充完整再试吧。</p>
+                            </div>
+                        </main>
+
+                        <main v-if="!errorM">
+                            <div class="knowledge-points">
+                                知识点：<span style="  color: #4bc7c7;margin-right: 1vw;"
+                                    v-for="(item,index) in nowData.knowledges" :key="index"
+                                    v-html="renderInline(item)"></span>
+                            </div>
+
+                            <div class="section"
+                                style="background: #f8fdfd; padding: 20px; border-radius: 8px; margin-left: -20px; margin-right: -20px;">
+                                <div class="section-title">
+                                    <span class="section-dot"></span>
+                                    总览
+                                </div>
+                                <div class="section-content">
+                                    <p style="font-size: 1.4rem; line-height: 2.0; color: #333;"
+                                        v-html="renderWithLatex(String.raw`${nowData.comment.split('改进意见')[0]}`)">
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 答案解析 -->
+                            <div class="section">
+                                <div class="section-title">
+                                    <span class="section-dot"></span>
+                                    答案解析
+                                </div>
+                                <div class="section-content">
+                                    <div class="analysis-list">
+                                        <div class="analysis-item" v-for="(item ,index) in nowData.analysis"
+                                            :key="index">
+                                            <div class="analysis-content">
+                                                <span class="strong">小题<span>{{ item.index }}.</span></span>
+                                                <span class="analysis-text"
+                                                    v-html="renderWithLatex(String.raw`${item.explanation}`)"></span>
+                                            </div>
+                                            <img class="status-icon"
+                                                :src="item.accuracy===100?' ../../../image/newhomework/zhengque.png':item.accuracy===0?'../../../image/newhomework/cuowu.png':item.accuracy<100?'../../../image/newhomework/bandui.png':''">
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 错误分析 -->
+                            <div class="section"
+                                style="background: #f8fdfd; padding: 20px; border-radius: 8px; margin-left: -20px; margin-right: -20px;"
+                                v-if="showList.length">
+                                <div class="section-title">
+                                    <span class="section-dot"></span>
+                                    错误分析
+                                </div>
+                                <div class="section-content">
+                                    <div v-for="(item,index) in showList" :key="index" class="error-item"
+                                        style="font-size: 1.4rem; line-height: 2.0; color: #333;">
+                                        <span class="strong">小题<span>{{ item.index }}.</span></span>
+                                        <span class="error-text"
+                                            v-html="renderWithLatex(String.raw`${item.errorAttribution}`)"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- 改进意见 -->
+                            <div class="section" :style="showList.length === 0 ? {background: '#f8fdfd',padding: '20px',borderRadius: '8px',marginLeft: '-20px', marginRight: '-20px'} : {}">
+                                <div class="section-title">
+                                    <span class="section-dot"></span>
+                                    改进意见
+                                </div>
+                                <div class="section-content">
+                                    <div style="font-size: 1.4rem; line-height: 2.0; color: #333;"
+                                        v-html="renderWithLatex(nowData.suggest)">
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+
+                        <!-- AI声明 -->
+                        <div class="ai-disclaimer" v-if="!errorM">
+                            <span class="ai-disclaimer-text">当前内容由AI模型生成，仅供参考</span>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片预览弹窗 -->
+            <div class="image-preview" v-if="preViewing" @click="closePreview">
+                <img :src="previewImageUrl" alt="预览图片">
+            </div>
+        </div>
+    </div>
+    </div>
+
+</body>
+
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.global.prod-3.5.18.js"></script>
+<script type="text/javascript" src="../../../script/aiAssistant/markdown/marked-4.3.0.min.js"></script>
+<script type="text/javascript" src="../../../script/aiAssistant/markdown/katex-0.16.9.min.js"></script>
+<script type="text/javascript" src="../../../script/aiAssistant/markdown/mhchem.min.js"></script>
+<script type="text/javascript" src="../../../script/aiAssistant/markdown/katex-renderer.js"></script>
+<script>
+
+
+
+    const { createApp, ref, onMounted, reactive, computed } = Vue;
+    // 关闭弹窗
+    function closeFrame() {
+        api.closeFrame({
+            name: 'ai_grading_detail'
+        });
+    }
+
+    // 全局预览图片函数，供HTML中的onclick调用
+    let vueInstance = null;
+    function previewImage(url) {
+        if (vueInstance) {
+            vueInstance.previewImage(url);
+        }
+    }
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+
+
+    apiready = function () {
+
+        // 初始化页面
+        console.log("页面参数：", JSON.stringify(api.pageParam));
+        vueInstance = createApp({
+            setup() {
+                const pageParam = api.pageParam;
+                const targetPercent = ref(0); // 正确率目标值
+                const animationPlayed = ref(false); // 是否已播放动画
+                const accuracyValue = ref('0%'); // 正确率文本元素引用
+                const nowData = reactive({
+                    knowledges: [],
+                    comment: '',
+                    suggest: '',
+                    analysis: []
+                })
+                const IDX = pageParam.needData.index;
+
+                const dataLoaded = ref(false); // 数据加载完成标记
+                const previewImageUrl = ref(''); // 预览图片URL
+                const preViewing = ref(false); // 是否正在预览图片
+                const errorM = ref(false)
+
+
+
+
+                // 格式化习题内容，为图片添加点击事件
+                const formatExerciseContent = (content) => {
+                    if (!content || typeof content !== 'string') return content;
+
+                    // 为img标签添加class和点击事件，支持单引号和双引号
+                    return content.replace(/<img([^>]+)src=(['"])([^'"]+)\2([^>]*)>/gi, (match, before, quote, src, after) => {
+                        // 转义src中的单引号，避免JavaScript语法错误
+                        const escapedSrc = src.replace(/'/g, "\\'");
+                        return `<img${before}src=${quote}${src}${quote}${after} class="clickable-image" onclick="previewImage('${escapedSrc}')">`;
+                    });
+                };
+
+                // 预览图片
+                const previewImage = (url) => {
+                    preViewing.value = true;
+                    previewImageUrl.value = url;
+                    // 阻止背景滚动
+
+                    document.body.style.overflow = 'hidden';
+                };
+
+                // 关闭预览
+                const closePreview = () => {
+                    preViewing.value = false;
+                    previewImageUrl.value = '';
+                    // 恢复背景滚动
+                    document.body.style.overflow = 'auto';
+                };
+
+                // 渲染Latex公式（只对行首有序列表序号转义小数点，避免误伤公式里的 0.5、22.4 等）
+                const renderWithLatex = (text) => {
+                    text = text.replace(/(^|\n)(\d+)\.\s+/g, '$1$2\\. ');
+                    return window.katexRenderer.renderWithLatex(text);
+                };
+
+                onMounted(() => {
+
+                    initiaPage();
+                    getDetail();
+
+                });
+
+                const colors = () => {
+
+                }
+
+                const showList = computed(() => {
+
+                    // 双重安全保障：确保analysis存在且是数组
+                    if (!nowData.analysis || !Array.isArray(nowData.analysis)) {
+                        return [];
+                    }
+                    return nowData.analysis.filter(item => item && item.accuracy < 100);
+                })
+
+
+
+                const transData = computed(() => {
+
+
+                    return {
+                        tx_code: pageParam.transportData.tx_code,
+                        tx: pageParam.transportData.txstr,
+                        nyd: pageParam.transportData.nyd,
+                        xsdastr: pageParam.transportData.xsdastr || '',
+                        xsdaobj: pageParam.transportData.xsdaobj || {},
+                        children: pageParam.transportData.children || [],
+                        tg: pageParam.transportData.tg || ''
+                    }
+                })
+
+                const myAnswer = computed(() => {
+                    const processContent = (contentItem) => {
+                        // 处理单个答案项，支持descript和value两种格式
+                        // 保持原始内容顺序，依次分离文字和图片
+                        const segments = [];
+                        let currentText = '';
+
+                        // 优先处理value数组中的内容（新格式）
+                        if (contentItem.value && Array.isArray(contentItem.value)) {
+                            // 按number字段分组，保持number未定义或为0的图片单独处理
+                            const groups = {};
+                            contentItem.value.forEach(val => {
+                                const key = (val.number !== undefined && val.number !== null) ? val.number : '__no_number__';
+                                if (!groups[key]) groups[key] = [];
+                                groups[key].push(val);
+                            });
+
+                            // 按key排序，确保顺序一致
+                            const sortedKeys = Object.keys(groups).sort((a, b) => {
+                                if (a === '__no_number__') return 1;
+                                if (b === '__no_number__') return -1;
+                                return a - b;
+                            });
+
+                            sortedKeys.forEach(key => {
+                                groups[key].forEach(val => {
+                                    if (val.descript && typeof val.descript === 'string') {
+                                        const parts = val.descript.split(/(<img[^>]*>)/gi);
+                                        parts.forEach(part => {
+                                            if (part.startsWith('<img') && part.endsWith('>')) {
+                                                const srcMatch = part.match(/src=["']([^"']+)["']/i);
+                                                if (srcMatch && srcMatch[1]) {
+                                                    if (currentText.trim()) {
+                                                        segments.push({
+                                                            type: 'text',
+                                                            content: currentText.trim()
+                                                        });
+                                                        currentText = '';
+                                                    }
+                                                    segments.push({
+                                                        type: 'image',
+                                                        src: srcMatch[1]
+                                                    });
+                                                } else {
+                                                    currentText += part;
+                                                }
+                                            } else {
+                                                currentText += part;
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                            // 处理最后剩下的文字
+                            if (currentText.trim()) {
+                                segments.push({
+                                    type: 'text',
+                                    content: currentText.trim()
+                                });
+                            }
+                        } else if (contentItem.descript && typeof contentItem.descript === 'string') {
+                            // 处理descript中的内容（旧格式），同样保持顺序
+                            const parts = contentItem.descript.split(/(<img[^>]*>)/gi);
+                            parts.forEach(part => {
+                                if (part.startsWith('<img') && part.endsWith('>')) {
+                                    // 这是图片标签
+                                    const srcMatch = part.match(/src=["']([^"']+)["']/i);
+                                    if (srcMatch && srcMatch[1]) {
+                                        // 如果前面有文字，先保存文字
+                                        if (currentText.trim()) {
+                                            segments.push({
+                                                type: 'text',
+                                                content: currentText.trim()
+                                            });
+                                            currentText = '';
+                                        }
+                                        // 保存图片
+                                        segments.push({
+                                            type: 'image',
+                                            src: srcMatch[1]
+                                        });
+                                    } else {
+                                        // 没找到src，当文字处理
+                                        currentText += part;
+                                    }
+                                } else {
+                                    // 这是文字
+                                    currentText += part;
+                                }
+                            });
+                            // 处理最后剩下的文字
+                            if (currentText.trim()) {
+                                segments.push({
+                                    type: 'text',
+                                    content: currentText.trim()
+                                });
+                            }
+                        }
+
+                        return {
+                            segments, // 保持原始顺序的分段
+                            hasContent: segments.length > 0
+                        };
+                    };
+
+                    if (transData.value.children.length > 0) {
+                        // 处理有子题目的情况
+                        return transData.value.children.map(item => {
+                            // 无论是否自动判题(is_auto)，都优先展示学生作答内容
+                            if (item.xsdastr && item.xsdastr !== '') {
+                                return processContent({ descript: item.xsdastr });
+                            } else if (item.xsdaobj && Array.isArray(item.xsdaobj) && item.xsdaobj.length > 0) {
+                                return processContent({
+                                    value: item.xsdaobj
+                                });
+                            }
+                            return processContent({});
+                        })
+                    } else {
+                        // 处理单个题目的情况
+                        if (transData.value.xsdastr != '') {
+                            return [processContent({ descript: transData.value.xsdastr })];
+                        } else if (transData.value.xsdaobj && Array.isArray(transData.value.xsdaobj) && transData.value.xsdaobj.length > 0) {
+                            // 支持value数组中的多个图片
+                            return transData.value.xsdaobj.map(item => processContent(item))
+                        }
+                        return [processContent({})];
+                    }
+                })
+
+                // 解析答案内容，保持原始顺序分离文字和图片
+                const parsedAnswer = computed(() => {
+
+                    if (!Array.isArray(myAnswer.value)) return [];
+
+                    const result = [];
+
+                    myAnswer.value.forEach(item => {
+                        if (!item.segments || !item.hasContent) return;
+
+                        // 按原始顺序添加每个分段，图片按照原始分组的连续顺序合并
+                        let currentImageGroup = [];
+
+                        item.segments.forEach(segment => {
+                            if (segment.type === 'text') {
+                                if (currentImageGroup.length > 0) {
+                                    result.push({
+                                        type: "image",
+                                        images: currentImageGroup
+                                    });
+                                    currentImageGroup = [];
+                                }
+                                result.push({
+                                    type: "text",
+                                    content: renderWithLatex(segment.content)
+                                });
+                            } else if (segment.type === 'image') {
+                                currentImageGroup.push(segment.src);
+                            }
+                        });
+
+                        if (currentImageGroup.length > 0) {
+                            result.push({
+                                type: "image",
+                                images: currentImageGroup
+                            });
+                        }
+                    });
+
+                    console.log('解析后的答案内容：', JSON.stringify(result));
+
+                    return result;
+                });
+
+                const getDetail = () => {
+
+                    api.showProgress({
+                        name: 'aiCorrect',
+                        text: '请稍后...',
+                    });
+                    apiObj.Get(UrlRouter.GetSingle, {
+                        values: {
+                            uid: pageParam.needData.uid,
+                            kcid: pageParam.needData.kcid,
+                            xtid: pageParam.needData.xtid,
+                            xsbjid: pageParam.needData.xsbjid,
+                            ytlx: pageParam.needData.ytlx,
+                            resource_type: 'homework_ai_correct'
+                        }
+                    }, (ret, err) => {
+                        console.log('获取AI批阅详情页面数据', JSON.stringify(ret), JSON.stringify(err));
+
+                        if (ret) {
+                           var content = (ret && ret.data && ret.data.content) || {};
+                            if (content.comment) {
+                                const formatNumberedTextToHtml = (text) => {
+                                    if (!text || typeof text !== 'string') return '';
+                                    let s = text.trim();
+                                    if (!s) return '';
+                                    // 直接返回原始文本，让marked处理有序列表
+                                    return s;
+                                };
+
+                                nowData.knowledges = content.knowledge_points || [];
+                                targetPercent.value = content.avg || 0;
+                                nowData.comment = content.comment || '';
+                                nowData.suggest = formatNumberedTextToHtml(content.suggestions || '');
+                                // 安全处理details数组，避免undefined.filter报错
+                                const details = Array.isArray(content.details) ? content.details : [];
+                                nowData.analysis = details.map((item, index) => {
+                                    return {
+                                        accuracy: item.accuracy || 0,
+                                        index: index + 1 || 0,
+                                        explanation: item.answer_explanation || '',
+                                        errorAttribution: item.error_attribution || '',
+                                    }
+                                })
+
+                                // 数据加载完成
+                                dataLoaded.value = true;
+                            } else {
+                                errorM.value = true;
+                                dataLoaded.value = true;
+                                return;
+                            }
+
+                            api.hideProgress();
+
+
+
+                        }
+
+                    });
+
+                }
+
+
+                const initiaPage = () => {
+                    animationPlayed.value = true;
+
+                    // 进度条动画
+                    setTimeout(() => {
+                        // 直接设置进度条到目标值，依赖CSS过渡效果
+                        accuracyValue.value = targetPercent.value + '%';
+
+                        // 动画结束后移除动画类
+                        setTimeout(() => {
+                            animationPlayed.value = false;
+                        }, 1500); // 与CSS过渡时间一致
+                    }, 300);
+
+
+                }
+
+                return {
+                    IDX,
+                    targetPercent,
+                    animationPlayed,
+                    accuracyValue,
+                    nowData,
+                    showList,
+                    transData,
+                    myAnswer,
+
+                    parsedAnswer,
+                    preViewing,
+                    errorM,
+                    initiaPage,
+                    dataLoaded,
+                    previewImageUrl,
+                    formatExerciseContent,
+                    previewImage,
+                    closePreview,
+                    renderWithLatex,
+                    renderInline
+                }
+            }
+        }).mount('#app');
+
+    };
+
+
+</script>
+
+</html>

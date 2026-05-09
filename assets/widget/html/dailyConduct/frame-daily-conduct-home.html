@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: white;
+        }
+
+        .aui-tips {
+            text-align: center;
+            display: none;
+        }
+
+        .top-header {
+            height: 50px;
+            padding: 0 0.75rem;
+        }
+
+        summary::-webkit-details-marker {
+            display: none
+        }
+        .aui-grid [class*=aui-col-] {
+            padding: 0.5rem 0;
+        }
+
+
+
+
+        .sec-content {
+            background-color: #fff;
+            padding: 0 0 0 2%;
+        }
+            .a-code{
+                color: #00bbd4;
+            }
+        .d-code {
+            color: red;
+        }
+        .aui-pull-left {
+            height: 50px;
+            line-height: 50px;
+
+        }
+
+        .aui-pull-right {
+            height: 50px;
+            line-height: 50px;
+            color: #4BC7C7;
+        }
+        .a-code {
+            color: #00bbd4;
+        }
+        .aui-list-item-title{
+            width: 75%;
+        }
+        .add-chl {
+            position: relative;
+            top: 0;
+            right: 0
+        }
+        .fangkuai{
+            height: 20px;
+            width: 3px;
+            margin-top:15px;
+            margin-right: 3px;
+            background-color:#4BC7C7 ;
+        }
+        .fangkuai-li{
+            height: 20px;
+            width: 3px;
+            margin-top:10px;
+            margin-right: 3px;
+            background-color:#4BC7C7 ;
+        }
+        .folding-content {
+        }
+        .li-li {
+            padding-left: 0.75rem;
+            border-top: solid;
+            border-width: 1px;
+            border-color: #ccc;
+            background-color: white;
+        }
+        .menu {
+            width: 100%;
+
+        }
+        .first-li-txt {
+            line-height: 40px;
+        }
+        .aui-img-round {
+            float: left;
+            margin-top: 5px;
+            height: 40px;
+            width: 40px;
+            margin-right: 10px;
+        }
+        .name {
+            line-height: 50px;
+            color: #4bc6c6;
+        }
+        .aui-checkbox {
+            height: 20px;
+            width: 20px;
+            float: right;
+            margin-top: 15px;
+            margin-right: 0.75rem;
+        }
+        .frist-li {
+            background-color: white;
+            height: 40px;
+            padding-right: 5px;
+        }
+        .sag{
+            height: 1px;
+            width: 100%;
+            color: #ccc;
+        }
+    </style>
+    <title>Title</title>
+</head>
+<body>
+<div class="aui-tips aui-margin-b-15" id="tips-home" onclick="setWifi()">
+    <i class="aui-iconfont aui-icon-info"></i>
+    <div class="aui-tips-title">网络连接不可用</div>
+    <i class="aui-iconfont aui-icon-info"></i>
+</div>
+
+<div class="sag"></div>
+<div class="aui-content aui-margin-b-15 folding-content">
+    <ul class="aui-list aui-list-in aui-list-first">
+
+        <li class="li-li ">
+            <details class="menu" open>
+                <summary class="frist-li">
+                    <span class="aui-pull-left fangkuai-li"></span>
+                    <span class="first-li-txt">卫生</span>
+                    <span class="aui-iconfont aui-icon-fold aui-pull-right"></span>
+                </summary>
+                <ul class="aui-list aui-list-in aui-list-second">
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">卫生太差<span class="d-code">-2</span>分</div>
+                            <div class="aui-list-item-right">
+                                <div class="add-chl">添加学生</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">卫生太差<span class="d-code">-2</span>分</div>
+                            <div class="aui-list-item-right">
+                                <div class="add-chl">添加学生</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-inner aui-list-item-arrow">
+                            <div class="aui-list-item-title">好好学习<span class="a-code">+4</span>分</div>
+                            <div class="aui-list-item-right">
+                                <div class="add-chl">添加学生</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </details>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+
+function addChild() {
+    api.openWin({
+        name: 'win-daily-add-child',
+        url: 'daily/win-daily-add-child.html',
+        pageParam: {name: 'pageparamname'}
+    });
+}
+</script>
+</html>

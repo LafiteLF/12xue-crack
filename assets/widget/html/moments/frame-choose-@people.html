@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .people-cell {
+            line-height: 40px;
+            height: 60px;
+        }
+
+        .groupCell {
+            background-color: white;
+            line-height: 44px;
+        }
+
+        .level {
+            padding: 1px 4px;
+            margin: 0.25rem 0.2rem 0.45rem 0.2rem;
+            background-color: #7D8FE6;
+            vertical-align: middle;
+        }
+
+        .job {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+
+        .people-list {
+            background-color: white;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list .aui-list-item-label-icon {
+            padding-right: 0px !important;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="people-list">
+    <div class="aui-content">
+        <ul class="aui-list aui-list-in">
+            <!--<li class="aui-list-item people-cell"  tapmode onclick="onClick(this);">-->
+            <!--<div class="aui-list-item-label-icon" style=" overflow: visible;width:2rem;height: 2rem;min-height:2rem;min-width: 2rem; margin-top: 0.15rem">-->
+            <!--<img src="../../image/no_data.png" style="width:2rem;height: 2rem;" class="aui-img-round"/></div>-->
+            <!--<div class="aui-list-item-inner">-->
+            <!--<div><span class="aui-margin-l-5 aui-text-primary"> realname</span>-->
+            <!--<span class="aui-label aui-label-info level">user.rank</span>-->
+            <!--<span class="job"> type </span></div>-->
+            <!--</div> </li>-->
+        </ul>
+    </div>
+
+</div>
+<div class="no-data" style="display: none;height: 100%;">
+    <div style="height: 35%;"></div>
+    <div style="margin: 0 auto 0px auto;text-align: center">
+        <img src="../../image/stuHomePad/noContent.png" style="width:30%">
+    </div>
+    <!--<div style="text-align: center;color: #2F2F2F;padding: 0.3rem;">暂无数据</div>-->
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var p = 1;
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage("token"));
+        getData();
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            p++;
+            getData();
+        });
+    };
+    function getData() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        switch (api.pageParam.type) {
+            case "school":
+                apiObj.Get(UrlRouter.GetDynamicSearcher, {
+                    values: {
+                        key: api.pageParam.name,
+                        p: p,
+                        searchtype: 'school'
+                    }
+                }, function (ret, err) {
+                    dealData(ret, err);
+                })
+                break;
+            case "follow":
+                apiObj.Get(UrlRouter.GetFollowUsers, {
+                    values: {
+                        p: p,
+                        otheruid: $api.getStorage("uid")
+                    }
+                }, function (ret, err) {
+                    dealData(ret, err);
+                })
+                break;
+            case "search":
+                apiObj.Get(UrlRouter.GetDynamicSearcher, {
+                    values: {
+                        key: api.pageParam.name,
+                        p: p,
+                        searchtype: "all"// 默认学校用户
+                    }
+                }, function (ret, err) {
+                    dealData(ret, err);
+                })
+                break;
+            default:
+                alert("参数错误");
+                break;
+        }
+
+    }
+    function dealData(ret, err) {
+        if (ret && ret.ret == 0) {
+            //请求成功
+            var data = ret.list;
+            if (data == "" || data == null || data == undefined) {
+                //无数据
+                if (p == 1) {
+                    var msg = api.pageParam.type == "search" ? "暂未搜索到用户" : false;
+                    if (msg) {
+                        api.toast({
+                            msg: msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    } else {
+                        showNoData();
+                    }
+
+                } else {
+                    p--;
+                    api.toast({
+                        msg: '已加载全部…',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                //数据的解析
+                if (p == 1) {
+                    $api.html($api.dom(".aui-list"), '');
+                }
+                for (var i = 0; i < data.length; i++) {
+                    var user = data[i];
+                    var type = '';
+                    switch (user.identitytype) {
+                        case '2':
+                            type = "老师";
+                            break;
+                        case '3':
+                            type = "学生";
+                            break;
+                        case '4':
+                            type = "家长";
+                            break;
+                    }
+                    var realname = user.realname.length > 6 ? user.realname.substring(0, 6) + "..." : user.realname;
+                    var html = '<li class="aui-list-item people-cell" uid="' + user.uid + '" realname="'+user.realname+'" tapmode onclick="onClick(this);">' +
+                        '<div class="aui-list-item-label-icon" style="min-width: inherit;overflow: visible;width:2rem;height: 2rem; min-height:2rem;min-width: 2rem; margin-top: 0.15rem">' +
+                        '<img src="' + user.face + '" style="width:2rem;height: 2rem;" class="aui-img-round"/></div>' +
+                        '<div class="aui-list-item-inner">' +
+                        '<div><span class="aui-margin-l-5 aui-text-primary">' + realname + '</span>' +
+                        '<span class="aui-label aui-label-info level">' + user.rank + '</span>' +
+                        '<span class="job">' + type + '</span></div>' +
+                        '</div> </li>';
+                    $api.append($api.dom(".aui-list"), html);
+                }
+            }
+        } else {
+            //请求失败  错误信息
+            if (p != 1) {
+                p--;
+            }
+            var msg = '';
+            if (ret) {
+                msg = ret.msg;
+            } else {
+                msg = err.msg;
+            }
+            api.toast({
+                msg: msg,
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+        api.hideProgress();
+    }
+    function onClick(context) {
+//        var uid = $api.attr(context, "uid");
+//        var realname = $api.text($api.dom(context, '.aui-list-item-inner div span.aui-text-primary'));//乔帮主v3老师
+//        api.sendEvent({
+//            name: 'at',
+//            extra: {realname: realname, uid: uid}
+//        });
+//        api.closeWin();
+
+        var uid = $api.attr(context, "uid");
+        var realname = $api.attr(context, "realname");//乔帮主v3老师
+        api.sendEvent({
+            name: 'at',
+            extra: {realname: realname, uid: uid}
+        });
+        api.closeWin();
+    }
+    function dealError(ret, err) {
+        if (ret && ret.ret == 0) {
+            dealData(ret.list);
+        } else {
+            var msg = '';
+            if (ret) {
+                msg = ret.msg;
+            } else {
+                msg = err.msg;
+            }
+            api.toast({
+                msg: msg,
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+    function showNoData() {
+        $api.css($api.dom(".no-data"), 'display:block;');
+    }
+</script>
+</html>

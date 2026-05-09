@@ -1,0 +1,480 @@
+/*右侧索引大容器*/
+.indexBox {
+    width: 1rem;
+    position: fixed;
+    /*color: black;*/
+    color: #333333;
+    height: 100%;
+    z-index: 2;
+    right:15px;
+    /*设为弹性盒子*/
+    display: -webkit-box;
+    /*display: box;*/
+    /*盒子内子元素纵向显示*/
+    -webkit-box-orient: vertical;
+    box-orient: vertical;
+    /*background-color: red;*/
+}
+
+/*右侧共分三部分，竖向排列，第一，三部分高度一致，实现字母索引上下居中效果*/
+.items {
+    -webkit-box-flex: 1;
+    box-flex: 1;
+}
+
+/*当前字母提示窗*/
+#views {
+    width: 90px;
+    height: 90px;
+    position: fixed;
+    display: none;
+    z-index: 2;
+    font-size: 50px;
+    background: rgba(0, 0, 0, .5);
+    border-radius: 8px;
+    text-align: center;
+    line-height: 90px;
+    color: white;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+/*右侧索引字母*/
+#mainWord li {
+    line-height: 17px;
+    text-align: center;
+    font-size: 12px;
+}
+
+/*头像*/
+img {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    float: left;
+}
+
+
+
+#top li {
+    padding: 0;
+    position: relative;
+    height: 2.5rem;
+    background: #FFF;
+}
+.currbj {
+    height: 2.5rem;
+    line-height: 2.5rem;
+    margin-left: 0.5rem;
+    width: 4rem;
+    color: rgb(79,199,199);
+}
+.classname {
+    height: 2.5rem;
+    line-height: 2.5rem;
+    width: calc(100% - 7rem);
+    text-align: right;
+    float: right;
+    margin-right: 1.5rem;
+}
+
+.stuli {
+    background: #FFF;
+    height: 3.5rem;
+}
+
+/*分组标记*/
+.titles {
+    background: rgb(238, 238, 238);
+    padding: 5px 0 5px 15px !important;
+    color: rgb(102, 102, 102);
+}
+
+.titles:after {
+    border: none !important;
+}
+
+.realname {
+    color: #333333;
+    width: 4rem;
+    /*position: absolute;*/
+    float: left;
+    /*left: 100px;*/
+    top: 0.6rem;
+    padding-left: 0.25rem;
+    font-size: 0.75rem;
+
+}
+.account {
+    color: rgb(166,168,167);
+    width: 4rem;
+    position: absolute;
+    left: 4rem;
+    top: 1.8rem;
+    padding-left: 0.25rem;
+    font-size: 0.7rem;
+}
+
+.cls-score {
+    /*max-width: 7rem;*/
+    /*position: absolute;*/
+    /*top: 1.3rem;*/
+    /*padding-left: 0.25rem;*/
+    left: 17.5rem;
+    height: 2rem;
+    line-height: 2rem;
+    float: left;
+    font-size: 0.65rem;
+    color: rgb(125,128,127);
+}
+
+.score {
+    max-width: 3rem;
+    color: #4bc7c7;
+}
+
+.btn-add {
+    top: 0.3rem;
+    right: 5%;
+    color: #FFF;
+    background: #4bc7c7;
+    position: absolute;
+    width: 16%;
+    height: 1.5rem;
+}
+
+.btn-add:active {
+    color: #ffffff;
+    background-color: #00acc1;
+}
+
+.btn-decrease {
+    top: 2rem;
+    right: 5%;
+    color: #FFF;
+    background: #f57f17;
+    position: absolute;
+    width: 16%;
+    height: 1.5rem;
+}
+
+.btn-decrease:active {
+    color: #ffffff;
+    background-color: #d46d17;
+}
+
+.btn_score {
+    background: rgba(0, 0, 0, 0);
+    color: rgb(79, 199, 198);
+    font-size: 0.7rem;
+    height: 2rem;
+    line-height: 2rem;
+    width: 1.5rem;
+    position: absolute;
+    right: 1.25rem;
+}
+
+.aui-list-item-arrow:before {
+    border-bottom: 1px solid #dbdbdb;
+    border-left: 1px solid #dbdbdb;
+    right: 20px;
+}
+.selectimg {
+    width: 1rem;
+    height: 1rem;
+    /*float: left;*/
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+    border-radius: 0;
+}
+/*已选学生遮罩*/
+.mask_selectedstu {
+    display: none;
+    position: fixed;
+    left:0;
+    top:-66px;
+    height: calc(100% + 66px);
+    width: 100%;
+    background-color: rgba(0,0,0,0.1);
+    z-index: 11;
+}
+.closemystu {
+    position: fixed;
+    top: 0;
+    height: calc(100% + 66px - 16rem);
+    width: 100%;
+    background-color: rgba(0,0,0,0);
+    z-index: 12;
+}
+.closemyscore {
+    position: fixed;
+    top: 0;
+    height: calc(100% + 66px - 17rem);
+    width: 100%;
+    background-color: rgba(0,0,0,0);
+    z-index: 12;
+}
+.closemynj {
+    position: fixed;
+    top: 0;
+    height: calc(100% + 66px - 17rem);
+    width: 100%;
+    background-color: rgba(0,0,0,0);
+    z-index: 12;
+}
+
+.hasselectedstu {
+    position: fixed;
+    bottom: 0;
+    height: 16rem;
+    width: 100%;
+    background-color: white;
+    z-index: 12;
+}
+.hasselectedstu span {
+    position: absolute;
+    left: 0.75rem;
+    color: rgb(186,186,186);
+    line-height: 2rem;
+    height: 2rem;
+}
+.selectedstu_ul {
+    position: absolute;
+    /*margin-top:2.5rem;*/
+    top:2rem;
+    left:0;
+    background: white;
+    height: 14rem;
+    width: 100%;
+    overflow-x:hidden;
+    overflow-y:scroll;
+}
+.selectedstu_ul_li {
+    width: calc(33.33% - 1.5rem);
+    /*overflow: hidden;*/
+    height:2.3rem;
+    margin: 0.5rem 0.75rem;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    /*line-height: 2.5rem;*/
+    text-align: center;
+    border:1px solid #999999;
+    color: #999999;
+    border-radius: 3px;
+    font-size: 0.5rem;
+    padding-left: 3px;
+    padding-right: 3px;
+    float: left;
+}
+/*.selectedstu_ul_li p {*/
+    /*margin: 0;*/
+/*}*/
+.selectedstu_ul_li img {
+    width: 1rem;
+    height:1rem;
+    float: right;
+    margin-right: -15px;
+    margin-top:-10px;
+}
+/*已选学生遮罩*/
+
+
+/*选择班级遮罩*/
+.mask {
+    display: none;
+    position: fixed;
+    left:0;
+    top:-66px;
+    height: calc(100% + 66px);
+    width: 100%;
+    background: rgba(0,0,0,0.1);
+    z-index: 11;
+}
+.choosebj {
+    position: absolute;
+    bottom: 0;
+    height: 17rem;
+    width: 100%;
+    background: white;
+    z-index: 12;
+}
+.choosebj span {
+    position: absolute;
+    left: 0.75rem;
+    color: rgb(186,186,186);
+    line-height: 2rem;
+    height: 2rem;
+}
+.closeimgdiv {
+    position: absolute;
+    width: 3rem;
+    height: 2.5rem;
+    /*background-color: white;*/
+    top:0;
+    right: 0;
+}
+.closeimg {
+    width: 1rem;
+    height:1rem;
+    position: absolute;
+    top:0.5rem;
+    right: 1rem;
+}
+.bj_title {
+    width: 100%;
+    height: 2rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: rgb(245,245,245);
+}
+.bj_sure {
+    background: white;
+    width: 100%;
+    height: 2.5rem;
+    position: absolute;
+    bottom: 0;
+    left:0;
+    border-top:0.5px solid rgb(245,245,245);
+}
+.bj_sure button {
+    height: 2rem;
+    width: calc(100% - 2rem);
+    margin-left: 1rem;
+    background: #4bc7c7;
+    color: #FFFFFF;
+    margin-top: 0.25rem;
+    border:0 solid;
+    font-size: 0.75rem;
+}
+.njlist {
+    position: absolute;
+    top:2rem;
+    left:0;
+    background: rgb(234,234,234);
+    height: 12.5rem;
+    width: 40%;
+    overflow-x:hidden;
+    overflow-y:scroll;
+}
+.njlist li {
+    width: 100%;
+    height: 3rem;
+    line-height: 3rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.8rem;
+}
+.nj_selected {
+    background: white;
+}
+.bjlist {
+    position: absolute;
+    top:2rem;
+    right:0;
+    background: white;
+    height: 12.5rem;
+    width: 60%;
+    overflow-x:hidden;
+    overflow-y:scroll;
+}
+.bjlist li {
+    width: calc(100% - 2rem);
+    height: 2rem;
+    line-height: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    margin-left: 1rem;
+    background-color: white;
+    padding-left: 1.5rem;
+    font-size: 0.7rem;
+}
+.bj_selected {
+    border-radius: 4px;
+    border:1px solid #4bc7c7;
+    color: #4bc7c7;
+    background-size: 7% auto;
+    background-position: 5% center;
+    background-image: url(../../image/12xueTch/xz.png);
+    background-repeat: no-repeat;
+}
+/*选择班级遮罩*/
+
+
+.aui-bar {
+    position: fixed;
+}
+#top{
+    position: fixed;
+    height:2.5rem;
+    top:76px;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+}
+
+#mainList {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    margin-bottom: 30px;
+    z-index: 1;
+}
+
+#mainList li {
+    padding: 0.75rem 0;
+    /*position: relative;*/
+}
+#mainList li:last-child {
+    margin-bottom: 50px;
+}
+.aui-bar {
+    font-size: 0.8rem !important;
+}
+.winbottom {
+    z-index: 1;
+}
+.winbottom li:first-child {
+    font-size: 16px;
+}
+.winbottom li:last-child {
+    color: white;
+    font-size: 16px;
+}
+
+.stulistselect {
+    /*height: 3.5rem;*/
+    /*width: 100%;*/
+}
+.bottombtn1 {
+    color: #333333
+}
+.bottombtn2 {
+    background-color: #4bc7c7
+}
+
+.aui-searchbar {
+    width: calc(100% - 5rem);
+    top: 21px;
+    left: 2rem;
+    background-color: rgba(0,0,0,0);
+}
+.aui-searchbar-input {
+    margin: 0 !important;
+}
+.selectedstu_name {
+    margin-top: 4px;
+    color: #666666;
+    font-size: 0.75rem;
+    height: 0.75rem;
+}
+.selectedstu_account {
+    font-size: 0.65rem;
+    height: 0.65rem;
+    color: #999999;
+    margin-top: 3px;
+}

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>确定是否生成</title>
+</head>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.6);
+        font-family: MicrosoftYaHei, sans-serif;
+    }
+
+    .box_2 {
+        background-color: rgba(255, 255, 255, 1);
+        border-radius: 1.2vw;
+        width: 45%;
+        max-width: 38vw;
+        padding: 3vw 2.2vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .text-wrapper_1 {
+        width: 100%;
+        text-align: center;
+        line-height: 1.8;
+        margin-bottom: 3vw;
+        font-size: 1.8vw;
+    }
+
+    .text_1 {
+        color: rgba(51, 51, 51, 1);
+    }
+
+    .text_2 {
+        color: rgba(75, 199, 199, 1);
+        font-weight: 700;
+    }
+
+    .paragraph_1 {
+        color: rgba(51, 51, 51, 1);
+    }
+
+    .text_4 {
+        color: rgba(248, 42, 26, 1);
+        font-weight: 700;
+    }
+
+    .text_5 {
+        color: rgba(51, 51, 51, 1);
+    }
+
+    .box_3 {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        /* 移除 gap 以兼容老设备 */
+    }
+
+    .text-wrapper_2 {
+        border-radius: 3vw;
+        height: 4.5vw;
+        border: 0.2vw solid rgba(75, 199, 199, 1);
+        width: 14vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 2.5vw;
+        /* 替代 gap */
+    }
+
+    .text_6 {
+        color: rgba(75, 199, 199, 1);
+        font-size: 1.8vw;
+    }
+
+    .text-wrapper_3 {
+        background-color: rgba(75, 199, 199, 1);
+        border-radius: 3vw;
+        height: 4.5vw;
+        width: 14vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 次数不足时"是"按钮的禁用样式 */
+    .text-wrapper_3.disabled {
+        background-color: #cccccc;
+        border-color: #cccccc;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .text_7 {
+        color: rgba(255, 255, 255, 1);
+        font-size: 1.8vw;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+
+    @media (max-width: 600px) {
+        .box_2 {
+            padding: 4vw 3vw;
+        }
+
+        .text-wrapper_1 {
+            font-size: 2.5vw;
+            margin-bottom: 4vw;
+        }
+
+        .box_3 {
+            flex-direction: column;
+            align-items: center;
+            /* 移除 gap 以兼容老设备 */
+        }
+
+        .text-wrapper_2 {
+            margin-right: 0;
+            margin-bottom: 2vw;
+            /* 移动端纵向排列时用 margin-bottom 替代 gap */
+        }
+
+        .text-wrapper_2,
+        .text-wrapper_3 {
+            width: 100%;
+            max-width: 32vw;
+        }
+    }
+</style>
+
+<body>
+    <div class="box_2" id="app" v-cloak>
+        <div class="text-wrapper_1">
+            <span class="text_1">主观题AI批阅将消耗</span>
+            <span class="text_2">{{ selectedCount }}</span>
+
+            <span class="paragraph_1">
+                次生成次数，<br />
+                您本月还有
+            </span>
+
+            <span class="text_4">{{ aiCount }}</span>
+            <span class="text_5">{{ tipText }}</span>
+
+        </div>
+        <div class="box_3">
+            <div class="text-wrapper_2" tapmode @click="handleNo">
+                <span class="text_6">取消</span>
+            </div>
+
+            <div class="text-wrapper_3" tapmode @click=" handleYes" :class="{ disabled: isDisabled }">
+                <span class="text_7">立即批阅</span>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.global.prod-3.5.18.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<!-- <script src="https://cdn.staticfile.org/vConsole/3.15.1/vconsole.min.js"></script>
+<script>
+    try {
+        window.vConsole = new window.VConsole();
+        console.log('vConsole 初始化成功');
+    } catch (e) {
+        alert('vConsole 加载失败: ' + e.message);
+    }
+</script> -->
+<script>
+    apiready = async function () {
+        var app;
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        api.parseTapmode();
+
+        app = Vue.createApp({
+            data() {
+                const QRUrl = '';
+                const cache = $api.getStorage('aiCheck') || {};
+                const selectedCount = api.pageParam.selectedCount || 0;
+                const selectedItems = api.pageParam.selectedItems || [];
+                const isDisabled = true; // 初始化为true，接口请求完成前禁用按钮
+
+                // 替换 ?? 为兼容性更好的写法
+                let aiCount = (cache.count !== undefined && cache.count !== null) ? cache.count : 0;
+                // 如果后端返回了disabled状态，使用它
+                const disabledFromServer = (cache.disabled !== undefined && cache.disabled !== null) ? cache.disabled : false;
+
+                return {
+                    QRUrl,
+                    selectedCount,
+                    selectedItems,
+                    aiCount,
+                    loading: true, // 初始化为true，表示正在加载
+                    submitting: false,
+                    isDisabled,
+                    disabledFromServer // 后端是否整体禁用该功能
+                };
+            },
+
+            computed: {
+                // 是否次数不足
+                isInsufficient() {
+                    return this.aiCount <= 0 || this.selectedCount > this.aiCount;
+                },
+
+                // 提示文本
+                tipText() {
+                    if (this.isInsufficient) {
+                        return "次生成次数，次数不足，无法进行批阅";
+                    }
+                    return "次生成次数，是否生成？";
+                }
+            },
+
+            methods: {
+                getDisabled() {
+                    this.isDisabled = this.loading || this.submitting || this.isInsufficient;
+                },
+
+                handleNo() {
+                    api.sendEvent({
+                        name: 'ai_check_confirm',
+                        extra: {
+                            confirmed: false
+                        }
+                    });
+
+                    api.closeFrame();
+                },
+
+                async handleYes() {
+                    // 先统一刷新禁用状态
+                    this.getDisabled();
+
+                    // 后端整体禁用：弹框并禁止发送
+                    if (this.disabledFromServer) {
+                        alert('您已被禁用该AI功能~');
+                        api.sendEvent({
+                            name: 'ai_check_confirm',
+                            extra: { confirmed: false }
+                        });
+                        api.closeFrame();
+                        return;
+                    }
+
+                    // 次数不足等前端禁用场景
+                    if (this.isInsufficient) {
+                        api.toast({
+                            msg: '没有足够的AI批阅次数了哦~',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                        api.sendEvent({
+                            name: 'ai_check_confirm',
+                            extra: { confirmed: false }
+                        });
+                        api.closeFrame();
+                        return;
+                    }
+
+                    if (this.isDisabled) return;
+
+                    this.loading = true;
+                    this.submitting = true;
+                    this.getDisabled();
+
+                    try {
+                        const aiAnalysis = $api.getStorage('aiCheck') || { count: 0 };
+
+                        if (this.selectedCount > (aiAnalysis.count || 0)) {
+                            api.toast({
+                                msg: '没有足够的AI批阅次数了哦~',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                            api.sendEvent({
+                                name: 'ai_check_confirm',
+                                extra: { confirmed: false }
+                            });
+                            return;
+                        }
+
+                        let lastRet = null; // 新增：用来在外部记录最后一次接口的返回结果
+
+                        // 循环调用消耗次数的接口
+                        for (let i = 0; i < this.selectedCount; i++) {
+                            const item = this.selectedItems[i];
+
+                            let requestBody = {
+                                schoolid: $api.getStorage('schoolid'),
+                                type: 'ai_subjective_review',
+                                count: 1,
+                                resource_id: item.sys_id,
+                                card_type: aiAnalysis.card_type !== undefined ? aiAnalysis.card_type : null
+                            };
+
+                            if (aiAnalysis.card_id !== undefined) {
+                                requestBody.card_id = aiAnalysis.card_id;
+                            }
+
+                            await new Promise((resolve, reject) => {
+                                apiObj
+                                    .Header({ 'Content-Type': 'application/json' })
+                                    .Post(
+                                        UrlRouter.PostPayfeeOperationLog,
+                                        { body: $api.jsonToStr(requestBody) },
+                                        (ret, err) => {
+                                            if (ret) {
+                                                lastRet = ret; // 记录成功的返回结果
+                                                resolve(ret);
+                                            } else {
+                                                reject(err); // 接口抛错时，直接进入 catch
+                                            }
+                                        }
+                                    );
+                            });
+
+                            // 每次成功后更新次数
+                            aiAnalysis.count -= 1;
+                            this.aiCount = aiAnalysis.count;
+                        }
+
+                        // 循环结束后更新存储
+                        this.aiCount = aiAnalysis.count;
+                        $api.setStorage('aiCheck', aiAnalysis);
+
+                        console.log('ai批阅最后一次接口结果', lastRet); // 修改：打印记录下来的变量
+
+                        api.sendEvent({
+                            name: 'update_ai_count',
+                            extra: { count: aiAnalysis.count }
+                        });
+
+                        api.sendEvent({
+                            name: 'ai_check_confirm',
+                            extra: { confirmed: true }
+                        });
+
+                        api.closeFrame();
+
+                    } catch (err) {
+                        // 修改：如果是 JS 语法报错，err.message 能看到具体原因；如果是接口报错，打印完整 JSON
+                        console.error('AI check 发生错误:', err.message || JSON.stringify(err));
+                        api.toast({
+                            msg: '操作失败，请稍后重试',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+
+                    } finally {
+                        this.submitting = false;
+                        this.getDisabled();
+                    }
+                }
+            },
+
+            mounted() {
+                apiObj.Get(
+                    UrlRouter.GetPayfeeCountByType,
+                    {
+                        values: {
+                            type: 'ai_subjective_review',
+                            schoolid: $api.getStorage('schoolid')
+                        }
+                    },
+                    async (ret, err) => {
+
+                        if (ret && ret.ret === 0) {
+                            console.log('获取AI批阅次数接口返回', JSON.stringify(ret), JSON.stringify(err));
+                            if (ret.data.disabled) {
+                                // 标记为被禁用，按钮置灰，点击时弹框并拦截
+                                this.disabledFromServer = true;
+                                $api.setStorage('aiCheck', ret.data);
+                                api.sendEvent({
+                                    name: 'update_ai_disabled',
+                                    extra: {
+                                        disabledFromServer: true
+                                    }
+                                });
+                            } else {
+                                const count = ret.data.count || 0;
+                                this.aiCount = count;
+                                $api.setStorage('aiCheck', ret.data);
+                            }
+                        } else {
+                            this.aiCount = 0;
+                            $api.setStorage('aiCheck', { count: 0 });
+                        }
+
+                        this.loading = false;
+                        this.getDisabled();
+                    }
+                );
+
+                this.getDisabled()
+            }
+        });
+
+        app.mount('#app');
+    };
+</script>
+
+</html>

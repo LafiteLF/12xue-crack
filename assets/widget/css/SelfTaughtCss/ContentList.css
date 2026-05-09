@@ -1,0 +1,115 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+    display: block;
+    margin: 0px;
+    background: #f4f4f4;
+    height: auto;
+    min-height: 100%;
+}
+
+.wDiv {
+    height: auto;
+    padding-bottom: 20px;
+}
+
+.Listmain h1 {
+    height: 36px;
+    line-height: 46px;
+    padding-left: 20px;
+    font-size: 14px;
+    font-family: "微软雅黑";
+    color: #999;
+    font-weight: normal;
+}
+
+.Listmain ul {
+    padding: 0px 15px;
+    background: #f4f4f4;
+}
+
+.Listmain ul li {
+    width: 50%;
+    float: left;
+    height: 186px;
+    margin-top: 10px;
+}
+
+.XZlist {
+    width: 90%;
+    height: 186px;
+    background: #fff;
+    margin: 0 auto;
+    border-radius: 4px;
+}
+
+.XZtitle {
+    padding: 17px 10px 5px 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    /* line-height: 21px; */
+    height: 46px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #666666;
+}
+
+.szdfl {
+    text-align: center;
+    font-size: 12px;
+    width: 80%;
+    margin: 0 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 24px;
+    line-height: 24px;
+
+}
+
+.jindutiao {
+    display: block;
+    width: 110px;
+    height: 17px;
+    border: 1px solid #4bc7c7;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+.jindu {
+    text-align: center;
+    color: #4BC7C7;
+    line-height: 24px;
+    font-size: 14px;
+    height: 60px;
+    margin-top: 16px;
+}
+
+.anniu {
+    width: 70%;
+    height: 28px;
+    text-align: center;
+    line-height: 28px;
+    background: #4BC7C7;
+    border-radius: 4px;
+    margin: 0 auto;
+    font-size: 14px;
+    color: #FFFFFF;
+}
+
+.jinduno {
+    text-align: center;
+    line-height: 39px;
+    height: 75px;
+    color: #FFAD31;
+}
+
+.jinduno img {
+    width: 55px;
+    margin-top: 6px;
+}
+
+	 

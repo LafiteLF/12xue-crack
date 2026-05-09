@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+    <title>遮罩层</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            /* backgrou  nd: red; */
+            width: 100%;
+            height: 100%;
+        }
+        .mask-div {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="mask-div" onclick="handleClick()"></div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript">
+    function handleClick() {
+        api.sendEvent({
+            name: 'tsxx'
+        });
+    }
+</script>
+</html>
+

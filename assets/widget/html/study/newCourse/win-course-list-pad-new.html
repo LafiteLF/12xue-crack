@@ -1,0 +1,272 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css"/>
+    <style type="text/css">
+        .winTitle {
+            width: auto;
+            max-width: calc(30% - 30px)
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e5e5
+        }
+
+        a {
+            display: inline-block;
+            float: left
+        }
+
+        span b {
+            color: #333333 !important;
+            font-weight: normal;
+            font-size: 0.8rem
+        }
+
+        span {
+            float: right;
+            padding-right: 20px;
+        }
+
+        .chapter {
+            display: none;
+            color: #00c8c8 !important;
+            margin-right: 20px;
+            background: url("../../../image/stuHomePad/xljt.jpg") no-repeat right 15px center;
+            background-size: 10px;
+            line-height: 30px;
+            margin-top: 9px;
+            font-size: 1.6rem;
+            max-width: 30%;
+            border: 1px solid #00c8c8;
+            border-radius: 25px;
+            padding: 0px 30px 0px 15px;
+        }
+
+        .unit {
+            color: #00c8c8 !important;
+            margin-right: 20px;
+            background: url("../../../image/stuHomePad/xljt.jpg") no-repeat right 15px center;
+            background-size: 10px;
+            font-size: 1.6rem;
+            max-width: 20%;
+            line-height: 30px;
+            margin-top: 9px;
+            border: 1px solid #00c8c8;
+            border-radius: 25px;
+            text-align: center;
+            padding: 0px 30px 0px 15px;
+            display: none;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<header class="clearfix wincontent" style="text-align: center" v-cloak="">
+    <div onclick=" closeWin();" class="winTitle pull_left"></div>
+    <span class="chapter overflow" :style="dyName!=null?'display:block':''" tapmode onclick="vm.choosechapter()">{{dyName}}</span>
+    <span class="unit overflow" :style="gradeData.njname!=null?'display:block':''" tapmode onclick="vm.chooseUnit()">{{gradeData.njname}} {{gradeData.sxcname}}</span>
+</header>
+<div class="kong"  style="width: 30%; margin: 0 auto; padding-top: 12%; text-align: center;display: none;">
+    <img src="../../../image/stuHomePad/noCourse.png" style="width: 100%; max-width: 508px;">
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var dyid;
+    var index;
+    var index1;
+    var jieid = '';
+    var jiemc = '';
+    var dymc = '';
+    var fcname = '';
+    var number = '';
+    var number1;
+    var flag1 = '';
+    var njid = '';
+
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        var xkmc = api.pageParam.xkmc;
+        $('.winTitle').html(xkmc + '课堂资源包');
+        // var header = document.querySelector('header');
+        // var headerH = $api.offset(header).h;
+        // var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        getCourseListNew();
+
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+        //传递最新单元和年级的数值
+        api.addEventListener({
+            name: 'studentLesson'
+        }, function (ret, err) {
+            vm.gradeData = ret.value.data;
+            njid = vm.gradeData.njid;
+            dyid = vm.gradeData.sxcid;
+            jieid = ret.value.jieid;
+            vm.dyName="全部单元";
+
+        });
+        api.addEventListener({
+            name: 'chooseunit'
+        }, function (ret, err) {
+            $('.unit').html(ret.value.dymc + ' ' + ret.value.fcname);
+            $('.unit').show();
+            njid = ret.value.njid;
+            dyid = ret.value.dyid;
+            dymc = ret.value.dymc;
+            fcname = ret.value.fcname;
+            flag1 = ret.value.flag;
+            jiemc = '全部单元';
+
+        });
+        api.addEventListener({
+            name: 'chooseChapter'
+        }, function (ret, err) {
+            $('.chapter').html(ret.value.jiemc);
+            jieid = ret.value.jieid;
+            jiemc = ret.value.jiemc;
+            index1 = ret.value.index1;
+            number1 = ret.value.number1;
+        });
+
+    };
+    var vm = new Vue({
+        el: '.wincontent',
+        data: {
+            subjects: [],
+            gradeData: "",
+            dyName:""
+        },
+        methods: {
+            chooseUnit: function () {
+                api.openFrame({
+                    name: 'choose-list',
+                    url: 'choose-list-new.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: 'auto',
+                        h: padWinHeight
+                    },
+                    pageParam: {
+                        classid: api.pageParam.classid,
+                        xkid: api.pageParam.xkid,
+                        dymc: dymc,
+                        flag1: flag1,
+                        fcname: fcname,
+                        fcid: dyid,
+                        njid: njid,
+                        index: index
+                    }
+                })
+            },
+            choosechapter: function () {
+                api.openFrame({
+                    name: 'chapter-list',
+                    url: 'chapter-list-new.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: 'auto',
+                        h: padWinHeight
+                    },
+                    pageParam: {
+                        classid: api.pageParam.classid,
+                        xkid: api.pageParam.xkid,
+                        dyid: dyid,
+                        njid: njid,
+                        jiemc: jiemc,
+                        jieid: jieid
+                    }
+                })
+            }
+        }
+    });
+
+    function closeWin() {
+        api.sendEvent({
+            name: 'sxkmlb'
+        });
+        api.closeWin();
+    }
+    function getCourseListNew() {
+        var  params = {};
+        var classid = api.pageParam.classid;
+
+        for (var i = 0; i < classid.length; i++) {
+            params["classid[" + i + "]"] = classid[i];
+        }
+        params['uid'] = $api.getStorage('uid');
+        params['xkid'] = api.pageParam.xkid;
+        apiObj.Get(UrlRouter.GetCourseList, {
+            values: params
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0&&ret.data.length>0) {
+                    b=ret.data[0].njid;
+                    c=ret.data[0].sxcid;
+                    var header = document.querySelector('header');
+                    var headerH = $api.offset(header).h;
+                    var frameH = padWinHeight - headerH;
+                    api.openFrame({
+                        name: 'frame-course-list-pad',
+                        url: 'frame-course-list-pad-new.html',
+                        rect: {
+                            x: 0,
+                            y: headerH,
+                            w: 'auto',
+                            h: frameH
+                        },
+                        pageParam: {
+                            classid: api.pageParam.classid,
+                            xkid: api.pageParam.xkid,
+                            b:b,
+                            c:c
+                        },
+                        bounces: false
+                    });
+                } else {
+                    $api.css($api.dom('.unit'),'display:none');
+                    $api.css($api.dom('.chapter'),'display:none');
+                    $api.css($api.dom('.kong'),'display:block');
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+</script>

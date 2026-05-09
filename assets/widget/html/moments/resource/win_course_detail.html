@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+
+        }
+
+        .aui-toolbar-title {
+            text-align: left;
+            /*width: 50%;*/
+        }
+
+        .content {
+            margin-top: 0.5rem;
+            width: 3.5rem;
+            /*height: 80%;*/
+            overflow-y: auto;
+            float: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .scroll {
+            width: 3.5rem;
+            /*height: 80%;*/
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+            overflow-y: auto;
+            margin: 0 auto;
+            position: relative;
+            top:0px;
+        }
+
+        .item {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            border: 1px solid #4bc7c7;
+            background-color: #fff;
+            margin: 9px 7px;
+            float: left;
+            line-height: 1.5rem;
+            text-align: center;
+            color: #4bc7c7;
+            font-size: 0.6rem;
+            margin-left: 1rem;
+        }
+
+        .type {
+            background-color: #4bc7c7;
+            width: 100%;
+            height: 2rem;
+            line-height: 2rem;
+            color: #fff;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+
+        .right-btn {
+            /*float: right;*/
+            height: 7rem;
+            width: 3rem;
+            margin-top: 15%;
+            position: fixed;
+            right: 0;
+            z-index: 20;
+        }
+
+        .up, .down {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 15%;
+            background: rgba(0, 0, 0, 0.32);
+            text-align: center;
+            line-height: 2.2rem;
+            /*position: absolute;*/
+            margin-top: 1.5rem;
+            right: 0;
+        }
+        .up:active, .down:active {
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 15%;
+            background: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            line-height: 2.2rem;
+            /*position: absolute;*/
+            margin-top: 1.5rem;
+            right: 0;
+        }
+
+        .aui-border:after {
+            border-radius: 15%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<!--<header class="aui-bar aui-bar-nav aui-bar-primary">-->
+    <!--<a class="aui-toolbar-title aui-pull-left aui-ellipsis-1" tapmode onclick="api.closeWin();">-->
+        <!--<span class="aui-iconfont aui-icon-left"></span>-->
+    <!--</a>-->
+<!--</header>-->
+
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <!--<span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()'></span>-->
+    </a>
+</header>
+
+<div>
+    <div class="content">
+        <div class="type"></div>
+        <div class="scroll">
+        </div>
+    </div>
+    <div class="right-btn">
+        <div class="up aui-border" tapmode onclick="winpageUpOnclick();">
+            <span class="aui-iconfont aui-icon-shangyiti" style="font-size: 1.8rem !important;color: white;line-height: 2.2rem"></span>
+        </div>
+        <div class="down aui-border" tapmode onclick="winnextOnclick();">
+            <span class="aui-iconfont aui-icon-xiayiti" style="font-size: 1.8rem !important;color: white;line-height: 2.2rem"></span>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    var currentIndex;
+    var courseArr = [];
+    apiready = function () {
+
+        //监听返回，设置强制竖屏
+        api.addEventListener({
+            name: 'keyback'
+        }, function(ret, err) {
+//            api.setScreenOrientation({
+//                orientation: 'portrait_up'
+//            });
+            api.closeWin();
+        });
+
+        var header = document.querySelector('header');
+        var item = $api.dom('.content');
+        var itemH = $api.offset(item).h;
+        headerH = $api.offset(header).h;
+        var contentH = padWinHeight - headerH - 15;
+        var scrollH = contentH - $api.offset($api.dom('.type')).h;
+        $api.css($api.dom('.content'), 'height:' + contentH + 'px');
+        $api.css($api.dom('.scroll'), 'height:' + scrollH + 'px');
+        $api.html($api.dom('.aui-toolbar-title'), '<span class="aui-iconfont aui-icon-left " style="font-size: 18px" tapmode onclick="api.closeWin();"></span>'+api.pageParam.homeworkName+'');
+        var array = api.pageParam.list;
+        courseArr = api.pageParam.list;
+        var frameAry = [];
+        var frameObj = {};
+        for (var i = 0; i < array.length; i++) {
+            switch (array[i].type) {
+                case 'zyyq':
+                    frameObj = {
+                        name: 'frame' + (i + 1),
+                        url: 'frame_text.html',
+                        pageParam: {content: array[i].content, zymc: array[i].name},
+                        bounces: false
+                    };
+                    break;
+                case 'zy':
+                    switch (array[i].zytype) {
+                        case 'doc':
+                            frameObj = {
+                                name: 'frame' + (i + 1),
+                                url: 'frame_doc.html',
+                                pageParam: {url: array[i].url, zymc: array[i].name,convertStatus:array[i].convert_status,zyid:array[i]},
+                                bounces: false
+                            };
+                            break;
+                        case 'video':
+                            if(array[i].filetype == '.mp3' || array[i].filetype == '.wma'){
+                                frameObj = {
+                                    name: 'frame' + 1,
+                                    url: 'frame_homework_voice_pad_course.html',
+                                    pageParam: {
+                                        isConvert: array[i].is_convert,
+                                        convertStatus: array[i].convert_status,
+                                        zyid: array[i].zyid,
+                                        zyqf: array[i].zyqf,
+                                        index: i,
+                                    },
+                                    bounces: false
+                                };
+                            }
+                            else {
+                                frameObj = {
+                                    name: 'frame' + (i + 1),
+                                    url: 'frame_mp4.html',
+                                    pageParam: {
+                                        url: array[i].url,
+                                        zymc: array[i].name,
+//                                    headerH: headerH,
+//                                    frameH: frameH,
+                                        convertStatus:array[i].convert_status,
+                                        filetype:array[i].filetype,
+                                    },
+                                    bounces: false
+                                };
+                            }
+                            break;
+                        case 'photo':
+                            frameObj = {
+                                name: 'frame' + (i + 1),
+                                url: 'frame_img.html',
+                                pageParam: {url: array[i].url, zymc: array[i].name},
+                                bounces: false
+                            };
+                            break;
+                        case 'swf':
+                            frameObj = {
+                                name: 'frame' + (i + 1),
+                                url: 'frame_swf.html',
+                                pageParam: {url: array[i].url, zymc: array[i].name},
+                                bounces: false
+                            };
+                            break;
+                    }
+                    break;
+                case 'xt':
+                    frameObj = {
+                        name: 'frame' + (i + 1),
+                        url: 'frame_text.html',
+                        bounces: false,
+                        pageParam: {zymc: array[i].name, answer: array[i].answer, analysis: array[i].analysis}
+                    };
+                    break;
+            }
+            frameAry.push(frameObj);
+        }
+        var leftW = $api.offset($api.dom('.content')).w;
+        var rightW = $api.offset($api.dom('.right-btn')).w;
+        api.openFrameGroup({
+            name: 'materiallist',
+            scrollEnabled: true,
+            rect: {
+                x: leftW +10,
+                y: headerH +13,
+                w: api.winWidth - leftW - leftW,
+                h: padWinHeight - headerH
+            },
+            index: api.pageParam.index,
+            preload: 0,
+            frames: frameAry
+        }, function (ret, err) {
+            currentIndex = ret.index;
+            $api.html($api.dom('.type'), (ret.index + 1) + '\/' + array.length);
+            for (var i = 0; i < $api.domAll('.item').length; i++) {
+                $api.css($api.domAll('.item')[i], 'color:#4bc7c7;background-color: #fff;width:1.5rem;height:1.5rem;line-height: 1.5rem; margin-left: 1rem;font-size: 0.6rem;');
+            }
+            $api.css($api.domAll('.item')[ret.index], 'color:#fff;background-color: #4bc7c7; width:1.8rem;height:1.8rem;line-height: 1.8rem; margin-left: 0.85rem;font-size: 0.75rem;');
+            //设置上面index跟随下面滑动
+            if ($api.html($api.domAll('.item')[ret.index]) > 5) {
+                $api.dom('.scroll').scrollTop = ($api.html($api.domAll('.item')[ret.index]) - 4) * 56;
+            } else {
+                $api.dom('.scroll').scrollTop = 0;
+            }
+            api.sendEvent({
+                name: 'stopVideo'
+            });
+            api.sendEvent({//暂停音频
+                name: 'yinpinCLose'
+            });
+        });
+        var num = array.length;
+//        var itemWidth = num * 45 + 190;
+//        $api.css($api.dom('.scroll'), 'width:' + itemWidth + 'px;');
+        for (var i = 0; i < num; i++) {
+            $api.append($api.dom('.scroll'), '<div class="item" onclick="itemClick(this);">' + (i + 1) + '</div>');
+        }
+        api.parseTapmode();
+    };
+
+    function itemClick(context) {
+
+        for (var i = 0; i < $api.domAll('.item').length; i++) {
+            $api.css($api.domAll('.item')[i], 'color:#4bc7c7;background-color: #fff; width:1.5rem;height:1.5rem;line-height: 1.5rem; margin-left: 1rem;font-size: 0.6rem;');
+        }
+        //设置上面index跟随下面滑动
+        if ($api.html(context) > 5) {
+            $api.dom('.scroll').scrollTop = ($api.html(context) - 4) * 56;
+        } else {
+            $api.dom('.scroll').scrollTop = 0;
+        }
+        $api.css(context, 'color:#fff;background-color: #4bc7c7; width:1.8rem;height:1.8rem; line-height: 1.8rem; margin-left: 0.85rem;font-size: 0.75rem;');
+
+        api.setFrameGroupIndex({
+            name: 'materiallist',
+            index: $api.text(context) - 1,
+            scroll: true
+        });
+    }
+    function winpageUpOnclick() {
+        if(currentIndex == 0){
+            api.toast({
+                msg: '已经是第一个了',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        api.setFrameGroupIndex({
+            name: 'materiallist',
+            index: currentIndex - 1,
+            scroll: true
+        });
+    }
+    function winnextOnclick() {
+
+        if(currentIndex+1 == courseArr.length){
+            api.toast({
+                msg: '已经是最后一个了',
+                duration: 2000,
+                location: 'bottom'
+            });
+            return;
+        }
+        api.setFrameGroupIndex({
+            name: 'materiallist',
+            index: currentIndex + 1,
+            scroll: true
+        });
+    }
+    function goback() {
+//        api.setScreenOrientation({
+//            orientation: 'portrait_up'
+//        });
+        api.closeWin();
+    }
+
+</script>
+</html>

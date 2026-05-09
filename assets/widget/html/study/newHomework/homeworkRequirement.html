@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+.content{width: 100%;height: 100%}
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            width: 100%;
+            height: 100%
+        }
+
+        .main {
+            width: calc(40% - 48px);
+            height: calc(90% - 48px);
+            position: fixed;
+            top: 10%;
+            right: 70px;
+            background: #fff;
+            border-radius: 6px;
+            padding: 24px 5px 24px 24px;
+            color: #666;
+            font-size: 1.6rem;
+            line-height: 26px;
+        }
+
+        .neirong {
+            height: 100%;
+            overflow-y: scroll;
+            padding-right: 19px;
+        }
+
+        .zyyq {
+            height: 37px;
+            width: 40px;
+            background: #fff;
+            color: #333;
+            position: fixed;
+            right: 12px;
+            top: calc(50% - 170px);
+            font-size: 1.2rem;
+            text-align: center;
+            padding-top: 3px;
+            border-radius: 100px;
+            box-shadow: 0 0 8px #5858588c;
+
+        }
+
+        /*滚动条样式*/
+        *::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            /*height: 100%;*/
+        }
+
+        *::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        *::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+
+        .sjjt {
+            width: 0;
+            height: 0;
+            border-top: 6px solid rgba(0, 0, 0, 0);
+            border-right: 6px solid rgba(255, 0, 0, 0);
+            border-bottom: 6px solid rgba(0, 128, 0, 0);
+            border-left: 6px solid #ffffff;
+            background: rgba(255, 0, 0, 0);
+            position: fixed;
+            right: 58px;
+            top: calc(50% - 157px);
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <div class="close" tapmode onclick="vm.closeFrame();"></div>
+
+    <div class="main">
+        <div class="neirong">
+            <p style="color:#333">作业要求：</p>
+            <p v-text="zyyq.zymc"></p>
+
+        </div>
+
+
+    </div>
+    <div class="sjjt"></div>
+    <div class="zyyq" tapmode onclick="vm.closeFrame();">作业<br>要求</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue();
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                zyyq: api.pageParam.zyyq
+            },
+            methods: {
+                closeFrame: function () {
+                    api.closeFrame({
+                        name: 'homeworkRequirement'
+                    });
+                },
+
+            }
+        });
+    }
+
+    function closeWin() {
+        api.closeWin();
+    }
+</script>

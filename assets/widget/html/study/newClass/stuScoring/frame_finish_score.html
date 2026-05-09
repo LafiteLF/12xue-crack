@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style type="text/css">
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.2);
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+            justify-content: center; /*定义body的里的元素水平居中*/
+        }
+
+        .pop-content {
+            width: auto;
+            height: auto;
+            max-height: 200px;
+            padding: 12px;
+            background-color: #000000;
+            border-radius: 3px;
+            opacity: 0.5;
+            display: flex;
+            align-items: center; /*定义body的元素垂直居中*/
+        }
+
+        img {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .span1 {
+            font-size: 18px;
+            font-stretch: normal;
+            line-height: 20px;
+            color: #ffffff;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        .span2 {
+            font-size: 18px;
+            font-weight: bold;
+            font-stretch: normal;
+            line-height: 20px;
+            color: #ffffff;
+            margin-left: 20px;
+            margin-right: 10px;
+        }
+
+
+        [v-cloak] {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<div v-cloak="" class="pop-content">
+    <img src="../../../../image/class/stuscore.png">
+    <span class="span1" v-text="stuName"></span>
+    <span class="span2" v-text="getTitle()"></span>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    apiready = function () {
+        initVue();
+        setTimeout(function () {
+            api.closeFrame();
+        }, 2000);
+        if (api.pageParam.type =='stu') {
+            vm.stuName = $api.getStorage('realname');
+        } else {
+            vm.stuName = $api.getStorage('groupScoreName');
+        }
+    };
+
+    function initVue() {
+        vm = new Vue({
+            el: '.pop-content',
+            data: {
+                title: api.pageParam.title,
+                score: api.pageParam.score,
+                stuName: ''
+            },
+            methods: {
+                getTitle: function () {
+                    return api.pageParam.title + '   ' + '(' + api.pageParam.score  +')'
+                }
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .content_delete {
+            width: 35%;
+            max-height: 50%;
+            height: auto;
+            top: 25%;
+            position: absolute;
+            left: 32.5%;
+            border-radius: 10px;
+            background: white;
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .sure {
+            width: 50%;
+            height: 40px;
+            border-radius: 6px;
+            color: white;
+            text-align: center;
+        }
+        .sure button {
+            border-width: 0;
+            background-color: #4bc7c7;
+            height: 100%;
+            width: 70%;
+            font-size: 16px;
+            border-radius: 30px;
+            margin-left: 10px;
+        }
+        .cancel {
+            width: 50%;
+            height: 40px;
+            border-radius: 6px;
+            color: white;
+            text-align: center;
+        }
+        .cancel button {
+            border-width: 0;
+            background-color: #4bc7c7;
+            height: 100%;
+            width: 70%;
+            font-size: 16px;
+            border-radius: 30px;
+            margin-right: 10px;
+        }
+        .alert {
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+        .alert p {
+            font-size: 20px;
+            color: #666666;
+            font-family: MicrosoftYaHei;
+            font-weight: normal;
+            font-stretch: normal;
+        }
+        .btns {
+            display: flex;
+            width: 100%;
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="close" tapmode onclick="api.closeFrame({
+    name: 'frame_deleteImg'
+});"></div>
+<div class="content_delete">
+    <div class="alert">
+        <p>确定删除本图片吗？</p>
+    </div>
+    <div class="btns">
+        <div tapmode onclick="vm.sure(this);" class="sure">
+            <button>
+                确定
+            </button>
+        </div>
+        <div tapmode onclick="vm.cancel(this);" class="cancel">
+            <button>
+                取消
+            </button>
+        </div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    apiready = function () {
+        vm = new Vue({
+            el: '.content_delete',
+            data: {
+
+            },
+            methods: {
+                sure: function (item) {
+                    var jsfun = 'deleteCorrectionImg();';
+                    api.execScript({
+                        frameName: 'frame_displayImg',
+                        script: jsfun
+                    });
+
+                    api.closeFrame({
+                        name: 'frame_deleteImg'
+                    });
+                },
+                cancel: function (item) {
+                    api.closeFrame({
+                        name: 'frame_deleteImg'
+                    });
+                },
+            }
+        });
+    };
+</script>
+</html>

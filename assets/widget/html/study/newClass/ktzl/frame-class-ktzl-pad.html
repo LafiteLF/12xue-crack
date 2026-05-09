@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>课堂资料</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui-pull-refresh.css"/>
+    <style>
+        .vue-content {
+            width: 100%
+        }
+
+        ul {
+            width: 100%;
+            padding: 15px
+        }
+
+        ul li {
+            width: 100%;
+            background: #fff;
+            padding: 15px
+        }
+
+        h1 {
+            width: 100%;
+            font-size: 0.8rem;
+            color: #333
+        }
+
+        span {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 1%
+        }
+
+        .title {
+            max-width: 70%;
+        }
+
+        .kj {
+            max-width: 20%;
+            color: #666;
+        }
+
+        .main {
+            width: 100%;
+            font-size: 0.7rem;
+            color: #666;
+            position: relative;
+            padding: 5px 0px;
+        }
+
+        .nj {
+            max-width: 20%
+        }
+
+        .dy {
+            max-width: 30%
+        }
+
+        .name {
+            max-width: 50%
+        }
+
+        .more {
+            position: absolute;
+            display: inline;
+            right: 0px
+        }
+
+        .time {
+            font-size: 0.6rem;
+            color: #999;
+            background: url("../../../../image/naozhong.png") no-repeat left center;
+            background-size: 15px 15px;
+            padding-left: 20px
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+
+        .noDataimg{
+            margin-top: 10%;
+            width:20%;
+            margin-left: 40%;
+        }
+        .nodatap{
+            width: 100%;
+            text-align: center;
+        }
+
+        .nullView{
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="nullView aui-hide">
+    <img class="noDataimg" src="../../../../image/noclass.png" />
+    <p class="nodatap">亲，老师课堂上还没有为你发送学习资料噢！</p>
+</div>
+
+<section class="aui-refresh-content">
+
+    <div class="content" v-cloak="">
+        <ul v-for="data,index of dataList">
+            <li @click="openDetailRes(index)">
+                <h1>
+                    <span class="title" v-text="data.title"></span>
+                    <span class="kj" v-text="getType(index)"></span>
+                </h1>
+                <div class="main">
+                    <span class="nj" v-text="xd"></span>
+                    <span class="dy" v-text="dymc"></span>
+                    <span class="name" v-text="kjmc"></span>
+                    <span class="more">查看 > </span>
+                </div>
+                <div class="time" v-text="getPuchTime(index)"></div>
+            </li>
+
+
+            <!--<li>-->
+            <!--<span class="title" v-text="data.title">沁园春长沙和哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈或或或或或或或或或或</span>-->
+            <!--<span class="kj">课件</span>-->
+            <!--</h1>-->
+            <!--<div class="main">-->
+            <!--<span class="nj">高二</span>-->
+            <!--<span class="dy">第一单元</span>-->
+            <!--<span class="name">沁园春长沙和哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈或或或或或</span>-->
+            <!--<span class="more">查看 > </span>-->
+            <!--</div>-->
+            <!--<div class="time">6分钟前</div>-->
+            <!--</li>-->
+
+        </ul>
+
+</section>
+</div>
+</body>
+
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+    var classObj, ClassApiObjForCloud;
+    var pullRefresh;
+
+    apiready = function () {
+        ClassApiObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+        classObj = new GridOpenApi('http://' + $api.getStorage('ip'), source, version);
+        vm.initData();
+        api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中',
+            modal: false
+        });
+        api.sendEvent({
+            name: 'closePopFrame'
+        });
+
+        api.addEventListener({
+            name: 'removeKtzl'
+        }, function (ret, err) {
+            vm.initData();
+        });
+        
+
+        //下拉刷新
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                vm.initData();
+            }
+        });
+
+
+    };
+
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            kjmc: '', //课件名称
+            xd: '',  //级部
+            dymc: '', //单元名称
+            dataList: [] // 课件列表
+        },
+        methods: {
+            initData: function () {
+
+                //区分云端课堂
+                if ($api.getStorage('connectType') == 'Lan') {
+                    classObj.Get('/docs_send', {
+                        values: {
+                            classid: $api.getStorage('classid')
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            ProcessRet1(ret);
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: '请求失败',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+
+                } else {
+
+                    api.addEventListener({
+                        name: 'ReceiveMessage_10'
+                    }, function (ret, err) {
+                        ProcessRet1(ret.value.receive);
+                    });
+
+                    ClassApiObjForCloud.Get('/docs_send', {
+                        values: {
+                            classid: $api.getStorage('classid'),
+                            uid: $api.getStorage('uid'),
+                            from: 'ReceiveMessage_10',
+                            vclass_token: $api.getStorage('vclass_token'),
+                            private_token: $api.getStorage('private_token')
+                        }
+                    }, function (ret, err) {
+                        if (ret && ret.status == 1) {
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: '请求失败',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+
+                }
+            },
+
+
+            openDetailRes: function (idx) {
+                api.openWin({
+                    name: 'win-ktzl-detail',
+                    url: 'win-ktzl-detail.html',
+                    pageParam: {dataList: vm.dataList, index: idx}
+                });
+            },
+
+            getType: function (index) {
+                var fl = vm.dataList[index].fl;
+                switch (fl) {
+                    case '1':
+                        return '教学设计';
+                        break;
+                    case '2':
+                        return '自主学习单';
+                        break;
+                    case '3':
+                        return '精讲助学';
+                        break;
+                    case '4':
+                        return '影音素材';
+                        break;
+                    case '5':
+                        return '其他类';
+                        break;
+                    case '6':
+                        return '微课';
+                        break;
+                    default:
+                        return '其他类';
+                        break;
+                }
+            },
+
+            getPuchTime: function (index) {
+                var timestamp;
+                if (vm.dataList[index].push_time != null && vm.dataList[index].push_time != '') {
+                    timestamp = getDateDiff(vm.dataList[index].push_time);
+                } else {
+                    timestamp = '';
+                }
+                return timestamp;
+            }
+
+        }
+
+    });
+
+
+    //JavaScript函数：
+    var minute = 1000 * 60;
+    var hour = minute * 60;
+    var day = hour * 24;
+    var halfamonth = day * 15;
+    var month = day * 30;
+    var timeResult;
+    function getDateDiff(dateTimeStamp) {
+        var now = new Date().getTime();
+        var diffValue = now - dateTimeStamp*1000;
+        var monthC =diffValue/month;
+        var weekC =diffValue/(7*day);
+        var dayC =diffValue/day;
+        var hourC =diffValue/hour;
+        var minC =diffValue/minute;
+        if(monthC>=1){
+            timeResult = parseInt(monthC) + '个月前';
+        }
+        else if(weekC>=1){
+            timeResult = parseInt(weekC) + '周前';
+        }
+        else if(dayC>=1){
+            timeResult = parseInt(dayC) + '天前';
+        }
+        else if(hourC>=1){
+            timeResult = parseInt(hourC) + '小时前';
+        }
+        else if(minC>=1){
+            timeResult = parseInt(minC) + '分钟前';
+        }else
+            timeResult = '刚刚';
+        return timeResult;
+    }
+
+
+
+    function Paixu(data) { //按照发送时间排序
+        var len = data.length;
+        for (var i = 0; i < len; i++) {
+            for (var j = 0; j < len - 1 - i; j++) {
+                if (data[j].push_time < data[j+1].push_time) {   //相邻元素两两对比
+                    var temp = data[j+1];        //元素交换
+                    data[j+1] = data[j];
+                    data[j] = temp;
+                }
+            }
+        }
+        return data;
+    }
+
+
+    function ProcessRet1(ret) {
+        api.hideProgress();
+        if (ret.status == 0 && ret.data) {
+            pullRefresh.cancelLoading();
+            if (ret.data.docs != null && ret.data.docs.length > 0) {
+                vm.kjmc = ret.data.title;
+                vm.xd = ret.data.njname;
+                vm.dymc = ret.data.dyname;
+                vm.dataList = Paixu(ret.data.docs);
+            } else {
+                $api.addCls($api.dom('.aui-refresh-content'), 'aui-hide');
+                $api.removeCls($api.dom('.nullView'), 'aui-hide');
+            }
+
+        } else {
+            pullRefresh.cancelLoading();
+            $api.addCls($api.dom('.aui-refresh-content'), 'aui-hide');
+            $api.removeCls($api.dom('.nullView'), 'aui-hide');
+            api.toast({
+                msg: ret.msg,
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+</script>
+
+</html>

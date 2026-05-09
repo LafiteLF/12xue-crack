@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>批阅记录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            word-wrap: break-word;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            box-sizing: border-box;
+            font-size: 1.88vw;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #E6E9FF;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            width: 100%;
+            height: 10vh;
+        }
+
+        .title-container .pull_right {
+            margin-left: auto;
+        }
+
+        .title-container .pull_middle {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 100%;
+            font-size: 1.4vw;
+            color: gray;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .remaining-text {
+            color: #4bc7c7;
+            font-weight: bold;
+            font-size: 1.4vw;
+        }
+
+        .vue-app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            min-height: 100vh;
+            background: url('../../image/aiEssayReview/background.jpg');
+            background-size: 100% 100%;
+        }
+
+        .app-header {
+            padding: 1.875vh 0 0 0;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            border-bottom: none;
+            background-color: transparent;
+            margin: 0 0 1.875vh;
+        }
+
+        .app-content {
+            margin: 0;
+            padding-left: 3vw;
+            padding-right: 3vw;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            left: auto;
+            top: auto;
+            /* background-color: #E6E9FF; */
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .winTitle {
+            color: black;
+            display: flex;
+            align-items: center;
+            margin-left: 1.56vw;
+            cursor: pointer;
+        }
+
+        .winTitleText {
+            display: flex;
+            align-items: center;
+        }
+
+        .winTitleBack {
+            width: 2vw;
+            margin-right: 0.88vw;
+        }
+
+        .winTitleTextBefore {
+            font-size: 2vw;
+            margin-right: 0.625vw;
+            font-weight: normal;
+            line-height: 1;
+        }
+
+        .pull_middle {
+            color: gray;
+        }
+
+        .report-btn {
+            max-width: 7.81vw;
+            margin-right: 1.56vw;
+            margin-top: 1.25vh;
+        }
+
+        .no-report {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            min-height: 37.5vh;
+        }
+
+        .no-report img {
+            max-width: 80vw;
+            max-height: 60vh;
+            width: auto;
+            height: auto;
+            display: block;
+        }
+
+        .reports-container {
+            overflow-y: auto;
+            height: 0;
+            flex: 1;
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* 隐藏滚动条
+        .reports-container::-webkit-scrollbar {
+            width: 0.31vw;
+        } */
+
+        .reports-container::-webkit-scrollbar-track {
+            background: #f0f8ff;
+            border-radius: 0.23vw;
+        }
+
+        /* .reports-container::-webkit-scrollbar-thumb {
+            background: skyblue;
+            border-radius: 0.23vw;
+        } */
+
+        /* .reports-container::-webkit-scrollbar-thumb:hover {
+            background: skyblue;
+        } */
+
+        .unit-item {
+            background: white;
+            margin: 1.25vh 0 2.8vh 0;
+            border-radius: 0.94vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 14.5vh;
+            min-height: 14.5vh;
+            position: relative;
+        }
+
+        .unit-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            overflow: hidden;
+            height: 100%;
+            padding-left: 2vw;
+        }
+
+        .unit-item-in-progress {
+            background-color: white;
+            /* 灰色背景 */
+            opacity: 0.7;
+            /* 半透明，看起来变暗 */
+        }
+
+        .unit-title {
+            font-size: 1.8vw;
+            font-weight: normal;
+            color: #333;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .unit-time {
+            font-size: 1.5vw;
+            color: #999;
+            line-height: 1.2;
+        }
+
+        .status-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 4vw;
+        }
+
+        .status-badge {
+            padding: 1vh 2.5vw;
+            border-radius: 10vw;
+            font-size: 1.6vw;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-badge.in-progress {
+            background-color: #F5EADB;
+            color: #F59A23;
+        }
+
+        .status-badge.in-progress1 {
+            background-color: #FFDED9;
+            color: red;
+        }
+
+        .status-badge.completed {
+            background-color: #EBF6F6;
+            color: #70B603;
+        }
+
+
+        .changeBoardBtnDiv {
+            height: 8vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .select-container {
+            display: flex;
+            align-items: center;
+            margin-left: 5vw;
+            margin-top: 1vh;
+        }
+
+        .select-button {
+            border: none;
+            background: none;
+            color: #4bc7c7;
+            font-size: 2.3vw;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            margin-right: 5vw;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 8vh 5vw;
+            border-radius: 1.5vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* gap: 6vh; */
+            /* 按钮之间的间距 */
+            box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.15);
+        }
+        .modal-button {
+            background-color: #4bc7c7;
+            color: white;
+            border: none;
+            border-radius: 1vw;
+            padding: 1.5vh 8vw;
+            font-size: 2.2vw;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            /* margin-top: 5vh; */
+        }
+        .modal-button1 {
+            background-color: #4bc7c7;
+            color: white;
+            border: none;
+            border-radius: 1vw;
+            padding: 1.5vh 8vw;
+            font-size: 2.2vw;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-top: 5vh;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="vue-app" v-cloak id="a">
+        <header class="app-header">
+            <div class="title-container">
+                <div class="winTitle" @click="closeWin()">
+                    <img class="winTitleBack" src="../../image/aiEssayReview/back.png" alt="返回">
+                    <span class="winTitleTextBefore">批阅记录</span>
+                </div>
+                <div class="pull_middle">
+                    本月剩余AI批阅次数：<span class="remaining-text"
+                        :style="remaining_Show.count !== 0 ? {'color': '#4BC7C7'} : {'color': '#F82A1A'}">{{remaining_Show.count}}</span>
+                </div>
+                <div class="pull_right">
+                </div>
+            </div>
+            <!-- 学段和科目选择 -->
+            <div class="select-container">
+                <button class="select-button" @click="showLevelModal">{{ levelText }} ▼</button>
+                <button class="select-button" @click="showSubjectModal">{{ subjectText }} ▼</button>
+            </div>
+        </header>
+
+        <div class="app-content">
+            <div class="reports-container">
+                <div v-if="filteredReports.length === 0" class="no-report">
+                    <img src="../../image/aiEssayReview/norecords.png" style="height: 50vh;" />
+                </div>
+                <div v-else>
+                    <div class="unit-item" v-for="(report, index) in filteredReports" :key="index"
+                        @click="gotoReportDetail(report)"
+                        :class="{ 'unit-item-in-progress': report.status === '1' || report.status === '-1' }"
+                        :style="(report.status ==='1' || report.status === '-1') ? 'pointer-events: none;' : ''">
+
+                        <div class="unit-item-content">
+                            <div class="unit-title">{{report.name}}</div>
+                            <div class="unit-time">生成时间：{{report.submit_time}}</div>
+                        </div>
+                        <div class="status-container">
+                            <div class="status-badge" :class="getStatusClass(report)">
+                                {{ getStatusText(report) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 弹窗对话框 -->
+        <div v-if="isLevelModalVisible || isSubjectModalVisible" class="modal-overlay" @click="closeModals">
+            <div class="modal-content" @click.stop>
+                <!-- 学段选择 -->
+                <template v-if="isLevelModalVisible">
+                    <button class="modal-button" @click="selectLevel('chuzhong')">初中</button>
+                    <button class="modal-button1" @click="selectLevel('gaozhong')">高中</button>
+                </template>
+                <!-- 科目选择 -->
+                <template v-if="isSubjectModalVisible">
+                    <button class="modal-button" @click="selectSubject('chinese')">语文</button>
+                    <button class="modal-button1" @click="selectSubject('english')">英语</button>
+                </template>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+    <script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+    <script type="text/javascript" src="../../script/vue.global.prod-3.5.18.js"></script>
+</body>
+<script>
+    const { createApp, computed } = Vue
+    let apiObj;
+    let pageParam;
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        pageParam = api.pageParam;
+
+
+        createApp({
+            data() {
+                return {
+                    reportsList: [
+
+                        // { name: '我的校园生活', submit_time: '2025-09-08', status: '1', xd: 31, km: 'yw' },
+                        // { name: '我的校园生活', submit_time: '2025-09-08', status: '-1', xd: 31, km: 'yw' },
+                        // { name: '我的校园生活', submit_time: '2025-09-08', status: '2', xd: 31, km: 'yw' },
+                        // { name: '我的校园生活', submit_time: '2025-09-08', status: '0', xd: 31, km: 'yw' },
+
+                    ],
+                    remaining_Show: { count: 0 },
+                    selected: "chuzhong", // 默认选中"初中"
+                    selected1: "chinese", // 默认选中"语文"
+                    isLevelModalVisible: false, // 控制学段选择弹窗
+                    isSubjectModalVisible: false, // 控制科目选择弹窗
+                }
+            },
+            computed: {
+                // 根据当前选择显示不同文本
+                levelText() {
+                    return this.selected === 'chuzhong' ? '初中' : '高中';
+                },
+                subjectText() {
+                    return this.selected1 === 'chinese' ? '语文' : '英语';
+                },
+                filteredReports() {
+                    // 1. 根据当前选择的学段和科目，确定用于筛选的code
+                    const xd_code = this.selected === 'chuzhong' ? 31 : 34;
+                    const km_code = this.selected1 === 'chinese' ? 'yw' : 'yy';
+
+                    // 2. 使用 filter 方法从总列表(reportsList)中筛选出符合条件的数据
+                    return this.reportsList.filter(report => {
+                        // 筛选条件：报告的xd和km必须同时匹配
+                        return report.xd === xd_code && report.km === km_code;
+                    });
+                }
+
+            },
+            // mounted: 当 Vue 应用创建好并挂载到页面上之后，会自动执行这里的代码
+            async  beforeMount() {
+                console.log("Vue app has been mounted. Initializing data...");
+                this.loadReportsData();
+                await new Promise((resolve, reject) => {
+                    apiObj.Get(UrlRouter.GetPayfeeCountByType, {
+                        values: {
+                            type: 'ai_review',
+                            schoolid: $api.getStorage('schoolid'),
+                        }
+                    }, (ret, err) => {
+                        if (ret && ret.ret === 0) {
+                            this.remaining_Show = ret.data;
+                            resolve();
+                        } else {
+                            this.remaining_Show = { count: 0 };
+                        }
+                    })
+                })
+
+            },
+            methods: {
+                closeWin: function () {
+                    console.log('关闭窗口');
+                    api.closeWin();
+                },
+                loadReportsData: function () {
+                    api.showProgress({ title: '加载中...', text: '请稍候...' });
+                    // const xd_code = this.selected === 'chuzhong' ? 31 : 34;
+                    // const km_code = this.selected1 === 'chinese' ? 'yw' : 'yy';
+
+                    const params = {};
+
+
+                    apiObj.Get(UrlRouter.GetAiOfflineCorrectList, params, (ret, err) => {
+                        api.hideProgress();
+                        // console.log("sadas", JSON.stringify(ret));
+                        if (ret && ret.ret === 0 && ret.data && ret.data.list) {
+                            this.reportsList = ret.data.list.map(item => {
+                                let reportName = '';
+                                // let reportStatus = '';
+                                let reportTime = '';
+                                let xdValue = undefined;
+                                let kmValue = undefined;
+                                //新增失败标志
+                                let isFailed = false;
+                                if (item.create_date) {
+                                    const datePart = item.create_date.split(' ')[0];
+                                    reportTime = datePart.replace(/\//g, '-');
+                                }
+
+                                try {
+                                    const requestData = JSON.parse(item.request);
+
+                                    //从解析后的对象中获取xd和km
+                                    xdValue = requestData.xd;
+                                    // kmValue = requestData.km;
+
+                                    // 根据 xkid 来判断科目
+                                    if (requestData.xkid === '1071') { // 1071 是语文
+                                        kmValue = 'yw';
+                                    } else if (requestData.xkid === '2887') { // 2887 是英语
+                                        kmValue = 'yy';
+                                    } else {
+                                        kmValue = undefined; // 或者其他默认值
+                                    }
+                                } catch (e) {
+                                    console.warn('解析 request 字段失败:', item.request);
+                                }
+
+                                try {
+                                    if (item.content && item.content.trim().startsWith('{')) {
+                                        const contentData = JSON.parse(item.content);
+                                        if (contentData.error) {
+                                            isFailed = true;
+                                            reportName = "作文批阅失败";
+                                        } else if (
+                                            contentData &&
+                                            contentData.data &&
+                                            contentData.data.answer &&
+                                            contentData.data.answer.title
+                                        ) {
+                                            // 如果 content 存在且有标题，就用这个标题
+                                            reportName = contentData.data.answer.title;
+                                        }
+
+                                    }
+                                } catch (e) {
+                                    console.warn('解析 content 字段失败:', item.content);
+                                    isFailed = true;
+                                    reportName = '解析报告内容失败';
+                                }
+
+                                // 如果reportName为空，并且 item.title 存在，使用item.title 作为备用标题
+                                if (!reportName && item.title) {
+                                    reportName = item.title;
+                                }
+
+                                //如果连标题没有，给一个默认标题
+                                if (!reportName) {
+                                    reportName = '未知作文标题';
+                                }
+                                // 1. 从API原始数据中获取status
+                                let finalStatus = item.status;
+
+                                // 2. 如果通过内容解析判断出是失败状态，则覆盖status
+                                if (isFailed) {
+                                    finalStatus = -1; // 使用 -1 代表失败
+                                }
+                                return {
+                                    name: reportName,
+                                    submit_time: reportTime,
+                                    // score: reportScore,
+                                    status: String(finalStatus),
+                                    originalData: item,
+                                    xd: parseInt(xdValue, 10),
+                                    km: kmValue,
+                                    isFailed: isFailed
+                                };
+
+                            });
+                        } else {
+                            this.reportsList = [];
+                            console.error('获取成绩报告失败:', JSON.stringify(err || ret));
+                            api.toast({ msg: (ret && ret.msg) || '加载失败，请重试', duration: 2000 });
+                        }
+
+                    });
+
+                },
+                gotoReportDetail(report) {
+                    console.log('查看报告详情:', report);
+                    api.openWin({
+                        name: 'win-aiEssayReview',
+                        url: './win-aiEssayReview.html',
+                        pageParam: {
+                            status: 4,
+                            academicStage: this.selected === 'chuzhong' ? '初中' : '高中',
+                            subject: this.selected1 === 'chinese' ? '语文' : '英语',
+                            content: report.originalData.content,
+                        },
+                        reload: true,
+                        slidBackEnabled: false
+                    });
+                    // console.log("asds",JSON.stringify(report.originalData.content));
+
+                },
+                formatTime: function (timeStr, learningStatus, completionRate) {
+                    if (!timeStr) {
+                        // 如果没有时间但有分数，说明已提交但时间丢失，显示"已提交"
+                        if (completionRate >= 100) {
+                            return '已提交';
+                        } else if (completionRate > 0) {
+                            return '学习中...';
+                        } else {
+                            return '未开始学习';
+                        }
+                    }
+                    try {
+                        // 显示具体的提交时间，格式为 YYYY-MM-DD HH:MM
+                        const date = new Date(timeStr);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const hours = String(date.getHours()).padStart(2, '0');
+                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                        return `${year}-${month}-${day} ${hours}:${minutes}`;
+                    } catch (e) {
+                        return '时间格式错误';
+                    }
+                },
+
+                getStatusText(report) {
+                    // 1. 优先检查是否失败
+                    // if (report.isFailed) {
+                    //     return 'AI批阅失败';
+                    // }
+
+                    if (report.status === '1') {
+                        return 'AI批阅中';
+                    } else if (report.status === '-1') {
+                        return 'AI批阅失败';
+                    } else {
+                        return '批阅完成';
+                    }
+                },
+                getStatusClass(report) {
+                    if (report.status === '1') {
+                        return 'in-progress';
+                    } else if (report.status === '-1') {
+                        return 'in-progress1';
+                    }
+                    else {
+                        return 'completed';
+                    }
+                },
+
+                showLevelModal() {
+                    this.isSubjectModalVisible = false; // 关闭另一个弹窗
+                    this.isLevelModalVisible = true;
+                },
+                showSubjectModal() {
+                    this.isLevelModalVisible = false; // 关闭另一个弹窗
+                    this.isSubjectModalVisible = true;
+                },
+                selectLevel(level) {
+                    this.selected = level;
+                    this.closeModals();
+                    console.log(`已选择学段: ${this.levelText}`);
+                },
+                selectSubject(subject) {
+                    this.selected1 = subject;
+                    this.closeModals();
+                    console.log(`已选择科目: ${this.subjectText}`);
+                },
+                closeModals() {
+                    this.isLevelModalVisible = false;
+                    this.isSubjectModalVisible = false;
+                }
+            }
+        }).mount('#a')
+    }
+</script>
+
+</html>

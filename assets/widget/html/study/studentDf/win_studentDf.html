@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>学生打分</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css"/>
+</head>
+<body>
+<header class="clearfix">
+    <div onclick=" closeWin();" class="winTitle pull_left" style="width: 300px;">
+        学生打分
+    </div>
+    <div style="width: 100px;height: 49px;float: right" onclick="openBjPage();">
+        <span class="bjname" style="text-align: center;line-height: 49px;display: inline;width: 80px;font-size: 1.5rem;"></span>
+        <img style="width: 12px;height: 8px;" src="../../../image/jiantou.png" alt="">
+    </div>
+    <div style="width: 100px;height: 49px;float: right;margin-right: 15px" onclick="openNjPage();">
+        <span class="njname" style="text-align: center;line-height: 49px;display: inline;width: 80px;font-size: 1.5rem;"></span>
+        <img style="width: 12px;height: 8px;" src="../../../image/jiantou.png" alt="">
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var njIndex = 0;
+    var bjIndex = 0;
+    var data;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+
+        getData();
+
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        api.addEventListener({
+            name: 'selectnjindex'
+        }, function (ret, err) {
+            if(njIndex == ret.value.njindex){
+            }else {
+                njIndex = ret.value.njindex;
+                $api.text($api.dom('.njname'), data.data[njIndex].title);
+                $api.text($api.dom('.bjname'), data.data[njIndex].data[0].name);
+                api.openFrame({
+                    name: 'frame_studentDf',
+                    url: 'frame_studentDf.html',
+                    rect: {
+                        x: 0,
+                        y: headerH,
+                        w: api.winWidth,
+                        h: frameH
+                    },
+                    pageParam: {bjid:data.data[njIndex].data[0].classid,evaluate:data.data[njIndex].data[0].evaluate},
+                    reload:true
+                });
+            }
+
+
+        });
+        api.addEventListener({
+            name: 'selectbjindex'
+        }, function (ret, err) {
+            if(bjIndex == ret.value.bjindex){
+            }else {
+                bjIndex = ret.value.bjindex;
+                $api.text($api.dom('.bjname'), data.data[njIndex].data[bjIndex].name);
+                api.openFrame({
+                    name: 'frame_studentDf',
+                    url: 'frame_studentDf.html',
+                    rect: {
+                        x: 0,
+                        y: headerH,
+                        w: api.winWidth,
+                        h: frameH
+                    },
+                    pageParam: {bjid:data.data[njIndex].data[bjIndex].classid,evaluate:data.data[njIndex].data[bjIndex].evaluate},
+                    reload:true
+                });
+            }
+
+        });
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+    };
+    function getData() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.SetAuthToken($api.getStorage("token"));
+        apiObj.Get(UrlRouter.GetScorecheckAudit, {
+            values: {
+                isdetail: '1'
+            }
+        }, function (ret, err) {
+            if (ret && ret.ret == 0&&ret.data.status == 1) {
+                data = ret.data;
+                $api.text($api.dom('.njname'), ret.data.data[0].title);
+                $api.text($api.dom('.bjname'), ret.data.data[0].data[0].name);
+                var header = document.querySelector('header');
+                var headerH = $api.offset(header).h;
+                var frameH = padWinHeight - headerH;
+                api.setStatusBarStyle({
+                    style: 'light'
+                });
+                api.openFrame({
+                    name: 'frame_studentDf',
+                    url: 'frame_studentDf.html',
+                    rect: {
+                        x: 0,
+                        y: headerH,
+                        w: api.winWidth,
+                        h: frameH
+                    },
+                    pageParam: {bjid:ret.data.data[0].data[0].classid,evaluate:ret.data.data[0].data[0].evaluate},
+                });
+            }
+        });
+    }
+    function openNjPage() {
+        api.openFrame({
+            name: 'njpage',
+            url: 'njpage.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight
+            },
+            pageParam: {data: data.data},
+            bounces: true
+        });
+    }
+    function openBjPage() {
+        api.openFrame({
+            name: 'bjpage',
+            url: 'bjpage.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight
+            },
+            pageParam: {data: data.data[njIndex].data},
+            bounces: true
+        });
+    }
+
+    function closeWin() {
+        api.closeWin();
+    }
+</script>
+</html>

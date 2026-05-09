@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/marking.css"/>
+    <title>习题列表</title>
+
+    <style>
+        .yinpinDiv {
+            width: 80%;
+            margin-left: 10%;
+            border: 1px solid inherit;
+            height: 80%;
+            box-shadow: 0px 0px 10px #cecece;
+            position: relative;
+            top:10%;
+            background-color: white;
+        }
+
+        .toplightGreen {
+            width: 100%;
+            height: 65%;
+            background-color: #F1FFFD;
+            position: relative;
+        }
+
+        .greenline {
+            width: 100%;
+            height: 6px;
+            background-color: green;
+            position: absolute;
+            bottom: 0;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: #E0FAF9;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #4bc7c7;
+        }
+
+        .imageDiv {
+            height: 60%;
+            position: absolute;
+            top: 10%;
+        }
+
+        .image {
+            width: 43%;
+            margin-left: 6%;
+            margin-top: 3%;
+            height: 82%;
+            display: inline-block;
+        }
+
+        .image1 {
+            width: 43%;
+            margin-left: 1%;
+            margin-top: 3%;
+            height: 82%;
+            display: inline-block;
+        }
+
+        .prosstime{
+            position: absolute;
+            top: 75%;
+            width: 100%;
+            text-align: center;
+            color: #4bc7c7;
+        }
+
+
+        .btn:active {
+
+        }
+
+        .btn {
+            width: 12%;
+            height: auto;
+            margin-left: 44%;
+            margin-top: 2%;
+            border-radius: 50%;
+        }
+
+        .markingContent{
+            width: 100%;
+            height: auto;
+            /*background-color: red;*/
+            overflow-y: scroll;
+        }
+
+        .imgDiv{
+            text-align: center;
+            margin: 15px;
+        }
+
+        .imgDiv img{
+            /*width: 300px;*/
+            height: auto;
+            margin: auto;
+        }
+
+        .bhz2{
+            width: 200px;
+            height: auto;
+            margin-left: calc(50% - 100px);
+            margin-top: 100px;
+        }
+        .bhz3{
+            width: 270px;
+            height: 36px;
+            line-height: 36px;
+            background-color: #4bc7c7;
+            border-radius: 20px;
+            color: white;
+            margin-left: calc(50% - 135px);
+            margin-top: 100px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .zuyuanzuowan{
+            width: 200px;
+            height: 36px;
+            line-height: 36px;
+            background-color: #4bc7c7;
+            border-radius: 20px;
+            color: white;
+            margin-left: calc(50% - 150px);
+            position: fixed;
+            bottom: 50px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
+        .xianshianniu{
+            width: 200px;
+            height: 36px;
+            line-height: 36px;
+            background-color: #4bc7c7;
+            border-radius: 4px;
+            color: white;
+            position: fixed;
+            bottom: 50px;
+            right: 65px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        .triangle{
+            width:0;
+            height:0;
+            border-top:8px solid transparent;
+            border-bottom:8px solid transparent;
+            border-left:8px solid #4bc7c7;
+            position: fixed;
+            bottom: 59px;
+            right: 58px;
+            display: none;
+        }
+
+
+        [v-cloak] {
+            display: none
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="content" v-cloak="">
+    <div class="subContent">
+        <div class="markingContent" v-if="data[0].is_txt !=2" v-for="item,index in data">
+            <div class="wenziDiv" :id="'wenzi'+index"  v-if="item.is_txt == 1&&item.descript != '不会做'" v-html="item.descript"></div>
+            <img class="bhz2" v-if="item.is_txt == 1&&item.descript == '不会做'" src="../../../../image/homework/cantDo.png" alt="">
+            <div class="bhz3" v-if="item.is_txt == 1&&item.descript == '不会做'">不会做默认错误，不允许修改！</div>
+            <div class="imgDiv" v-if="item.is_txt == 0">
+                <img  :src="item.descript" :style=" imgType[index]== 1?'width: 800px':'width: 300px'"  @click="imgClick(item.descript);"  alt="">
+            </div>
+            <div v-if="item.is_txt == 3" class="dashipin"
+                 :url="item.descript" @click="videoZYPlay(item)">
+                <img class="scshipinan" src="../../../../image/bof_03.png">
+            </div>
+        </div>
+        <div style="width: 100%;height: 100%;" v-if="data[0].is_txt ==2" v-for="item,index in data">
+            <div class="yinpinDiv">
+                <div class="toplightGreen">
+                    <div class="imageDiv">
+                        <img class="image" src="../../../../image/homework/xxc_03.png" alt="">
+                        <img class="image1" src="../../../../image/homework/xxc_03.png" alt="">
+                    </div>
+                    <p class="prosstime" v-text="'00:00/'+getOutTime(item.filetime)"></p>
+                    <progress :max="data[0].filetime" value="0" class="greenline"></progress>
+                </div>
+                <audio class="hideenAudio" :src='item.descript'></audio>
+                <!--http://vod-qiniu.12xue.com/X2I9uJUpfglIuJN1cTtKNeiRy1Q=/Fp19A-RVjqSdmZgdzYja23CyOmp0-->
+                <img class="btn" @click="studentRecord();" src="../../../../image/startPlay.png" alt="">
+                <div style="clear: both"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="rightDiv">
+        <img class="daanimg" @click="openZqda()"  src="../../../../image/ckda.png" alt="">
+        <img class="remarkPic" @click="openPicDraw()" src="../../../../image/remarkPic.png" alt="">
+
+        <img class="rightimg" @click="ChangeDC(1);"   v-if="isTrue == 1&&is_unable != 1&&isFenzhi == 0" src="../../../../image/newhomework/zhengque.png">
+        <img class="rightimg" @click="ChangeDC(1);" v-if="isTrue != 1&&is_unable != 1&&isFenzhi == 0" src="../../../../image/newhomework/noanswerl.png">
+        <img class="rightimg" v-if="is_unable == 1&&isFenzhi == 0" src="../../../../image/newhomework/zhengquehui.png">
+
+        <img class="banduiimg" @click="openZql();" v-if="isTrue == 3&&is_unable != 1&&isFenzhi == 0" src="../../../../image/newhomework/bandui.png">
+        <img class="banduiimg" @click="openZql();" v-if="isTrue != 3&&is_unable != 1&&isFenzhi == 0" src="../../../../image/newhomework/noanswerh.png">
+        <img class="banduiimg" v-if="is_unable == 1&&isFenzhi == 0" src="../../../../image/newhomework/banduihui.png">
+
+        <img class="wrongimg" @click="ChangeDC(2);" v-if="isTrue == 2&&is_unable != 1&&isFenzhi == 0" src="../../../../image/newhomework/cuowu.png">
+        <img class="wrongimg" @click="ChangeDC(2);" v-if="isTrue != 2&&is_unable != 1&&isFenzhi == 0" src="../../../../image/newhomework/noanswerc.png">
+        <img class="wrongimg"  v-if="is_unable == 1&&isFenzhi == 0" src="../../../../image/newhomework/cuowu.png">
+
+        <div class="rightFZDiv" @click="ChangeFZ(fenZhi);"  v-if="currentfenZhi == fenZhi&&is_unable != 1&&isFenzhi != 0"  v-text="fenZhi" style="background-color: #4bc7c7;border: solid 1px #4bc7c7;"></div>
+        <div class="rightFZDiv" @click="ChangeFZ(fenZhi);"  v-if="currentfenZhi != fenZhi&&is_unable != 1&&isFenzhi != 0"  v-text="fenZhi" style="border: solid 1px #4bc7c7;color: #4bc7c7;background-color: white;"></div>
+        <div class="rightFZDiv" @click="ChangeFZ(fenZhi);"  v-if="is_unable == 1&&isFenzhi != 0"  v-text="fenZhi"></div>
+
+        <div class="banduiFZDiv middleFz" @click="openFZ();"  v-if="currentfenZhi != fenZhi&&currentfenZhi != 0&&is_unable != 1&&isFenzhi != 0&&isHasOne ==2"  style="background-color: #FFCC00;border: solid 1px #FFCC00;">{{currentfenZhi}}</div>
+        <div class="banduiFZDiv middleFz" @click="openFZ();"  v-if="currentfenZhi != fenZhi&&currentfenZhi != 0&&is_unable == 1&&isFenzhi != 0&&isHasOne ==2">{{currentfenZhi}}</div>
+        <div class="banduiFZDiv middleFz" @click="openFZ();"  v-if="(currentfenZhi == fenZhi||currentfenZhi == 0)&&is_unable != 1&&isFenzhi != 0&&isHasOne ==2" style="border: solid 1px #FFCC00;color: #FFCC00;background-color: white;">半对</div>
+        <div class="banduiFZDiv middleFz" @click="openFZ();"  v-if="(currentfenZhi == fenZhi||currentfenZhi == 0)&&is_unable == 1&&isFenzhi != 0&&isHasOne ==2">半对</div>
+
+        <div class="banduiFZDiv middleFz2" @click="ChangeFZ(0.5);"  v-if="isTrue == 3&&is_unable != 1&&isFenzhi != 0&&isHasOne ==1" style="background-color: #FFCC00;border: solid 1px #FFCC00;">0.5</div>
+        <div class="banduiFZDiv middleFz2" @click="ChangeFZ(0.5);"  v-if="isTrue != 3&&is_unable != 1&&isFenzhi != 0&&isHasOne ==1" style="color: #FFCC00;border: solid 1px #FFCC00;background-color: white;">0.5</div>
+        <div class="banduiFZDiv middleFz2" @click="ChangeFZ(0.5);"  v-if="is_unable == 1&&isFenzhi != 0&&isHasOne ==1">0.5</div>
+
+        <div class="wrongFZDiv" @click="ChangeFZ(0);"  v-if="isTrue == 2&&is_unable != 1&&isFenzhi != 0"  style="background-color: #F57F17;border: solid 1px #F57F17;">0</div>
+        <div class="wrongFZDiv" @click="ChangeFZ(0);"  v-if="isTrue == 2&&is_unable == 1&&isFenzhi != 0"  style="background-color: #F57F17;border: solid 1px #F57F17;">0</div>
+        <div class="wrongFZDiv" @click="ChangeFZ(0);"  v-if="isTrue != 2&&is_unable != 1&&isFenzhi != 0"  style="border: solid 1px #F57F17;color: #F57F17;background-color: white;">0</div>
+
+
+        <img class="nextXt" onclick="vm.nextXt()" src="../../../../image/newhomework/nextXt.png" alt="">
+        
+        
+    </div>
+
+    <div class="zuyuanzuowan">已经是第一个组员</div>
+
+    <div class="xianshianniu">本小题已批完，切换继续批阅</div>
+
+    <div class="triangle"></div>
+
+</div>
+
+
+
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script type="text/javascript" src="../../../../script/html2canvas.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var playStatus = 0;
+    var timer = null;
+    var imageName = 'check_' + new Date().getTime();
+    apiready = function () {
+        vue();
+        vm.getHWstuExamStatus();
+
+        if($api.getStorage('isInShadow') !=  '1'){
+            api.openFrame({
+                name: 'shadow',
+                url: 'shadow.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth,
+                    h: api.winHeight
+                },
+
+            });
+            $api.setStorage('isInShadow', '1');
+        }
+
+
+
+        if(api.pageParam.tx == 'tkt'){
+            $api.attr($api.dom('.nextXt'), 'src', '../../../../image/newhomework/nextKong.png');
+            $api.text($api.dom('.xianshianniu'), '本填空已批完，切换继续批阅');
+        }
+
+        api.addEventListener({
+            name: 'appearYz'
+        }, function (ret, err) {
+            $api.text($api.dom('.zuyuanzuowan'), '已经是第一个组员');
+            $api.css($api.dom('.zuyuanzuowan'), 'display:block;');
+            setTimeout(function(){
+                $api.css($api.dom('.zuyuanzuowan'), 'display:none;');
+            },1000);
+        });
+
+        api.addEventListener({
+            name: 'appearZz'
+        }, function (ret, err) {
+            $api.text($api.dom('.zuyuanzuowan'), '已经是最后一个组员');
+            $api.css($api.dom('.zuyuanzuowan'), 'display:block;');
+            setTimeout(function(){
+                $api.css($api.dom('.zuyuanzuowan'), 'display:none;');
+            },1000);
+        });
+
+
+        api.addEventListener({
+            name: 'changeYinPin'
+        }, function (ret, err) {
+            if(playStatus == '1'){
+                playStatus = 2;
+                $api.attr($api.dom('.btn'), 'src', '../../../../image/startPlay.png');
+                $api.attr($api.dom('.image'), 'src', '../../../../image/homework/xxc_03.png');
+                $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/xxc_03.png');
+                clearInterval(timer);
+                var hideenAudio = $api.dom('.hideenAudio');
+                hideenAudio.pause();
+            }
+        });
+
+        api.addEventListener({
+            name: 'fenzhiC'
+        }, function (ret, err) {
+            if (api.pageParam.index == ret.value.index) {
+                vm.banduiD(90 - ret.value.fenzhi * 10);
+            }
+        });
+
+        api.addEventListener({
+            name: 'fenzhiC2'
+        }, function (ret, err) {
+            if (api.pageParam.index == ret.value.index) {
+                //分值接口挪过来
+                vm.ChangeFZ(ret.value.fenzhi);
+            }
+        });
+
+        api.addEventListener({
+            name:'xsbtn'
+        },function (ret,err) {
+            if(api.pageParam.answersSort[api.pageParam.answersSort.length - 1] != api.pageParam.sort){
+                $api.css($api.dom('.nextXt'), 'display:block;');
+                $api.css($api.dom('.xianshianniu'), 'display:block;');
+                $api.css($api.dom('.triangle'), 'display:block;');
+                setTimeout(function(){
+                    $api.css($api.dom('.xianshianniu'), 'display:none;');
+                    $api.css($api.dom('.triangle'), 'display:none;');
+                },1000);
+            }
+        });
+
+        api.addEventListener({
+            name: 'changeTPSuccess'
+        }, function (ret, err) {
+            if (api.pageParam.index == ret.value.index) {
+                vm.getHWstuExamStatus();
+            }
+        });
+
+
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                isTrue: 0,
+                data: [],
+                data2: [],
+                sort: 0,
+                tx_code: '',
+                sys_id: '',
+                flag: 0,
+                isFenzhi: api.pageParam.isFenzhi,
+                fenZhi: 0,
+                currentfenZhi: '0',
+                tx:api.pageParam.tx,
+                is_unable:'',
+                fristTrue:0,
+                roll:[0,0,0,0,0],
+                imgType:[0,0,0,0,0],
+                zqda:'',
+                dajx:'',
+                push_num:'',
+                isHasOne:0,   //判断打分中间那个显示问题
+                exercisesInfo:{},
+            },
+            updated: function () {
+            },
+            methods: {
+                getHWstuExamStatus: function () {//待批主观题列表
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetcorrectMobileExercisesIndex, {
+                        values: {
+                            tuid: api.pageParam.tuid, //获取hwid
+                            hwid: api.pageParam.hwid, //获取hwid
+                            classid: api.pageParam.classid,
+                            xtid: api.pageParam.xtid,
+                            ytlx: api.pageParam.ytlx,
+                            leaderuid: $api.getStorage('uid'),
+                            suid: api.pageParam.data.uid,
+                            sort: api.pageParam.sort,
+//                            table: api.pageParam.table,
+                            xt_type: api.pageParam.xt_type,
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.isTrue = ret.data.studentAnswers.is_true;
+                                vm.fristTrue = ret.data.studentAnswers.is_true;
+                                vm.sort = ret.data.sort;
+                                vm.sys_id = ret.data.sys_id;
+                                vm.tx_code = ret.data.exercisesInfo.tx_code;
+                                vm.data = ret.data.studentAnswers.xsdaobj;
+                                dataArr = ret.data.studentAnswers.xsdaobj;
+                                vm.flag = ret.data.flag;
+                                vm.fenZhi = ret.data.studentAnswers.scoreTotal;
+                                vm.is_unable = ret.data.studentAnswers.is_unable;
+                                vm.exercisesInfo = ret.data.exercisesInfo;
+                                vm.dajx = ret.data.exercisesInfo.dajx;
+                                vm.zqda = ret.data.exercisesInfo.dastr;
+                                vm.push_num = ret.data.studentAnswers.push_num;
+                                if (ret.data.studentAnswers.score != 0) {
+                                    vm.currentfenZhi = ret.data.studentAnswers.score;
+                                }
+                                if (ret.data.studentAnswers.scoreTotal > 0 && ret.data.studentAnswers.scoreTotal <= 0.5) {
+                                    vm.isHasOne = 0;  //分数小于1时  显示两个按钮
+                                }
+                                if (ret.data.studentAnswers.scoreTotal > 0.5 && ret.data.studentAnswers.scoreTotal <= 1) {
+                                    vm.isHasOne = 1;  //中间显示1
+                                }
+                                if(ret.data.studentAnswers.scoreTotal > 1){
+                                    vm.isHasOne = 2;  //中间显示半对
+                                }
+                                if (ret.data.answersSort.length != 0) {
+                                    if (ret.data.dpList.length == 0 && (api.pageParam.answersSort[api.pageParam.answersSort.length - 1] != api.pageParam.sort)) {
+                                        $api.css($api.dom('.nextXt'), 'display:block;');
+                                        $api.css($api.dom('.xianshianniu'), 'display:block;');
+                                        $api.css($api.dom('.triangle'), 'display:block;');
+                                        setTimeout(function(){
+                                            $api.css($api.dom('.xianshianniu'), 'display:none;');
+                                            $api.css($api.dom('.triangle'), 'display:none;');
+                                        },1000);
+                                    }
+                                }
+                                for(var i = 0;i<ret.data.studentAnswers.xsdaobj.length; i++){
+                                        if(ret.data.studentAnswers.xsdaobj[i].is_txt == 0){
+                                            $api.css($api.dom('.remarkPic'), 'visibility:visible;');
+                                        }
+                                        if(ret.data.studentAnswers.xsdaobj[i].is_txt ==1&&ret.data.studentAnswers.xsdaobj[i].descript != '不会做'){
+                                           $api.css($api.dom('.remarkPic'), 'visibility:visible;');
+                                        }
+                                        if(ret.data.studentAnswers.xsdaobj[i].is_txt == 0){
+                                            vm.getPicSize(ret.data.studentAnswers.xsdaobj[i].descript,i);
+                                        }
+                                }
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'middle'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    })
+                },
+                ChangeDC: function (isTure) {
+                    if(vm.is_unable == 1){
+                        alert('不会做默认为错，无法修改批阅');
+                        return;
+                    }
+                    api.closeFrame({
+                        name: 'frame_zql'
+                    });
+                    apiObj.Post(UrlRouter.PostEexercisesReviewAnswer, {
+                        values: {
+                            sys_id: vm.sys_id,
+                            tx_code: vm.tx_code,
+                            is_true: isTure,
+                            number: vm.sort,
+                            operateuid: $api.getStorage('uid'),
+                            identitytype:3,
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.isTrue = isTure;
+                                api.sendEvent({
+                                    name: 'changeCurrentFZ',
+                                    extra: {
+                                        isTrue: isTure,
+                                        fristTrue: vm.fristTrue,
+                                        index: api.pageParam.index,
+                                    }
+                                });
+                                vm.fristTrue = isTure;
+                                api.hideProgress();
+                            } else {
+                                api.hideProgress();
+                                alert(ret.msg);
+                            }
+                        } else {
+                            api.hideProgress();
+                            alert(err.msg);
+                        }
+                    });
+
+                },
+                banduiD: function (fenzhi) {
+                    if(vm.is_unable == 1){
+                        alert('不会做默认为错，无法修改批阅');
+                        return;
+                    }
+                    api.showProgress();
+                    apiObj.Post(UrlRouter.PostEexercisesReviewAnswer, {
+                        values: {
+                            sys_id: vm.sys_id,
+                            tx_code: vm.tx_code,
+                            is_true: 3,
+                            number: vm.sort,
+                            accuracy: fenzhi / 100,
+                            operateuid: $api.getStorage('uid'),
+                            identitytype:3,
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.isTrue = 3;
+                                api.sendEvent({
+                                    name: 'changeCurrentDC',
+                                    extra: {
+                                        isTrue: 3,
+                                        index: api.pageParam.index,
+                                        fristTrue: vm.fristTrue,
+                                        zql: fenzhi
+                                    }
+                                });
+                                vm.fristTrue = 3;
+                                api.hideProgress();
+                            } else {
+                                api.hideProgress();
+                                alert(ret.msg);
+                            }
+                        } else {
+                            api.hideProgress();
+                            alert(err.msg);
+                        }
+                    })
+                },
+                openZql: function () {
+                    if(vm.is_unable == 1){
+                        alert('不会做默认为错，无法修改批阅');
+                        return;
+                    }
+                    api.openFrame({
+                        name: 'frame_zql',
+                        url: 'frame_zql.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: 'auto'
+                        },
+                        bounces: false,
+                        pageParam: {
+                            index: api.pageParam.index,
+                            score:vm.fenZhi,
+                        }
+                    });
+                },
+                openPicDraw: function () {
+                    if(vm.is_unable == 1){
+                        return;
+                    }
+                    if(vm.data[0].is_txt == '2'){
+                        alert('音频答案不支持写画功能！');
+                        return;
+                    }
+                    if(vm.data[0].is_txt == '3'){
+                        alert('视频答案不支持写画功能！');
+                        return;
+                    }
+                    var imageArr = [];
+                    var sortArr = [];
+                    var numArr = [];
+                    if (vm.data[0].is_txt == '1') {
+                        vm.textToImage(function (ret, err) {
+                            if (ret && ret.status) {
+                                $api.css($api.dom('.wenziDiv'), 'background-color: transparent;');
+                                imageUrl = api.fsDir + "/trans/" + imageName;
+                                imageArr.push(imageUrl);
+                                sortArr.push(vm.data[0].sort);
+                                numArr.push(vm.data[0].number);
+                                api.openWin({
+                                    name: 'Drawing_marking',
+                                    url: 'Drawing_marking.html',
+                                    pageParam: {
+                                        imageArr: imageArr,
+                                        sortArr: sortArr,
+                                        sys_id: vm.sys_id,
+                                        tx_code: vm.tx_code,
+                                        index: api.pageParam.index,
+                                        numArr:numArr,
+                                        isZh:'1'
+                                    }
+                                });
+                            } else {
+                                $api.css($api.dom('.wenziDiv'), 'background-color: transparent;');
+                                alert("文字转图片失败");
+                            }
+                        });
+                    } else {
+                        for (var i = 0; i < vm.data.length; i++) {
+                            if (vm.data[i].is_txt == 0) {
+                                // var src = $api.attr(vm.data[i].descript,'src');
+                                var arr = vm.data[i].descript.split("?");
+                                var str =  arr[0];
+                                imageArr.push(str);
+                                sortArr.push(vm.data[i].sort);
+                                numArr.push(vm.data[i].number);
+                            }
+                        }
+                        api.openWin({
+                            name: 'Drawing_marking',
+                            url: 'Drawing_marking.html',
+                            pageParam: {
+                                imageArr: imageArr,
+                                sortArr: sortArr,
+                                sys_id: vm.sys_id,
+                                tx_code: vm.tx_code,
+                                index: api.pageParam.index,
+                                numArr:numArr,
+                                roll:vm.roll,
+                            },
+                            slidBackEnabled: false
+                        });
+                    }
+                },
+                textToImage: function (callback) {
+                    $api.css($api.dom('.wenziDiv'), 'background-color: white;');
+                    var shareContent = $('#wenzi' + 0);
+                    var width = shareContent.offsetWidth;
+                    var height = shareContent.offsetHeight;
+                    var canvas = document.createElement("canvas");
+                    var scale = 2;
+                    canvas.width = width * scale;
+                    canvas.height = height * scale;
+                    canvas.getContext("2d").scale(scale, scale);
+                    var opts = {
+                        scale: scale,
+                        canvas: canvas,
+                        logging: true,
+                        width: width,
+                        height: height
+                    };
+                    html2canvas(shareContent[0], opts).then(function (canvas) {
+                        var imgBase64 = canvas.toDataURL('image/jpg');
+                        vm.trans64ToImage(imgBase64, callback);
+                    });
+                },
+                trans64ToImage: function (base64, callback) {
+                    var trans = api.require('trans');
+                    var transBase64 = base64.substr(base64.indexOf(',') + 1);
+                    trans.saveImage({
+                        base64Str: transBase64,
+                        imgPath: "fs://trans",
+                        imgName: imageName,
+                        album: false
+                    }, function (ret, err) {
+                        callback(ret, err);
+                    });
+                },
+                getPicSize:function (pic,index) {
+                    var img = new Image();
+                    img.src = pic;
+                    img.onload = function(){
+                        var scale = img.width/img.height;  //图片的宽高比
+                        if(scale >= 5){
+                            vm.imgType[index] = 1;
+                            vm.force();
+                        }
+                    };
+                },
+                force:function () {
+                    this.$forceUpdate();
+                },
+                studentRecord: function (context) {
+                    var greenline = $api.dom('.greenline');
+                    var hideenAudio = $api.dom('.hideenAudio');
+                    //这是没有播放的情况  播放点击的音频  可能有其他音频正在播放  先关掉其他音频  再播放这个音频
+                    if (playStatus == '0') {
+                        if (timer) {
+                            clearInterval(timer);
+                        }
+                        $api.attr($api.dom('.btn'), 'src', '../../../../image/stop.png');
+                        $api.attr($api.dom('.image'), 'src', '../../../../image/homework/move.gif');
+                        $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/move.gif');
+                        playStatus = 1;
+                        hideenAudio.play();
+                        sec = 0;
+                        timer = setInterval(function (e) {
+                            if (greenline.value != vm.data[0].filetime){
+                                greenline.value++;
+
+                                $api.text($api.dom('.prosstime'), vm.getOutTime(greenline.value)+'/'+vm.getOutTime(vm.data[0].filetime));
+
+                            } else {
+                                greenline.value = 0;
+                                playStatus = 0;
+                                clearInterval(timer);
+                                $api.attr($api.dom('.btn'), 'src', '../../../../image/startPlay.png');
+                                $api.attr($api.dom('.image'), 'src', '../../../../image/homework/xxc_03.png');
+                                $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/xxc_03.png');
+                                $api.text($api.dom('.prosstime'), '00:00:'+vm.getOutTime(vm.data[0].filetime));
+                            }
+                        }, 1000);
+                    } else if (playStatus == '1') {
+                        playStatus = 2;
+                        $api.attr($api.dom('.btn'), 'src', '../../../../image/startPlay.png');
+                        $api.attr($api.dom('.image'), 'src', '../../../../image/homework/xxc_03.png');
+                        $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/xxc_03.png');
+                        clearInterval(timer);
+                        hideenAudio.pause();
+                    } else {
+                        playStatus = 1;
+                        hideenAudio.play();
+                        $api.attr($api.dom('.btn'), 'src', '../../../../image/stop.png');
+                        $api.attr($api.dom('.image'), 'src', '../../../../image/homework/move.gif');
+                        $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/move.gif');
+                        timer = setInterval(function (e) {
+                            if (greenline.value != vm.data[0].filetime){
+                                greenline.value++;
+                                $api.text($api.dom('.prosstime'), vm.getOutTime(greenline.value)+'/'+vm.getOutTime(vm.data[0].filetime));
+                            } else {
+                                greenline.value = 0;
+                                playStatus = 0;
+                                clearInterval(timer);
+                                $api.attr($api.dom('.btn'), 'src', '../../../../image/startPlay.png');
+                                $api.attr($api.dom('.image'), 'src', '../../../../image/homework/xxc_03.png');
+                                $api.attr($api.dom('.image1'), 'src', '../../../../image/homework/xxc_03.png');
+                                $api.text($api.dom('.prosstime'), '00:00:'+vm.getOutTime(vm.data[0].filetime));
+                            }
+                        }, 1000);
+                    }
+                },
+                openFZ: function () {
+                    if(vm.is_unable == 1){
+                        alert('不会做默认0分，无法修改批阅');
+                        return;
+                    }
+                    api.openFrame({
+                        name: 'frame_zql',
+                        url: 'frame_zql.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: api.winHeight
+                        },
+                        bounces: false,
+                        pageParam: {
+                            index: api.pageParam.index,
+                            score:vm.fenZhi,
+                        }
+                    });
+                },
+                ChangeFZ: function (fenzhi) {
+                    api.closeFrame({
+                        name: 'frame_zql'
+                    });
+                    if(vm.is_unable == 1){
+                        alert('不会做默认0分，无法修改批阅');
+                        return;
+                    }
+                    var isTrue;
+                    if (fenzhi == vm.fenZhi) {
+                        isTrue = 1;
+                    } else if (fenzhi == 0) {
+                        isTrue = 2;
+                    }else {
+                        isTrue = 3;
+                    }
+                    apiObj.Post(UrlRouter.PostEexercisesReviewAnswer, {
+                        values: {
+                            sys_id: vm.sys_id,
+                            tx_code: vm.tx_code,
+                            is_true: isTrue,
+                            score: fenzhi,
+                            total: vm.fenZhi,
+                            number: vm.sort,
+                            operateuid: $api.getStorage('uid'),
+                            identitytype:3,
+                        }
+                    }, function (ret, err) {
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                vm.currentfenZhi = fenzhi;
+                                vm.isTrue = isTrue;
+                                api.sendEvent({
+                                    name: 'changeCurrentFZ',
+                                    extra: {
+                                        isTrue: isTrue,
+                                        index: api.pageParam.index,
+                                        fenzhi:fenzhi,
+                                        fristTrue: vm.fristTrue,
+                                    }
+                                });
+                                vm.fristTrue = isTrue;
+                                api.hideProgress();
+                            } else {
+                                alert(ret.msg);
+                            }
+                        } else {
+                            alert(err.msg);
+                        }
+                    })
+                },
+                nextXt:function () {
+                    var jsfun = 'vm.nextXt();';
+                    api.execScript({
+                        script: jsfun
+                    });
+                },
+                getOutTime: function (intime) {
+                    var outTime = '';
+                    if (intime <= 9) {
+                        outTime = '00:0' + intime;
+                    } else if (intime <= 59) {
+                        outTime = '00:' + intime;
+                    } else {
+                        var min = parseInt(intime / 60);
+                        var sec = intime % 60;
+                        if (sec <= 9) {
+                            if (min > 0 && min < 10) {
+                                outTime = '0' + min + ':0' + sec;
+                            } else if (min >= 10) {
+                                outTime = min + ':0' + sec;
+                            } else {
+                                outTime = '00:0' + sec;
+                            }
+                        } else {
+                            if (min > 0 && min < 10) {
+                                outTime = '0' + min + ':' + sec;
+                            } else if (min >= 10) {
+                                outTime = min + ':' + sec;
+                            } else {
+                                outTime = '00:' + sec;
+                            }
+                        }
+                    }
+                    return outTime;
+                },
+                videoZYPlay: function (item) {
+
+                    api.openWin({
+                        name: 'win_video_view',
+                        url: '../../../win_video_view.html',
+                        pageParam: {
+                            path: item.descript,
+                            title: '',
+                            isMp3: 'false',
+                            filetime: item.filetime
+                        }
+                    });
+                },
+                imgClick:function (imgurl) {
+                    var photoBrowser = api.require('photoBrowser');
+                    photoBrowser.open({
+                        images: [
+                            imgurl
+                        ],
+                        placeholderImg: 'widget://image/loading_more.gif',
+                        bgColor: '#fff'
+                    }, function (ret, err) {
+                        if (ret.eventType == 'click') {
+                            photoBrowser.close();
+                        }
+                    });
+                },
+                openZqda:function () {
+                    api.openFrame({
+                        name: 'popCorrentAnswer',
+                        url: 'popCorrentAnswer.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: 'auto',
+                            h: 'auto'
+                        },
+                        bounces: false,
+                        pageParam: {
+                            zqda: vm.zqda,
+                            dajx: vm.dajx,
+                            tx:vm.tx,
+                            tx_code: vm.tx_code,
+                            exercisesInfo:vm.exercisesInfo,
+                            sort:api.pageParam.sort
+                        }
+                    });
+                },
+            }
+        });
+    }
+
+</script>
+</html>

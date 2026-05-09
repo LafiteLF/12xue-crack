@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>答题统计</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <style>
+        .content {
+            width: 100%;
+            position: relative;
+            height: 100%;
+            /*display: none;*/
+        }
+
+        .top {
+            width: 60%;
+            position: absolute;
+            left: 20%;
+            top: 30px;
+            background: #e0f4f4;
+            height: 220px;
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+
+        .top2 {
+            width: 60%;
+            position: absolute;
+            left: 20%;
+            top: 30px;
+            background: #e0f4f4;
+            height: 110px;
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+
+        .bottom {
+            width: 60%;
+            position: absolute;
+            left: 20%;
+            top: 260px;
+            background: #fff;
+            height: calc(100% - 280px);
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+        .bottom2 {
+            width: 60%;
+            position: absolute;
+            left: 20%;
+            top: 150px;
+            background: #fff;
+            height: calc(100% - 170px);
+            border-radius: 6px;
+            border: 1px dashed #bfbfbf;
+        }
+
+        .ltimg, .rtimg {
+            width: 75px;
+            position: absolute;
+            top: -16px;
+        }
+
+        .ltimg {
+            left: -38px;
+        }
+
+        .rtimg {
+            right: -38px;
+        }
+
+        .lflj, .rflj {
+            width: 15px;
+            position: absolute;
+            bottom: -30px;
+            z-index: 10;
+        }
+
+        .lflj {
+            left: 90px
+        }
+
+        .rflj {
+            right: 90px
+        }
+
+        .white_circle {
+            width: 102px;
+            height: 102px;
+            border-radius: 100px;
+            border: 2px solid #fff;
+            margin: 0 auto;
+            margin-top: 13px;
+        }
+
+        .white_circle2 {
+            width: 102px;
+            height: 102px;
+            border-radius: 100px;
+            border: 2px solid #fff;
+            margin: 0 auto;
+            margin-top: 27px;
+        }
+
+        .solid_cricle {
+            width: 85px;
+            height: 85px;
+            border-radius: 100px;
+            background: #fff;
+            margin: 8px auto
+        }
+
+        .solid_cricle2 {
+            width: 82px;
+            height: 82px;
+            border-radius: 100px;
+            background: #fff;
+            margin: 5px auto;
+            border: 5px solid #4bc7c7;
+        }
+
+        .solid_cricle2 b {
+            font-size: 3.4rem;
+            color: #4bc7c7;
+            text-align: center;
+            display: inline;
+            font-weight: normal;
+            /* padding-top: 14px; */
+            height: 40px;
+            vertical-align: top;
+            padding: 0 3px;
+            /* padding-top: 54px; */
+        }
+
+        .solid_cricle2 span {
+            font-size: 1.4rem;
+            color: #000;
+            display: block;
+            line-height: 80px;
+            text-align: center;
+        }
+
+        .solid_cricle b {
+            font-size: 3.0rem;
+            color: #4bc7c7;
+            text-align: center;
+            display: block;
+            font-weight: normal;
+            padding-top: 17px;
+            height: 34px;
+        }
+
+        .solid_cricle span {
+            font-size: 1.4rem;
+            color: #000;
+            display: block;
+            text-align: center
+        }
+
+        .ranking {
+            font-size: 1.8rem;
+            color: #303030;
+            width: 100%;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        .ranking span {
+            font-size: 2.1rem;
+            color: #4bc7c7
+        }
+
+        .ranking b {
+            width: 25px;
+            display: inline-block;
+        }
+
+        .Identification {
+            text-align: center;
+            padding-top: 13px;
+        }
+
+        .Identification li {
+            display: inline-block;
+            text-align: center;
+            font-size: 1.4rem;
+            margin: 0 10px;
+        }
+
+        .Identification li span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 5px;
+            border-radius: 40px;
+            vertical-align: bottom;
+            margin-bottom: 6px;
+        }
+
+        .Identification li:nth-of-type(1) {
+            color: #4bc7c7
+        }
+
+        .Identification li:nth-of-type(1) span {
+            color: #4bc7c7;
+            background: #4bc7c7;
+        }
+
+        .Identification li:nth-of-type(2) {
+            color: #df7605
+        }
+
+        .Identification li:nth-of-type(2) span {
+            color: #df7605;
+            background: #df7605
+        }
+
+        .Identification li:nth-of-type(3) {
+            color: #ffcc00
+        }
+
+        .Identification li:nth-of-type(3) span {
+            color: #ffcc00;
+            background: #ffcc00
+        }
+
+        .Identification li:nth-of-type(4) {
+            color: #d5d5d5
+        }
+
+        .Identification li:nth-of-type(4) span {
+            color: #d5d5d5;
+            background: #d5d5d5
+        }
+
+
+
+        .IdentificationUnfinish {
+            text-align: center;
+            padding-top: 13px;
+        }
+
+        .IdentificationUnfinish li {
+            display: inline-block;
+            text-align: center;
+            font-size: 1.4rem;
+            margin: 0 25px;
+        }
+
+        .IdentificationUnfinish li span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 5px;
+            border-radius: 40px;
+            vertical-align: bottom;
+            margin-bottom: 6px;
+        }
+
+        .IdentificationUnfinish li:nth-of-type(1) {
+            color: #4bc7c7
+        }
+
+        .IdentificationUnfinish li:nth-of-type(1) span {
+            color: #4bc7c7;
+            background: #4bc7c7;
+        }
+
+        .IdentificationUnfinish li:nth-of-type(2) {
+            color: #d5d5d5
+        }
+
+        .IdentificationUnfinish li:nth-of-type(2) span {
+            color: #d5d5d5;
+            background: #d5d5d5
+        }
+
+
+        .bottomnr {
+            margin: 25px 15px 10px 15px;
+            padding-left: 10px;
+            padding-right: 10px;
+            height: calc(100% - 35px);
+            width: calc(100% - 50px);
+            overflow-y: scroll;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #303030;
+            height: 18px;
+            line-height: 18px;
+            border-left: 4px solid #4bc7c7;
+            padding-left: 12px;
+            font-weight: normal;
+            /* margin-left: 0px; */
+            margin-top: 15px;
+        }
+
+        .classification {
+            position: relative;
+            padding-top: 5px;
+        }
+
+        .classification span {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: #9a9a9a;
+            font-size: 1.2rem
+        }
+
+        .classification span b {
+            font-weight: normal;
+            color: #4bc7c7;
+            padding: 0 3px;
+            font-size: 1.2rem
+        }
+
+        .Serial li {
+            float: left;
+            width: 30px;
+            height: 30px;
+            border-radius: 100px;
+            color: #fff;
+            background: #4bc7c7;
+            text-align: center;
+            line-height: 30px;
+            font-size: 1.4rem;
+            margin: 5px 8px
+        }
+
+        .Serial {
+            padding-bottom: 10px;
+            padding-top: 10px;
+            padding-left: 9px;
+        }
+
+        /*滚动条样式*/
+        *::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            height: 100%;
+        }
+
+        *::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        *::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+
+        .tzts {
+            font-size: 1.2rem;
+            color: #9a9a9a;
+            position: absolute;
+            display: inline-block;
+            top: 17px;
+            left: 123px;
+        }
+
+        .solid_cricle i {
+            display: inline;
+            font-size: 2rem;
+            font-style: normal
+        }
+
+        .wxts {
+            font-size: 1.4rem;
+            color: #d5d5d5;
+            text-align: center;
+            position: absolute;
+            width: 100%;
+            top: calc(50% - 16px);
+        }
+
+        .xtzTitle {
+            width: 100%;
+            height: 40px;
+            font-size: 1.8rem;
+            font-weight: normal;
+            font-stretch: normal;
+            line-height: 40px;
+            color: #303030;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .buttonDiv {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+        }
+        .buttonDiv span{
+            font-size: 1.4rem;
+            background-color: #4bc7c7;
+            border-radius: 20px;
+            padding: 8px 30px;
+            color: white;
+        }
+
+        [v-clock] {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <!--有习题-->
+    <div :class="is_complete==0 ? 'top2' : 'top'">
+        <img class="ltimg" src="../../../../image/stuHomePad/tjleft.png">
+        <img class="rtimg" src="../../../../image/stuHomePad/tjright.png">
+        <img class="lflj" src="../../../../image/stuHomePad/tj.png">
+        <img class="rflj" src="../../../../image/stuHomePad/tj.png">
+        <div class="xtzTitle">习题组答题结果</div>
+        <div class="white_circle" v-if="is_complete == 1">
+            <div class="solid_cricle">
+                <b v-html="zqlnumber+'<i>%</i>'"
+                   :style="zqlnumber>=85 ? 'color:#4bc7c7' : zqlnumber>=60 ? 'color:#ffcd06' : 'color:#df7605'"></b>
+                <span>正确率</span>
+            </div>
+        </div>
+        <ul class="IdentificationUnfinish" v-if="is_complete == 0">
+            <li v-html="'<span></span>已提交' + completeNum + '题'"></li>
+            <li v-html="'<span></span>未提交' + unCompleteNum + '题'"></li>
+        </ul>
+        <ul class="Identification" v-if="is_complete == 1">
+            <li v-html="'<span></span>正确' + zhengqueNum + '题'"></li>
+            <li v-html="'<span></span>错误' + cuowuNum + '题'"></li>
+            <li v-html="'<span></span>半对' + banduiNum + '题'"></li>
+            <li v-html="'<span></span>未答' + unAnsweredNum + '题'"></li>
+        </ul>
+    </div>
+    <div class="bottom" :class="is_complete==0 ? 'bottom2' : 'bottom'">
+        <!--显示答案-->
+        <div class="bottomnr">
+            <div class="classification">
+                <ul class="Serial clearfix" v-if="is_complete == 1">
+                    <li v-for="(item, index) in answerArr" v-text="index + 1" tapmode onclick="selectExe(this)" :id="index"
+                        :style="getStyle(item)"></li>
+                </ul>
+                <ul class="Serial clearfix" v-if="is_complete == 0">
+                    <li v-for="(item, index) in answerArr" v-text="index + 1" tapmode onclick="selectExe(this)" :id="index"
+                        :style="getStyle2(item)"></li>
+                </ul>
+            </div>
+            <div style="font-size: 16px;margin-top: 100px;margin-left: 20px;">答题结束后可以返回继续做AI变式题哦~</div>
+        </div>
+
+        <!--<div class="buttonDiv" v-if="is_complete == 1" tapmode onclick='next()'><span>下一题</span></div>-->
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script>
+
+    var arcProgress;//圆环
+    var classObj, classObjForCloud;
+    var vm;
+    var arcProgressId;
+    apiready = function () {
+        classObj = new GridOpenApi('http://'+ $api.getStorage('ip'), source, version);
+        classObjForCloud = new GridOpenApi('http://' + $api.getStorage('netIP'), source, version);
+        initVue();
+        api.addEventListener({
+            name: 'finishDT'
+        }, function (ret, err) {
+            api.toast({
+                msg: '答题已结束！',
+                duration: 2000,
+                location: 'bottom'
+            });
+            vm.is_complete = 1;
+            vm.accuracyNum = ret.value.accuracy;
+            finishDT();
+        });
+
+        //下一题
+        api.addEventListener({
+            name: 'nextxiti'
+        }, function (ret, err) {
+            next();
+        });
+
+        if (api.pageParam.complete == 1) {
+            vm.is_complete = 1;
+            finishDT();//答题结束进入答题卡
+        } else {
+            getUnFinishNum();
+        }
+    };
+
+    function initVue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                xitiinfo: api.pageParam.xitiinfo,
+                answerArr: api.pageParam.answerArr,
+                is_complete: '', //0未完成 1已完成
+                zqlnumber: 0, // 正确率
+                completeNum: 0,
+                unCompleteNum: 0,
+                zhengqueNum: 0,
+                cuowuNum: 0,
+                banduiNum: 0,
+                unAnsweredNum: 0,
+                accuracyNum: api.pageParam.accuracy,
+                arcProgressNum: 0
+            },
+            updated: function () {
+            },
+            methods: {
+                getStyle: function (item) {
+                    if (item != '') {
+                        if (Array.isArray(item)) {
+                            var childRightNum = 0;
+                            for (var y=0; y<item.length; y++ ) {
+                                if (item[y].is_true == 1) {
+                                    childRightNum++;
+                                }
+                            }
+                            if (childRightNum == 0) {
+                                return 'background:#df7605';
+                            } else if (childRightNum == item.length) {
+                                return 'background:#4bc7c7';
+                            } else {
+                                return 'background:#ffcc00';
+                            }
+                        } else {
+                            if (item.is_true == 1) {
+                                return 'background:#4bc7c7';
+                            } else if (item.is_true == 2) {
+                                return 'background:#df7605';
+                            } else {
+                                return 'background:#ffcc00';
+                            }
+                        }
+                    } else {
+                        return 'background:#fff; border: 1px solid #cecece; color: #cccccc ;width: 28px; height: 28px;';
+                    }
+                },
+                getStyle2: function (item) {
+                    if (item != '') {
+                        return 'background:#4bc7c7';
+                    } else {
+                        return 'background:#fff; border: 1px solid #cecece; color: #cccccc ;width: 28px; height: 28px;';
+                    }
+                }
+            }
+        });
+    }
+
+    function getUnFinishNum() {
+        vm.completeNum = 0;
+        vm.unCompleteNum = 0;
+        for (var i=0; i<vm.answerArr.length; i++) {
+            if (vm.answerArr[i] != '') {
+                vm.completeNum++;
+            } else {
+                vm.unCompleteNum++;
+            }
+        }
+    }
+
+    //答题结束进入答题卡
+    function finishDT() {
+        getFinishNum();
+
+        arcProgress = api.require('arcProgress');
+        var centerX;
+        centerX = api.frameWidth / 2;
+        var pgcolor;
+        var accuracy=  vm.arcProgressNum * 100;
+        if (accuracy >= 85) {
+            pgcolor = '#4bc7c7'
+        } else if (accuracy >= 60) {
+            pgcolor = '#ffcd06'
+        } else {
+            pgcolor = '#df7605'
+        }
+        arcProgress.open({
+            type: 'annular',
+            centerX: centerX + 1,
+            centerY: 40 + 107,
+            radius: 45,
+            loopWidth: 7,
+            bgColor: '#dedede',
+            pgColor: pgcolor,
+            fixed: false,
+            fixedOn: 'frame_xtzanswer_statics'
+        }, function (ret, err) {
+            arcProgressId = ret.id;
+            arcProgress.setValue({
+                id: ret.id,
+                value: accuracy
+            });
+        });
+    }
+
+
+    function getFinishNum() {
+        vm.cuowuNum = 0;
+        vm.banduiNum = 0;
+        vm.zhengqueNum = 0;
+        vm.unAnsweredNum = 0;
+        for (var i=0; i<vm.answerArr.length; i++) {
+            if (vm.answerArr[i] != '') {
+                if (Array.isArray(vm.answerArr[i])) {
+//                if (vm.answerArr[i].length > 1) { //不能判断数组长度 应该判断是否包含数组
+                    var childRightNum = 0;
+                    for (var y=0; y<vm.answerArr[i].length; y++ ) {
+                        if (vm.answerArr[i][y].is_true == 1) {
+                            childRightNum++;
+                        }
+                    }
+                    if (childRightNum == 0) {
+                        vm.cuowuNum++;
+                    } else if (childRightNum == vm.answerArr[i].length) {
+                        vm.zhengqueNum++;
+                    } else {
+                        vm.banduiNum++;
+                    }
+
+                } else {
+                    if (vm.answerArr[i].is_true == 1) {
+                        vm.zhengqueNum++;
+                    } else if (vm.answerArr[i].is_true == 2) {
+                        vm.cuowuNum++;
+                    } else {
+                        vm.banduiNum++;
+                    }
+                }
+            } else {
+                vm.unAnsweredNum++;
+            }
+        }
+
+        vm.arcProgressNum = Number((Number(vm.accuracyNum)/Number(vm.xitiinfo.length))).toFixed(3);
+
+        if (vm.arcProgressNum == 1) {
+            vm.zqlnumber = 100;
+        } else {
+            vm.zqlnumber = parseFloat((vm.arcProgressNum * 100).toFixed(1));
+        }
+    }
+
+
+    //点击题目（答题卡）
+    function selectExe(context) {
+        var index = $api.attr(context,'id');
+        api.sendEvent({
+            name: 'jumptoindex',
+            extra: {
+                exeIndex: index
+            }
+        });
+        $api.setStorage('card',false);
+        if (vm.is_complete == 0) {//主动查看
+            api.closeWin();
+        } else  {//答题结束 ，点击查看答案解析
+//            查看答题结果，防止习题界面答案未显示
+            api.sendEvent({
+                name: 'ShowAnswer'
+            });
+            api.openWin({
+                name: 'win-xsdt-xtz-main-pad',
+                url: 'win-xsdt-xtz-main-pad.html'
+            });
+        }
+    }
+    //下一题
+    function next() {
+        //区分云端课堂
+        if ($api.getStorage('connectType') == 'Lan') {
+            classObj.Get(UrlRouter.GetCmdToPc, {
+                values: {
+                    cmdname: 'dtstate',
+                    classid: $api.getStorage('classid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    ProcessRet1(ret);
+                } else {
+                    api.toast({
+                        msg: '老师未开启课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+
+        } else {
+            api.addEventListener({
+                name: 'ReceiveMessage_15'
+            }, function (ret, err) {
+                ProcessRet1(ret.value.receive);
+            });
+            classObjForCloud.Get(UrlRouter.GetCmdToPc, {
+                values: {
+                    cmdname: 'dtstate',
+                    classid: $api.getStorage('classid'),
+                    uid: $api.getStorage('uid'),
+                    from: 'ReceiveMessage_15',
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+                if (ret && ret.status == 1) {
+                } else {
+                    api.toast({
+                        msg: ret.info,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+    }
+
+    //请求题目内容
+    function getXiList() {
+
+        if ($api.getStorage('connectType') == 'Lan') {
+            classObj.Get(UrlRouter.GetCmdToPc, {
+                values: {
+                    cmdname: 'xtinfo',
+                    classid: $api.getStorage('classid')
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    ProcessRet2(ret);
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: '获取习题失败',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+
+        } else {
+            api.addEventListener({
+                name: 'ReceiveMessage_16'
+            }, function (ret, err) {
+                ProcessRet2(ret.value.receive);
+            });
+            classObjForCloud.Get(UrlRouter.GetCmdToPc, {
+                values: {
+                    cmdname: 'xtinfo',
+                    classid: $api.getStorage('classid'),
+                    uid: $api.getStorage('uid'),
+                    from: 'ReceiveMessage_16',
+                    vclass_token: $api.getStorage('vclass_token'),
+                    private_token: $api.getStorage('private_token')
+                }
+            }, function (ret, err) {
+                if (ret && ret.status == 1) {
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.info,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            });
+        }
+
+    }
+
+    function ProcessRet1(ret) {
+        api.hideProgress();
+        if (ret) {
+            switch (ret.status) {
+                case '-2':
+                    api.toast({
+                        msg: '你不是当前班的学生',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '1':
+                    arcProgress.close({
+                        id: arcProgressId
+                    });
+                    api.closeWin({
+                        name:'win-xsdt-xtz-main-pad'
+                    });
+                    //请求题目内容
+                    getXiList();
+                    break;
+                case '-1':
+                    api.toast({
+                        msg: '老师还未开始新的答题，请耐心等待~',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '0':
+                    api.toast({
+                        msg: '老师还未开始新的答题，请耐心等待~',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '2':
+                    api.toast({
+                        msg: '老师还未开始新的答题，请耐心等待~',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                case '3':
+                    api.toast({
+                        msg: '习题组为空',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+                default:
+                    api.toast({
+                        msg: '老师未开启课堂',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                    break;
+            }
+        } else {
+            api.toast({
+                msg: '老师未开启课堂',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+
+    function ProcessRet2(ret) {
+        api.hideProgress();
+        if (ret) {
+            if (ret.xtgroup) {
+                //是习题组
+                api.openWin({
+                    name: 'win-xsdt-xtz-main-pad',
+                    url: 'win-xsdt-xtz-main-pad.html',
+                    pageParam: {
+                        xitiinfo: ret.xitiinfo,
+                        classid: $api.getStorage('classid')
+                    },
+                    slidBackEnabled:false,
+                    reload: true
+                });
+            } else {
+                api.openWin({
+                    name: 'win-xsdt-dt-main-pad',
+                    url: '../answers/win-xsdt-dt-main-pad.html',
+                    pageParam: {
+                        xtinfo: ret
+                    },
+                    slidBackEnabled: false,
+                    reload: true
+                });
+            }
+        }
+    }
+
+
+</script>
+</html>

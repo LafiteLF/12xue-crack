@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>习题列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/exerciseCss.css"/>
+    <style>
+        .ex_content {
+            display: none
+        }
+
+        .ex_content dl {
+            padding-top: 0px;
+        }
+
+        .ex_content {
+            padding-top: 10px
+        }
+
+        .kongcontent {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: none;
+        }
+
+        .kongcontent img {
+            position: absolute;
+            left: calc(50% - 162px);
+            top: calc(50% - 162px)
+        }
+    </style>
+</head>
+<body>
+<div class="kongcontent">
+    <img src="../../../image/newhomework/2_03.png" style="width: 324px; height: 324px">
+</div>
+<div class="ex_content">
+    <dl>
+        <dd v-for="(CourseList,index) in CourseLists" @click="openCourseDetail(CourseList,index)">
+            <p v-if="!(CourseList.tx=='tdjh' || CourseList.tx=='tdh' || CourseList.tx=='tdb'|| CourseList.tx=='ttt')"
+               v-html="(index+1)+'.'+tixing(CourseList.txstr,CourseList.zyqf)+courseList(CourseList.xsmc)"></p>
+            <p v-if="CourseList.tx=='tdjh' || CourseList.tx=='tdh' || CourseList.tx=='tdb'|| CourseList.tx=='ttt'">
+                {{ (index + 1) + '.' + tixing(CourseList.txstr, CourseList.zyqf) }}
+                <img src="../../../image/newhomework/tlbt.png">
+            </p>
+            <span class="ex-xiaoti" style="right:70px;" v-if=" CourseList.xts>0"
+                  v-text="CourseList.tx_code==2?'['+CourseList.xts+'填空]':'['+CourseList.xts+'小题]'"></span>
+            <span class="ex-daipi" v-if="CourseList.is_true!=0">
+                <img v-if="CourseList.is_true==1" src="../../../image/newhomework/zhengque.png">
+                <img v-if="CourseList.is_true==2" src="../../../image/newhomework/cuowu.png">
+                <img v-if="CourseList.is_true==3" src="../../../image/newhomework/bandui.png">
+            </span>
+            <span class="ex-daipi" v-if="CourseList.is_true==0" style="color: #4bc7c7;">
+                （已答）
+            </span>
+        </dd>
+    </dl>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        getDetailLists();
+    };
+    var vm = new Vue({
+        el: '.ex_content',
+        data: {
+            CourseLists: [],
+            title: '',
+            isNull: false,
+            hwid: ''
+        },
+        methods: {
+            GetCourseinfoUrl: function (kcid, cdn) {
+
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+
+                apiObj.Get(UrlRouter.Getv2courseCourseInfo, {
+                    values: {
+                        kcid: api.pageParam.kcid,
+                        classid: api.pageParam.bjid,
+                        uid: $api.getStorage('uid'),
+                        schoolid: api.pageParam.schoolid
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            vm.hwid = ret.id;
+                            if (ret.data.materiallist.length == 0) {
+                                vm.isNull = true;
+                                $('.kongcontent').show();
+                            } else {
+                                vm.CourseLists = ret.data.materiallist;
+                                $('.ex_content').show();
+                            }
+                            vm.title = ret.data.title;
+                        } else {
+                            _toast(ret.msg);
+                        }
+                    } else {
+
+                    }
+                    // api.refreshHeaderLoadDone();
+                    // pullRefresh.cancelLoading();
+                })
+            },
+            tixing: function (txstr, zyqf) {
+                return zyqf == 1 ? '【素材】' : txstr ? '【' + txstr + '】' : '【素材】';
+            },
+            courseList: function (xsmc) {
+
+                var string;
+                string = xsmc.replace(new RegExp("<br>", "gm"), "");
+                string = string.replace(new RegExp("<br/>", "gm"), "");
+                string = string.replace(new RegExp("<br />", "gm"), "");
+                return string;
+            },
+            openCourseDetail: function (CourseList, index) {
+                api.openWin({
+                    name: 'win_detail',
+                    url: 'win_detail.html',
+                    pageParam: {
+                        courseArr: vm.CourseLists,
+                        index: index,
+                        title: vm.title,
+                        bjid: api.pageParam.bjid,
+                        schoolid: api.pageParam.schoolid,
+                        hwid: vm.hwid
+                    }
+                });
+            }
+        }
+    });
+
+    function getDetailLists() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        if(api.pageParam.id){
+            apiObj.Get(UrlRouter.GetPracticeCourseInfo, {
+                values: {
+                    id: api.pageParam.id
+                }
+            }, function (ret, err) {
+                api.hideProgress();
+                if (ret) {
+                    if (ret.ret === 0) {
+                        vm.hwid = ret.data.id;
+                        if (ret.data.materiallist.length === 0) {
+                            vm.isNull = true;
+                            $('.kongcontent').attr('src', '../../../image/newhomework/2_1.png').show()
+                        } else {
+                            vm.CourseLists = ret.data.materiallist;
+                            $('.ex_content').show();
+                        }
+                        vm.title = ret.data.title;
+                    } else {
+                        _toast(ret.msg);
+                    }
+                }
+            });
+        }else{
+            apiObj.Get(UrlRouter.Getv2courseCourseInfo, {
+                values: {
+                    kcid: api.pageParam.kcid,
+                    classid: api.pageParam.bjid,
+                    uid: $api.getStorage('uid'),
+                    schoolid: api.pageParam.schoolid
+                }
+            }, function (ret, err) {
+                api.hideProgress();
+                if (ret) {
+                    if (ret.ret == 0) {
+                        vm.hwid = ret.data.id;
+                        if (ret.data.materiallist.length == 0) {
+                            vm.isNull = true;
+                            $('.kongcontent').show();
+                        } else {
+                            vm.CourseLists = ret.data.materiallist;
+                            $('.ex_content').show();
+                        }
+                        vm.title = ret.data.title;
+                    } else {
+                        _toast(ret.msg);
+                    }
+                } else {
+
+                }
+            });
+        }
+    }
+</script>
+
+</html>

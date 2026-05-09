@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        /*滚动条样式*/
+        *::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            height: 100%;
+        }
+
+        *::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        *::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+        .content {
+            width: 38%;
+            top: calc(50% - 118px);
+            position: absolute;
+            left: 31%;
+            overflow-y: scroll;
+            background-color: white;
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            height: 200px;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+        .subjest-list {
+            width: 100%;
+            height: 200px;
+            /*overflow-y: scroll;*/
+            padding-top: 10px;
+            text-align: left;
+        }
+
+        .subjest-list div {
+            float: left;
+            width: 33.3%;
+            height: 40px;
+            background-color: #FFFFFF;
+            text-align: center;
+            margin-top: 15px;
+            line-height: 40px;
+        }
+        .btndiv {
+            width: 38%;
+            top: calc(50% - 118px + 200px);
+            position: absolute;
+            left: 31%;
+            background-color: white;
+            text-align: center;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            height: 60px;
+            font-size: 1.6rem;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .subjest-list div:active {
+            background-color: #FFFFFF;
+        }
+
+        span {
+            display: inline-block;
+            height: 40px;
+            width: 80%;
+            border: 1px solid #4bc7c7;
+            border-radius: 5px;
+            color: #4bc7c7;
+        }
+
+        /*span:active {*/
+        /*background-color: #d5fcfc;*/
+        /*}*/
+        .cancel-btn {
+            position: absolute;
+            left: 20%;
+            bottom: 10px;
+            height: 40px;
+            width: 26.6%;
+            background-color: #4bc7c7;
+            line-height: 40px;
+            border-radius: 5px;
+            color: #FFFFFF;
+        }
+
+        .done-btn {
+            position: absolute;
+            right: 20%;
+            bottom: 10px;
+            height: 40px;
+            width: 26.6%;
+            background-color: #4bc7c7;
+            line-height: 40px;
+            border-radius: 5px;
+            color: #FFFFFF;
+        }
+
+        .close {
+            width: 100%;
+            height: 100%;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .selected {
+            background-color: #d5fcfc;
+        }
+
+        .noselected {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="api.closeFrame({name: 'frame_add_subject'});"></div>
+<div id="app" class="content">
+    <div class="subjest-list clearfix">
+        <div v-for="(index,item) in othersub">
+            <span v-text="item.name" @click="selectSubject(index,item)" :id="index"></span>
+        </div>
+    </div>
+</div>
+<div class="btndiv">
+    <div class="cancel-btn" tapmode onclick="api.closeFrame()">取消</div>
+    <div class="done-btn" onclick="openOfflineError()">确定</div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/vue.min.js"></script>
+<script type="text/javascript">
+    var vm;
+    apiready = function () {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                othersub: api.pageParam.othersub,
+                selected: '-1',//上一个被选中
+                selectedSub: ''
+            },
+            methods: {
+                selectSubject: function (index, item) {
+                    vm.selectedSub = item;
+//                    $api.css($api.byId(index), 'background-color: #d5fcfc');
+//                    $api.css($api.byId(vm.selected), 'background-color: #fff');
+//                    vm.selected = index;
+
+
+                    if (vm.selected == index) {
+                        if ($api.hasCls($api.byId(index), 'selected')) {
+                            $api.removeCls($api.byId(index), 'selected');
+                            $api.addCls($api.byId(index), 'noselected');
+                            vm.selected = -1;
+                        }
+                        else {
+                            $api.removeCls($api.byId(index), 'noselected');
+                            $api.addCls($api.byId(index), 'selected');
+                            vm.selected = index;
+                        }
+
+                    }
+                    else {
+                        $api.addCls($api.byId(index), 'selected');
+                        if ($api.hasCls($api.byId(index), 'noselected')) {
+                            $api.removeCls($api.byId(index), 'noselected');
+                        }
+
+                        $api.addCls($api.byId(vm.selected), 'noselected');
+                        if ($api.hasCls($api.byId(vm.selected), 'selected')) {
+                            $api.removeCls($api.byId(vm.selected), 'selected');
+                        }
+
+                        vm.selected = index;
+                    }
+                },
+
+            }
+        });
+    };
+    function openOfflineError () {
+        if (vm.selected != '-1') {
+            api.openWin({
+                name: 'win_error_reply',
+                url: 'win_error_reply.html',
+                pageParam: {
+                    xkid: vm.selectedSub.id,
+                    errorData: 0,
+                    lasterror: 1,
+                    editct: 0
+                }
+            });
+            api.closeFrame();
+        } else {
+            toast12xue('请先选择科目');
+        }
+    }
+</script>
+</html>

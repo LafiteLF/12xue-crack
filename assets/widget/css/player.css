@@ -1,0 +1,99 @@
+.audioplayer {
+    /*background: url(../image/yinpin/player-background.png) no-repeat;*/
+
+    /*background-size: 100% 100%;*/
+    border: 1px solid #ebebeb;
+    width: 100%;
+    height: 100%;
+    padding: 60px 10px;
+    line-height: 20px;
+
+}
+
+.audioplayer-bar-loaded {
+    float: left;
+    position: relative;
+    width: 100% !important;
+    height: 4px;
+    background: #E8E8E8;;
+    margin-top: 3px;
+    display: inline-block;
+}
+
+.audioplayer-bar-played {
+    width: 0;
+    height: 4px;
+    background: rgba(75, 199, 199, 0.62);
+    overflow: hidden;
+}
+
+.audioplayer-bar-button {
+    width: 10px;
+    height: 10px;
+    background: #4BC7C7;
+    position: absolute;
+    border-radius: 10px;
+    top: -3px;
+}
+
+.audioplayer-playpause {
+    float: left;
+    width: 40px;
+    height: 40px;
+    background: url("../image/yinpin/player-play.png") no-repeat 1px 2px;
+    cursor: pointer;
+}
+
+.audioplayer-play {
+    float: left;
+    width: 40px;
+    height: 40px;
+    background: url("../image/yinpin/player-pause.png") no-repeat 1px 2px;
+    cursor: pointer;
+}
+
+.audioplayer-time-current {
+    display: none;
+    float: left;
+}
+
+.audioplayer-bar {
+    float: left;
+    margin: 15px 10px 0;
+}
+
+.audioplayer-time {
+    color: #8E8E8E;;
+}
+
+.audioplayer-time-duration {
+    float: right;
+    /* margin: 10px; */
+    width: 33px;
+    font-size: 12px;
+    line-height: 40px;
+}
+
+.audioplayer-volume {
+    float: left;
+    margin-top: 10px;
+    width: 0px;
+    height: 20px;
+    background: url("../image/yinpin/player-volume.png");
+    display: none;
+    cursor: pointer;
+}
+
+.audioplayer-volume-mute {
+    float: left;
+    margin-top: 10px;
+    width: 0px;
+    height: 20px;
+    background: url("../image/yinpin/player-mute.png");
+    display: none;
+    cursor: pointer;
+}
+
+.audioplayer-bar {
+width: calc(100% - 100px)
+}

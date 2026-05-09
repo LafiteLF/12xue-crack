@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        body{background: #f2f2f2}
+        .content{ width: 80%; margin: 0 auto; padding-top: 20px}
+        .content li{ width: 100%; height: 2.2rem; line-height: 2.2rem; background: #fff; margin-bottom: 10px; padding: 0 20px; text-align: left}
+        .content li span,.content li .yz,.content li input{ display: inline-block; font-size: 0.8rem}
+        .content li input{ width: 80%}
+        .yz{background: #4bc7c7; color: #fff; padding: 2px 10px 0 10px; border-radius: 3px; height: 30px; line-height:30px; font-size: 0.6rem!important;}
+    </style>
+</head>
+<body>
+<ul class="content">
+        <li >
+           <span>学习卡:</span>&nbsp&nbsp&nbsp<span class="card"></span>
+        </li>
+        <li class="check aui-hide">
+            <span>学习机:</span>&nbsp&nbsp&nbsp<div class="yz" tapmode onclick="openInputCode()">点击验证</div>
+        </li>
+        <li class="checked aui-hide">
+            <span>学习机: </span> <span>已验证</span>
+        </li>
+        <li class="Outofdate aui-hide">
+            <span>学习机: </span> <span>已过期</span>
+        </li>
+</ul>
+
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+
+    var headerH;
+    var frameH;
+    var deviceId;
+    var deviceModel;
+    var deviceName;
+    var apiObj;
+    apiready = function () {
+        var header = document.querySelector('header');
+        headerH = api.pageParam.headerH;
+        frameH = padWinHeight - headerH;
+        // deviceId = api.deviceId.replace(new RegExp(":", "gm"), "");
+        deviceId = '';
+        deviceModel = api.deviceModel;
+        deviceName = api.deviceName;
+
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        getCardInfo();
+        getInfo();
+
+        api.addEventListener({
+            name: 'deviceSuccess'
+        }, function (ret, err) {
+            $api.addCls($api.dom('.check'), 'aui-hide');
+            $api.removeCls($api.dom('.checked'), 'aui-hide');
+        });
+
+
+    };
+    
+    function openInputCode() {
+
+        if (api.systemType == 'android') {
+            api.openFrame({
+                name: 'inputCode',
+                url: 'inputCode.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: api.winWidth+4,
+                    h: $api.getStorage('padHeight')         //Math.min(api.winHeight, api.winWidth)
+                },
+                bounces: false
+            });
+        } else {
+            api.toast({
+                msg: '苹果设备无需验证',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+        
+    }
+
+
+    function getInfo() {
+        apiObj.Get(UrlRouter.Checkdevice, {
+            values: {
+                device_id: deviceId,
+                device_name: deviceName,
+                device_mode: deviceModel
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.status == 1) {
+                        //已验证
+                        $api.removeCls($api.dom('.checked'), 'aui-hide');
+                    } else if (ret.data.status == 2) {
+                        //已过期
+                        $api.removeCls($api.dom('.Outofdate'), 'aui-hide');
+                    } else if (ret.data.status == 0) {
+                        //未验证
+                        $api.removeCls($api.dom('.check'), 'aui-hide');
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+
+    function getCardInfo() {
+        apiObj.Get(UrlRouter.CardInfo, {
+            values: {
+                uid: $api.getStorage('uid'),
+                type: 1
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.card_id && ret.card_id != null && ret.card_id != '') {
+                        $api.text($api.dom('.card'),ret.card_id);
+                    } else {
+                        $api.text($api.dom('.card'), '无');
+                    }
+                } else {
+                    $api.text($api.dom('.card'), '获取失败');
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                $api.text($api.dom('.card'), '获取失败');
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        });
+    }
+
+</script>

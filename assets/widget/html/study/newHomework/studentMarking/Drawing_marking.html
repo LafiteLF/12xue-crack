@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/winDetailCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/drawing_board.css"/>
+    <title>Title</title>
+    <style>
+
+        img{
+            max-width: 110%;
+        }
+
+
+        .winTitle {
+            width: calc(100% - 631px);
+        }
+
+        .threeDisappear{
+            width: 110px;
+            height: auto;
+            position: absolute;
+            left: 5px;
+            bottom: 5px;
+            z-index: 999;
+            display: none;
+        }
+
+        .content{
+            background: #e3e3e3;
+            width: calc(100% - 195px);
+            height: 100%;
+            position: absolute;
+            left: 115px;
+            top: 0px;
+            border: 1px solid #e4e4e8;
+            border-radius: 3px;
+        }
+
+        .images{
+            background: white;
+            width: 100px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            border: 1px solid #e4e4e8;
+            border-radius: 3px;
+        }
+
+        .littleImage{
+            width: 80%;
+            height: 70px;
+            margin-top: 20px;
+            margin-left: 10%;
+            border: 2px solid #4bc7c7;
+            border-radius: 3px;
+        }
+
+        .imageli{
+            width: 100%;
+            height: 100px;
+
+        }
+    </style>
+</head>
+<body>
+<header class="clearfix">
+    <div onclick=" closeframe() " class="winTitle pull_left">
+        手写板
+    </div>
+    <ul class="pull_right clearfix winIcon" id="baocun">
+        <li class="buttonTwo font4BC7C7 baocun pull_right" tapmode="active" onclick="sure()"><p>确定</p></li>
+        <!--<li class="buttonTwo font4BC7C7 qiongkong pull_right" tapmode="active" onclick="clear1()"><p>清空</p></li>-->
+    </ul>
+</header>
+<div id="wrap">
+    <div id="main">
+        <div class="inputzi">
+            <input id="pollting" value="要添加的文字"/>
+            <input id="color" value="颜色"/>
+            <input id="width" value="宽度"/></div>
+
+        <div class="images">
+
+            <ul style="height: 100%;overflow-y: scroll">
+                <li class="imageli" v-for="(item,index) in imgarr" :id="index"  tapmode
+                    onclick="vm.changeImg(this);">
+                    <img class="littleImage" :src="item" :style="current==index?' border: 2px solid #4bc7c7':' border: 2px solid #dddddd'" alt="">
+                </li>
+                <!--<li>-->
+                    <!--<img class="littleImage" src="../../../../image/video_bg.png" alt="">-->
+                <!--</li>-->
+            </ul>
+            <img class="threeDisappear" @click="disappearPic()" src="../../../../image/newhomework/threeDisappear.png">
+        </div>
+
+        <div class="content" style="background: #e3e3e3;">
+
+        </div>
+
+        <div class="tool" :style="isRedoButton?'background: none':''">
+            <ul v-if="!isRedoButton">
+                <li class="clickbtn3" tapmode="active" onclick="clear1()">
+                </li>
+                <li class="clickbtn1" tapmode="active" onclick="undo()">
+                    <!--<img src="../../../image/newhomework/vvx_03.png">-->
+                </li>
+                <li class="clickbtn2" tapmode="active" onclick="redo()">
+                </li>
+                <li class="clickbtn" tapmode="active" onclick="changethin()"><img
+                        :src="'../../../../image/newhomework/thin'+ thin +'.png'"></li>
+                <li class="clickbtn" tapmode="active" onclick="setState1()"><img
+                        :src="activeButton==1?'../../../../image/newhomework/vvx_08b.png':'../../../../image/newhomework/vvx_08.png'"></li>
+                <!--<li class="clickbtn" tapmode="active" onclick="setState6()"><img-->
+                <!--:src="activeButton==6?'../../image/newhomework/vvx_10a.png':'../../image/newhomework/vvx_10.png'"></li>-->
+                <li class="clickbtn" tapmode="active" onclick="setState5()"><img
+                        :src="activeButton==5?'../../../../image/newhomework/vvx_12a.png':'../../../../image/newhomework/vvx_12.png'"></li>
+                <li class="clickbtn" tapmode="active" onclick="setState2()"><img
+                        :src="activeButton==2?'../../../../image/newhomework/vvx_18a.png':'../../../../image/newhomework/vvx_18.png'"></li>
+                <li class="clickbtn" tapmode="active" onclick="setState4()"><img
+                        :src="activeButton==4?'../../../../image/newhomework/vvx_14a.png':'../../../../image/newhomework/vvx_14.png'"></li>
+                <li class="clickbtn" tapmode="active" onclick="setState3()"><img
+                        :src="activeButton==3?'../../../../image/newhomework/vvx_16a.png':'../../../../image/newhomework/vvx_16.png'"></li>
+
+            </ul>
+            <ul v-if="isRedoButton" class="RedoButton">
+                <li id="jixu" onclick="isRedoButton(this)">
+                    <img src="../../../../image/newhomework/jxzt.png">
+                    <p>继续作图</p>
+                </li>
+                <li id="chongzuo"  onclick="isRedoButton(this)">
+                    <img src="../../../../image/newhomework/cxzt.png">
+                    <p>重新作图</p>
+                </li>
+            </ul>
+            <!--<div class="clickbtn" tapmode="active" onclick="showView()">添加涂鸦View</div>-->
+            <!--<div class="clickbtn" tapmode="active" onclick="removeView()">移除涂鸦View</div>-->
+
+            <!--<div class="clickbtn" tapmode="active" onclick="setColor()">颜色</div>-->
+            <!--<div class="clickbtn" tapmode="active" onclick="setWidth()">宽度</div>-->
+            <!--&lt;!&ndash;<div class="clickbtn" tapmode="active" onclick="selectTime()">选择日期</div>&ndash;&gt;-->
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/wx-audio.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script type="text/javascript">
+
+    var moduleplotting = null;
+    var type;
+    var name;
+    var imgsrc;
+    var xzcolor;
+    var lineWidth;
+    var huabanx;
+    var huabany;
+    var huabanw;
+    var huabanh;
+    var vm;
+    var state;
+    var currentIndex = '0';
+    var changeArr = [];
+    var numArr = [0,0,0,0,0];
+    apiready = function () {
+        vue();
+        moduleplotting = api.require('moduleplotting');
+        type = api.pageParam.type;
+        name = api.pageParam.name;
+        huabanx = 120;
+        huabany = 60;
+        huabanw = api.winWidth - 200;
+        huabanh = $api.getStorage('padHeight') - 70;
+        imgsrc = api.pageParam.imageArr[currentIndex];
+        xzcolor = '#000000';
+        lineWidth = 3;
+        state = 1;
+        showView();
+
+        if($api.getStorage('threeP') >=  111|| api.systemType == 'ios'){
+            $api.css($api.dom('.threeDisappear'), 'display:none;');
+        }else {
+            $api.css($api.dom('.threeDisappear'), 'display:block;');
+        }
+
+
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeframe();
+        });
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '#wrap',
+            data: {
+                color: '#f87c1c',
+                activeButton:1,
+                thin:1,
+                imgarr: api.pageParam.imageArr,
+                current:currentIndex,
+                qiniuImgUrls: [],   // 上传七牛后的ip地址
+                type:api.pageParam.type,
+                isRedoButton:false,//是否重做按钮
+            },
+            updated: function () {
+            },
+            methods: {
+                disappearPic:function () {
+                    $api.css($api.dom('.threeDisappear'), 'display:none;');
+                    if($api.getStorage('threeP') >=  111){
+                    }else {
+                        if($api.getStorage('threeP')){
+                            var i = $api.getStorage('threeP') ;
+                            $api.setStorage('threeP',i+1);
+                        }else {
+                            $api.setStorage('threeP',1);
+                        }
+                    }
+                },
+                chooseColor: function () {
+                    if(vm.activeButton==5){
+                        api.toast({
+                            msg: '对不起，橡皮擦状态下无法选择颜色~',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }else {
+                        $('.colors').show();
+                        $('.choose_color').hide();
+                    }
+                },
+                changeImg: function (context) {
+                    if(currentIndex == $(context).attr('id')){
+                        return;
+                    }
+                    if($api.getStorage('threeC') >=  111){
+                        save($(context).attr('id'));
+                    }else {
+                        if($api.getStorage('threeC')){
+                            var i = $api.getStorage('threeC') ;
+                            $api.setStorage('threeC',i+1);
+                        }else {
+                            $api.setStorage('threeC',1);
+                        }
+                        changeTp($(context).attr('id'));
+//                        api.confirm({
+//                            title: '提示',
+//                            msg: '切换图片将自动保存本图操作，是否确定切换？',
+//                            buttons: ['确定', '取消']
+//                        }, function (ret, err) {
+//                            if (ret.buttonIndex == 1) {
+//                                save($(context).attr('id'));
+//                            }
+//                        });
+                    }
+                },
+                uploadQiniu: function (localUrl, index) {
+                    var apiObj = new GridOpenApi(UrlDomain, source, version);
+                    apiObj.SetAuthToken($api.getStorage('token-tch'));
+                    var fileKey = (new Date()).valueOf() + localUrl;
+                    apiObj.Get(UrlRouter.GetQiNiuToken, {
+                        values: {
+                            uid: $api.getStorage('uid-tch'),
+                            bucket: 'vodresource',
+                            key: fileKey
+                        }
+                    }, function (ret, err) {
+                        var qiniuStorage = api.require("qiniuStorage");
+                        qiniuStorage.configUploader({
+                            params: {},
+                            checkCrc: false,
+                            mimeType: ''
+                        });
+                        qiniuStorage.start({
+                            token: ret.data.token,
+                            path: localUrl,
+                            key: fileKey
+                        });
+                        qiniuStorage.addEventListener(function (ret) {
+
+                            if (ret.eventType == 'complete' && (api.systemType=='ios'?ret.info.statusCode:ret.statusCode) == 200) {
+                                //该建个数组保存修改过图的index
+                                //上传成功后组装访问路径
+                                vm.qiniuImgUrls.push(QINIU_DOMAIN + ret.key);
+                                if (index < changeArr.length-1) {
+                                    vm.uploadQiniu(vm.imgarr[changeArr[index+1]], index+1);
+                                }else {
+                                    vm.up12xue();
+                                }
+                                vm.changeCount++;
+                            }
+                        });
+                    });
+                },
+                up12xue: function () {
+
+                    var arr = [];
+                    // 拼接地址为img标签的形式
+                    for (var i = 0; i < vm.qiniuImgUrls.length; i++) {
+                        var param = {};
+                        if (vm.qiniuImgUrls[i]) {
+                            param.image = '<img src="' + vm.qiniuImgUrls[i] + '"/>';
+                            param.sort = api.pageParam.sortArr[changeArr[i]];
+                            param.number = api.pageParam.numArr[changeArr[i]];
+                        }
+                        arr.push(param);
+                    }
+                    var apiObj = new GridOpenApi(UrlDomain, source, version);
+                    apiObj.SetAuthToken($api.getStorage("token-tch"));
+                    apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.PostExercisesReviewImages, {
+                        body: $api.jsonToStr({
+                            sys_id: api.pageParam.sys_id,
+                            image: arr,
+                            tx_code:api.pageParam.tx_code,
+                        })
+                    },function (ret, err) {
+                        if (ret && ret.ret == 0) {
+                            api.sendEvent({
+                                name: 'changeTPSuccess',
+                                extra: {index: api.pageParam.index}
+                            });
+                            api.closeWin();
+                        } else {
+                            api.toast({
+                                msg: ret.msg ? ret.msg : err,
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        }
+                    });
+                },
+
+            }
+        });
+    }
+    function isRedoButton (content) {
+        var ischongzuo=$(content).attr('id');
+        vm.isRedoButton=false;
+        if(ischongzuo=='chongzuo'){
+            imgsrc = api.pageParam.imgUrl;
+            moduleplotting.removeView(function (ret, err) {
+                if (ret && ret.state == 'success') {
+                    showView();
+                }else{
+                    api.hideProgress();
+                }
+            });
+        }else{
+            setState1();
+        }
+    }
+    function showView() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        if(api.systemType == 'ios'){
+            var img = new Image();
+            img.src = imgsrc;
+            img.onload = function(){
+                var scale = img.width/img.height;  //图片的宽高比
+                var bzScale = huabanw/huabanh; //原画板宽高比
+                if(scale > bzScale){
+                    var imgH = api.winWidth/scale;   //图片的高度 就是打开画板的高度
+                    var imgY = huabanh/2 -imgH/2;   //图片的起始高度
+                    var param = {
+                        "x": huabanx,
+                        "y": imgY,
+                        "w": huabanw,
+                        "h": imgH,
+                        "url": imgsrc
+                    };
+                    moduleplotting.addView(param, function (ret, err) {
+                        if (ret.state == 'success') {
+                            api.hideProgress();
+                            setState1();
+                            isimg = 0;
+                        } else {
+                            api.hideProgress();
+                        }
+                    });
+                }else {
+                    var param = {
+                        "x": huabanx,
+                        "y": huabany,
+                        "w": huabanw,
+                        "h": huabanh,
+                        "url": imgsrc
+                    };
+                    moduleplotting.addView(param, function (ret, err) {
+                        if (ret.state == 'success') {
+                            api.hideProgress();
+                            setState1();
+                            isimg = 0;
+                        } else {
+                            api.hideProgress();
+                            // alert(err)
+                        }
+                    });
+                }
+            };
+
+        }else {
+            var param = {"x": huabanx, "y": huabany, "w": huabanw, "h": huabanh, "url": imgsrc};
+            moduleplotting.addView(param, function (ret, err) {
+                if (ret.state == 'success') {
+                    api.hideProgress();
+                    if(vm.isRedoButton==true){
+                        setState5()
+                    }else{
+                        setState1();
+                    }
+                } else {
+                    api.hideProgress();
+                    alert('图片没有出来,返回再试试吧 (T＿T)');
+                }
+            });
+        }
+
+
+
+    }
+    function changethin() {
+        if(vm.thin == '1'){
+            vm.thin = '2';
+            lineWidth = 9;
+        }else if(vm.thin == '2'){
+            vm.thin = '3';
+            lineWidth = 27;
+        }else if(vm.thin == '3'){
+            vm.thin = '1';
+            lineWidth = 3;
+        }
+        var param = {"state": state,"color": vm.color,"width": lineWidth};
+        moduleplotting.setState(param, function (ret, err) {
+            vm.activeButton = state;
+        });
+    }
+    function setState1() {
+        state = 1;
+        var param = {"state": state, "color": vm.color, "width": lineWidth};
+        moduleplotting.setState(param, function (ret, err) {
+            vm.activeButton=1;
+        });
+    }
+
+    function setState2() {
+        state = 2;
+        var param = {"state": state, "color": vm.color, "width": lineWidth};
+        moduleplotting.setState(param);
+        vm.activeButton=2;
+    }
+
+    function setState3() {
+        state = 3;
+        var param = {"state": state, "color": vm.color, "width": lineWidth};
+        moduleplotting.setState(param);
+        vm.activeButton=3;
+    }
+
+    function setState4() {
+        state = 4;
+        var param = {"state": state, "color": vm.color, "width": lineWidth};
+        moduleplotting.setState(param);
+        vm.activeButton=4;
+    }
+
+    function setState5() {
+        state = 5;
+        var param = {"state": state,"width": lineWidth};
+        moduleplotting.setState(param);
+        vm.activeButton=5;
+        $('.colors').hide();
+        $('.choose_color').show();
+    }
+
+    function setState6() {
+        api.prompt({
+            buttons: ['确定', '取消']
+        }, function(ret, err) {
+            if(ret.buttonIndex==1){
+                var mill = ret.text;
+                var param = {"state": 6, "b": mill,"width":50,"color": vm.color};
+                moduleplotting.setState(param);
+                vm.activeButton = 6;
+            }
+        });
+    }
+
+    function setColor(context) {
+        if ($(context).attr('id') == '1') {
+            vm.color = '#000000'
+        } else if ($(context).attr('id') == '2') {
+            vm.color = '#4969e4'
+        } else if ($(context).attr('id') == '3') {
+            vm.color = '#e34949'
+        }
+        $('.colors').hide();
+        $('.choose_color').show();
+        var param = {"color": vm.color};
+        moduleplotting.setColor(param);
+    }
+
+    function setWidth() {
+        var param = {"width": lineWidth};
+        moduleplotting.setWidth(param);
+    }
+
+    function save(newIndex) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: true
+        });
+        moduleplotting.save(function (ret, err) {
+
+            vm.imgarr[currentIndex] = ret.path;
+            numArr[currentIndex] = 1;
+            var isHas = '0';
+            for(var i =0;i<changeArr.length;i++){
+                if(currentIndex == changeArr[i]){
+                    isHas = '1';
+                }
+            }
+            if(isHas == '0'){
+                changeArr.push(currentIndex);
+            }
+            currentIndex = newIndex;
+            vm.current = currentIndex;
+
+            var imgbig = new Image();
+            imgbig.src = api.pageParam.imageArr[currentIndex];
+            imgbig.onload = function(){
+                var url = api.pageParam.imageArr[currentIndex];
+                if(/.*[\u4e00-\u9fa5]+.*$/.test(url)) {
+                    url = encodeURI(url);
+                }
+                moduleplotting.removeView(function (ret, err) {
+                    if (ret && ret.state == 'success') {
+
+                        if(api.systemType == 'ios'){
+                            var img = new Image();
+                            img.src = url;
+                            img.onload = function(){
+                                var scale = img.width/img.height;  //图片的宽高比
+                                var bzScale = api.winWidth/(api.winHeight -229); //原画板宽高比
+                                if(scale > bzScale){
+                                    var imgH = api.winWidth/scale;   //图片的高度 就是打开画板的高度
+                                    var imgY = (api.winHeight -229)/2 -imgH/2 +168;   //图片的起始高度
+                                    var param = {
+                                        "x": huabanx,
+                                        "y": imgY,
+                                        "w": huabanw,
+                                        "h": imgH,
+                                        "url": url
+                                    };
+                                    moduleplotting.addView(param, function (ret, err) {
+                                        if (ret.state == 'success') {
+                                            api.hideProgress();
+                                            setState1();
+                                            isimg = 0;
+                                        } else {
+                                            api.hideProgress();
+                                        }
+                                    });
+                                }else {
+                                    var param = {
+                                        "x": huabanx,
+                                        "y": huabany,
+                                        "w": huabanw,
+                                        "h": huabanh,
+                                        "url": url
+                                    };
+                                    moduleplotting.addView(param, function (ret, err) {
+                                        if (ret.state == 'success') {
+                                            api.hideProgress();
+                                            setState1();
+                                            isimg = 0;
+                                        } else {
+                                            api.hideProgress();
+                                            // alert(err)
+                                        }
+                                    });
+                                }
+                            };
+
+                        }else {
+                            var param = {
+                                "x": huabanx,
+                                "y": huabany,
+                                "w": huabanw,
+                                "h": huabanh,
+                                "url": url
+                            };
+                            moduleplotting.addView(param, function (ret, err) {
+                                if (ret.state == 'success') {
+                                    api.hideProgress();
+                                    setState1();
+                                    isimg = 0;
+                                } else {
+                                    api.hideProgress();
+                                }
+                            });
+                        }
+                    }else{
+                        api.hideProgress();
+                        alert('保存失败，请重新保存！')
+                    }
+
+                });
+            }
+
+
+        });
+    }
+
+    function sure() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: true
+        });
+        moduleplotting.save(function (ret, err) {
+            vm.imgarr[currentIndex] = ret.path;
+            var isHas = '0';
+            for(var i =0;i<changeArr.length;i++){
+                if(currentIndex == changeArr[i]){
+                    isHas = '1';
+                }
+            }
+            if(isHas == '0'){
+                changeArr.push(currentIndex);
+            }
+            vm.uploadQiniu(vm.imgarr[0],0);
+        });
+    }
+
+
+    function clear1() {
+        moduleplotting.clear();
+    }
+
+    function redo() {
+        moduleplotting.redo();
+    }
+
+    function undo() {
+        moduleplotting.undo();
+    }
+
+    function removeView() {
+        moduleplotting.removeView();
+    }
+
+    function changeTp(id) {
+
+        var moduleDialog = api.require('moduleDialog');
+        var param = {
+            "data": [{
+                "viewType": 100,
+                "x": api.winWidth / 2 - 150,
+                "y": $api.getStorage('padHeight') / 2 - 75,
+                "h": 150,
+                "w": 300
+            }, {
+                "viewType": 101,
+                "x": api.winWidth / 2 - 150 + 30,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                "h": 48,
+                "w": 240,
+                "lineSpacting": 1.3,
+                "showText": "<font color='#666666'>切换图片将自动保存本图操作，<br>是否确定切换？</font>",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 159,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "ok",
+                "showText": "确定",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 40,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "no",
+                "showText": "取消",
+                "textSize": 14
+            }]
+        };
+        moduleDialog.showDialog(param, function (ret, err) {
+            if (ret.state == 'success' && ret.clickID) {
+                if(ret.clickID=='ok'){
+                    save(id);
+                    moduleDialog.dismissDialog();
+                }else{
+                    moduleDialog.dismissDialog();
+                }
+            } else {
+
+            }
+        });
+    }
+
+    function closeframe() {
+
+        var moduleDialog = api.require('moduleDialog');
+        var param = {
+            "data": [{
+                "viewType": 100,
+                "x": api.winWidth / 2 - 150,
+                "y": $api.getStorage('padHeight') / 2 - 75,
+                "h": 150,
+                "w": 300
+            }, {
+                "viewType": 101,
+                "x": api.winWidth / 2 - 150 + 30,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                "h": 48,
+                "w": 240,
+                "lineSpacting": 1.3,
+                "showText": "<font color='#666666'>退出将无法保存写画内容，<br>请问是否退出？</font>",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 159,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "ok",
+                "showText": "退出",
+                "textSize": 14
+            }, {
+                "viewType": 102,
+                "x": api.winWidth / 2 - 150 + 40,
+                "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                "h": 35,
+                "w": 100,
+                "clickID": "no",
+                "showText": "不退出",
+                "textSize": 14
+            }]
+        };
+        moduleDialog.showDialog(param, function (ret, err) {
+            if (ret.state == 'success' && ret.clickID) {
+                if(ret.clickID=='ok'){
+                    api.hideProgress();
+                    api.closeWin();
+                    moduleDialog.dismissDialog();
+                }else{
+                    moduleDialog.dismissDialog();
+                }
+            } else {
+
+            }
+        });
+    }
+
+
+</script>
+</html>

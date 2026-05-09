@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .show {
+            position: absolute;
+            color: #000;
+            top: 0;
+            width: 40%;
+            background-color: white;
+            text-align: center;
+            margin-left: 30%;
+            /*margin-right: 15%;*/
+            margin-top: 15%;
+            padding: 3rem 0 2rem 0;
+            border-radius: 0.4rem;
+        }
+
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+
+        .content {
+            width: 70%;
+        }
+
+        .img {
+            text-align: center;
+        }
+
+        .aui-btn-primary {
+            padding: 0.2rem 0.3rem;
+            border-radius: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+<div class="backgroud" tapmode onclick="api.closeFrame({
+    name: this.name
+});"></div>
+<div class="show">
+    <div class="img">
+        <img class="active" src="../../../image/audio1.png" alt="" style="border-radius: 50%;width: 50%">
+    </div>
+    <div class="audiotext" style="margin: 0.5rem 0;font-size: 16px;color: #999">按住录音</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript">
+    var path = '';
+    var beforeload;
+    var afterload;
+    var seconds;
+    apiready = function () {
+        setAudioListener();
+    };
+    // 音频 长按 点击事件
+    function setAudioListener() {
+        var currentTime = 0;
+        var audioBtn = document.getElementsByClassName("active");
+        audioBtn[0].addEventListener("touchstart", function (e) {
+            e.preventDefault();
+            currentTime = new Date().getTime();
+            $api.attr($api.dom( '.active'), 'src', '../../../image/audio.gif');
+            $api.text($api.dom('.audiotext'), '松开结束录音');
+            beforeload = (new Date()).getTime();
+
+            path = "/audio/" + new Date().getTime() + ".amr";
+            api.startRecord({
+                path: 'fs:/' + path
+            });
+        });
+        audioBtn[0].addEventListener("touchend", function (e) {
+            $api.attr($api.dom( '.active'), 'src', '../../../image/audio1.png');
+            $api.text($api.dom('.audiotext'), '按住录音');
+            if (new Date().getTime() - currentTime > 300) {
+                api.stopRecord(
+                    function (ret, err) {
+                        if (ret) {
+                            afterload = (new Date()).getTime();
+                            seconds = (afterload-beforeload) / 1000;
+                            api.sendEvent({
+                                name: 'audio',
+                                extra: {
+                                    path: path,
+                                    seconds: seconds.toFixed(1)
+
+                                }
+                            });
+                            api.closeFrame({});
+                        }
+                    }
+                );
+            } else {
+                api.stopRecord(
+                    function (ret, err) {
+                        if (ret) {
+                            api.sendEvent({
+                                name: 'audio',
+                                extra: {
+                                    path: path,
+                                    seconds:0
+                                }
+                            });
+                        }
+                    }
+                );
+            }
+        })
+    }
+
+</script>
+</html>

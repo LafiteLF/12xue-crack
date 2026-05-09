@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>录音</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>
+    <style>
+        .reading_main {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<div class="reading_main">
+    <div class="reading_top">
+        <h1 class="font4BC7C7" v-text="isRecord==1?'正在录音':isRecord==2?'录音停止':isRecord==3?'录音完成':'音频录制'"></h1>
+        <p v-text="time"></p>
+    </div>
+    <div class="reading_center" v-html="tg">
+
+    </div>
+    <div class="reading_bottom">
+        <progress max="900" value="0" class="greenline"></progress>
+        <img tapmode onclick="vm.record();" class="reading_button"
+             :src="isRecord==0?'../../../image/newhomework/luyin.png':isRecord==1?'../../../image/newhomework/luyinb.png':'../../../image/newhomework/continue.png'">
+        <p v-text="isRecord==0?'点击开始录音':isRecord==1?'最长可录制15分钟':isRecord==2?'继续录音':''"></p>
+        <div v-if="isRecord==2||isRecord==3" class="reading_again" tapmode onclick="vm.cancilRecode();">
+            <span></span>
+            <b>重录</b>
+        </div>
+        <div v-if="isRecord==2||isRecord==3" tapmode onclick="vm.chuanRecord();" class="reading_use">
+            <span></span>
+            <b>使用</b>
+        </div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<!--<script type="text/javascript" src="../../../script/qiniu_upload.js"></script>-->
+<script>
+    var path;
+    var timer;
+    var duration = 0;
+    var second = 0;
+    var min = 0;
+    var vm;
+    var audioRecorder;
+    var moduleDialog = null;//弹窗模块bhzparam
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    windowError();
+    apiready = function () {
+        moduleDialog = api.require('moduleDialog');
+        audioRecorder = api.require('audioRecorder');
+        vue();
+        $('.reading_main').show();
+        api.addEventListener({
+            name: 'closeReading'
+        }, function (ret, err) {
+            if (vm.isRecord != 0) {
+                moduleDialog.showDialog(vm.bhzparam, function (ret, err) {
+                    if (ret.state == 'success' && ret.clickID) {
+                        if (ret.clickID == 'ok') {
+                            api.closeWin();
+                            moduleDialog.dismissDialog();
+                        } else {
+                            moduleDialog.dismissDialog();
+                        }
+                    } else {
+
+                    }
+                });
+            } else {
+                api.closeWin();
+            }
+        });
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.reading_main',
+            data: {
+                isRecord: 0,
+                time: '00:00',
+                tg: api.pageParam.tg,
+                bhzparam: {
+                    "data": [{
+                        "viewType": 100,
+                        "x": api.winWidth / 2 - 150,
+                        "y": $api.getStorage('padHeight') / 2 - 75,
+                        "h": 150,
+                        "w": 300
+                    }, {
+                        "viewType": 101,
+                        "x": api.winWidth / 2 - 150 + 30,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 30,
+                        "h": 48,
+                        "w": 240,
+                        "lineSpacting": 1.3,
+                        "showText": "<font color='#666666'>返回将不保存录音文件，是否确定返回？ </font>",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 159,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "ok",
+                        "showText": "返回",
+                        "textSize": 14
+                    }, {
+                        "viewType": 102,
+                        "x": api.winWidth / 2 - 150 + 40,
+                        "y": $api.getStorage('padHeight') / 2 - 75 + 94,
+                        "h": 35,
+                        "w": 100,
+                        "clickID": "no",
+                        "showText": "继续录音",
+                        "textSize": 14
+                    }]
+                },
+
+            },
+            updated: function () {
+            },
+            methods: {
+                record: function () {
+                    if (vm.isRecord == 0) {
+                        //音频录制变成正在录音
+                        vm.isRecord = 1;
+                        timer = setInterval(function (e) {
+                            var greenline = $api.dom('.greenline');
+                            if (greenline.value != 900) greenline.value++;
+                            else greenline.value = 0;
+                            duration = duration + 1;
+                            if (min == 14 && second == 59) {
+                                min = 15;
+                                second = 0;
+                                clearInterval(timer);
+                                vm.isRecord = 3;
+                                $api.css($api.dom('.reading_button'), 'display:none;');
+                                vm.overrecord();
+                                api.toast({
+                                    msg: '语音最多只能录制15分钟',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            } else {
+                                if (second != 59) {
+                                    second = second + 1;
+                                } else {
+                                    second = 0;
+                                    min = min + 1;
+                                }
+                            }
+                            if (second < 10) {
+                                if (min < 10) {
+                                    vm.time = '0' + min + ':0' + second;
+                                } else {
+                                    vm.time = min + ':0' + second;
+                                }
+                            } else {
+                                if (min < 10) {
+                                    vm.time = '0' + min + ':' + second;
+                                } else {
+                                    vm.time = min + ':' + second;
+                                }
+                            }
+                        }, 1000);
+                        vm.startRecord();
+                    } else if (vm.isRecord == 1) {
+                        vm.isRecord = 2;
+                        clearInterval(timer);
+                        vm.overrecord();
+                    } else {
+                        vm.isRecord = 1;
+                        timer = setInterval(function (e) {
+                            var greenline = $api.dom('.greenline');
+                            if (greenline.value != 900) greenline.value++;
+                            else greenline.value = 0;
+                            duration = duration + 1;
+                            if (min == 14 && second == 59) {
+                                min = 15;
+                                second = 0;
+                                clearInterval(timer);
+                                vm.isRecord = 3;
+                                $api.css($api.dom('.reading_button'), 'display:none;');
+                                vm.overrecord();
+                                api.toast({
+                                    msg: '语音最多只能录制15分钟',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            } else {
+                                if (second != 59) {
+                                    second = second + 1;
+                                } else {
+                                    second = 0;
+                                    min = min + 1;
+                                }
+                            }
+                            if (second < 10) {
+                                if (min < 10) {
+                                    vm.time = '0' + min + ':0' + second;
+                                } else {
+                                    vm.time = min + ':0' + second;
+                                }
+                            } else {
+                                if (min < 10) {
+                                    vm.time = '0' + min + ':' + second;
+                                } else {
+                                    vm.time = min + ':' + second;
+                                }
+                            }
+                        }, 1000);
+                        vm.restartRecord();
+                    }
+                },
+                startRecord: function () {
+
+                    path = "/audio/" + new Date().getTime() + ".wav";
+                    audioRecorder.startRecord({
+                        savePath:api.fsDir + path,
+                        format:'wav'
+                    }, function(ret, err){
+                    });
+
+                },
+                restartRecord: function () {
+                    audioRecorder.resumeRecord(function(ret){});
+
+                },
+                cancilRecode: function () {
+                    vm.isRecord = 0;
+                    var greenline = $api.dom('.greenline');
+                    greenline.value = 0;
+                    duration = 0;
+                    min = 0;
+                    second = 0;
+                    vm.time = '00:00';
+                },
+                overrecord: function () {
+                    audioRecorder.pauseRecord(function(ret){});
+                },
+                chuanRecord: function () {
+                    if (duration == 0 || duration == "0") {
+                        alert('录音时间过短,请重新录制');
+                        vm.cancilRecode();
+                        api.hideProgress();
+                    } else {
+                        audioRecorder.stopRecord(function(ret){
+                            if (ret) {
+                                vm.qiniuUpSound();
+                            } else {
+                                api.hideProgress();
+                            }
+                        });
+                    }
+                },
+                qiniuUpSound: function () {
+                    api.showProgress({
+                        title: '正在上传音频',
+                        text: '请稍后',
+                        modal: true
+                    });
+                    var fileKey = (new Date()).valueOf() + api.fsDir + path;
+                    apiObj.Get(UrlRouter.GetQiNiuToken, {
+                                values: {
+                                    uid: $api.getStorage('uid'),
+                                    bucket: 'vodresource',
+                                    key: fileKey
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret == 0) {
+                                        var qiniuStorage = api.require("qiniuStorage");
+                                        qiniuStorage.configUploader({
+                                            params: {},
+                                            checkCrc: false,
+                                            mimeType: '',
+                                            zone: $api.getStorage('qiniuZone')
+                                        });
+                                        qiniuStorage.start({
+                                            token: ret.data.token,
+                                            path:  api.fsDir + path,
+                                            key: fileKey
+                                        });
+                                        qiniuStorage.addEventListener(function (ret) {
+                                            if (ret.eventType == 'complete') {
+                                                if ((api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                                                    //上传成功后组装访问路径，或直接访问文档
+                                                    api.hideProgress();
+                                                    var qiniuUrl = QINIU_DOMAIN + ret.key;
+                                                    api.sendEvent({
+                                                        name: 'giveRecoreData',
+                                                        extra: {
+                                                            index: api.pageParam.index,
+                                                            savename: ret.key,
+                                                            filetime: duration,
+                                                            Local_address:  api.fsDir + path,
+                                                            isfrom: api.pageParam.isform,
+                                                            qiniuUrl: qiniuUrl
+                                                        }
+                                                    });
+                                                } else {
+                                                    api.hideProgress();
+                                                    api.openFrame({
+                                                        name: 'frame_reupload',
+                                                        url: 'frame_reupload.html',
+                                                        rect: {
+                                                            x: 0,
+                                                            y: 0,
+                                                            w: api.winWidth,
+                                                            h: api.winHeight
+                                                        },
+                                                        pageParam: {frameName: api.frameName, tx: 'reading'},
+                                                        bounces: false
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        api.hideProgress();
+                                        api.toast({
+                                            msg: ret.msg,
+                                            duration: 2000,
+                                            location: 'bottom'
+                                        });
+                                    }
+
+                                } else {
+                                    api.hideProgress();
+                                    api.toast({
+                                        msg: '网络错误，请检查网络连接',
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    });
+                                }
+                            } ,'','',false
+                    );
+                }
+            }
+        });
+    }
+
+</script>
+</html>

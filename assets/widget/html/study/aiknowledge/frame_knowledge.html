@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+    <title>知识图谱</title>
+    <!-- <link rel="stylesheet" type="text/css" href="../../../css/api.css" /> -->
+    <style>
+
+        html,body{
+            /* background-color: black; */
+            margin: 0;
+            height: 100%;
+            /* overflow: hidden; */
+
+        }
+
+
+        .close-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 999;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div class="close-btn" tapmode onclick="closeWin()">关闭</div> -->
+    <iframe id="contentFrame" class="iframe-container"></iframe>
+
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript">
+        apiready = function () {
+            var url = `https://graph.12xue.com/html/index.html?token=${$api.getStorage('token')}&uid=${$api.getStorage('uid')}&schoolid=${$api.getStorage('schoolid')}`;
+            if(apiUrlIndex == 3){
+                url = `http://115.190.100.211:8000/html/index.html?token=${$api.getStorage('token')}&uid=${$api.getStorage('uid')}&schoolid=${$api.getStorage('schoolid')}`;
+            }
+            // window.location.href = url;      
+            console.log('知识图谱:',url);
+            document.getElementById('contentFrame').src = url;
+            // 监听子页面发来的消息
+            window.addEventListener('message', function (event) {
+                if (event.data === 'closeWin') {
+                    closeWin();  // 执行关闭窗口
+                }
+            });
+        };
+
+        function closeWin() {
+            api.closeWin();
+        }
+    </script>
+</body>
+
+</html>

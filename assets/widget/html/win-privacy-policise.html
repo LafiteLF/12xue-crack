@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <style>
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin()">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()'></span>隐私政策
+    </a>
+<!--    <a class="aui-pull-right" tapmode onclick="cancelAuth();" style="color: red;display: none">撤回</a>-->
+</header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        if(api.pageParam.from == 'more'){
+            $api.css($api.dom('.aui-pull-right'), 'display: block');
+        }
+        var header = document.querySelector('header');
+        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset($api.dom("header")).h;
+        api.openFrame({
+            name: 'frame-privacy-login',
+            url: 'frame-privacy-login.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: api.winHeight-headerH
+            },
+            pageParam: {}
+        });
+    };
+
+    function cancelAuth() {
+        api.confirm({
+            title: '提示',
+            msg: '撤回同意协议将自动退出12xue学生HDApp，是否执行撤回操作？',
+            buttons: ['确定', '取消']
+        }, function (ret, err) {
+            if (ret.buttonIndex == 1) {
+                $api.clearStorage();
+                api.closeWidget({
+                    id: 'A6942495244818',  //APPid
+                    retData: {
+                        name: 'closeWidget'
+                    },
+                    animation: {
+                        type: 'flip',
+                        subType: 'from_bottom',
+                        duration: 500
+                    },
+                    silent: true
+                });
+            }else {
+
+            }
+        })
+    }
+
+</script>
+</html>

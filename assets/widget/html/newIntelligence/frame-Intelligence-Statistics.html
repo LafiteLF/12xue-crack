@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+        body{
+             background: #f9f9f9;
+        }
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content {
+            width:100%;
+            height: 100%;
+            padding-top: 32px;
+            display: none;
+        }
+        .top{
+            width: calc(100% - 100px);
+            margin: 0 auto;
+            height:186px ;
+            background: #e0f4f4;
+            border: 1px dashed #bfbfbf;
+            position: relative;
+            padding: 13px 0px;
+            border-radius: 6px;
+        }
+        .ltimg,.rtimg{
+            width:75px;
+            position: absolute;
+            top: -16px;
+        }
+        .ltimg{
+            left: -38px;
+        }
+        .rtimg{
+            right: -38px;
+        }
+        .top-left,.top-right,.bottom-left,.bottom-right{ width: 50%; float: left; height: 100%}
+        .top-left,.bottom-left{ border-right: 1px dashed #bfbfbf}
+        .top h2{font-size: 16px;color:#333333; text-align: center; margin: 0px; padding: 10px 0px; }
+        .lflj,.rflj{
+            width: 20px;
+            position: absolute;
+            bottom: -39px;
+        }
+        .lflj{ left: 20px}
+        .rflj{ right: 20px}
+        .bottom{
+            width: calc(100% - 100px);
+            height: calc(100% - 215px );
+            margin: 0 auto;
+            background: #fff;
+            border: 1px dashed #bfbfbf;
+            padding: 23px 0 5px 0;
+            border-radius: 6px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .bottom-left,.bottom-right{
+            padding: 0 20px;
+            height: 100%; overflow-y: scroll;
+        }
+        .bottom-left h2{
+            height: 20px;
+            border-left:4px solid #00c8c8 ;
+            font-size: 16px;
+            color:#666 ;
+            padding-left:20px;
+            margin: 20px 0 10px 0;
+        }
+        .bottom-left ul li{ float: left; height: 30px; width: 30px; border-radius: 100px; font-size:14px; text-align: center; line-height: 30px;; margin: 5px; }
+        .istrue li{ border: 1px solid #00c8c8; color: #00c8c8; }
+        .isfalse li{ border: 1px solid #df7605; color: #df7605; }
+        .isweipi li{ border: 1px solid #d5d5d5; color: #d5d5d5; }
+        .bottom-left ul { padding-bottom: 10px ; border-bottom: 1px dashed #bfbfbf}
+        .isweipi{ border-bottom: none}
+        .bottom-right{ position: relative}
+        .bottom-right p{ padding: 30px 30px 0 30px; font-size: 14px; line-height: 24px;}
+        .fanhui{width: 180px; height:38px; line-height: 38px; text-align: center; color: #fff; background:#00c8c8;
+        border-radius: 100px; font-size: 14px; position: absolute; bottom:50px; left: calc(50% - 90px) }
+        .top-right img{ width:110px; margin: 0 auto; display: block }
+        .quan{ width: 100px; height: 100px; border: 1px solid #fff; border-radius: 1000px; margin: 0 auto ; margin-top: 5px; padding: 7px;}
+        .zql{ width:100%; height: 100%; border-radius: 1000px; background: #fff; }  .bottom-left ul:nth-of-type(3){ border-bottom: none}
+    </style>
+</head>
+<body>
+<div class="content"  >
+    <div class="top clearfix">
+        <img class="ltimg" src="../../image/stuHomePad/tjleft.png">
+        <img class="rtimg" src="../../image/stuHomePad/tjright.png">
+        <img class="lflj" src="../../image/stuHomePad/tj.png">
+        <img class="rflj" src="../../image/stuHomePad/tj.png">
+        <div class="top-left">
+            <h2>答题情况</h2>
+            <div class="quan" >
+                <div class="zql" :style="isweipi>0?'display:none':''">
+                    <p style="font-size: 26px; text-align: center;padding-top: 16px;  " :style="accuracy>=80?'color:rgba(75, 199, 199, 0.87)':'color:rgba(255, 70, 99, 0.87)'"><span v-text="accuracy"></span><span style="font-size: 18px">%</span></p>
+                    <p style="font-size: 14px; color: #333; text-align: center">正确率</p>
+                </div>
+                <div class="zql" :style="isweipi>0?'':'display:none'">
+                    <p style="font-size: 16px; color: #d5d5d5; text-align: center;height: 84px; line-height: 84px; ">待批阅</p>
+                </div>
+            </div>
+        </div>
+        <div class="top-right">
+            <h2 style="padding-bottom: 5px">掌握情况</h2>
+            <img :src="data.status==1?'../../image/tj-wgg.png':data.status==2?'../../image/tj-zgg.png':'../../image/tj-ygg.png'">
+        </div>
+    </div>
+    <div class="bottom clearfix">
+        <div class="bottom-left">
+            <h2 v-text="'答对:'+istrue+'题'"></h2>
+            <ul class="clearfix istrue">
+                <li v-for="list in data.data" :class=" list.is_true==1?'':'aui-hide'" v-text="list.keys"></li>
+            </ul>
+            <h2 >
+                <span v-text="'答错:'+isfalse+'题'"></span>
+                <span style="font-size: 14px;color: #9a9a9a" v-text="isunable>0?'（不会做的习题算答错）':''"></span>
+            </h2>
+            <ul class="clearfix isfalse">
+                <li v-for="list in data.data" :class=" list.is_true==2 || list.is_true==3?'':'aui-hide'" v-text="list.keys"></li>
+            </ul>
+            <h2 v-text="'待批:'+isweipi+'题'"></h2>
+            <ul class="clearfix isweipi">
+                <li v-for="list in data.data" :class=" list.is_true==0?'':'aui-hide'" v-text="list.keys"></li>
+            </ul>
+        </div>
+        <div class="bottom-right">
+            <p v-text="data.status==1?'根据您的答题情况，我们判断您还没有完全掌握本套题知识，现专为您再次推送一组习题，全答对后才能过关噢！':data.status==2?'恭喜您，自动批阅习题全部答对了，请等待老师对主观题的批阅吧！':'恭喜您掌握了本套习题考察的知识点噢！'"></p>
+            <div class="fanhui" :style="answershow?'':'background:#ccc'" v-text="data.status==1 && xt_type==1?'进入个性推送套题':data.status==1 && xt_type==2?'继续答题':'返回查看已答习题'" onclick="vm.openWin()"></div>
+            <p v-if="!answershow" style="   position: absolute;  bottom: 19px;  left: 0; text-align: center; width: 100%;  color: #ff0000;">老师发送答案后才可以进入答题哦～</p>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var arcProgress;
+    var openType;
+    var issaoma;
+    apiready = function () {
+        vm.data = api.pageParam.allshuju;
+        vm.olddata = api.pageParam.data;
+        vm.xt_type = api.pageParam.xt_type;
+        vm.answershow=api.pageParam.answershow;
+        openType = api.pageParam.openType;
+        issaoma= api.pageParam.issaoma;
+        if(vm.xt_type==2){
+            api.sendEvent({
+                name: 'close-win-Intelligence-personality-Detail'
+            });
+        }
+        for(var i=0;i<vm.data.data.length;i++){
+            if(vm.data.data[i].is_true==1){
+                vm.istrue++
+            }else if(vm.data.data[i].is_true==2 || vm.data.data[i].is_true==3){
+                vm.isfalse++
+            }else{
+                vm.isweipi++;
+            }
+            if(vm.data.data[i].is_unable==1){
+                vm.isunable++
+            }
+        }
+        if(vm.isweipi==0){
+            vm.accuracy = vm.data.accuracy
+        }else{
+            vm.accuracy = 0;
+        }
+        arcProgress = api.require('arcProgress');
+        var centerX;
+        centerX = (api.frameWidth - 100) / 4 +51 ;
+        var pgcolor;
+        if(vm.accuracy>=80){
+            pgcolor='#4bc7c7'
+        }else {
+            pgcolor='#ff4663'
+        }
+        arcProgress.open({
+            type: 'annular',
+            centerX: centerX,
+            centerY: 145,
+            radius: 45,
+            loopWidth: 7,
+            bgColor: '#dedede',
+            pgColor: pgcolor,
+            fixed: false,
+            fixedOn: 'frame-Intelligence-Statistics'
+        }, function (ret, err) {
+            arcProgress.setValue({
+                id: ret.id,
+                value: vm.accuracy
+            });
+        });
+
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            data:'',
+            istrue:0,
+            isfalse:0,
+            isweipi:0,
+            isunable:0,
+            olddata:'',
+            xt_type:0,
+            accuracy:0,
+            answershow:false
+        },
+        updated:function(){
+            $api.css($api.dom('.content'),'display:block');
+        },
+        methods: {
+            openWin:function () {
+                if(vm.answershow){
+                    $api.css($api.dom('.content'),'display:none');
+                    arcProgress.close({});
+                    if(vm.data.status==1){//未过关
+                        vm.GetPracticeIndividExercises(vm.olddata.id,vm.olddata.jieid,vm.olddata.complet,api.pageParam.version)
+                    }else{
+                        if(vm.xt_type==1){//起始套题统计过关 返回查看习题
+                            api.sendEvent({
+                                name: 'shuaxin-win-Intelligence-exercise-list',
+                            });
+                            api.openWin({
+                                name: 'win_exercise_list',
+                                url: 'win_exercise_list.html',
+                                pageParam: {
+                                    hwid :api.pageParam.data.id,
+                                    sxcid:api.pageParam.data.sxcid,
+                                    dyid:api.pageParam.data.dyid,
+                                    version:api.pageParam.version,
+                                    issaoma:issaoma,
+                                    bjlist: api.pageParam.bjlist,
+                                    bjcheck :api.pageParam.bjcheck,
+                                    smxkid : api.pageParam.smxkid,
+                                } ,
+                                slidBackEnabled:  false,
+                                reload:true
+                            });
+                        }else{//个性推送套题统计过关 返回查看习题
+                            if(openType == '0') {//顺序进来
+                                api.sendEvent({
+                                    name: 'shuaxin-personality-exercise-list',
+                                });
+                                api.closeToWin({
+                                    name: 'win_exerciseGxts_list',
+                                });
+                            }else{
+                                api.sendEvent({
+                                    name: 'shuaxin-personality-exercise-list',
+                                });
+                                api.openWin({
+                                    name: 'win_exerciseGxts_list',
+                                    url: 'gxts/win_exerciseGxts_list.html',
+                                    pageParam: {
+                                        hwid: api.pageParam.data.id,
+                                        sxcid: api.pageParam.data.sxcid,
+                                        dyid: api.pageParam.data.dyid,
+                                        version:api.pageParam.data.version,
+                                        openType:openType,
+                                        issaoma:issaoma,
+                                        bjlist: api.pageParam.bjlist,
+                                        bjcheck :api.pageParam.bjcheck,
+                                        smxkid : api.pageParam.smxkid,
+                                    }  ,
+                                    slidBackEnabled:  false,
+                                    reload:true
+                                });
+                            }
+
+                        }
+
+                    }
+                }
+
+            },GetPracticeIndividExercises: function (hwid, jieid, status,version) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetPracticeIndividExercises, {
+                    values: {
+                        hwid: hwid,
+                        jieid: jieid,
+                        is_complete: status,
+                        version:version
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            vm.show_statistics = ret.data.show_statistics;
+                            if(vm.xt_type==2 && openType=='1'){
+                                openType= '11'
+                            }else if(vm.xt_type==2 && openType=='2'){
+                                openType= '12'
+                            }
+                            // alert(vm.xt_type);
+                                api.openWin({
+                                    name: 'win_detail_gxts',
+                                    url: 'gxts/win_detail_gxts.html',
+                                    pageParam: {
+                                        olddata:vm.olddata,
+                                        personalityData:ret.data,
+                                        index:0,
+                                        version:version,
+                                        openType:openType,
+                                        issaoma:issaoma,
+                                        bjlist: api.pageParam.bjlist,
+                                        bjcheck :api.pageParam.bjcheck,
+                                        smxkid : api.pageParam.smxkid,
+                                        checkClass:api.pageParam.checkClass,
+                                        schoolid:api.pageParam.schoolid
+                                    },
+                                    slidBackEnabled:  false,
+                                    reload:true
+                                });
+
+                        } else {
+                            api.toast(
+                                    {
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                            )
+                        }
+                    } else {
+                        api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                        )
+                    }
+
+                })
+            },
+        }
+    });
+</script>
+</html>

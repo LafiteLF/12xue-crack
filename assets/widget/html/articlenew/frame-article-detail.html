@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>文章详情-frame</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background-color: #f2f2f2
+        }
+
+        .content {
+            width: 80%;
+            margin: 0 auto;
+            background: #fff
+        }
+
+        img {
+            width: 96%;
+            margin-left: 2%;
+            height: auto
+        }
+
+        /*p img{*/
+        /*margin-left: -2em;*/
+        /*}*/
+
+        .pinglun {
+            display: inline-block;
+            border-bottom: solid red 1px;
+            position: relative;
+            left: 2%;
+            margin-top: 30px;
+        }
+
+        .badge {
+            position: absolute;
+            top: -2px;
+            left: 35px;
+            padding: 0;
+        }
+
+
+        p {
+            width: 96%;
+            margin-left: 2%;
+            line-height: 24px;
+            /*text-indent: 2em;*/
+            /*font-size: 19px;*/
+            margin-bottom: 10px;
+            padding-top: 10px;
+        }
+
+        .nopinglun {
+            margin-top: 10px;
+            text-align: center;
+            padding-bottom: 45px;
+        }
+
+        .aui-card-list-content {
+            margin-left: 70px;
+        }
+
+        .aui-card-list {
+            margin: 0;
+            border-bottom: solid lightgrey 1px;
+        }
+
+        .remark {
+            top: 2px;
+            left: 0px;
+            position: absolute;
+        }
+
+        .xin {
+            top:6px;
+            /*left: 65%;*/
+            left: calc(48% - 12px);
+            width: 25px;
+            height: 25px;
+            position: absolute;
+        }
+
+        .xin1 {
+            top:6px;
+            /*left: 65%;*/
+            left: calc(48% - 15px);
+            width: 30px;
+            height: auto;
+            position: absolute;
+        }
+
+        .badge2 {
+
+            /*width:30px;*/
+            text-align: center;
+            margin-top:6px;
+            font-size: 12px;
+            color: #010101;
+        }
+        .aui-card-list-user-avatar {
+            width: 2.5rem;
+            margin-top: 8px;
+        }
+
+        .aui-card-list-header {
+            padding: 0.5rem 0.6rem;
+            word-wrap: break-word !important;
+            word-break: normal !important;
+        }
+
+        .aui-card-list-user-avatar img {
+            width: 45px;
+            height: 45px;
+        }
+        .dibuDiv {
+            height: 50px;
+            width: 50px;
+            position: fixed;
+            bottom: 20px;
+            color: #0a8ddf;
+            background-color: #ffffff;
+            z-index: 999;
+            border-radius: 100px;
+            float: right;
+            margin-left: 82%;
+            box-shadow: 0 1px 5px 1px rgba(0,0,0,0.25);
+        }
+        .dibuDiv li {
+            width: 100%;
+            float: left;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .dibuDiv li span {
+            display: inline-block;
+            padding-left: 29px;
+            font-size: 16px;
+            color: #4bc7c7;
+            position: relative
+        }
+
+        .dibuDiv li span img {
+            width: 19px;
+            height: 19px;
+        }
+
+        video {
+            width: 90% !important;
+            margin-left: 5% !important;
+            background-color: rgba(0, 0, 0, .5);
+            background-image: url("../../image/about_software_logo.png");
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <p style="text-indent: 0;font-size: 20px;">{{title}}</p>
+    <p style="text-indent: 0;font-size: 16px;color: lightgrey">{{date}}{{'&nbsp;'+'&nbsp;'+'&nbsp;'+'&nbsp;'+'&nbsp;'+'&nbsp;'}}{{view}}人读过</p>
+    <div style="width: 100% !important;overflow-x: hidden;margin-bottom: 30px" v-html="article_content"></div>
+<!--    <div class="pinglun">-->
+<!--        <span style="font-size: 18px;font-family: 微软雅黑">{{'评论'}}</span>-->
+<!--        <div class="aui-badge badge">{{comment}}</div>-->
+<!--    </div>-->
+
+<!--    <div class="aui-content">-->
+<!--        <ul class="aui-list">-->
+<!--            <li class="aui-card-list" v-for="(list,index) in commentdata">-->
+<!--                <div class="aui-card-list-header aui-card-list-user">-->
+<!--                    <div class="aui-card-list-user-avatar followAvatar">-->
+<!--                        <img :src="list.face" class="aui-img-round">-->
+<!--                    </div>-->
+<!--                    <div class="aui-card-list-content aui-font-size-12">-->
+<!--                        {{list.nickname}}-->
+<!--                    </div>-->
+<!--                    <div v-text="time(list.create_time)" class="aui-card-list-content"-->
+<!--                         style="display: flex;font-size:10px; color: grey">-->
+<!--                    </div>-->
+<!--                    <div class="aui-card-list-content aui-text-default aui-font-size-12"-->
+<!--                         style="display: block;width: 60%;">-->
+<!--                        {{list.content}}-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
+<!--    <div v-if="comment_alert == 0" class="nopinglun">{{'还没有评论~'}}</div>-->
+<!--    <div v-if="comment_alert == 1" class="nopinglun">{{'没有评论了~'}}</div>-->
+
+
+    <!--正常状态已点赞-->
+    <div v-if="ispraise == 1" class="dibuDiv">
+        <!--<img class="remark" style="width: 25px" onclick="remark()" src="../../../image/12xueTch/remark.png">-->
+        <div style="width:25px;height:25px">
+            <img class="xin Xin"  :isZan="1" onclick="praise(id)"
+                 src="../../image/redZan.png">
+        </div>
+        <div class=" badge2" style="color: red">{{good}}</div>
+    </div>
+    <!--正常状态未点赞-->
+    <div v-if="ispraise == 0" class="dibuDiv">
+        <!--<img class="remark" style="width: 25px" onclick="remark()" src="../../../image/12xueTch/remark.png">-->
+        <div style="width:25px;height:25px">
+            <img class="xin Xin"  :isZan="0" onclick="praise(id)" src="../../image/zan.png">
+        </div>
+        <div class=" badge2" >{{good}}</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript">
+    var listpage = 1;
+    var totalPage = '';
+    var currentTimes = 0;
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+
+        api.addEventListener({
+            name: 'reloadCommentList'
+        }, function (ret, err) {
+            listpage = 1;
+            getDetail();
+            api.addEventListener({
+                name: 'scrolltobottom',
+                extra: {
+                    threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+                }
+            }, function (ret, err) {
+                listpage++;
+                if (totalPage >= listpage) {
+                    getPinglunList();
+                }
+
+            });
+        });
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            listpage++;
+            if (totalPage >= listpage) {
+                getPinglunList();
+            }
+        });
+
+        getDetail();//获取文章详情
+        getArtCheck();
+
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                id: api.pageParam.id,//文章id
+                title: '',//标题
+                view: '',//已读人数
+                article_content: '',//文章内容
+                comment: '',//评论数
+                comment_alert: '-1',//0-没有评论 1-评论列表下拉刷新到底
+                commentdata: [],
+                good: '',//点赞数
+                isExit: $api.getStorage('isLogin'),
+                ispraise: '',//是否点过赞,
+                date: '',
+            },
+            methods: {
+                time: function (inputTime) {
+                    var date = new Date(inputTime * 1000);
+                    var y = date.getFullYear();
+                    var m = date.getMonth() + 1;
+                    m = m < 10 ? ('0' + m) : m;
+                    var d = date.getDate();
+                    d = d < 10 ? ('0' + d) : d;
+                    var h = date.getHours();
+                    h = h < 10 ? ('0' + h) : h;
+                    var minute = date.getMinutes();
+                    var second = date.getSeconds();
+                    minute = minute < 10 ? ('0' + minute) : minute;
+                    second = second < 10 ? ('0' + second) : second;
+                    return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+                }
+            }
+        });
+    }
+    function getDetail() {
+        api.showProgress();
+        apiObj.Get(UrlRouter.GetArticleInfo, {
+            values: {
+                id: vm.id
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.hideProgress();
+                    api.refreshHeaderLoadDone();
+
+                    vm.good = ret.good;
+                    vm.title = ret.title;
+                    vm.date = vm.time(ret.update_time);
+                    vm.view = ret.view;
+                    vm.article_content = ret.content;
+                    vm.comment = ret.comment;
+                    if(vm.isExit == 'true'){
+                        getPinglunList();
+                        videoCss();
+                    }
+
+                } else {
+                    api.hideProgress();
+                    alert(ret.msg);
+                }
+            } else {
+                api.hideProgress();
+                alert(err.msg);
+            }
+        })
+    }
+
+    function getPinglunList() {
+        api.showProgress();
+        var url = '/article/comments';
+        apiObj.Get(url, {
+            values: {
+                article_id: vm.id,
+                p: listpage
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    videoCss();
+                    api.hideProgress();
+                    api.refreshHeaderLoadDone();
+
+                    totalPage = ret.totalpage;
+                    if (!ret.list || ret.list.length == 0) {//评论数为0
+                        vm.comment_alert = 0;
+                        api.removeEventListener({
+                            name: 'scrolltobottom',
+                        });
+                    } else {
+                        if (listpage == 1) {
+                            vm.commentdata = ret.list;
+                        } else {
+                            vm.commentdata = vm.commentdata.concat(ret.list);//页数大于1 追加
+                        }
+
+                        if (ret.totalpage == 1) {//只有一页 小于等于20条
+                            api.removeEventListener({
+                                name: 'scrolltobottom',
+                            });
+                        }
+                        if (ret.current == ret.totalpage) {//最后一页
+                            vm.comment_alert = 1;
+                        }
+                    }
+                } else {
+                    api.hideProgress();
+                    alert(ret.msg);
+                }
+            } else {
+                api.hideProgress();
+                alert(err.msg);
+            }
+        })
+    }
+    function getArtCheck() {
+        if ($api.getStorage('isLogin') == 'true') {//未登录
+            var url = '/Article/checkpraise';
+            apiObj.Get(url, {
+                values: {
+                    article_id: vm.id
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        if (ret.ispraise != 0) {
+                            //已经点过赞
+                            vm.ispraise = ret.ispraise;
+                        } else {
+                            //没点过赞
+                            vm.ispraise = ret.ispraise;
+                        }
+                    } else {
+                        api.hideProgress();
+                        //没点过赞
+                        vm.ispraise = 0;
+                    }
+                } else {
+                    api.hideProgress();
+                    alert(err.msg);
+                }
+            })
+        } else {
+        }
+    }
+
+    function praise() {
+        if (new Date().getTime() - currentTimes < 3000) {
+            return;
+        }
+        currentTimes = new Date().getTime();
+        if ($api.getStorage('isLogin') == 'true') {
+            var isZan = $api.attr($api.dom('.xin'), 'isZan');
+            if (isZan == 0) {
+
+                verifypraise();
+            } else {
+
+                cancelpraise();
+            }
+        } else {
+            alert('您还未登录,请登录后操作。');
+        }
+    }
+    function verifypraise() {
+        var url = '/article/praise';
+
+        apiObj.Put(url, {
+            values: {
+                article_id: vm.id
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    //
+                    // setTimeout(function () {
+                    //     $api.removeCls($api.dom('.Xin'), 'xin1');
+                    //     $api.addCls($api.dom('.Xin'), 'xin');
+                    //     $api.css($api.dom('.badge2'), 'display:block');
+                    //     $(".xin").attr('src', '../../image/redZan.png');
+                    //     var containter = $api.closest($api.dom('.xin'), '.dibuDiv');
+                    //     var goodEl = $api.dom(containter, '.badge2');
+                    //     var good = $api.text(goodEl);
+                    //     var goodnum = parseInt(good);
+                    //     goodnum = goodnum + 1;
+                    //     $(".badge2").text(goodnum);
+                    //     $api.attr($api.dom('.xin'), 'isZan', '1');
+                    // }, 100);
+                    // $api.css($api.dom('.badge2'), 'display:none');
+                    // $api.removeCls($api.dom('.Xin'), 'xin');
+                    // $api.addCls($api.dom('.Xin'), 'xin1');
+                    // $(".Xin").attr('src', '../../image/redBZan.png');
+
+                    setTimeout(function(){
+                        $api.css($api.dom('.Xin'),'display:block');
+                        $api.removeCls($api.dom('.Xin'),'xin1');
+                        $api.addCls($api.dom('.Xin'),'xin');
+                        $api.css($api.dom('.badge2'),'color:red');
+                        $api.css($api.dom('.badge2'),'display:block');
+                        $(".xin").attr('src', '../../image/redZan.png');
+                        var containter = $api.closest($api.dom('.xin'), '.dibuDiv');
+                        var goodEl = $api.dom(containter, '.badge2');
+                        var good = $api.text(goodEl);
+                        var goodnum = parseInt(good);
+                        goodnum = goodnum + 1;
+                        $(".badge2").text(goodnum);
+                        $api.attr($api.dom('.xin'), 'isZan', '1');
+                    }, 400);
+                    setTimeout(function () {
+                        $api.css($api.dom('.Xin'),'display:block');
+                        $api.css($api.dom('.badge2'),'display:none');
+                        $api.removeCls($api.dom('.Xin'),'xin');
+                        $api.addCls($api.dom('.Xin'),'xin1');
+                        $(".Xin").attr('src', '../../image/redBZan.png');
+                    },150)
+                     $api.css($api.dom('.badge2'),'display:none');
+                     $api.css($api.dom('.Xin'),'display:none');
+
+                } else {
+                    alert(ret.msg);
+                }
+            } else {
+                alert(err.msg);
+            }
+        })
+    }
+    function cancelpraise() {
+
+        var url = '/article/praise?article_id=' + vm.id;
+        apiObj.Delete(url, null, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+
+                    $(".xin").attr('src', '../../image/zan.png');
+                    $api.css($api.dom('.badge2'),'color:#010101');
+                    var containter = $api.closest($api.dom('.xin'), '.dibuDiv');
+                    var goodEl = $api.dom(containter, '.badge2');
+                    var good = $api.text(goodEl);
+                    var goodnum = parseInt(good);
+                    if (goodnum != 0) {
+                        goodnum = goodnum - 1;
+                    }
+                    $(".badge2").text(goodnum);
+                    $api.attr($api.dom('.xin'), 'isZan', '0');
+                } else {
+                    alert(ret.msg);
+                }
+            } else {
+                alert(err.msg);
+            }
+        })
+
+    }
+
+    function videoCss() {
+        var videoArr = $api.domAll('video');
+
+        for(var i=0;i<videoArr.length;i++){
+            if (api.systemType == 'ios') {
+                $api.css(videoArr[i], 'height: auto !important;');
+            } else {
+                $api.attr(videoArr[i], 'poster', '../../image/video/videoBac.png');//poster 属性规定视频下载时显示的图像，或者在用户点击播放按钮前显示的图像。如果未设置该属性，则使用视频的第一帧来代替。
+                $api.attr(videoArr[i], 'controlsList', 'nodownload');//去掉下载按钮
+                $api.css(videoArr[i], 'height:' + parseInt($api.offset(videoArr[i]).w * (9 / 16)) + 'px !important;');
+            }
+        }
+//        var videos = document.querySelectorAll('video');
+//        videos.forEach(function(video){
+//            if(api.systemType == 'ios'){
+//                $api.css(video, 'height: auto !important;');
+//            }else {
+//                $api.attr(video, 'poster','../../image/video/videoBac.png');
+//                $api.attr(video, 'controlsList','nodownload');
+//                $api.css(video, 'height:'+parseInt($api.offset(video).w*(9/16))+'px !important;');
+//            }
+//        });
+    }
+</script>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>乐园</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <style>
+        html{
+            --wrem: calc(100vw / 1920);
+            --hrem: calc(100vh / 1200);
+        }
+
+        body {
+            /*background-color: white;*/
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 10px;
+            background: none;
+        }
+
+        .name-content {
+            /*padding-top: 5%;*/
+            width: 100%;
+            font-size: 20px;
+        }
+        .aui-list .aui-list-item:after{ height: 0px;}
+       .aui-list {    border: 1px solid #e4e4e8;
+            border-radius: 3px;}
+
+        .zoo-content {
+            background-color: #fff;
+            text-align: center;
+        }
+        .aui-list:before{ height: 0px;}
+        .aui-list:after{ height: 0px;}
+        p {
+            font-size: 0.7rem;
+            color: #333;
+        }
+        img {
+            margin: 0.5rem;
+            width: 75%;
+            height: 75%;
+            margin-left: 12.5%;
+        }
+        .aui-font-size-14 {
+            font-size: 0.8rem !important;
+        }
+        li.aui-list-item.aui-list-item-arrow::after {
+            background-color: #E5E5E5;
+        }
+        [v-cloak] {
+            display: none;
+
+        }
+        .aui-list .aui-list-item-inner{
+            color: #4bc7c7;
+        }
+        .title-border{
+            border-bottom: 1px dashed #d5d5d5;
+        }
+        .title{ padding:0 10px;background: #fff}
+        .tu img{ border: 3px solid #4bc7c7; border-radius:5px }
+        ul{ margin-top: 20px !important;}
+        /*.name-content{ display: none}*/
+    </style>
+</head>
+
+<body>
+<div class="name-content" id="app" v-cloak style="display: none;">
+    <ul class="aui-list title" >
+        <li class="aui-list-item aui-list-item-arrow title-border">
+            <div @click="openPersionScore()" class="aui-list-item-inner aui-font-size-14"
+                 style="float: left;margin-left: 0.3rem">个人总分:{{user.score==0.00?'0':user.score}}学分
+            </div>
+        </li>
+        <div class="zoo-content" @click="openPersionZooList()">
+            <p style="padding: 1rem 0 0.6rem 0;">在"个人总分乐园"中,您的宠物是一只{{user.grade}}</p>
+            <li class="aui-list-item aui-list-item-arrow tu"  >
+                <img :src="user.img_url">
+            </li>
+
+            <p style="padding: 1rem 0;">再获得<span style="color: #4bc7c7;  font-size: 1rem;margin: 0 6px">{{user.next}}</span>学分宠物进行形象进化</p>
+        </div>
+    </ul>
+    <ul class="aui-list title" v-for="(item,index) of group ">
+        <li class="aui-list-item aui-list-item-arrow title-border">
+            <div @click="openGroupScore(index)" class="aui-list-item-inner aui-font-size-14"
+                 style="float: left;margin-left: 0.3rem" >{{item.title}}({{item.classname}})总分:{{item.score==0.00?'0':item.score}}学分
+            </div>
+        </li>
+        <div class="zoo-content" @click="openGroupZooList(index)">
+            <p style="padding: 1rem 0 0.6rem 0;" v-if="item.grade == '家'">在"小组总分乐园"中,{{item.title}}要在{{item.grade}}好好学习了</p>
+            <p style="padding: 1rem 0 0.6rem 0;" v-else>在"小组总分乐园"中,{{item.title}}可以去{{item.grade}}玩了</p>
+            <li class="aui-list-item aui-list-item-arrow tu" >
+                <img :src="item.img_url">
+            </li>
+            <p style="padding-bottom: 0.5rem">再获得<span style="color: #4bc7c7 ;font-size: 1rem; margin: 0 6px">{{item.next}}</span>学分你们可以去{{item.nextstr}}玩</p>
+        </div>
+    </ul>
+    <div @click.stop="openCreditRecords" style="position: fixed; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; background: white; padding: calc(80 * var(--hrem)) calc(10 * var(--wrem)); border-radius: calc(20 * var(--wrem)) 0 0 calc(20 * var(--wrem));">
+        <img src="../../../image/stuMain/extracurricularInterestResearchStation/credit_records.png" style="width: calc(50 * var(--wrem)); display: block; margin: 0;" alt="学分记录">
+        <div style="color: #777777; font-size: calc(30 * var(--wrem))">学分记录</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var vm = null;
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        vm.loadCreditZooData();
+    };
+    vm = new Vue({
+        el: '#app',
+        data: {
+            user: '',
+            group: ''
+        },
+        updated:function () {
+            $api.css($api.dom('.name-content'), 'display:block');
+        },
+        mounted: function () {
+            $('html').css({
+                '--wrem': window.innerWidth / 1920 + 'px',
+                '--hrem': window.innerHeight / 1200 + 'px',
+            })
+        },
+        methods: {
+            openPersionScore: function () {//进入个人总分
+                api.openWin({
+                    name: 'win-persionscore',
+                    url: 'win-persionscore.html',
+                    pageParam: {name: 'pageparamname'}
+                });
+            },
+            openPersionZooList: function () {//进入个人乐园排名
+                api.openWin({
+                    name: 'win-persionscoreList',
+                    url: 'win-persionscoreList.html',
+                    pageParam: {name: 'pageparamname'}
+                });
+            },
+            openGroupScore: function (index) {//进入小组总分
+                var groupData = this.group[index];
+                api.openWin({
+                    name: 'win-groupscore',
+                    url: 'win-groupscore.html',
+                    pageParam: {groupData: groupData}
+                });
+            },
+            openGroupZooList: function (index) {//进入小组乐园排名
+                var groupData = this.group[index];
+                api.openWin({
+                    name: 'win-groupscoreList',
+                    url: 'win-groupscoreList.html',
+                    pageParam: {groupData: groupData}
+                });
+            },
+            loadCreditZooData:function () {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetGrouptechCreditZoo, {
+                    values: null
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            $('.name-content').show();
+                            vm.user = ret.data.user;
+                            vm.group = ret.data.group;
+                        } else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            },
+            openCreditRecords: function () {
+                api.openWin({
+                    name: 'win-score-record',
+                    url: './win-score-record.html',
+                    pageParam: {schoolid: $api.getStorage('schoolid')},
+                });
+            }
+        }
+    })
+</script>
+</html>

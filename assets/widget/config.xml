@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><widget id="A6942495244818" security="false" version="0.0.2">
+
+    <name>12xue学生HD</name>
+
+    <description>
+
+        Example For APICloud.
+
+    </description>
+
+    <author email="developer@apicloud.com" href="http://www.apicloud.com">
+
+        Developer
+
+    </author>
+
+    <content src="html/login/login_win.html"/>
+    <!--<content src="html/study/newHomework/studentMarking/win_marking.html"/>-->
+    <!-- <content src="html/win-stu-main.html"/> -->
+    <access origin="*"/>
+
+    <preference name="pageBounce" value="false"/>
+
+    <preference name="appBackground" value="rgba(0,0,0,0.0)"/>
+
+    <preference name="windowBackground" value="rgba(0,0,0,0.0)"/>
+
+    <preference name="frameBackgroundColor" value="rgba(0,0,0,0.0)"/>
+
+    <preference name="hScrollBarEnabled" value="true"/>
+
+    <preference name="vScrollBarEnabled" value="true"/>
+
+    <preference name="autoLaunch" value="true"/>
+
+    <preference name="fullScreen" value="false"/>
+
+    <preference name="checkSslTrusted" value="false"/>
+
+    <preference name="appCertificateVerify" value="false"/>
+
+    <preference name="autoUpdate" value="true"/>
+
+    <preference name="smartUpdate" value="true"/>
+
+    <preference name="useWKWebView" value="false"/>
+
+    <preference name="debug" value="false"/>
+
+    <preference name="statusBarAppearance" value="true"/>
+
+    <!-- 移除此权限 -->
+    <!-- <permission name="readPhoneState"/> -->
+
+    <permission name="camera"/>
+
+    <permission name="record"/>
+
+    <!-- <permission name="location"/> -->
+
+    <permission name="fileSystem"/>
+
+    <permission name="internet"/>
+
+    
+
+    
+
+<preference name="statisticEnabled" value="true"/><preference name="adEnabled" value="true"/></widget>

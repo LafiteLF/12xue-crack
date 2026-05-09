@@ -1,0 +1,220 @@
+body {
+    background-color: #f2f2f2;
+    position: relative;
+}
+
+header {
+    text-align: left;
+    position: absolute;
+    left: 0;
+    top: 0
+}
+
+a {
+    display: inline-block;
+    float: left;
+    max-width: 30%;
+}
+
+header .aui-icon-left:before {
+    position: absolute;
+    left: 0;
+}
+
+.titlea span {
+    display: block;
+    width: 100%
+}
+
+.titlea span b {
+    color: #333333 !important;
+    font-weight: normal;
+    font-size: 0.8rem;
+    display: inline-block;
+    padding-left: 20px;;
+    max-width: 100%;
+    overflow: hidden;
+    /*文本不换行*/
+    white-space: nowrap;
+    /*文字超出用省略号*/
+    text-overflow: ellipsis;
+    float: left;
+    text-align: left
+}
+
+.nyd {
+    float: left;
+    height: 26px;
+    padding-top: 2px;
+}
+
+.nyd img {height: 20px;
+}
+
+.qstt {
+    font-size: 0.6rem;
+    color: #666;
+    float: left;
+    margin-left: 10px;
+}
+
+.content {
+    top: 67px;
+    width: 3.5rem;
+    height: calc(100% - 77px);
+    overflow: hidden;
+    float: left;
+    border-bottom: 1px solid #e5e5e5;
+    position: absolute;
+    left: 0;;
+
+}
+
+.scroll {
+    width: 3.5rem;
+    height: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+.scroll .item:last-child {
+    margin-bottom: 70px;
+}
+
+.item {
+    border-radius: 50%;
+    border: 1px solid #4bc7c7;
+    float: left;
+    text-align: center;
+    font-size: 0.6rem;
+}
+
+.itemcss {
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: #fff;
+    margin: 9px 7px;
+    line-height: 1.5rem;
+    color: #4bc7c7;
+    margin-left: 1rem;
+}
+
+.itemcssactive {
+    width: 1.6rem;
+    height: 1.6rem;
+    background-color: #4bc7c7;
+    margin: 9px 7px;
+    line-height: 1.6rem;
+    color: #fff;
+    margin-left: 1rem;
+}
+
+.type {
+    background-color: #4bc7c7;
+    width: 100%;
+    height: 2rem;
+    line-height: 2rem;
+    color: #fff;
+    text-align: center;
+    font-size: 0.7rem;
+}
+
+.right-btn {
+    /*float: right;*/
+    height: 7rem;
+    width: 3rem;
+    margin-top: 15%;
+    position: fixed;
+    right: 0;
+    z-index: 20;
+}
+
+.up, .down {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 15%;
+    background: rgba(0, 0, 0, 0.32);
+    text-align: center;
+    line-height: 2.2rem;
+    /*position: absolute;*/
+    margin-top: 1.5rem;
+    right: 0;
+}
+
+.up:active, .down:active {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 15%;
+    background: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    line-height: 2.2rem;
+    /*position: absolute;*/
+    margin-top: 1.5rem;
+    right: 0;
+}
+.right-btn img{width: 100%; height: 100%}
+.aui-border:after {
+    border-radius: 15%;
+    border: none;
+}
+
+.tijiao {
+    font-size: 16px;
+    padding: 0 10px;
+    border: 1px solid #4bc7c7;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 13px;
+    margin-right: 20px;
+    float: right; background: url("../image/allinput.png") no-repeat 8px center ;
+    padding-left: 30px;
+    background-size: auto 60%;
+    border-radius: 3px;
+}
+.tijiao:active{
+    background: url("../image/allinputb.png") no-repeat 8px center  #4bc7c7;
+    background-size: auto 60%;
+    color: #fff;
+}
+
+.wzxt {
+    float: right;
+    display: inline-block;
+    font-size: 18px;
+    color: #666;
+    margin-right: 20px;
+}
+
+.wzxt span {
+    color: #ff778c
+}
+
+.huaban {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    right: 100px;
+}
+
+.nav-spanBtn {
+    border: 1px solid #4bc7c7 !important;
+    border-radius: 3px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    /*border-radius: 20%;*/
+    font-size: 0.8rem
+}
+
+.nav-spanBtn:active {
+    color: #fff;
+    background-color: #4bc7c7;
+}
+
+.aui-icon-check:before {
+    content: "\e619";
+    margin-right: 10px;
+    font-size: 20px;
+}

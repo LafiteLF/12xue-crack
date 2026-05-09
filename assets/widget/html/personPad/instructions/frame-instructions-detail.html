@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background: white;
+            width: 100%;
+            height: auto;
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+
+        .bright {
+            width: auto;
+            height: 40px;
+            line-height: 40px;
+            position: absolute;
+            right: 40px;
+            display: table;
+            top: 10px;
+        }
+
+        .bright img {
+            width: 34px;
+            height: 26px;
+            display: table-cell;
+            vertical-align: middle;
+            padding-right: 8px;
+            margin-top: 7px;
+            margin-right: 0;
+        }
+
+        .bright span {
+            font-size: 20px !important;
+            color: rgb(80, 181, 183);
+            display: table-cell;
+            vertical-align: middle;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        .topline {
+            margin-left: 30px;
+            margin-right: 30px;
+            width: calc(100% - 60px);
+            /*margin-top: 60px;*/
+            position: absolute;
+            top:60px;
+            /*border-top: 1px solid rgba(0, 0, 0, 0.2);*/
+            height: 0.5px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .yellow {
+            width: 5px;
+            height: 30px;
+            position: absolute;
+            left: 0;
+            top: 15px;
+            background: rgb(247, 206, 70);
+        }
+
+        .title {
+            color: rgb(80, 181, 183);
+            width: 70%;
+            height: 60px;
+            position: absolute;
+            left: 30px;
+            top: 0;
+            line-height: 60px;
+            font-size: 20px;
+        }
+
+        .title h1 {
+            font-size: 0.8rem;
+        }
+
+        .main {
+            margin: 80px 30px 80px 30px;
+            width: calc(100% - 60px);
+        }
+        video {
+            width: calc(100% - 20px);
+            margin-left: 10px;
+            margin-right: 10px;
+            background-color: rgba(0, 0, 0, .5);
+            background-image: url("../../../image/about_software_logo.png");
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+        p {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-family: 微软雅黑;
+            font-size: 16px;
+        }
+        img {
+            width: calc(100% - 20px);
+            margin-left: 10px;
+            margin-right: 10px;
+            height: auto
+        }
+        [v-cloak] {
+            display: none;
+        }
+        table {
+            margin: 0px 10px;
+            /*防止表格变形*/
+            table-layout: fixed;
+            word-wrap: break-word;
+            border: solid thin #bdbdbd;
+            /*是将表格边框的间隙去掉*/
+            border-collapse: collapse;
+        }
+
+        td, th {
+            padding: 4px;;
+            /*overflow: hidden;*/
+            /*text-overflow: ellipsis;*/
+            /*white-space: nowrap;*/
+            font-size: 14px;
+            border: 1px solid #d0d0d0;
+            font-weight: normal;
+            display: table-cell;
+            vertical-align: inherit;
+        }
+        hr {
+            height: 1px;
+            background: #666666;
+        }
+        em{
+            font-style: italic;
+            font-weight:bold;
+        }
+        strong {
+            font-style: italic;
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <div class="yellow"></div>
+    <h1 class="title aui-ellipsis-1">{{title}}</h1>
+    <div class="main" v-html="content"></div>
+    <!--<div class="bright" onclick="like()">-->
+        <!--<img :src="praise_flag==1?'../../../image/czzn_zaned.png':'../../../image/czzn_zan.png'" alt="">-->
+        <!--<span>{{praise}}</span>-->
+    <!--</div>-->
+    <div class="topline"></div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/aui-tab.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var videoArr = [];
+    apiready = function () {
+        vue();
+        getdetail();
+        api.addEventListener({
+            name: 'pause'
+        }, function(ret, err) {
+            if(videoArr.length > 0){
+                for(var i=0;i<videoArr.length;i++){
+                    videoArr[i].pause();
+                }
+                //$api.dom('video').pause();
+            }
+        });
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data: [],
+                content: '',
+                title: '',
+                praise: '',
+                praise_flag: '',
+                audioList: [],
+            },
+            methods: {
+                pauseAll: function(e){//多个音频点击的时候，禁止已经播放的，然后播放点击的
+                    //
+                    //	console.log(e.target,"...",this);
+                    var self = e.target;//获取到当前的点击的audio
+                    [].forEach.call(this.audioList, function (i) {
+                        // 将audios中其他的audio全部暂停
+                        i !== self && i.pause();
+                    })
+                }
+            }
+        });
+    }
+    function getdetail() {
+        api.showProgress();
+        apiObj.Get(UrlRouter.GetGuideInfo, {
+            values: {
+                id: api.pageParam.id,
+                uid: $api.getStorage('uid'),
+                type:'4'
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.data = ret.data;
+                    vm.praise = ret.data.praise;
+                    vm.praise_flag = ret.data.parise_flag;
+                    vm.content = ret.data.content;
+                    vm.title = ret.data.title;
+                    setTimeout(function () {
+                        videoCss();
+                    },100);
+                }else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            }else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        })
+    }
+    function like() {
+        if (vm.praise_flag == 0) {//未点赞
+            api.showProgress();
+            apiObj.Post(UrlRouter.GuidePraise, {
+                values: {
+                    id: api.pageParam.id,
+                    uid: $api.getStorage('uid')
+                }
+            }, function (ret, err) {
+                api.hideProgress();
+                if (ret) {
+                    if (ret.ret == 0) {
+                        getdetail();
+                    }else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                }else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            })
+        }
+        else {
+        }
+    }
+    function videoCss() {
+        videoArr = $api.domAll('video');
+        for(var i=0;i<videoArr.length;i++){
+            if (api.systemType == 'ios') {
+                $api.css(videoArr[i], 'height: auto !important;');
+            } else {
+                $api.attr(videoArr[i], 'poster', '../../../image/video/videoBac.png');//poster 属性规定视频下载时显示的图像，或者在用户点击播放按钮前显示的图像。如果未设置该属性，则使用视频的第一帧来代替。
+                $api.attr(videoArr[i], 'controlsList', 'nodownload');//去掉下载按钮
+                $api.css(videoArr[i], 'height:' + parseInt($api.offset(videoArr[i]).w * (9 / 16)) + 'px !important;');
+            }
+        }
+        //        vm.audioList = document.getElementsByTagName("audio");//获取到所有音频
+        vm.audioList = videoArr;//获取到所有音频
+        if(vm.audioList.length>0){//给音频添加点击事件
+            //	console.log(vm.audioList,"...",vm.articleInfo);
+            //想办法给所有的audio添加点击播放事件
+            // 给play事件绑定暂停函数
+            [].forEach.call(vm.audioList, function (i) {
+                i.addEventListener("play", vm.pauseAll.bind(i));
+            });
+        }
+    }
+</script>
+</html>

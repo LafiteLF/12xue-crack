@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>录音</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle{
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<header class="clearfix">
+    <div onclick=" closeWin();" class="winTitle pull_left">
+        <span class="winTitle2">作业名称</span>
+    </div>
+    <div style="font-size: 1.5rem;top: 12px;line-height: 35px;color: #878787;">组员待批习题</div>
+</header>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var title = api.pageParam.detailData.title;
+        $('.winTitle2').html(title);
+        api.openFrame({
+            name: 'frame_piyuelist',
+            url: 'frame_piyuelist.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: frameH
+            },
+            pageParam: api.pageParam,
+//            bounces: true
+        });
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name:'keyback'
+        },function(ret,err){
+            closeWin();
+        });
+    };
+    function closeWin() {
+        api.closeWin();
+    }
+</script>
+</html>

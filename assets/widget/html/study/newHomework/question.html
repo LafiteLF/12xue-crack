@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <title>帮助提示</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css" />
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dialog {
+            background: #fff;
+            border-radius: 8px;
+            width: 70%;
+            max-width: 480px;
+            padding: 30px 20px;
+            box-sizing: border-box;
+         
+            text-align: center;
+        }
+
+        .question-tip-title {
+            margin-bottom: 20px;
+        }
+
+        .question-tip-title img {
+            width: 100px;
+            margin: 0 5px;
+            vertical-align: middle;
+        }
+
+        .question-tip-content {
+            font-size: 1.6rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .tzts {
+           
+          
+            display: inline-block;
+
+        }
+
+        .question-tip-btn {
+            background: #4bc7c7;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 50px;
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak class="overlay" @click="closeFrame ">
+        <div class="dialog" @click.stop>
+            <div class="question-tip-title">
+                <img style="width: 80px;" src="../../../image/circle.png" alt="客观题">
+                <img style="width: 80px;" src="../../../image/square.png" alt="主观题">
+            </div>
+            <div class="question-tip-content">
+                部分主观题题型不支持AI批阅（无法选中）
+                  <div class="tzts">拓展类习题不统计正确率或得分</div>
+            </div>
+          
+            <button class="question-tip-btn" @click="closeFrame()">知道了</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+
+<script>
+    apiready = function () {
+        var vm = new Vue({
+            el: '#app',
+            methods: {
+                closeFrame: function () {
+                    api.closeFrame({
+                        name: 'question_tip'
+                    });
+                }
+            }
+        });
+    };
+</script>
+
+</html>

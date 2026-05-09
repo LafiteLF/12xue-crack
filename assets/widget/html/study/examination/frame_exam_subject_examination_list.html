@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>待考试列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+        [v-cloak] {
+            display: none
+        }
+        body{
+            background-color: rgba(0,0,0,0.5);
+            font-size: 16px;
+            color: #d5d5d5;
+        }
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+        .clearfix:after {
+            clear: both;
+        }
+        .content{
+            padding-top: 15px;
+            padding-bottom: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            width: 350px;
+            float: right;
+            height: calc(100% - 15px);
+            background-color: #f2f2f2;
+            box-shadow: -3px 2px 50px 0px rgba(14, 5, 10, 0.1);
+            border-bottom-left-radius: 5px;
+            border-top-left-radius: 5px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 2;
+        }
+        .exam-ul{
+            display: block;
+            width: 94%;
+            margin-left: 3%;
+            /*background-color: #ffffff;*/
+        }
+        .exam-li{
+            background-color: #ffffff;
+            box-shadow: 2px 3px 16px 0px rgba(14, 5, 11, 0.06);
+            border-radius: 8px;
+            opacity: 0.86;
+            margin-bottom: 10px;
+            padding: 10px;
+            position: relative;
+        }
+        .exam-li-header{
+            font-size: 14px;
+        }
+        .exam-li-footer{
+            padding-top: 5px;
+            font-size: 16px;
+        }
+        .exam-date{
+            float: left;
+            width: 50%;
+            text-align: left;
+        }
+        .exam-tch-name{
+            float: right;
+            width: 50%;
+            text-align: right;
+        }
+        .exam-subject{
+            float: left;
+            width: 30%;
+            text-align: left;
+        }
+        .exam-name{
+            float: right;
+            width: 70%;
+            text-align: right;
+        }
+        .suo {
+            border-radius: 8px;
+            width: 100%;
+            position: absolute;
+            height: 100%;
+            background: url("../../../image/suo.png") no-repeat center center rgba(0, 0, 0, 0.6);
+            right: 0;
+            top: 0;
+            z-index: 20;
+            background-size: 14%;
+            color: #d5d5d5;
+        }
+        /*滚动条样式*/
+        *::-webkit-scrollbar { /*滚动条整体样式*/
+            width: 5px; /*高宽分别对应横竖滚动条的尺寸*/
+            /*height: 100%;*/
+        }
+
+        *::-webkit-scrollbar-thumb { /*滚动条里面小方块*/
+            border-radius: 10px;
+            -webkit-box-shadow: none;
+            background: #83dad9;
+        }
+
+        *::-webkit-scrollbar-track { /*滚动条里面轨道*/
+            -webkit-box-shadow: none;
+            border-radius: 10px;
+            background: #d8f6f4;
+        }
+
+        progress {
+            width: 100%;
+            height: 5px;
+            border: none;
+            background: #e2f6f6;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: #E0FAF9;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #87dada;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body >
+<div class="close" onclick="api.closeFrame();"  ></div>
+    <div class="content" v-cloak>
+        <ul class="exam-ul">
+            <li class="exam-li clearfix" v-for="list in data" @click="openExam(list)">
+                <div class="suo"v-if="list.is_lock"></div>
+                <div class="exam-li-header clearfix" :style="list.is_open?'color:#999':''">
+                    <div class="exam-date overflow" v-text="gettime(list.start_time)"> </div>
+                    <div class="exam-tch-name overflow"  v-text="list.bjmc+'(' +list.fbrxm+'老师)'"></div>
+                </div>
+                <div class="exam-li-footer" :style="list.is_open?'color:#333':''">
+                    <div class="exam-subject overflow" v-text="list.xkname"></div>
+                    <div class="exam-name overflow" v-text="list.title"></div>
+                </div>
+            </li>
+
+        </ul>
+
+    </div>
+<img src="../../../image/exam/shuaxin.png" style="width: 45px; position: fixed; right: 0; bottom:20px; z-index: 100 " onclick="vm.shuaxin2()">
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+    vm.GetPaperSoonexam();
+        api.addEventListener({
+            name:'shuaxinkssj2'
+        },function(ret,err){
+            vm.GetPaperSoonexam();
+        });
+        api.addEventListener({
+            name:'resume'
+        }, function(ret, err){
+            vm.GetPaperSoonexam();
+        });
+        api.addEventListener({
+            name:'online'
+        }, function(ret, err){
+            vm.GetPaperSoonexam();
+        });
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            data:[]
+        },
+        methods: {
+            shuaxin2:function(){
+                vm.GetPaperSoonexam();
+                api.sendEvent({
+                    name: 'shuaxinkssj'
+                });
+            },
+            GetPaperSoonexam: function () {//
+                // api.showProgress({
+                //     title: '加载中',
+                //     text: '请稍后...',
+                //     modal: false
+                // });
+                apiObj.Get(UrlRouter.GetPaperSoonexam, {
+                    values: {
+                        bjid: api.pageParam.classids.join(",")
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            if (ret.data.length == 0) {
+
+                            } else {
+                                vm.data=ret.data.data;
+
+
+
+                            }
+                        }
+                        else{
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret .msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    }else{
+                        api.hideProgress();
+                        api.toast({
+                            msg: err .msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } ,'','',false);
+            },
+            openExam:function(list){
+                if(list.is_lock){//带锁
+                    api.openFrame({
+                        name: 'buy',
+                        url: 'buy.html',
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winWidth,
+                            h: api.winHeight
+                        },
+                        pageParam: {
+
+                        },
+//            bounces: true
+                    });
+                }else{
+                    if(list.is_open){
+                       vm. GetPaperStuinfo(list)
+                    }
+                }
+            },
+            GetPaperStuinfo: function (list) {// 学生获取有考试的科目
+                // api.showProgress({
+                //     title: '加载中',
+                //     text: '请稍后...',
+                //     modal: false
+                // });
+                apiObj.Get(UrlRouter.GetPaperStuinfo, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        classid:list.bjid,
+                        paperid:list.id
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            if(ret.data.is_complete==1 || ret.data.is_complete==5){//已经开始或者考完试的
+                                api.openWin({
+                                    name: 'win_detail',
+                                    url: 'win_detail.html',
+                                    pageParam: {
+                                        examtitle:ret.data.title,
+                                        examid:ret.data.id,
+                                        exambjid:ret.data.bjid,
+                                        examMateriallist:ret.data.materiallist,
+                                        examzts:ret.data.zts,
+                                        index:0,
+                                        complete:ret.data.is_complete,
+                                        zyyq:ret.data.content
+                                    }
+                                });
+                            }else if(ret.data.is_complete==3 ){//五分钟内开始
+                                api.openWin({
+                                    name: 'win_examing2',
+                                    url: 'win_examing.html',
+                                    pageParam: {
+                                        examXq:ret.data,
+                                        list:list
+                                    }
+                                });
+                            }
+                            api.closeFrame();
+
+                        }
+                        else{
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret .msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    }else{
+                        api.hideProgress();
+                        api.toast({
+                            msg: err .msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } ,'','',false);
+            },
+            gettime: function (updateTime) {
+                // var date = new Date();
+                // date.setTime(updateTime*1000);
+                // var y = date.getFullYear();
+                // var m = date.getMonth() + 1;
+                // m = m < 10 ? ('0' + m) : m;
+                // var d = date.getDate();
+                // d = d < 10 ? ('0' + d) : d;
+                // return y + '-' + m + '-' + d;
+                var date = new Date(updateTime * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                var Y = date.getFullYear() + '-';
+                var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                var D = date.getDate();
+                D = D < 10 ? ('0' + D) + ' ' : D + ' ';
+                var h = date.getHours();
+                h = h < 10 ? ('0' + h) + ':' : h + ':';
+                var m = date.getMinutes();
+                m = m < 10 ? ('0' + m) : m;
+                return  Y + M + D + h + m;
+
+
+            },
+
+        }
+    });
+</script>
+</html>

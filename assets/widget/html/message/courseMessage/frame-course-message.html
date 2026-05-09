@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+
+    <style>
+        body {
+            background: #f2f2f2
+        }
+
+        .aui-content {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .li-content {
+            margin: 0 1.4rem;
+            background-color: white;
+            border-radius: 0.3rem;
+            height: auto;
+        }
+
+        .time {
+            margin: 0px 1.4rem;
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+            color: #aaa;
+            border-bottom: 1px solid #e4e4e8;
+            position: relative;
+        }
+
+        .li-content .content {
+            padding: 0.8rem 0 0 0;
+            min-height: 1.7rem;
+        }
+
+        .footer {
+            margin-top: 0.8rem;
+            border-top: 0.05rem solid #DBDBDB;
+            padding: 0.5rem;
+        }
+
+        span.tag {
+            color: #ff778c;
+            background-color: #fff;
+            border: 1px solid #ff778c;
+            font-size: 0.6rem;
+            float: left;
+            margin-top: 5px;
+            margin-right: 5px;
+
+        }
+
+        .masz {
+            color: #4BC7C7;
+            text-align: center;
+        }
+
+        .content {
+            word-break: break-all;
+        }
+
+        .aui-text-primary {
+            color: #4BC7C7 !important;
+            font-size: 0.7rem;
+        }
+
+        .aui-list li {
+            background: #fff;
+            margin: 10px 0px;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .time span {
+            display: block;
+            width: 6px;
+            height: 31px;
+            background: #ffcd06;
+            position: absolute;
+            left: -1.4rem;
+            top: 11px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <section class="aui-refresh-content" style="height: 100%;">
+        <div class="aui-content" v-if="messageList.length > 0">
+            <ul class="aui-list">
+                <li v-for="(list,index) in messageList">
+                    <div class="time">{{list.createtime}}
+                        <span></span></div>
+                    <div class="li-content">
+                        <div class="content">{{list.content}}
+                        </div>
+                        <div class="aui-clearfix">
+                            <span class="tag" style="padding:0 0.25rem;border-radius: 3px;">上课时间</span>
+                            <span class="time-end aui-text-primary">{{list.begin_time}}</span>
+                        </div>
+                        <div class="footer" :kcid="list.kcid" :classid="list.classid">
+                            <div class="masz" tapmode onclick="clickItem(this)">马上查看></div>
+                            <div style="clear: both">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var isClean = true;
+    var p = 1;
+    var totalPage;
+    var vm;
+    var pullRefresh;
+    apiready = function () {
+        vue();
+        getHomeworkMessage();
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isClean = true;
+                getHomeworkMessage();
+            }
+        });
+        $api.css($api.dom('.aui-refresh-pull-arrow'), 'z-index:0');
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                messageList: [],
+            },
+            updated: function () {
+            },
+            methods: {}
+        });
+    }
+    function getHomeworkMessage() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetCourseMessage, {
+            values: {
+                suid: $api.getStorage('uid'),
+                identitytype: 3,
+                p: p,
+                num: 10
+            }
+        }, function (ret, err) {
+            pullRefresh.cancelLoading();
+            if (ret) {
+                api.hideProgress();
+                if (isClean) {
+                    vm.messageList = [];
+                }
+                if (ret.ret == 0) {
+                    if (ret.list.length == 0) {
+                        showNoData();
+                    } else {
+                        $api.css($api.dom(".no-data"), 'display:none;');
+                        for (var i = 0; i < ret.list.length; i++) {
+                            vm.messageList.push(ret.list[i]);
+                        }
+                    }
+
+                    p++;
+                    totalPage = ret.totalpage;
+
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100           //设置距离底部多少距离时触发，默认值为0，数字类型
+                        }
+                    }, function (ret, err) {
+                        if (p > totalPage) {
+                            api.toast({
+                                msg: '已经到底啦，没有更多了',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            isClean = false;
+                            getHomeworkMessage();
+                            api.removeEventListener({
+                                name: 'scrolltobottom'
+                            });
+                        }
+                    });
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+        });
+    }
+
+    function clickItem(context) {
+        var liContent = $api.closest(context, '.li-content');
+        var content = $api.text($api.dom(liContent, ".content"));
+        var startIndex = content.indexOf('"');
+        var lastIndex = content.lastIndexOf('"');
+        var title = content.substring(startIndex + 1, lastIndex);
+        var kcid = $api.attr($api.closest(context, '.footer'), 'kcid');//获得课堂资源包id
+        var classid = $api.attr($api.closest(context, '.footer'), 'classid');//获得班级id
+
+        api.openWin({
+            name: 'win-handout-list',
+            url: '../../study/newCourse/win-handout-list.html',
+            pageParam: {submit: '100', kcid: kcid, bjid: classid, title: title, schoolid: $api.getStorage('schoolid')}
+        });
+    }
+    function showNoData() {
+        $api.html($api.dom('.content'), '<div class="no-data"> <img class="img-null" src="../../../image/no_ktzyb_message.png" style="height:auto!important;width: 26%;vertical-align: middle;position: absolute;top: 10%;left: 37%;"/> </div>');
+        $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+    }
+</script>
+</html>

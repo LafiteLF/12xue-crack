@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>答题卡</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        .aui-12xue-title{
+            color: #000000;
+        }
+
+        .nav-spanBtn {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            padding: 3px 10px;
+            margin-right: 10px;
+
+        }
+        .nav-spanBtn:active{
+            color: #fff;
+        }
+
+        .nextxiti {
+            width: 100px;
+            height: 36px;
+            /*margin-top: 10px;*/
+            margin: 9px 5px;
+            position: absolute;
+            right: 5px;
+            background-color: #4bc7c7;
+            border-radius: 50px;
+            color: #ffffff;
+            line-height: 36px;
+        }
+
+        .nextxiti:active{
+            background-color: #ffffff;
+            color: #4bc7c7;
+        }
+
+
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="closeWin()">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="closeWin();"></span>答题结果
+    </a>
+
+    <!--<div style="float: right;height: 58px;" tapmode onclick="nextxiti()" class="nextxiti ">-->
+        <!--<span class="nav-spanBtn" style="font-size: 0.7rem">继续答题</span>-->
+    <!--</div>-->
+
+    <div class="nextxiti aui-hide" tapmode onclick="nextxiti()">
+        <span style="font-size: 18px;">继续答题</span>
+    </div>
+
+</header>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/ThridJS/iScroll-lite.js"></script>
+<script type="text/javascript" src="../../../../script/class_score.js"></script>
+<script type="text/javascript">
+    var complete = 0;
+    apiready = function () {
+        var header = document.querySelector('header');
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        complete = api.pageParam.complete;
+        if (complete == 1) {
+            $api.removeCls($api.dom('.nextxiti'), 'aui-hide');
+        }
+
+        api.openFrame({
+            name: 'frame_xtzanswer_statics',
+            url: 'frame_xtzanswer_statics.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            bounces: false,
+            pageParam: {
+                xitiinfo:api.pageParam.xitiinfo,
+                answerArr: api.pageParam.answerArr,
+                complete: complete,
+                accuracy: api.pageParam.accuracy
+            },
+            reload: true
+        });
+        exit_app();
+        api.addEventListener({
+            name: 'finishDT'
+        }, function (ret, err) {
+            complete = 1;
+            $api.removeCls($api.dom('.nextxiti'), 'aui-hide');
+        });
+
+        //接收打开打分的事件
+        api.addEventListener({
+            name: api.winName
+        }, function (ret, err) {
+            stuScorePublicFunction(ret.value.scoreData, ret.value.type);
+        });
+    };
+
+
+    function nextxiti() {
+        api.sendEvent({
+            name: 'nextxiti'
+        });
+    }
+
+
+    //关闭当前页
+    function closeWin() {
+        //如果用户主动查看，答题恰好结束，不执行之前的跳转操作，直接本界面更新界面即可
+        if (complete == 1) {
+            api.closeToWin({
+                name: 'win-interaction-home-pad',
+                animation: {
+                    subType: 'from_left',
+                    duration: 300
+                }
+            });
+        } else {
+            $api.setStorage('card',false);
+            api.closeWin();
+        }
+    }
+    //返回监听
+    function exit_app() {
+        api.addEventListener({
+            name : 'keyback'
+        }, function(ret, err) {
+            closeWin();
+        });
+    }
+</script>
+</html>

@@ -1,0 +1,47 @@
+body {
+    background: #fff;
+
+}
+
+.aui-list-view-cell {
+    font-size: 14px;
+    line-height: 50px;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+img {
+    height: 30px !important;
+}
+
+.xuanxiang {
+    width: 90%;
+    margin: 0 auto;
+    text-align: center
+}
+
+.xuanxiang li {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #50b8b9;
+    text-align: center;
+    line-height: 40px;
+    color: #50b8b9;
+    display: inline-block;
+    border-radius: 20px;
+    margin: 0px 10px;
+}
+
+.tijiao {
+    width: 40%;
+    height: 40px;
+    color: #fff;
+    text-align: center;
+    line-height: 40px;
+    background: #50b8b9;
+    border-radius: 7px;
+    margin: 0 auto;
+    margin-top: 74px;
+}

@@ -1,0 +1,426 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>错题本列表frame</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style type="text/css">
+        body {
+            background-color: #F2F2F2;
+        }
+        .imp-img-online{
+            float: left;
+            position: absolute;
+            width: 14px;
+            padding-left: 8px;
+        }
+        .ex_content dl {
+            margin-bottom: 10px;
+            background: #fff;
+            position: relative;
+            padding: 0 0 0 0;
+            width: 100%;
+            margin-left: 0;
+            /*min-height: 30px;*/
+        }
+
+        .ex_content dl dd {
+            min-height: 30px;
+            line-height: 30px;
+            font-size: 1.4rem;
+            position: relative;
+            padding-top: 13px;
+            padding-bottom: 10px;
+        }
+        .ex_content dl dd + dd {
+            border-top: 1px solid #e4e4e8
+        }
+
+        .ex_content dl dd p {
+            width: calc(100% - 80px);
+            margin-left: 30px;
+            min-height: 30px;
+            white-space: normal;
+            word-break: break-all;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            line-height: 24px;
+            font-size: 18px;
+        }
+
+        .ex_content dl dd p img {
+            height: 30px!important;
+            vertical-align: top;
+            margin: 3px;
+            width: auto!important;
+        }
+
+        .ex-xiaoti {
+            font-size: 1.2rem;
+            color: #4bc7c7;
+            display: block;
+            height: 55px;
+            line-height: 55px;
+            position: absolute;
+            width: 50px;
+            top: 0;
+            right: 5px;
+            text-align: center;
+        }
+
+        .ex-xiaoti {
+            right: 5px;
+            text-align: center;
+        }
+
+        /*线下错题样式*/
+        .ex_content dl div {
+            height: 45px;
+            line-height: 45px;
+            font-size: 1.4rem;
+            position: relative;
+            padding-top: 10px;
+            padding-bottom: 7px;
+        }
+        .ex_content dl div p:nth-of-type(1) {
+            position: absolute;
+            width: 30px;
+            margin-left: 25px;
+            height: 45px;
+            font-size: 1.4rem;
+            color: black;
+            text-align: center;
+        }
+        .imp-div{
+            float: left;
+            position: absolute;
+            width: 14px;
+            padding-left: 8px;
+            top: -3px;
+        }
+        .imp-img-offline {
+            width: 14px;
+        }
+        .offline-img{
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            margin-left: 35px;
+            border-radius: 3px;
+        }
+        .ex_content dl div p:nth-of-type(2) {
+            position: absolute;
+            width: 30px;
+            margin-left: 105px;
+            height: 45px;
+            font-size: 1.2rem;
+            color: #999999;
+        }
+        .ex_content dl div p:nth-of-type(3) {
+            position: absolute;
+            width: calc(100% - 135px);
+            margin-left: 135px;
+            height: 45px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+            font-size: 18px;
+        }
+        .nostu {
+            width: 100%;
+            height: 30%;
+        }
+        .nostu img{
+            width: 20%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            /*margin-top: 20%;*/
+            padding-top: 15%;
+        }
+        *{word-wrap: break-word;}
+        [v-cloak] {
+            display: none
+        }
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="ex_content" v-cloak="">
+        <dl v-if="exercisesArr.length!=0">
+            <!--线上错题-->
+            <dd v-if="online == 1" v-for="(list,index) in exercisesArr" :id="index" @click="openErrorDetail(list,index)">
+                <img v-if="list.is_important == 1" class="imp-img-online" src="../../../image/stuHomePad/bjerror.png"/>
+                <!--<p v-html="index+1+'.'+getzymc(list.txstr,list.tx,list.tg)"></p>-->
+                <p style="width: auto;" v-html="index+1+'.'"></p>
+                <p v-if="list.tx == 'tdjh' || list.tx == 'tdh' || list.tx == 'tdb'|| list.tx == 'ttt'" style="-webkit-line-clamp: 2;margin-left: 55px;width: calc(100% - 120px);margin-top: -28px" v-html="getzymc(list.txstr,list.tx,list.tg)"></p>
+                <p v-else style="margin-left: 55px;width: calc(100% - 120px);margin-top: -28px" v-html="getzymc(list.txstr,list.tx,list.tg)"></p>
+                <img v-if="list.tx == 'tdjh' || list.tx == 'tdh' || list.tx == 'tdb'|| list.tx == 'ttt'" style="margin-bottom: -15px;margin-left: 55px;height: 49px !important;" src="../../../image/newhomework/tlbt.png">
+                <span class="ex-xiaoti" v-if=" list.xts>0"
+                      v-text="list.tx_code==2?'['+list.xts+'填空]':'['+list.xts+'小题]'"></span>
+            </dd>
+            <!--线下错题-->
+            <div v-if="online == 2" v-for="(list,index) in exercisesArr" :id="index" style="border-top: 1px solid #e4e4e8"
+                 @click="openErrorDetail(list,index)">
+                <div class="imp-div">
+                    <img v-if="list.is_important == 1" class="imp-img-offline" src="../../../image/stuHomePad/bjerror.png"/>
+                </div>
+
+                <p  v-text="(index+1)+'.'"></p>
+                <img v-if="list.content" class="offline-img" :src="list.content[0]+'?imageView2/2/h/40'"/>
+                <p v-if="list.content" v-text="'('+list.content.length+'张)'"></p>
+                <p v-if="list.descript" v-text="getOffline(list.descript)"></p>
+            </div>
+        </dl>
+        <div v-if="exercisesArr.length==0" class="nostu">
+            <img class="noData-img" src="../../../image/no_content_error.png"/>
+        </div>
+    </div>
+</section>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/underscore-min.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var clean;
+    var vm;
+    var p = 1;
+    var totalPage;
+    var data;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+//        $api.fixTabBar($api.dom('.aui-refresh-content'));
+        api.closeFrame({
+            name: 'subjectList_frame'
+        });
+        api.closeFrame({
+            name: 'unitList_frame'
+        });
+        api.closeFrame({
+            name: 'chapterList_frame'
+        });
+
+        api.addEventListener({
+            name: 'finishErroeReply'
+        }, function (ret, err) {
+            p = 1;
+            vm.getInfo();
+        });
+        api.addEventListener({
+            name: 'removeError'
+        }, function (ret, err) {
+            p = 1;
+            vm.getInfo();//移除线下错题成功执行
+        });
+        api.addEventListener({
+            name: 'editImp'
+        }, function (ret, err) {
+            p = 1;
+            vm.getInfo();
+        });
+        api.addEventListener({
+            name: 'addErrorArr'
+        }, function (ret, err) {
+            vm.exercisesArr = ret.value.data;
+        });
+        apiObj.SetAuthToken($api.getStorage('token-stu'));
+        initVue();
+        vm.getInfo();
+        //下拉刷新
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                vm.getInfo();
+            }
+        });
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: -100           //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            if (p >= totalPage) {
+                api.toast({
+                    msg: '已经到底啦，没有更多习题了',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                clean = false;
+                //在名为winName的window中执行jsfun脚本
+                p++;
+                vm.getInfo();
+            }
+        });
+    };
+
+    function replyClick() {
+        apiObj.Get(UrlRouter.ExercisesLastWrongsUpload, {
+            values: {
+                uid: $api.getStorage('uid'),
+                schoolid: $api.getStorage('newSchoolId'),
+                xkid: api.pageParam.xkid,
+                xxxz: $api.getStorage('errorxxxz'),
+                czxz: $api.getStorage('errorczxz'),
+                gzxz: $api.getStorage('errorgzxz')
+            }
+        }, function (ret, err) {
+//        api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (JSON.stringify(ret.data) == '{}') {
+                        api.openWin({
+                            name: 'win_error_reply',
+                            url: 'win_error_reply.html',
+                            pageParam: {
+                                xkid: api.pageParam.xkid,
+                                errorData: 0,
+                                lasterror: 1,
+                                editct: 0
+                            }
+                        });
+                    } else {
+                        api.openWin({
+                            name: 'win_error_reply',
+                            url: 'win_error_reply.html',
+                            pageParam: {
+                                xkid: api.pageParam.xkid,
+                                errorData: ret.data,
+                                lasterror: 1,
+                                editct: 0
+                            }
+                        });
+                    }
+                }
+            }
+        })
+    }
+
+    function initVue() {
+        vm = new Vue({
+            el: ".ex_content",
+            data: {
+                exercisesArr: '1',
+                count: '',
+                imp: '0',
+                online: '1'
+            },
+            methods: {
+                openErrorDetail: function (exercise, index) {
+                    api.openWin({
+                        name: 'win_error_detail_new',
+                        url: 'win_error_detail_new.html',
+
+                        pageParam: {
+                            xkid: api.pageParam.xkid,
+                            dyid: api.pageParam.dyid,
+                            jieid: exercise.jieid,
+                            njid: api.pageParam.njid,
+                            online: api.pageParam.online,
+                            type: api.pageParam.type,
+                            total: vm.count,
+                            index: index + 1,
+                            tx: exercise.tx,
+                            is_important: exercise.is_important,//本道错题是不是标记的重点
+                            data: exercise,
+                            sys_id: exercise.sys_id,
+                            kc_type: exercise.kc_type,
+                            isImportant: api.pageParam.is_important,//win中的筛选条件是否是重点
+                            tx_type:api.pageParam.tx,
+                            xkmc: api.pageParam.xkmc
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                getzymc: function (txstr, tx, zymc) {
+                    var tgStr;
+                    tgStr = zymc.replace(new RegExp("<br>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br style=\"white-space: normal;\"/>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br style=\"whi-space: normal;\"/>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br/>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br />", "gm"), "");
+                    tgStr = tgStr.replace(/<table.*?>|<\/table>/ig,"");
+                    tgStr.replace(/(^\s*)|(\s*$)/g, "");
+                    tgStr = tgStr.replace(new RegExp("&nbsp;", "gm"), "");
+//                    if (tx != 'tdjh' && tx != 'tdh' && tx != 'tdb') {
+//                        return '【' + txstr + '】' + tgStr;
+//                    } else {
+//                        //听力也显示题干
+//                        return '【' + txstr + '】' + tgStr + '<img style="height: 49px;!important;" src="../../../image/newhomework/tlbt.png">';
+//                    }
+                    return '【' + txstr + '】' + tgStr;
+                },
+                getOffline: function (txstr) {
+                    var tgStr;
+                    tgStr = txstr.replace(new RegExp("<br>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br style=\"white-space: normal;\"/>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br style=\"whi-space: normal;\"/>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br/>", "gm"), "");
+                    tgStr = tgStr.replace(new RegExp("<br />", "gm"), "");
+                    tgStr.replace(/(^\s*)|(\s*$)/g, "");
+                    tgStr = tgStr.replace(new RegExp("&nbsp;", "gm"), "");
+                    return tgStr;
+                },
+                getInfo: function () {
+                    api.showProgress();
+                    var params = api.pageParam;
+                    delete params.xkmc;
+                    params['uid'] = $api.getStorage('uid');
+                    params['schoolid'] = $api.getStorage('newSchoolId');
+                    params['page'] = p;
+                    params['num'] = 20;
+                    params['xd'] = $api.getStorage('stuXD');//
+                    vm.online = api.pageParam.online;
+
+                    apiObj.Get(UrlRouter.ExercisesWrongs, {
+                        values: params
+                    }, function (ret, err) {
+                        pullRefresh.cancelLoading();
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                totalPage = Math.ceil(ret.data.total/20);
+                                vm.count = ret.data.total;
+                                if (p == 1) {
+                                    data = ret.data.data;
+                                    vm.exercisesArr = data;
+                                } else {
+                                    data = data.concat(ret.data.data);
+                                    vm.exercisesArr = data;
+                                }
+                            }else {
+                                toast12xue(ret.msg);
+                            }
+                        }else{
+                            toast12xue(err.msg);
+                        }
+                    });
+                    api.hideProgress();
+                }
+            }
+        })
+    }
+
+    function addErrorArr(exerciseArr) {
+        vm.exercisesArr = exerciseArr;
+    }
+</script>
+
+</html>

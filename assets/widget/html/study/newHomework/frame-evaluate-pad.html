@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>作业列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none
+        }
+        body{
+            background: #f2f2f2;
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content{ text-align: center; padding-top: 14%;}
+        .content img{ width:150px;  display: block; margin: 0 auto}
+        span{     font-size: 1rem;
+            color: #4bc7c7;
+            padding: 30px 0px 10px 0px;
+            display: block;}
+        p{ font-size: 0.8rem;color:#666 }
+
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <img :src="getRemark(remark)">
+    <span v-text="content"></span>
+    <!--<p>保持良好的学习状态！每次作业完成的都很好，老师非常满意。</p>-->
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var vm;
+    apiready = function () {
+        initVue();
+    };
+    function initVue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                remark: api.pageParam.remark,
+                content:api.pageParam.content
+
+            },
+            methods: {
+                getRemark:function (remark) {
+                    var imgUrl;
+                    if(remark == '优'){
+                        imgUrl='../../../image/stuHomePad/you.png'
+                    }
+                    if(remark == '良'){
+                        imgUrl='../../../image/stuHomePad/liang.png'
+                    }
+                    if(remark == '中'){
+                        imgUrl='../../../image/stuHomePad/zhong.png'
+                    }
+                    if(remark == '差'){
+                        imgUrl='../../../image/stuHomePad/cha.png'
+                    }
+                    return imgUrl;
+                }
+            }
+        });
+    }
+
+
+</script>
+</html>

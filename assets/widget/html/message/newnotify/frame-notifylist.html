@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>通知列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/notification/noti_list.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <section class="aui-refresh-content">
+        <div class="aui-content">
+            <ul v-if="data.length > 0" id="mainList">
+                <li class="list-item aui-border-b" v-for="(list,index) in data " :index="index" :id="list.id" tapmode
+                    onclick="notidetail(this)">
+                    <div class="createtime">{{list.createtime}}</div>
+                    <div class="other">
+                        <img v-if="list.rejectStatus == 0 " class="reject" src="../../../image/notification/noti_reject.png"
+                             alt="">
+                        <div class="notistatus">
+                            <div class="noti_list_title aui-ellipsis-1">{{uncodeUtf16(list.title)}}</div>
+                            <span v-if="list.status == 0" class="readstatus">未读</span>
+                        </div>
+
+                        <!--<div v-if="list.audio_list[0].length == 0" class="noti_list_content aui-ellipsis-2">-->
+                            <!--{{list.content}}-->
+                        <!--</div>-->
+                        <div v-if="list.content && list.content != '' " class="noti_list_content aui-ellipsis-2">
+                            {{uncodeUtf16(list.content)}}
+                        </div>
+                        <div v-if="!(list.content && list.content != '') && list.audio_list.length == 1 && list.audio_list !='' " tapmode class="noti_list_content_voice">
+                            <img src="../../../image/yuyin1.png">
+                            <span v-text="jsonparse(list.audio_list[0])"></span>
+                        </div>
+                        <div class="noti_list_line"></div>
+                        <div class="noti_list_bottom ">
+                            {{list.realname.length>4?list.realname.substr(0,4)+'...':list.realname}}老师
+                        </div>
+                        <div class="look">查看详情</div>
+                        <img class="lookimg" src="../../../image/notification/noti_left.png" alt="">
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!--<div class="loading aui-hide">加载中...</div>-->
+    </section>
+
+    <div class="kong">
+        <img class="kongimg" src="../../../image/notification/noti_kong.png" alt="">
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+    var num = 10;
+    //下拉刷新 上拉加载
+    var pullRefresh;
+    var p = 1;
+    var isClean = true;
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+        getNotifylist();
+        api.addEventListener({
+            name: 'refreshNotityList'
+        }, function (ret, err) {
+            p = 1;
+            isClean = true;
+            getNotifylist();
+        });
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isClean = true;
+                getNotifylist();
+            }
+        });
+
+        $('.kongimg').css('margin-top',api.frameHeight/2 - 95);
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data: [],
+            },
+            updated: function () {
+            },
+            methods: {
+                jsonparse: function (content) {
+                    var duration;
+                    var index = content.indexOf('amr');
+                    duration = content.substring(index + 3) + "″";
+                    return duration;
+                },
+                uncodeUtf16: function (str) {
+                    var reg = /\&#.*?;/g;
+                    var result = str.replace(reg,function(char){
+                        var H,L,code;
+                        if(char.length == 9 ){
+                            code = parseInt(char.match(/[0-9]+/g));
+                            H = Math.floor((code-0x10000) / 0x400)+0xD800;
+                            L = (code - 0x10000) % 0x400 + 0xDC00;
+                            return unescape("%u"+H.toString(16)+"%u"+L.toString(16));
+                        }else{
+                            return char;
+                        }
+                    });
+                    return result;
+                },
+            }
+        });
+    }
+    function getNotifylist() {
+        api.showProgress();
+        apiObj.Get(UrlRouter.GetStuNotify, {
+            values: {
+                p: p,
+                num: num,
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            pullRefresh.cancelLoading();
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (isClean) {
+                        vm.data = [];
+                    }
+                    var flag = 0;
+                    for (var i = 0; i < ret.list.length; i++) {
+                        flag++;
+                        vm.data.push(ret.list[i]);
+                    }
+                    if(vm.data.length == 0){
+                        $('.kong').css('display','block');
+                        api.sendEvent({
+                            name: 'kong',
+                            extra: {
+
+                            }
+                        });
+                    }
+                    else {
+                        $('.kong').css('display','none');
+                    }
+                    p++;
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100
+                        }
+                    }, function (ret, err) {
+                        if (flag < num) {
+                            api.toast({
+                                msg: '已经到底啦，没有更多了',
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        } else {
+                            isClean = false;
+                            $api.removeCls($api.dom('.loading'), 'aui-hide');
+                            getNotifylist();
+                            api.removeEventListener({
+                                name: 'scrolltobottom'
+                            });
+                        }
+                    });
+                }else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            }else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        })
+    }
+    function notidetail(e) {
+        api.openWin({
+            name: 'win-notidetail',
+            url: 'win-notidetail.html',
+            pageParam: {
+                list: vm.data[$(e).attr('index')]
+            },
+        });
+    }
+</script>
+</html>

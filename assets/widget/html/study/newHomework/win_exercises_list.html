@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>习题列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle {
+            width: calc(100% - 400px);
+        }
+        .buttonFive {
+            font-size: 1.2rem;
+            height: 27px;
+            line-height: 28px;
+            width: 110px;
+            overflow: hidden;
+            border: 1px solid #4BC7C7;
+            border-radius: 3px;
+            /*display: inline-block;*/
+            text-align: right;
+            display: none;
+        }
+        .buttonFive p{ display: inline-block; height: 27px; width:86px; text-align: center}
+
+        .buttonSix{
+            font-size: 1.2rem;
+            height: 27px;
+            line-height: 28px;
+            width: 90px;
+            overflow: hidden;
+            border: 1px solid #4BC7C7;
+            border-radius: 3px;
+            display: none;
+            text-align: right;
+        }
+        .buttonSix p{ display: inline-block; height: 27px; width:66px; text-align: center}
+
+        .markingMember {
+            background: url(../../../image/newhomework/xspy.png) no-repeat 5px 5px #fff;
+            background-size: 19px 17px;
+        }
+        .markingMember:active {
+            color: #fff;
+            background: url(../../../image/newhomework/xspy2.png) no-repeat 5px 5px #4bc7c7;
+            background-size: 19px 17px;
+        }
+    </style>
+</head>
+<body>
+<header class="clearfix">
+    <div onclick=" closeWin();" class="winTitle pull_left">
+    </div>
+    <ul class="pull_right clearfix winIcon">
+        <li onclick="openAnswerStatics()" class="buttonFour font4BC7C7 answerStatistics pull_right"><p>答题统计</p></li>
+        <li onclick="openHomePushExercises()" class="buttonSix font4BC7C7 answerStatistics pull_right"><p>习题推送</p></li>
+        <li onclick="openStudentpy()"  class="buttonFive font4BC7C7 markingMember pull_right"><p>批阅组员作业</p></li>
+    </ul>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var data;
+    var materiallist;
+    var materialtzxt;
+    var tuisongList;
+    var tongji = 0;
+    var hwid;
+    var xsbjid;
+    var tuid;
+    apiready = function () {
+        hwid = api.pageParam.detailData.id;
+        xsbjid = api.pageParam.detailData.bjid;
+        getHomeworkList();
+        getHomeworkPushExercises();
+        // api.addEventListener({
+        //     name: 'shuaxin-frame-homework-list-pad'
+        // }, function (ret, err) {
+        //     getHomeworkList();
+        // });
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin();
+        });
+    };
+
+    function getHomeworkList() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetStudenthomeworkUrl, {
+            values: {
+                hwid: hwid,
+                classid: xsbjid,
+                identitytype: '3',//学生身份
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            // pullRefresh.cancelLoading();
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    // alert(JSON.stringify(ret));
+                    tongji = 0;
+                    data = ret;
+                    materiallist = ret.materiallist;
+                    materialtzxt = ret.materialtzxt;
+                    tuid = ret.uid;
+                    if (ret.student_can_correct == 1){
+                        $api.css($api.dom('.buttonFive'), 'display:inline-block;');
+                    }
+                    if (ret.materialdxa.length > 0) {
+                        materiallist.unshift(ret.materialdxa[0]);
+                        tongji++;
+                    }
+                    var zymc = ret.content;
+                    if (ret.content) {
+                        var zyyq = {'txstr': '作业要求', 'zymc': zymc, 'zyqf': 3};
+                        materiallist.unshift(zyyq);
+                        tongji++;
+                    }
+                    var header = document.querySelector('header');
+                    var headerH = $api.offset(header).h;
+                    var frameH = padWinHeight - headerH;
+                    api.setStatusBarStyle({
+                        style: 'light'
+                    });
+                    var title = api.pageParam.detailData.title;
+                    $('.winTitle').html(title);
+                    if (materiallist.length == 0 && materialtzxt.length == 0) {
+                        api.openFrame({
+                            name: 'kong_list',
+                            url: 'kong.html',
+                            rect: {
+                                x: 0,
+                                y: headerH,
+                                w: api.winWidth,
+                                h: frameH
+                            },
+                            bounces: false,
+//            bounces: true
+                        });
+                    } else {
+                        api.openFrame({
+                            name: 'frame_exercises_list',
+                            url: 'frame_exercises_list.html',
+                            rect: {
+                                x: 0,
+                                y: headerH,
+                                w: api.winWidth,
+                                h: frameH
+                            },
+                            bounces: false,
+                            pageParam: {
+                                homeworkListData: api.pageParam.detailData,
+                                materiallist: materiallist,
+                                materialtzxt: materialtzxt,
+                                is_score: data.is_score,
+                                classid:api.pageParam.classid,
+                                homeworkIndex:api.pageParam.homeworkIndex,
+                                data:data
+                            }
+//            bounces: true
+                        });
+                    }
+
+                }
+                // vm.isNull = true;
+            }
+        });
+
+    }
+
+    function getHomeworkPushExercises() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetHomeworkPushExercises, {
+            values: {
+                resource_id: hwid,
+                classid: xsbjid,
+                identitytype: '3',//学生身份
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            // pullRefresh.cancelLoading();
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    tuisongList = ret.data.materiallist;
+                    if (ret.data.materiallist.length > 0){
+                        $api.css($api.dom('.buttonSix'), 'display:inline-block;');
+                    }
+                }
+            }
+        });
+
+    }
+
+    function openAnswerStatics() {
+        api.openWin({
+            name: 'win_answer_statics',
+            url: 'win_answer_statics.html',
+            pageParam: {
+                hwid: hwid,
+                xsbjid: xsbjid,
+                is_score: data.is_score,//是否是得分
+                complete: 2,
+                homeworkListData: api.pageParam.detailData,
+                tongji: tongji,
+                inputType: 'liebiao'
+            }
+        });
+    }
+
+    function openHomePushExercises() {
+        api.openWin({
+            name: 'win_xtts',
+            url: 'pushexercise/win_xtts.html',
+            pageParam: {
+                homeworkListData: api.pageParam.detailData,
+                tuisongList: tuisongList,
+                homeworkIndex:api.pageParam.homeworkIndex,
+                classid:api.pageParam.classid,
+                hwid : api.pageParam.detailData.id,
+                xsbjid : api.pageParam.detailData.bjid
+            }
+        });
+    }
+
+
+    function openStudentpy() {
+
+//        api.openWin({
+//            name: 'win_marking',
+//            url: 'studentMarking/win_marking.html',
+//            pageParam: {
+//                tuid: api.pageParam.tuid,
+//                ytlx: list.ytlx,
+//                hwid:list.hwid,
+//                classid:api.pageParam.xsbjid,
+//                xtid:list.zyid,
+//                tx_code:list.tx_code,
+//            },
+//            slidBackEnabled: false
+//        });
+
+
+        api.openWin({
+            name: 'win_piyuelist',
+            url: 'studentMarking/win_piyuelist.html',
+            pageParam: {
+                tuid:tuid,
+                hwid: hwid,
+                xsbjid: xsbjid,
+                is_score: data.is_score,//是否是得分
+                detailData: api.pageParam.detailData,
+                tongji: tongji,
+            }
+        });
+    }
+
+
+    function closeWin() {
+        if (api.pageParam.from == 'message') {//区分从作业消息进入的情况
+            api.closeToWin({
+                name: 'win-homework-message-list'
+            })
+        }else if(api.pageParam.inputType=='dati'){
+            api.closeToWin({
+                name: 'win-subject-list-pad'
+            })
+        } else  {
+            // api.sendEvent({
+            //     name: 'shuaxin-frame-homework-list-pad',
+            //     extra:{
+            //         index:api.pageParam.homeworkIndex
+            //     }
+            // });
+            api.closeToWin({
+                name: 'win-homework-list-pad'
+            });
+        }
+    }
+</script>
+</html>

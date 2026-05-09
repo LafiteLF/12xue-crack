@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>统计</title>
+    <link rel="stylesheet" type="text/css" href="../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/winDetailCss.css"/>
+    <style>
+        .winTitle {
+            width: auto;
+            max-width: calc(100% - 470px);
+        }
+
+        .nydimg {
+            width: 115px;
+            margin-top: 15px;
+            margin-left: 15px
+        }
+
+        .qstt {
+            font-size: 1.2rem;
+            vertical-align: top;
+            /* margin-bottom: 22px; */
+            display: inline-block;
+            margin-top: 17px;
+            margin-left: 13px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content1">
+    <header class="clearfix">
+        <div tapmode onclick="closeWin();" class="winTitle pull_left" v-text="data.title"></div>
+        <img class="nydimg"
+             :src="data.nyd==1?'../../image/new1xing.png':data.nyd==2?'../../image/new2xing.png':'../../image/new3xing.png'">
+        <span class="qstt" > 起始套题</span>
+    </header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vm.data = api.pageParam.data;
+        var header = document.querySelector('header');
+        var headerH = $api.offset(header).h;
+        var frameH = padWinHeight - headerH;
+        api.openFrame({
+            name: 'frame-Intelligence-Statistics-two',
+            url: 'frame-Intelligence-Statistics-two.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: 'auto',
+                h: frameH
+            },
+            pageParam: {
+                data:vm.data,
+                xt_type:api.pageParam.xt_type
+            },
+            bounces: false,
+            reload: true
+        });
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            closeWin()
+        });
+    };
+    var vm = new Vue({
+        el: '.content1',
+        data: {
+            data: ''
+        },
+        methods: {
+
+        }
+
+    });
+    function closeWin() {
+        api.closeWin();
+    }
+</script>

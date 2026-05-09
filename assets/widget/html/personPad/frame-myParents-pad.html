@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <style>
+        body{ background:#f2f2f2 }
+        .content{width: 80%; padding-top: 20px; margin: 0 auto;background-color: #f2f2f2}
+
+
+        .gone {
+            display: none;
+        }
+
+        .nodata img {
+            margin-top: 10%;
+            width: 16%;
+            margin-left: 42%;
+        }
+
+        .nodata p {
+            width: 96%;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            margin-left: 2%;
+        }
+        li{
+            height: 50px;
+            line-height: 50px;
+        }
+        span{
+            height: 50px;!important;
+            line-height: 50px;
+            padding-top: 5px;
+        }
+        .phoneNum{
+            margin-left: 5%;
+            color: #4bc7c7;
+        }
+        /*[v-cloak]{*/
+            /*display: none;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="content">
+    <div style="background-color: white">
+        <ul >
+            <li>
+                <span>李明博</span>
+                <span class="phoneNum">(18553503122)</span>
+                <span></span>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="nodata gone">
+    <img src="../../image/nullPic.png"/>
+    <p>暂无数据</p>
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script>
+
+    vm = new Vue({
+        el: '.content',
+        data: {
+            list:''
+        },
+        methods: {
+            getTime:function (item) {
+                var d = new Date(item.create_time * 1000);
+                var hours = '';
+                var minutes = '';
+                var month = '';
+                if(d.getHours()<10){
+                    hours ='0'+d.getHours();
+                }else {
+                    hours = d.getHours();
+                }
+                if(d.getMonth()<9){
+                    month =d.getMonth()+1;
+                    month = '0'+month;
+
+                }else {
+                    month = d.getMonth()+1;
+                }
+                if(d.getMinutes()<10){
+                    minutes ='0'+d.getMinutes();
+                }else {
+                    minutes = d.getMinutes();
+                }
+                var date = (d.getFullYear()) + "-" + (month) + "-" + (d.getDate()) + " " + (hours) + ":" + (minutes);
+                return date;
+            },
+
+        }
+    });
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var page = 1;
+    apiready = function () {
+        GetV1ClasspayUserpays();
+//        //下拉刷新
+//        var pullRefresh = new auiPullToRefresh({
+//            container: document.querySelector('.aui-refresh-content'),
+//            triggerDistance: 100
+//        }, function (ret) {
+//            if (ret.status == "success") {
+//                setTimeout(function () {
+//                    page = 1;
+//                    GetV1ClasspayUserpays();
+//                    pullRefresh.cancelLoading(); //刷新成功后调用此方法隐藏
+//                }, 500)
+//            }
+//        });
+
+        //下拉到底部的监听
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            page++;
+            GetV1ClasspayUserpays();
+        });
+    };
+
+    function GetV1ClasspayUserpays() {//根据uid获取付费服务列表
+        apiObj.SetAuthToken($api.getStorage('token'));
+        apiObj.Get(UrlRouter.GetV1ClasspayUserpays, {
+            values: {
+                pay_status : '1',
+                type: '1,2,3',
+                p:page,
+                num:20,
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+
+                    if (ret.data.data.length == 0) {
+                        //无数据
+                        if (page == 1) {
+                            showNoData();
+                        } else {
+                            page--;
+                            api.toast({
+                                msg: '已加载全部',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        if (page == 1) {
+                            vm.list =ret.data.data;
+                        } else {
+                            vm.list =vm.list.concat(ret.data.data);
+                        }
+                    }
+
+                } else {
+                    api.toast(
+                        {
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                    )
+                }
+            } else {
+                api.toast(
+                    {
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    }
+                )
+            }
+        })
+    }
+
+    function showNoData() {
+//        $api.css($api.dom(".bt"), "display:none");
+        $api.css($api.dom(".nodata"), 'display:block');
+        $api.css($api.dom("ul"), "display:none");
+    }
+
+
+
+</script>
+</html>

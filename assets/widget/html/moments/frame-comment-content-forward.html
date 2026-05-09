@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        body{
+            background-color: white !important;
+        }
+        .level{
+            padding: 1px 4px;
+            margin:0 5px;
+            background-color: #7D8FE6;
+        }
+        .forward-content{
+            padding-top: 0.2rem;
+            padding-bottom: 0.2rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            background: whitesmoke;
+            line-height: 1.5;
+        }
+        .commen-count{
+            background-color: white;
+            font-size: 12px;
+            color: #8e8e93;
+            padding: 5px 0;
+
+        }
+        .user-info{
+            padding-bottom: 0!important;
+        }
+        .user-icon{
+            padding-bottom: 0!important;
+        }
+        .user-name {
+            overflow: auto;
+            font-size: 16px !important;
+            color: #4bc6c6 !important;
+            line-height: 1 !important;
+        }
+
+        .name-length {
+            font-size: 16px !important;
+            color: #4bc6c6 !important;
+        }
+
+        .little-user-name {
+            overflow: inherit;
+            font-size: 14px !important;
+            color: #4bc6c6 !important;
+        }
+        .send-time {
+            color: #979797 !important;
+            font-size: 12px !important;
+            margin-top: 3px !important;
+            padding-bottom: 5px;
+        }
+
+        .content-text {
+            font-size: 14px;
+            padding-top: 0;
+            padding-left: 3rem;
+            line-height: 1.8;
+            word-break: break-all;
+        }
+
+        .focus {
+            font-size: 14px;
+            line-height: 1;
+            text-decoration: none;
+            position: absolute;
+            top: 0.7rem;
+            display: inline-block;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            -webkit-font-smoothing: antialiased;
+            color: #fff!important;
+            background-color: #ffcc00;
+            padding-left:8px;
+            padding-right: 8px;
+        }
+        .school{
+            color: #979797 !important;
+            font-size: 14px;
+        }
+        .report-content{
+            font-size: 14px;
+            margin-top: 0;
+            color: #3d4145;
+        }
+        .report-content-title{
+            font-size: 14px !important;
+            color: #4bc6c6 !important;
+        }
+
+        .comment{
+            margin-left: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            color: #979797;
+
+        }
+        .school-green{
+            color: #4bc6c6 !important;
+            font-size: 14px;
+        }
+        .comment-btn{
+            text-align: right;
+            color: #979797;
+        }
+        .bottom-btn{
+            margin-right: 15px;
+        }
+        .btn-title{
+            padding-left: 3px;
+            font-size: 12px;
+            color: #5f646e;
+        }
+    </style>
+</head>
+<body>
+<div class="aui-content aui-margin-b-15" style="margin-bottom: 0!important;">
+    <ul class="aui-list aui-media-list">
+        <li class="aui-list-item aui-list-item-middle">
+            <div class="aui-media-list-item-inner">
+                <div class="aui-list-item-media user-icon" style="width: 3.5rem;">
+                    <img src="../../image/default_portrait.png" class="aui-img-round aui-list-img-sm">
+                </div>
+                <div class="aui-list-item-inner user-info">
+                    <div class="aui-list-item-text">
+                        <div class="aui-list-item-title aui-font-size-16 user-name">乔帮主<div class="aui-label aui-label-info level">v3</div></div>
+                        <div class="aui-list-item-right focus aui-btn"><span class="aui-iconfont aui-icon-add"></span>关注</div>
+                    </div>
+                    <div class="aui-list-item-text school">
+                        <a class="school">烟台第五中学 老师</a>
+                    </div>
+                    <div class="aui-list-item-text send-time">
+                        2分钟前 来自iphone客户端
+                    </div>
+                    <!--<div class="focus aui-btn" tapmode onclick="focus();"><span-->
+                            <!--class="aui-iconfont aui-icon-add"></span>关注-->
+                    <!--</div>-->
+                </div>
+            </div>
+            <div class="aui-info" style="padding-top:0">
+
+                <div class="aui-info-item">这个真不错!推荐一下</div>
+                <!--<div class="aui-info-item content-text">-->
+                    <!--<span class=""><a class="report-content aui-ellipsis-1"> 上传了</a><a class="report-content-title aui-ellipsis-1">[教学设计]小猫钓鱼</a></span>-->
+                    <!--<span class=""><a class="report-content aui-ellipsis-1"> 数学 七年级 鲁教版(新版)第四单元 估算</a></span>-->
+                <!--</div>-->
+            </div>
+        </li>
+        <li class="aui-list-view-cell ">
+            <div class="forward-content">
+                <span class="user-name"><a class="name-length"> 王明</a><div class="aui-label aui-label-info level">v3</div><a class="school">(烟台第五中学 老师)</a></span>
+                <span class=""><a class="report-content aui-ellipsis-1"> 上传了</a><a class="report-content-title aui-ellipsis-1">[教学设计]小猫钓鱼</a></span>
+                <span class=""><a class="report-content aui-ellipsis-1"> 数学 七年级 鲁教版(新版)第四单元 估算</a></span>
+                <div class="content-img aui-padded-b-5">
+                    <div class="aui-row aui-row-padded">
+                        <div class="aui-col-xs-4">
+                            <img src="../../image/default_portrait.png" alt="">
+                        </div>
+                        <div class="aui-col-xs-4">
+                            <img src="../../image/default_portrait.png" alt="">
+                        </div>
+                        <div class="aui-col-xs-4">
+                            <img src="../../image/default_portrait.png" alt="">
+                        </div>
+
+                    </div>
+                </div>
+                <p class='send-time'>2分钟前 来自iphone客户端</p>
+            </div>
+        </li>
+    </ul>
+    <div class="commen-count"><span class="aui-iconfont aui-icon-comment comment"></span><span>评论(6)</span></div>
+</div>
+<div class="aui-content aui-margin-b-15">
+    <ul class="aui-list aui-media-list">
+        <li class="aui-list-item aui-list-item-middle">
+            <div class="aui-media-list-item-inner">
+                <div class="aui-list-item-media user-icon" style="width: 3rem;">
+                    <img src="../../image/default_portrait.png" class="aui-img-round aui-list-img-sm">
+                </div>
+                <div class="aui-list-item-inner user-info">
+                    <div class="aui-list-item-text">
+                        <div class="aui-list-item-title aui-font-size-16 user-name">乔帮主<div class="aui-label aui-label-info level">v3</div><a class="school">(烟台第五中学 老师)</a></div>
+                        <!--<div class="aui-list-item-right">08:00</div>-->
+                    </div>
+                    <div class="aui-list-item-text send-time">
+                        2分钟前
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="content-text">回复<span class="little-user-name">@李四<div class="aui-label aui-label-info level">v3</div><a class="school-green">(淄博文化中学 老师)</a></span>:<span>谢谢你,客气!</span></div>
+            <div class="comment-btn"><span class="aui-iconfont aui-icon-community bottom-btn"><span class="btn-title">查看对话</span></span><span class="aui-iconfont aui-icon-comment bottom-btn"><span class="btn-title">回复</span></span><span class="aui-iconfont aui-icon-delete bottom-btn"><span class="btn-title">删除</span></span></div>
+
+        </li>
+
+        <li class="aui-list-item aui-list-item-middle">
+            <div class="aui-media-list-item-inner">
+                <div class="aui-list-item-media user-icon" style="width: 3rem;">
+                    <img src="../../image/default_portrait.png" class="aui-img-round aui-list-img-sm">
+                </div>
+                <div class="aui-list-item-inner user-info">
+                    <div class="aui-list-item-text">
+                        <div class="aui-list-item-title aui-font-size-16 user-name">李四<div class="aui-label aui-label-info level">v3</div><a class="school">(烟台第五中学 老师)</a></div>
+                        <!--<div class="aui-list-item-right">08:00</div>-->
+                    </div>
+                    <div class="aui-list-item-text send-time">
+                        2分钟前
+                    </div>
+
+                </div>
+            </div>
+            <div class="content-text">非常好</div>
+            <div class="comment-btn"><span class="aui-iconfont aui-icon-comment bottom-btn"><span class="btn-title">回复</span></span></div>
+
+        </li>
+    </ul>
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        
+    };
+</script>
+</html>

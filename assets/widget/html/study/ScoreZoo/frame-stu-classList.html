@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>乐园</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }   .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .content {
+            width: 35%;
+            height: 70%;
+            top: 15%;
+            position: absolute;
+            left: 32.5%;
+
+        }
+        .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .content dl {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            margin: 0 auto;
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+
+
+        .content dl dd {
+            line-height: 55px;
+            font-size: 0.8rem;
+            color: #333333;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;;
+        }
+        .content dl dd:active {
+            line-height: 55px;
+            font-size: 0.8rem;
+            color: #4bc7c7;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;;
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+        [v-cloak] {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="closeSelFrame()"></div>
+<div  id="app" class="content">
+    <dl>
+        <dd  v-for="item,index of contents" class="item-content aui-border-b" tapmode @click="itemClick(index)" v-text="item.bjmc">dasddasdsa</dd>
+    </dl>
+</div>
+<!--<div id="app" class="show" v-cloak>-->
+    <!--<div>-->
+        <!--<p v-for="item,index of contents" class="item-content aui-border-b" tapmode @click="itemClick(index)">-->
+            <!--{{item.bjmc}}</p>-->
+    <!--</div>-->
+<!--</div>-->
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var vm = null;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        var type = api.pageParam.type;
+        vm = new Vue({
+            el: '#app',
+            data: {
+                contents: ''
+            },
+            methods: {
+                itemClick: function (index) {
+                    var func = "$api.html($api.dom('.type'), '" + api.pageParam.stuClassArr[index].bjmc + "');";
+                    api.execScript({
+                        script: func
+                    });
+                    if (type != 'zoo') {
+                        var funcLoadData = "classid='" + api.pageParam.stuClassArr[index].bjid + "';schoolid='" + api.pageParam.stuClassArr[index].schoolid + "';loadStuPersionScoreData()";
+                        api.execScript({
+                            frameName: 'frame-persionscore',
+                            script: funcLoadData
+                        });
+                    } else {
+                        var funcLoadData = "classid = '" + api.pageParam.stuClassArr[index].bjid + "';vm.loadStuScoreRankData()";
+                        api.execScript({
+                            frameName: 'frame-persionscoreList',
+                            script: funcLoadData
+                        });
+                    }
+                    closeSelFrame();
+                }
+            }
+        });
+        vm.contents = api.pageParam.stuClassArr;
+//        getGroupScoreData();
+
+    };
+    function getGroupScoreData(index) {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetClassInfoByStu, {
+            values: {
+                uid: $api.getStorage('uid')
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.contents = ret.data;
+//                    $api.css($api.dom('caogaozhiDiv'), 'height:'+ret.data.length*30+'px');
+
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+    function closeSelFrame() {
+
+        api.closeFrame({
+            name: 'frame-stu-classList'
+        });
+    }
+</script>
+</html>

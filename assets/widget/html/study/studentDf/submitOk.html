@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .content2 {
+            width: 200px;
+            height: 80px;
+            top: calc(50% - 40px);
+            position: absolute;
+            left: calc(50% - 100px);
+            padding: 10px;
+            border-radius: 6px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .content2 img{width: 40px;margin-top: 10px;margin-left:30px;float: left}
+    </style>
+</head>
+<body>
+<div class="close" tapmode onclick="vm.closeFrame()"></div>
+<div class="content2">
+    <img src="../../../image/dgpic.png">
+    <div style="color: white;margin-top: 16px;margin-left: 87px">已打分</div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        setTimeout(function(){
+            closeFrame();
+        },2000);
+    };
+    function closeFrame () {
+        api.closeFrame({
+            name: 'submitOk'
+        });
+    }
+</script>

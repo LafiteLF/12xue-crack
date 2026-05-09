@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Title</title>
+    <script src="../../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+        }
+
+        #main {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #F6F8F9;
+        }
+
+        #rules-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            background-color: white;
+            margin: 4vh 3.125vw 5vh;
+            padding: 3vh 2vw;
+            border-radius: 1.197vw;
+            justify-content: center;
+            row-gap: 4.167vh;
+            align-content: center;
+        }
+
+        #rules-container > div {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            grid-template-rows: auto;
+            gap: 2.25vh 1vw;
+        }
+
+        #rules-container > div > :first-child {
+            grid-row: 1;
+            grid-column: 1;
+            color: white;
+            font-size: 1.458vw;
+            border-radius: 50%;
+            background-color: #4BC7C7;
+            width: 2.6vw;
+            height: 2.6vw;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rules-container > div > :nth-child(2) {
+            grid-row: 1;
+            grid-column: 2;
+
+            color: #333333;
+            font-size: 1.667vw;
+            margin-left: 1.6vw;
+            display: flex;
+            align-items: center;
+        }
+
+        #rules-container > div > :last-child {
+            grid-row: 2;
+            grid-column: 2;
+            background-color: #F7F9FA;
+            border-radius: 1.5625vw;
+            padding: 3.25vh 1.7vw;
+            color: #666666;
+            font-size: 1.4583vw;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <template v-if="isLoaded">
+        <div style="display: flex; flex-direction: row; margin: 5.3vh 0 0 2vw;align-items: center;">
+            <img @click.stop="close" src="../../image/onlineMember/back.png" alt="back"
+                 style="width: 2vw;height: 2vw;margin-right: 0.88vw">
+            <div style="color: #333333;font-size: 2vw">套餐有效期及使用规则</div>
+        </div>
+        <div id="rules-container">
+            <div>
+                <div>1</div>
+                <div>多套餐开通/兑换后的使用顺序</div>
+                <div>
+                    若您同时开通或兑换多个不同类型的新套餐，将按照以下规则依次使用会员权益：<br>优先使用激活时间较早的套餐；当前套餐到期后，自动启用下一个激活的新套餐。
+                </div>
+            </div>
+            <div>
+                <div>2</div>
+                <div>套餐升级规则</div>
+                <div>
+                    当您选择升级套餐时，帐号当前的套餐版本将立即更换为升级后的版本，且套餐到期时间保持不变。<br>举例：A用户于3月1日兑换1年尊荣版套餐（到期时间为次年3月1日），若5月1日选择升级为1年尊享版套餐，尊享版套餐将立即生效，到期时间仍为次年3月1日。
+                </div>
+            </div>
+            <div>
+                <div>3</div>
+                <div>主套餐与专项流量包的抵扣规则</div>
+                <div>
+                    若主套餐中某项功能的当月使用次数已耗尽，将自动开始抵扣专项流量包中该功能的次数；次月1日主套餐该功能的使用次数重置更新后，专项流量包的抵扣自动结束，恢复使用主套餐次数。
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+</body>
+<script>
+    const {createApp, ref} = Vue
+    createApp({
+        setup() {
+            const isLoaded = ref(true);
+            apiready = async () => {
+                isLoaded.value = true;
+            }
+
+            function close() {
+                api.closeWin();
+            }
+
+            return {
+                isLoaded,
+                close,
+            }
+        }
+    }).mount('#main')
+</script>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>购买</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+        [v-cloak] {
+            /*display: none*/
+        }
+        body{
+            background-color: rgba(0,0,0,0.5);
+            font-size: 14px;
+        }
+
+        .content{
+            width: 300px;
+            height: 250px;
+            background: url("../../../image/exam/buy.png") no-repeat center top #fff;
+            background-size: 100% auto;
+            position: relative;
+            z-index: 2;
+            border-radius: 5px;
+            top: calc(50% - 125px);
+            left:calc(50% - 150px);
+            color: #333;
+            text-align: center;
+        }
+        .content p{
+            padding-top: 132px;
+            color: #666;
+            line-height: 24px;
+        }
+        .sure{
+            width: 100px; height: 35px;line-height: 37px; border-radius: 1000px;color: #fff;font-size: 1.4rem;background: #4bc7c7;
+            margin: 0 auto;margin-top: 10px;
+        }
+    </style>
+</head>
+<body >
+<div class="close" onclick="api.closeFrame();"  ></div>
+    <div class="content" v-cloak>
+        <p>当前试卷需购买相关分册精品资源后<br>方可使用,请反馈老师解决！</p>
+        <div class="sure" onclick="api.closeFrame();">确定</div>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+</html>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout android:id="@id/rl_root" android:layout_width="match_parent" android:layout_height="match_parent">
+        <SurfaceView android:layout_gravity="center" android:id="@id/mo_fnscanner_preview_view" android:layout_width="match_parent" android:layout_height="match_parent" />
+        <com.uzmap.pkg.uzmodules.uzFNScanner.Zxing.view.ViewfinderView android:id="@id/mo_fnscanner_viewfinder_view" android:layout_width="wrap_content" android:layout_height="wrap_content" app:orientation="port" />
+    </RelativeLayout>
+    <RelativeLayout android:id="@id/topbar" android:layout_width="match_parent" android:layout_height="50.0dp">
+        <ImageView android:id="@id/mo_fnscanner_back" android:layout_width="22.0dp" android:layout_height="22.0dp" android:layout_marginLeft="15.0dp" android:src="@drawable/mo_back" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+        <TextView android:textColor="#ffffff" android:id="@id/mo_fnscanner_photo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="15.0dp" android:text="@string/fnscanner_album" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+        <ImageView android:id="@id/mo_fnscanner_light" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="30.0dp" android:src="@drawable/mo_fnscanner_light_light" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+    </RelativeLayout>
+</RelativeLayout>

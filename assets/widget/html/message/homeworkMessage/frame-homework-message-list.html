@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+
+    <style>
+        body {
+            background: #f2f2f2
+        }
+
+        .aui-content {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .li-content {
+            margin: 0 1.4rem;
+            background-color: white;
+            border-radius: 0.3rem;
+            height: auto;
+        }
+
+        .time {
+
+            margin: 0px 1.4rem;
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+            color: #aaa;
+            border-bottom: 1px solid #e4e4e8;
+            position: relative;
+        }
+
+        .li-content .content {
+            padding: 0.8rem 0 0 0;
+            min-height: 1.7rem;
+        }
+
+        .footer {
+            margin-top: 0.8rem;
+            border-top: 0.05rem solid #DBDBDB;
+            padding: 0.5rem;
+        }
+
+        span.tag {
+            color: #ff778c;
+            background-color: #fff;
+            border: 1px solid #ff778c;
+            font-size: 0.6rem;
+            float: left;
+            margin-top: 7px;
+            margin-right: 5px;
+
+        }
+
+        .masz {
+            color: #4BC7C7;
+            text-align: center;
+        }
+
+        .content {
+            word-break: break-all;
+        }
+
+        .aui-text-primary {
+            color: #4BC7C7 !important;
+            font-size: 0.7rem;
+            display: inline-block;
+            padding-top: 5px;
+        }
+
+        .aui-list li {
+            background: #fff;
+            margin: 10px 0px;
+        }
+
+        .aui-list:before {
+            height: 0px;
+        }
+
+        .aui-list:after {
+            height: 0px;
+        }
+
+        .time span {
+            display: block;
+            width: 6px;
+            height: 31px;
+            background: #ffcd06;
+            position: absolute;
+            left: -1.4rem;
+            top: 11px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="content11" v-cloak="">
+    <section class="aui-refresh-content" style="height: 100%;">
+        <div class="aui-content" v-if="messageList.length > 0">
+            <ul class="aui-list">
+                <li v-for="(list,index) in messageList">
+                    <div v-if="list.type == 2">
+                        <div class="time">
+                            {{list.createtime}}
+                        </div>
+                        <div class="li-content">
+                            <div class="content">
+                                {{getResult(list.content,0)}}老师{{getResult(list.content,1)}}评价你的作业
+                                "{{getResult(list.content,2)}}" 为 "{{getResult(list.content,3)}}"
+                            </div>
+                            <div class="footer" :zyid="list.zyid" :classid="list.classid" tapmode>
+                                <div class="aui-pull-left">
+                                </div>
+                                <div class="masz" onclick="clickItemPj(this)">查看作业评价 ></div>
+                                <div style="clear: both">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="list.type == 5">
+                        <div class="time">{{list.createtime}}<span></span></div>
+                        <div class="li-content">
+                            <div class="content" v-text="htmlspecialchars(list.content)"></div>
+                            <div class="aui-clearfix">
+                                <span class="tag" style="padding:0 0.25rem;border-radius: 3px;">截止</span>
+                                <span class="time-end aui-text-primary" style="margin-left: 5px">{{list.end_time}}</span>
+                            </div>
+                            <div class="footer" :zyid="list.zyid" :classid="list.classid" tapmode>
+                                <div class="masz" onclick="clickItem(this)">马上做作业 ></div>
+                                <div style="clear: both"></div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var isClean = false;
+    var p = 1;
+    var totalPage;
+    var vm;
+    var pullRefresh;
+    apiready = function () {
+        vue();
+        getHomeworkMessage();
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isClean = true;
+                getHomeworkMessage();
+            }
+        });
+        $api.css($api.dom('.aui-refresh-pull-arrow'), 'z-index:0');
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content11',
+            data: {
+                messageList: [],
+            },
+            updated: function () {
+            },
+            methods: {
+                getResult: function (str, tag) {
+                    var result;
+                    var strjson = $api.strToJson(str);
+                    var zyname = strjson.kcname ? strjson.kcname : strjson.xkname;
+                    var teachername = strjson.teachername;
+                    var homeworktitle = vm.htmlspecialchars(strjson.homeworktitle);
+                    var remark = strjson.remark;
+                    if (tag == 0) {
+                        result = zyname;
+                    }
+                    else if (tag == 1) {
+                        result = teachername;
+                    }
+                    else if (tag == 2) {
+                        result = homeworktitle;
+                    }
+                    else {
+                        result = remark;
+                    }
+                    return result;
+                },
+                htmlspecialchars: function (str, n_to_empty = 0) {
+                    var s = '';
+                    if (typeof str === 'undefined' || str.length === 0) {
+                        return '';
+                    }
+                    for (var i = 0; i < str.length; i++) {
+                        switch (str.substr(i, 1)) {
+                            case "<":
+                                s += "&lt;";
+                                break;
+                            case ">":
+                                s += "&gt;";
+                                break;
+                            case "&":
+                                s += "&amp;";
+                                break;
+                            case "":
+                                if (str.substr(i + 1, 1) == "") {
+                                    s += " &nbsp;";
+                                    i++;
+                                } else s += " ";
+                                break;
+                            case "\'":
+                                s += "&quot;";
+                                break;
+                            case "\n":
+                                if (!n_to_empty) {
+                                    s += "<br>";
+                                } else {
+                                    s += `  `;
+                                }
+                                break;
+                            default:
+                                s += str.substr(i, 1);
+                                break;
+                        }
+                    }
+                    return s;
+                },
+            }
+        });
+    }
+    function getHomeworkMessage() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Get(UrlRouter.GetHomeworkMessage, {
+            values: {
+                p: p,
+                num: 10
+            }
+        }, function (ret, err) {
+            pullRefresh.cancelLoading();
+            if (ret) {
+                api.hideProgress();
+                if (isClean) {
+                    vm.messageList = [];
+                }
+                if (ret.ret == '0') {
+                    if (ret.list == null || ret.list.length == 0) {
+                        showNoData();
+                    } else {
+                        $api.css($api.dom(".no-data"), 'display:none;');
+
+                        for (var i = 0; i < ret.list.length; i++) {
+                            vm.messageList.push(ret.list[i]);
+                        }
+                    }
+                    p++;
+                    totalPage = ret.totalpage;
+
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100           //设置距离底部多少距离时触发，默认值为0，数字类型
+                        }
+                    }, function (ret, err) {
+                        if (p > totalPage) {
+                            api.toast({
+                                msg: '已经到底啦，没有更多了',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        } else {
+                            isClean = false;
+                            getHomeworkMessage();
+                            api.removeEventListener({
+                                name: 'scrolltobottom'
+                            });
+                        }
+                    });
+                } else {
+                    api.hideProgress();
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    })
+                }
+            } else {
+                api.hideProgress();
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                })
+            }
+        });
+    }
+    //进作业评价
+    function clickItemPj(context) {
+        var zyid = $api.attr($api.closest(context, '.footer'), 'zyid');//获得作业id
+        var classid = $api.attr($api.closest(context, '.footer'), 'classid');//获得班级id
+        //作业评价
+        api.openWin({
+            name: 'homeworkJudge_win',
+            url: 'homeworkJudge_win.html',
+            pageParam: {zyid: zyid, classid: classid}
+        });
+
+    }
+    //进作业
+    function clickItem(context) {
+        var zyid = $api.attr($api.closest(context, '.footer'), 'zyid');//获得作业id
+        var classid = $api.attr($api.closest(context, '.footer'), 'classid');//获得班级id
+        var liContent = $api.closest(context, '.li-content');
+        var content = $api.text($api.dom(liContent, ".content"));
+        var pageData;
+        //获取作业状态
+        apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+            values: {
+                uid: $api.getStorage('uid'),
+                identitytype: '3'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                api.hideProgress();
+                if (ret.ret == '0') {
+                    var schoolid = ret.data[0].id;
+                    //获取作业状态
+                    apiObj.Get(UrlRouter.GetStudenthomeworkUrl, {
+                        values: {
+                            hwid: zyid,
+                            classid: classid,
+                            identitytype: 3,//查看的角色信息（3学生 4家长）
+                            uid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                ret['bjid'] = classid;
+                                ret['complete'] = ret.yxzt;
+                                ret['zysm'] = ret.content;
+                                pageData = ret;
+
+                                if ((pageData.sys_type == 4 || pageData.sys_type == 5 || pageData.sys_type == 6) && (pageData.sxcid != null)) {
+                                    //打开收费界面
+                                    apiObj.Get(UrlRouter.GetPracticeCheckPayInfo, {
+                                        values: {
+                                            xkid: ret.xkid,
+                                            njid: pageData.njid,
+                                            sxcid: pageData.sxcid,
+                                            mac_addr: $api.getStorage('macAdress')
+                                        }
+                                    }, function (ret, err) {
+                                        api.hideProgress();
+                                        if (ret) {
+                                            if (ret.ret == 0) {
+
+                                                if (ret.data.status != 2) {   //!=3
+                                                    api.openWin({
+                                                        name: 'not_opened',
+                                                        url: '../../not_opened.html'
+                                                    });
+                                                } else {
+                                                    //直接进入
+                                                    $api.setStorage('hwClassid', pageData.bjid);
+                                                    if (pageData.complete == 2) {
+                                                        api.openWin({
+                                                            name: 'win_exercises_list',
+                                                            url: '../../study/newHomework/win_exercises_list.html',
+                                                            pageParam: {
+                                                                detailData: pageData,
+                                                                from: 'message'
+                                                            },
+                                                            slidBackEnabled: false
+                                                        });
+                                                    } else {
+                                                        if (pageData.jcxts == 0 && pageData.materiallist.length == 0 && !pageData.content) {
+                                                            api.openWin({
+                                                                name: 'win_detail_kzxt',
+                                                                url: '../../study/newHomework/kzxt/win_detail_kzxt.html',
+                                                                pageParam: {
+                                                                    detailData: pageData,
+                                                                    complete: pageData.complete,
+                                                                    index: 0
+                                                                },
+                                                                slidBackEnabled: false
+                                                            });
+
+                                                        } else {
+                                                            api.openWin({
+                                                                name: 'win_detail',
+                                                                url: '../../study/newHomework/win_detail.html',
+                                                                pageParam: {
+                                                                    detailData: pageData,
+                                                                    complete: pageData.complete,
+                                                                    index: 0,
+                                                                    from: 'message'
+                                                                },
+                                                                slidBackEnabled: false,
+                                                                reload: true
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                api.toast({
+                                                        msg: ret.msg,
+                                                        duration: 2000,
+                                                        location: 'bottom'
+                                                    }
+                                                )
+                                            }
+                                        } else {
+                                            api.toast({
+                                                    msg: err.msg,
+                                                    duration: 2000,
+                                                    location: 'bottom'
+                                                }
+                                            )
+                                        }
+                                    })
+                                } else {
+                                    //直接进入
+                                    $api.setStorage('hwClassid', pageData.bjid);
+                                    if (pageData.complete == 2) {
+                                        api.openWin({
+                                            name: 'win_exercises_list',
+                                            url: '../../study/newHomework/win_exercises_list.html',
+                                            pageParam: {
+                                                detailData: pageData,
+                                                from: 'message'
+                                            },
+                                            slidBackEnabled: false
+                                        });
+                                    } else {
+
+                                        if (pageData.zys == 0 && !pageData.content) {
+                                            api.openWin({
+                                                name: 'win_detail_kzxt',
+                                                url: '../../study/newHomework/kzxt/win_detail_kzxt.html',
+                                                pageParam: {
+                                                    detailData: pageData,
+                                                    complete: pageData.complete,
+                                                    index: 0,
+                                                    from: 'message'
+                                                },
+                                                slidBackEnabled: false
+                                            });
+                                        } else {
+                                            api.openWin({
+                                                name: 'win_detail',
+                                                url: '../../study/newHomework/win_detail.html',
+                                                pageParam: {
+                                                    detailData: pageData,
+                                                    complete: pageData.complete,
+                                                    index: 0,
+                                                    from: 'message'
+                                                },
+                                                slidBackEnabled: false
+                                            });
+                                        }
+                                    }
+                                }
+                            } else {
+                                api.toast({
+                                    msg: ret.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: err.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+    function showNoData() {
+        $api.html($api.dom('.content11'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width:34%;vertical-align: middle;position: absolute;top: 20%;left: 33%;"/> </div>');
+        $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+    }
+</script>
+</html>

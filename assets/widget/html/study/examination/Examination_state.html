@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>考试状态</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <style>
+        .close {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1
+        }
+        [v-cloak] {
+            display: none
+        }
+        body{
+            background-color: rgba(0,0,0,0.5);
+            font-size: 14px;
+        }
+
+        .content{
+            width: 250px;
+            height: 170px;
+            background-color: #fff;
+            position: relative;
+            z-index: 2;
+            border-radius: 10px;
+            top: calc(50% - 85px);
+            left:calc(50% - 125px);
+            color: #333;
+            text-align: center;
+        }
+        .exam-ul{
+            /*background-color: #ffffff;*/
+        }
+        .exam-ul li{
+            height: 42px;
+            line-height: 42px;
+        }
+        .exam-ul li+li{
+            border-top: 1px solid #e4e4e8;
+        }
+
+
+    </style>
+</head>
+<body >
+<div class="close" onclick="api.closeFrame();"  ></div>
+    <div class="content" v-cloak>
+        <ul class="exam-ul">
+            <li v-for="list in status" v-text="list.content" @click="select(list)" :style="statusid==list.id?'color:#4bc7c7':''"></li>
+        </ul>
+    </div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/common.js"></script>
+<script type="text/javascript" src="../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vm.statusid= api.pageParam.status
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            statusid:0,
+            status:[{'content':'全部','id':'0'},{'content':'阅卷完成','id':'3'},{'content':'阅卷中','id':'2'},{'content':'缺考','id':'1'}]
+        },
+        methods: {
+            select:function(list){
+                vm.statusid = list.id;
+                api.sendEvent({
+                    name: 'selectStatus',
+                    extra: {
+                        status: list.id,
+                    }
+                });
+                api.closeFrame();
+            },
+
+        }
+    });
+</script>
+</html>

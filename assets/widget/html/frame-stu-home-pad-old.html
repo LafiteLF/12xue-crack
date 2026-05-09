@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>首页</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background: #fff
+        }
+
+        [v-cloak] {
+            display: none
+        }
+
+        .content {
+            height: 100%;
+            padding: 0 10px 10px 10px
+        }
+
+        .content ul {
+            position: relative;
+            height: 100%
+        }
+
+        .content ul li {
+            position: absolute;
+            padding: 5px
+        }
+
+        .list {
+            width: 100%;
+            height: 100%
+        }
+
+        .imgtwo {
+            right: 10%;
+            bottom: 10%
+        }
+
+        .content ul li:nth-of-type(1) {
+            width: 30%;
+            height: 66%;
+            top: 0px;
+            left: 0px;
+        }
+
+        .content ul li:nth-of-type(1) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #0090ff;
+            background-size: 50%;
+        }
+
+        .content ul li:nth-of-type(1) .list .imgone {
+            width: 55%;
+            max-width: 300px;
+            left: 10%;
+            top: 20%;
+            position: absolute
+        }
+
+        .content ul li:nth-of-type(1) .list .imgtwo {
+            width: 39%;
+            max-width: 218px;
+            position: absolute
+        }
+
+        .xuanke {
+            width: 30%;
+            height: 20%;
+            top: 0px;
+            left: 0px;
+            z-index: 3
+        }
+
+        .xuankehomework {
+            width: 30% !important;
+            height: 46% !important;
+            top: 20% !important
+        }
+
+        .xuanke .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #806fff;
+            background-size: 40%;
+        }
+
+        .xuanke .list .imgone {
+            width: 30%;
+            max-width: 300px;
+            left: 16%;
+            bottom: 16%;
+            position: absolute;
+        }
+
+        .xuanke .list .imgtwo {
+            width: 39%;
+            max-width: 218px;
+            position: absolute;
+            bottom: 29%;
+
+        }
+
+        .content ul li:nth-of-type(2) {
+            width: 35%;
+            height: 33%;
+            top: 0px;
+            left: 30%;
+        }
+
+        .content ul li:nth-of-type(2) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #ff6780;
+            background-size: 40%;
+        }
+
+        .content ul li:nth-of-type(2) .list .imgone {
+            width: 26%;
+            max-width: 186px;
+            left: 10%;
+            top: 24%;
+            position: absolute
+        }
+
+        .content ul li:nth-of-type(2) .list .imgtwo {
+            width: 37%;
+            max-width: 253px;
+            position: absolute
+        }
+
+        .content ul li:nth-of-type(3) {
+            width: 35%;
+            height: 33%;
+            top: 0px;
+            left: 65%;
+        }
+
+        .content ul li:nth-of-type(3) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #3ad0a0;
+            background-size: 40%;
+        }
+
+        .content ul li:nth-of-type(3) .list .imgone {
+            width: 25%;
+            max-width: 151px;
+            left: 10%;
+            top: 22%;
+            position: absolute
+        }
+
+        .content ul li:nth-of-type(3) .list .imgtwo {
+            width: 37%;
+            max-width: 255px;
+            position: absolute
+        }
+
+        .content ul li:nth-of-type(4) {
+            width: 20%;
+            height: 33%;
+            top: 33%;
+            left: 30%;
+
+        }
+
+        .content ul li:nth-of-type(4) .list .bgg {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stuHomePad/index3.png") no-repeat center center;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(4) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #f68b00;
+            background-size: 40%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .content ul li:nth-of-type(4) .list .imgone {
+            max-width: 100%;
+            max-height: 100%;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .content ul li:nth-of-type(4) .list .imgtwo {
+            width: 32%;
+            max-width: 118px;
+            margin: 0 auto;
+            display: block;
+            padding-top: 2%
+        }
+
+        .content ul li:nth-of-type(8) {
+            width: 20%;
+            height: 33%;
+            top: 33%;
+            left: 50%;
+        }
+
+        .content ul li:nth-of-type(8) .list {
+            background: #fff;
+        }
+
+        .content ul li:nth-of-type(8) .list span {
+            display: block;
+            width: 100%;
+            height: 23.5%;
+            text-align: center;
+            color: #fff;
+            font-size: 0.8rem;
+            margin-top: 2%;
+        }
+
+        .content ul li:nth-of-type(8) .list span:nth-of-type(1) {
+            background: url("../image/stuHomePad/kwyz.png") no-repeat center center #f6b900;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(8) .list span:nth-of-type(2) {
+            background: url("../image/stuHomePad/xqah.png") no-repeat center center #f6b900;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(8) .list span:nth-of-type(3) {
+            background: url("../image/stuHomePad/ydys.png") no-repeat center center #f6b900;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(8) .list span:nth-of-type(1) {
+            margin-top: 0px;
+        }
+
+        .content ul li:nth-of-type(10) {
+            width: 30%;
+            height: 34%;
+            top: 66%;
+            left: 70%;
+        }
+
+        .content ul li:nth-of-type(10) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #8f8ac3;
+            background-size: 40%;
+        }
+
+        .content ul li:nth-of-type(7) {
+            width: 30%;
+            height: 34%;
+            top: 66%;
+            left: 0;
+        }
+
+        .ktjyactive {
+            width: 15% !important;
+            height: 34% !important;
+            top: 66% !important;
+            left: 0 !important;
+        }
+
+        .content ul li:nth-of-type(7) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #00c600;
+            background-size: 40%;
+        }
+
+        .content ul li:nth-of-type(7) .list .imgone {
+            width: 40%;
+            max-width: 194px;
+            left: 6%;
+            top: 20%;
+            position: absolute
+        }
+
+        .ktjyactive .list .imgone {
+            width: 70% !important;
+            max-width: 100% !important;
+            left: 15% !important;
+            top: 14% !important;
+            position: absolute !important;
+        }
+
+        .content ul li:nth-of-type(7) .list .imgtwo {
+            width: 49%;
+            max-width: 208px;
+            position: absolute
+        }
+
+        .ktjyactive .list .imgtwo {
+            width: 60% !important;
+            max-width: 208px !important;
+            position: absolute !important;
+            left: 20% !important;
+            bottom: 12% !important
+        }
+
+        .xsdf {
+            width: 15%;
+            height: 34%;
+            top: 66%;
+            left: 15%;
+        }
+
+        .xsdf .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #16c8d2;
+            background-size: 40%;
+        }
+
+        .xsdf .list .imgone {
+            width: 70%;
+            max-width: 100%;
+            left: 15%;
+            top: 14%;
+            position: absolute;
+        }
+
+        .xsdf .list .imgtwo {
+            width: 60%;
+            max-width: 208px;
+            position: absolute;
+            left: 20%;
+            bottom: 12%
+        }
+
+        .content ul li:nth-of-type(5) {
+            width: 20%;
+            height: 17%;
+            top: 66%;
+            left: 50%;
+        }
+
+        .content ul li:nth-of-type(5) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #6f6fff;
+            background-size: 40%;
+        }
+
+        .content ul li:nth-of-type(5) .list .bgg {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stuHomePad/xuefenleyuan.png") no-repeat center center;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(5) .list .imgone {
+            max-height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+            vertical-align: middle;
+        }
+
+        .content ul li:nth-of-type(5) .list .imgtwo {
+            width: 48%;
+            max-width: 198px;
+            margin: 0 auto;
+            display: block;
+            padding-top: 2%
+        }
+
+        .content ul li:nth-of-type(6) {
+            width: 20%;
+            height: 17%;
+            top: 83%;
+            left: 50%;
+        }
+
+        .content ul li:nth-of-type(6) .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #a25aff;
+            background-size: 40%;
+        }
+
+        .content ul li:nth-of-type(6) .list .bgg {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stuHomePad/wodeyingyong.png") no-repeat center center;
+            background-size: 100% auto;
+        }
+
+        .content ul li:nth-of-type(6) .list .imgone {
+            max-height: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+            vertical-align: middle;
+        }
+
+        .content ul li:nth-of-type(6) .list .imgtwo {
+            width: 48%;
+            max-width: 198px;
+            margin: 0 auto;
+            display: block;
+            padding-top: 4%
+        }
+
+        .photo {
+            /* width: 50px;
+            height: 50px; */
+            width: 6vw;
+            height: 6vw;
+            /* margin: 0 auto; */
+            /* margin-left: 15px; */
+            border-radius: 500px;
+            border: 2px solid #fff;
+            overflow: hidden;
+        }
+
+        .photo img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .photofar {
+            padding-top: 3.4vh;
+            position: absolute;
+            width: 6vw;
+            height: 6vw;
+            padding-left: 1.6vw;
+        }
+
+        .lv {
+            width: 20%;
+            height: 20px;
+            display: block;
+            background: #ffba16;
+            text-align: center;
+            line-height: 22px;
+            color: #fff;
+            position: absolute;
+            left: 39.9%;
+            top: 91%;
+            font-size: 0.55rem;
+            border-radius: 3px;
+        }
+
+        .name {
+            font-size: 0.5rem;
+            color: #fff;
+            text-align: left;
+            padding-top: 4vh;
+            padding-left: 10vw;
+            /* padding-bottom: 7px; */
+
+            width: auto;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            /* margin: 0 0 0 80px; */
+
+        }
+
+        .banji {
+            font-size: 0.5rem;
+            color: #fff;
+            text-align: left;
+            width: auto;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 0 auto;
+            padding-left: 10vw;
+            /* margin: 0 0 0 80px; */
+            /* padding-top: 4vh; */
+        }
+
+        .banji span {
+            padding: 0 10px
+        }
+
+        .school {
+            font-size: 0.5rem;
+            color: #fff;
+            text-align: left;
+            width: auto;
+            margin: 0 auto;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-left: 10vw;
+            /* margin: 0 0 0 80px;   */
+        }
+
+        .personal {
+            width: 36%;
+            position: absolute;
+            right: 10%;
+            bottom: 5%;
+            max-width: 200px;
+        }
+
+        .setup {
+            width: 20%;
+            position: absolute;
+            left: 10%;
+            bottom: 5%;
+            text-align: center;
+            display: none;
+
+        }
+
+        .setup img {
+            margin: 0 auto;
+            width: 84%;
+            max-width: 107px;
+        }
+
+        .setup span {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #fff;
+            display: block;
+            width: 100%;
+            margin-top: -8px;
+        }
+
+        .list .item img {
+            height: 100%
+        }
+
+        .content ul li:nth-of-type(5),
+        .content ul li:nth-of-type(6) {
+            display: none;
+        }
+
+        .iosxfly {
+            position: absolute;
+            width: 40%;
+            height: 34%;
+            top: 66%;
+            left: 30%;
+            display: none;
+        }
+
+        .iosxfly .list {
+            background: url("../image/stuHomePad/list-bg.png") no-repeat 70% 0px #cb52c7;
+            background-size: 40%;
+        }
+
+        .iosxfly .list .imgone {
+            width: 35%;
+            max-width: 186px;
+            left: 10%;
+            top: 20%;
+            position: absolute;
+        }
+
+        .iosxfly .list .imgtwo {
+            width: 26%;
+            max-width: 208px;
+            position: absolute;
+        }
+
+        @media only screen and (min-width: 970px) and (max-width: 980px) {
+            .photo {
+                width: 80px;
+                height: 80px;
+                border: 4px solid #fff;
+            }
+
+            .lv {
+                font-size: 0.5rem;
+            }
+
+            .name {
+                font-size: 0.7rem;
+                padding-bottom: 14px;
+            }
+
+            .banji {
+                font-size: 0.7rem;
+            }
+
+            .school {
+                font-size: 0.65rem;
+            }
+        }
+
+        .sign-div {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            width: auto;
+            /*padding-right: 9px;*/
+            /*padding-top: 20px;*/
+            text-align: center;
+            z-index: 6789;
+        }
+
+        .imgSign {
+            padding: 5px;
+            width: 60px;
+        }
+
+        .txtSigned {
+            /*font-size: 14px;*/
+            /*font-weight: normal;*/
+            /*font-stretch: normal;*/
+            /*color: #ffffff;*/
+            /*padding: 2px 5px;*/
+            /*border-radius: 3px;*/
+            /*border: solid 1.4px #d6d6d6;*/
+            padding: 5px;
+            width: 36px;
+        }
+
+        .shiyong {
+            position: absolute;
+            z-index: 1000;
+            color: #fff;
+            width: 41px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.28);
+            border-bottom-left-radius: 6px;
+            right: 5px;
+            top: 5px;
+            line-height: 24px;
+            font-size: 13px;
+        }
+
+        .aiAssistant {
+            width: 20%;
+            height: 17%;
+            top: 83%;
+            left: 30%;
+        }
+
+        .aiAssistant .bgg {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stuHomePad/aichat.png") no-repeat center center;
+            background-size: cover;
+        }
+
+        .englishword {
+            width: 20%;
+            height: 34%;
+            top: 66%;
+            left: 30%;
+        }
+
+        .englishword .bgg {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stuHomePad/quankouyu.png") no-repeat center center;
+            background-size: cover;
+        }
+
+
+        /* 1. 为新增的“AI知识图谱”模块定义样式 */
+        .knowledgeMap {
+            width: 30%;
+            height: 33%;
+            top: 33%;
+            left: 70%;
+        }
+
+        .knowledgeMap .bgg {
+            width: 100%;
+            height: 100%;
+            background: url("../image/stuHomePad/AIzhishi.png") no-repeat center center;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+<div class="content" v-cloak>
+    <ul>
+        <li v-for="(list1,listindex) in 7"
+            :class="listindex==0 && (chooseSubjectType!=1 && gradelist.length>0)?'xuankehomework':''"
+            :id="listindex" tapmode onclick="vm.openFrame(this)">
+            <div class="list" :src='"../image/stuHomePad/zi"+listindex+".png"'>
+                <div v-if="listindex==3" class="shiyong">
+                    试用
+                </div>
+                <div class="bgg" v-if="listindex==3 || listindex==4 || listindex==5"></div>
+                <img class="imgone" v-else :src='"../image/stuHomePad/index"+listindex+".png"'>
+                <img class="imgtwo"
+                     :style="listindex==3 || listindex==4 || listindex==5?'display:none':'display:block'"
+                     :src='"../image/stuHomePad/zi"+listindex+".png"'>
+            </div>
+        </li>
+        <li>
+            <div class="list">
+                    <span v-for="(item,itemIndex) in 3" tapmode @click="openArticleFrame(itemIndex)" class="item">
+                        <!--<img :src="itemIndex==0?' ../image/stuHomePad/kwyz.png':itemIndex==1?' ../image/stuHomePad/xqah.png':'../image/stuHomePad/ydys.png'">-->
+                    </span>
+                <span @click.stop="openAiEssayReview" class="item" style="background: #f6b900; display: flex; justify-content: center; align-items: center;">AI批阅</span>
+            </div>
+        </li>
+
+        <!-- AI知识图谱模块 -->
+        <li class="knowledgeMap" id='12' tapmode onclick="vm.openFrame(this)">
+            <div class="bgg">
+            </div>
+        </li>
+
+
+        <li>
+            <!-- 签到设置个人中心 -->
+            <div class="list">
+                <!-- <div class="sign-div">
+                    <img class="imgSign aui-hide" src="../icon/ic_sign.gif" tapmode onclick="sign()">
+                    <img class="txtSigned aui-hide" src="../icon/ic_sign.png" tapmode onclick="yisign()">
+                </div> -->
+
+                <div class="photofar">
+                    <div class="photo" tapmode onclick="vm.openOnlineMember()">
+                        <img :src="face">
+                        <img v-if="isShowAvatarFrame"
+                             style="position: absolute; top:50%;left:50%;transform: translate(-50%,-55%);margin: 3.4vh 0 0 1.6vw;width: 7.5vw;height: 7.5vw"
+                             :style="avatarFrameStyle"
+                             :src="avatarFrameUrl" alt="头像框">
+                    </div>
+                    <span class="lv aui-hide" v-text="Grade"></span>
+                </div>
+                <p class="name" v-text="personName" tapmode onclick="vm.openPerson()"></p>
+                <p class="banji" v-text="XdClass" tapmode onclick="vm.openPerson()"></p>
+                <p class="school" v-text="School" tapmode onclick="vm.openPerson()"></p>
+
+                <div class="setup" tapmode onclick="vm.setUp()">
+                    <img src="../image/stuHomePad/personal.png">
+                    <span>设置</span>
+                </div>
+                <img tapmode onclick="vm.openPerson()" class="personal" src="../image/stuHomePad/personalzi.png">
+            </div>
+        </li>
+        <!-- 学分乐园 -->
+        <li class="iosxfly" id='7' tapmode onclick="vm.openFrame(this)">
+            <div class="list">
+                <img class="imgone" src="../image/stuHomePad/iosone.png">
+                <img class="imgtwo" src="../image/stuHomePad/iostwo.png">
+            </div>
+        </li>
+        <!-- 学生打分 -->
+        <li class="xsdf" style="display: none;" id='8' tapmode onclick="vm.openFrame(this)">
+            <div class="list">
+                <img class="imgone" src="../image/stuHomePad/xsdftu.png">
+                <img class="imgtwo" src="../image/stuHomePad/xsdfzi.png">
+            </div>
+        </li>
+        <!--        选课-->
+        <li class="xuanke" id='9' v-if="chooseSubjectType!=1 &&  gradelist.length>0" tapmode
+            @click="GetSelectCourseStuOpenSelect(true,schoolid)">
+            <div class="list" v-if="chooseSubjectType==3">
+                <img class="imgone" src="../image/stuHomePad/xkxxlogo.png">
+                <img class="imgtwo" src="../image/stuHomePad/xkxxtitle.png">
+            </div>
+            <div class="list" v-else>
+                <img class="imgone" src="../image/stuHomePad/xklogo.png">
+                <img class="imgtwo" src="../image/stuHomePad/xktitle.png">
+            </div>
+        </li>
+        <!-- AI伴学 -->
+        <!-- <li class="aiAssistant" id='10' tapmode onclick="vm.openFrame(this)">
+            <div class="bgg">
+            </div>
+        </li> -->
+        <li class="englishword" id='11' tapmode onclick="vm.openFrame(this)">
+            <div class="bgg">
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../script/vue.js"></script>
+<!--<script type="text/javascript" src="../script/common.js"></script>-->
+<script>
+    var sendSuc = true;
+    var hsClass = false;//学生有没有申请还没有创建的班级
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            photoHeight: '',
+            personName: $api.getStorage('realname'),
+            XdClass: '',
+            School: '',
+            Grade: '',
+            face: $api.getStorage('head_url'),
+            schoolid: '',
+            isxuanke: true,
+            xkok: false,
+            chooseSubjectType: 1,//1不选课 2开始选课3 选课完成
+            SubjectData: {},
+            gradelist: [],
+            comboData: {}
+        },
+        computed: {
+            avatarFrameUrl: function () {
+                return `../image/onlineMember/${this.comboData.data['level']}/avatar-frame.png`
+            },
+            isShowAvatarFrame: function () {
+                return this.comboData.data && this.comboData.data['level'] !== 'nomal'
+            },
+            avatarFrameStyle: function () {
+                switch (this.comboData.data['level']) {
+                    case 'offprofessional':
+                        return {
+                            transform: 'translate(-50%, -50%)',
+                        }
+                    case 'offplus':
+                        return {
+                            transform: 'translate(-40%, -55%)',
+                        }
+                    case 'offmax':
+                        return {
+                            transform: 'translate(-50%, -55%)',
+                            width: '8vw',
+                            height: '8vw'
+                        }
+                    case 'max':
+                        return {
+                            width: '8vw',
+                            height: '8vw'
+                        }
+                    default:
+                        return {}
+                }
+            }
+        },
+        methods: {
+            GetStudentStudentgradeid: function (schoolid) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.SetAuthToken($api.getStorage('token'));
+                apiObj.Get(UrlRouter.GetStudentStudentgradeid, {
+                    values: {
+                        schoolid: schoolid,
+                        uid: $api.getStorage('uid'),
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            // alert(JSON.stringify(ret)+'dddd')
+                            vm.gradelist = ret.data
+                            if (vm.gradelist.length > 0) {
+                                vm.GetSelectCourseStuOpenSelect(false, schoolid)
+                            }
+
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+                    } else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+            },
+            GetSelectCourseStuOpenSelect: function (isclick, schoolid) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.SetAuthToken($api.getStorage('token'));
+                apiObj.Get(UrlRouter.GetSelectCourseStuOpenSelect, {
+                    values: {
+                        schoolid: schoolid,
+                        uid: $api.getStorage('uid'),
+                        // gradeid:'2073,2074'
+                        gradeid: vm.gradelist.toString()
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            // alert(JSON.stringify(ret))
+                            vm.chooseSubjectType = ret.data.type;
+                            vm.SubjectData = ret.data
+                            if (isclick) {//如果是点击进入
+                                vm.openSelectSubject()
+
+                            }
+                        } else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+
+
+                    } else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                });
+            },
+            getScorecheckAudit: function () {
+                apiObj.SetAuthToken($api.getStorage("token"));
+                apiObj.Get(UrlRouter.GetScorecheckAudit, {
+                    values: {
+                        isdetail: '1'
+                    }
+                }, function (ret, err) {
+                    if (ret && ret.ret == 0 && ret.data.status == 1) {
+                        $api.css($api.dom('.xsdf'), 'display:block');
+                        $('.content ul li').eq(6).addClass('ktjyactive');
+                    }
+                });
+            },
+            getClassInfo: async function () {
+                apiObj.SetAuthToken($api.getStorage("token"));
+                await new Promise(resolve => {
+                    apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                        values: {
+                            uid: $api.getStorage('uid'),
+                            identitytype: '3'
+                        }
+                    }, function (ret, err) {
+                        if (ret && ret.ret == 0) {
+                            if (ret.data.length > 0) {
+                                //区分七牛上传区域 重点区分华南华东，其他区域后期逐步添加
+                                switch (ret.data[0].provinceid) {
+                                    // case '440000':
+                                    // case '450000':
+                                    // case '460000':
+                                    case 350000:
+                                        $api.setStorage('qiniuZone', 'z2');
+                                        break;
+                                    // case '110000':
+                                    // case '120000':
+                                    // case '130000':
+                                    // case '150000':
+                                    case 410000:
+                                        $api.setStorage('qiniuZone', 'z0');
+                                        break;
+                                    // case '140000':
+                                    case 610000:
+                                        $api.setStorage('qiniuZone', 'z0');
+                                        break;
+                                    default:
+                                        $api.setStorage('qiniuZone', 'z0');
+                                        break;
+                                }
+                                var schoolid = ret.data[0].id;
+                                vm.schoolid = ret.data[0].id;
+                                vm.GetStudentStudentgradeid(schoolid);
+                                $api.setStorage('schoolid', schoolid);
+                                //获取学校id后 判断该学校是否暂停服务
+                                //                            getIndexCheck();
+                                vm.School = ret.data[0].xxmc;
+                                var classlist = ret.data[0].class;
+                                if (classlist.length > 0) {
+                                    for (var i = 0; i < classlist.length; i++) {
+                                        if (classlist[i].type == 1) {
+                                            vm.XdClass = classlist[0].xdtitle + ' ' + classlist[0].bjmc;
+                                            $api.setStorage('XdClass', vm.XdClass)
+                                            if (classlist[i].xd == 34) {
+                                                $api.setStorage('gzxd', '34');
+                                            }
+                                            if (classlist[i].njmc == '2020') {
+                                                $api.setStorage('njmc', '2020');
+                                            }
+                                            // return;
+                                        }
+                                    }
+                                } else {
+                                    vm.XdClass = '暂无班级';
+                                    $api.setStorage('XdClass', vm.XdClass);
+                                }
+                            } else {
+                                vm.XdClass = '暂无学校和班级';
+                                vm.School = '';
+                                $api.setStorage('XdClass', vm.XdClass);
+                                //                            errEmaill(ret);
+                            }
+                        } else {
+                            vm.XdClass = '暂无学校和班级';
+                            vm.School = '';
+                            $api.setStorage('XdClass', vm.XdClass);
+                            errEmaill(err);
+                        }
+                        resolve(ret);
+                    });
+                });
+            },
+            getPersonInfo: function () {
+                apiObj.Get(UrlRouter.GetDynamicspaceinfo, {
+                    values: {
+                        otheruid: $api.getStorage('uid')
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            $api.setStorage("reply_userinfo", ret);
+                            //存用户头像
+                            vm.personName = ret.realname;
+                            vm.Grade = ret.rank;
+                        }
+                    }
+                });
+            },
+            getPersonFace: function () {
+                apiObj.Get(UrlRouter.GetPortrait, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        size: 'b'
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            //存用户头像
+                            $api.setStorage('head_url', ret.face);
+                            vm.face = ret.face;
+                        }
+                    }
+                });
+            },
+            openSelectSubject: function () {//进入选课
+                //选课
+                if (vm.chooseSubjectType == 3) {//已选，进入走班信息界面
+                    api.openWin({
+                        name: 'win_subject',
+                        url: '../html/study/chooseSubject/win_subject.html',
+                        pageParam: {SubjectData: vm.SubjectData, schoolid: vm.schoolid}
+                    });
+
+                } else if (vm.chooseSubjectType == 2) {//未选，进入选课界面
+                    api.openWin({
+                        name: 'win_choose_subject',
+                        url: '../html/study/chooseSubject/win_choose_subject.html',
+                        pageParam: {SubjectData: vm.SubjectData, schoolid: vm.schoolid}
+                    });
+                } else if (vm.chooseSubjectType == 4) {
+                    alert('选课已经结束，请联系老师！')
+
+                } else {
+                    api.toast(
+                        {
+                            msg: '选课还未开始哦！',
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                    )
+                }
+            },
+            openFrame: function (context) {
+                if (sendSuc) {
+                    sendSuc = false;
+                    setTimeout(function () {
+                        sendSuc = true;
+                    }, 1000);//1秒后才能点击
+                } else {
+                    return;
+                }
+                getClassB();
+                var index = $(context).attr('id');
+                switch (index) {
+                    case '0':
+                        //作业
+                        name = 'win-subject-list-pad';
+                        // path = '../html/study/homeworkNewTixing/win_exercises_list.html';//新题型静态页
+                        path = '../html/study/newHomework/win-subject-list-pad.html';//新题型制作中
+                        break;
+                    case '1':
+                        //互动课堂
+                        name = 'classroom';
+                        path = 'classroom';
+                        break;
+                    case '2':
+                        //错题本
+                        name = 'win_error_subject_list_pad';
+                        path = '../html/study/errorNewEx/win_error_subject_list_pad.html';
+                        break;
+                    case '3':
+                        //资讯
+                        // articleSwitch(3);
+                        // return;
+                        //考试
+                        name = 'win_exam_subject_list';
+                        path = '../html/study/examination/win_exam_subject_list.html';
+                        break;
+                    case '4':
+                        //学分乐园
+                        name = 'win-myscorezoo';
+                        path = '../html/study/ScoreZoo/win-myscorezoo.html';
+                        break;
+                    case '7':
+                        //学分乐园
+                        name = 'win-myscorezoo';
+                        path = '../html/study/ScoreZoo/win-myscorezoo.html';
+                        break;
+                    case '5':
+                        //我的应用
+                        if ($api.getStorage('padType') != '2' && $api.getStorage('padType') != '3') {
+                            if ($api.getStorage('deviceModel') == 1) {
+                                api.sendEvent({
+                                    name: 'openAppStore'
+                                });
+                            } else {
+
+                                if (api.deviceModel == 'SM-P600' && api.deviceModel == 'Lenovo TB-X804F') {
+                                    return;
+                                }
+
+                                api.sendEvent({
+                                    name: 'myapps'
+                                });
+                            }
+                        } else {
+                            if ($api.getStorage('padType') == '2') {
+                                api.toast({
+                                    msg: '该功能正在完善中，请耐心等待！',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        }
+                        name = 'win-appstore';
+                        path = '../html/appStore/win-appstore.html';
+                        break;
+                    case '6':
+                        //课堂讲义
+                        // name = 'win-course-subject-list-pad';
+                        // path = '../html/study/coursePad/win-course-subject-list-pad.html';
+                        name = 'win-course-subject-list-pad';
+                        path = '../html/study/newCourse/win-course-subject-list-pad.html';//新讲义制作中
+                        break;
+                    case '8':
+                        //学生打分
+                        name = 'win_studentDf';
+                        path = '../html/study/studentDf/win_studentDf.html';
+                        break;
+                    case '10':
+                        //ai伴学
+                        name = 'win_aiAssistant';
+                        path = '../html/aiAssistant/win_aiAssistant_new.html';
+                        break;
+                    case '11':
+
+                        var ruurl = apiUrlIndex == '3' ? 'http://gitcode.12xue.com:4000' : 'https://en-web.12xue.com';//测试？测试：线上
+                        // var ruurl = 'http://192.168.103.000:5379';//本地
+                        name = 'oralTraining-win-main';
+                        path = ruurl;
+                        break;
+
+                    case '12':
+                        name = 'index';
+                        path = '../html/study/aiknowledge/frame_knowledge.html';
+                        break;
+                }
+
+                // if (index != '3') {
+                if ($api.getStorage('isLogin') == 'true') {
+                    checkClassid();
+                } else {
+                    // 未登录
+                    api.toast({
+                        msg: '请重新登陆',
+                        duration: 3000,
+                        location: 'middle'
+                    });
+                }
+                // }
+            },
+            openArticleFrame: function (index) {
+                articleSwitch(index);
+            },
+            openPerson: function () {
+                api.openWin({
+                    name: 'win-person-pad',
+                    url: 'personPad/win-person-pad.html'
+                });
+            },
+            // 线上会员
+            openOnlineMember: function () {
+                api.openFrame({
+                    name: 'member',
+                    url: '../html/onlineMember/frame-member.html'
+                })
+            },
+            setUp: function () {//设置
+                api.openWin({
+                    name: 'win-person-setup-pad',
+                    url: 'personPad/win-person-setup-pad.html'
+                });
+            },
+            openAiEssayReview: function () {
+                api.openWin({
+                    name: 'win-aiEssayReview',
+                    url: './aiEssayReview/win-aiEssayReview.html'
+                })
+            }
+        }
+    });
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var apiObj2 = new GridOpenApi('http://blacklist.12xue.com/api', source, version);
+    var classid = [];
+    var name = '';
+    var path = '';
+    var systemType;
+    apiready = async function () {
+        //取消首页等级显示
+        // vm.getPersonInfo();
+        if (!vm.face) {
+            vm.getPersonFace();
+        }
+        await vm.getClassInfo();
+        vm.getScorecheckAudit();
+        // vm.GetSelectCourseStuOpenSelect();
+
+        api.addEventListener({//选课成功 刷新首页壮体啊
+            name: 'istijiao'
+        }, function (ret, err) {
+            vm.GetSelectCourseStuOpenSelect(false, vm.schoolid);
+
+        });
+
+        systemType = api.systemType;
+        if (systemType == 'ios') {
+            $('.setup').hide();
+            $('.iosxfly').show();
+            $('ul li').eq(4).hide();
+            $('ul li').eq(5).hide();
+
+        } else {
+            $('.setup').show();
+            $('.iosxfly').hide();
+            $('ul li').eq(4).show();
+            $('ul li').eq(5).show();
+        }
+        api.addEventListener({
+            name: 'resume'
+        }, function (ret, err) {
+            if (getCurrentTimestamp() - $api.getStorage('loginSyncTime') > 1800 || typeof $api.getStorage('loginSyncTime') == 'undefined') {
+                postLoginSync();
+            }
+        });
+        //取消刷新头像和等级
+        //屏幕解锁后刷新首页的个人信息和头像  自动登录
+        // api.addEventListener({
+        //     name: 'init_user'
+        // }, function (ret, err) {
+        //     vm.getPersonInfo();
+        //     vm.getPersonFace();
+        // });
+        // api.addEventListener({
+        //     name: 'changeHeadUrl'
+        // }, function (ret, err) {
+        //     vm.getPersonFace();
+        // });
+        // api.addEventListener({
+        //     name: 'reloadNum'
+        // }, function (ret, err) {
+        //     vm.getPersonFace();
+        // });
+
+        if (api.pageParam.sex == '0') { //未设置性别
+            api.openFrame({
+                name: 'frame-choose-sex',
+                url: 'frame-choose-sex.html',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: $api.getStorage('padHeight')
+                },
+                bounces: false
+            });
+        }
+
+        //手动热更新功能
+        var mam = api.require('mam');
+        mam.checkSmartUpdate(function (ret, err) {
+            if (ret) {
+                if (ret.packages && ret.packages.length != 0) {
+                    var msg;
+                    if (ret.packages[0].extra != null && ret.packages[0].extra != '') {
+                        msg = '更新日志：\n' + ret.packages[0].extra;
+                    } else {
+                        msg = '修改部分已知问题';
+                    }
+                    mam.startSmartUpdate(function (ret, err) {
+                        if (ret) {
+                            if (ret.state == 3) {
+                                api.alert({
+                                    title: '云修复完成',
+                                    msg: msg,
+                                    buttons: ['重启后生效']
+                                }, function (ret, err) {
+                                    if (ret.buttonIndex == 1) {
+                                        //重启应用
+                                        api.sendEvent({
+                                            name: 'restartApp'
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        //检测签到状态
+        if (!$api.getStorage(getToday() + 'sign')) {
+            sign('checkSign');
+        } else {
+            $api.addCls($api.dom('.imgSign'), 'aui-hide');
+            $api.removeCls($api.dom('.txtSigned'), 'aui-hide');
+        }
+
+        //获取线上会员套餐详情
+        apiObj.Get(UrlRouter.GetPayfeeUserInfo, {
+            values: {
+                uid: $api.getStorage("uid"),
+                schoolid: $api.getStorage("schoolid"),
+            }
+        }, function (ret, err) {
+            if (ret) {
+                vm.comboData = ret;
+                $api.setStorage('comboData', JSON.stringify(ret));
+            }
+        });
+        api.addEventListener({
+            name: 'upgrade-updateComboData'
+        }, function (event) {
+            vm.comboData = JSON.parse($api.getStorage('comboData'));
+        });
+
+        $api.setStorage('upgradeQRCode', '1');
+
+        apiObj.Get(UrlRouter.GetSchoolConfig, {
+            values: {
+                schoolid: $api.getStorage("schoolid"),
+                type: 'ai_pay_tip'
+            }
+        }, function (res, err) {
+            if (res) {
+                if (res.data.length > 0 && String(res.data[0].value) !== "1") {
+                    $api.setStorage('upgradeQRCode', '0');
+                } else {
+                    $api.setStorage('upgradeQRCode', '1');
+                }
+            }
+        });
+
+        //登录日志
+        // const db = api.require('db');
+        // db.openDatabaseSync({
+        //     name: 'loginLog'
+        // })
+        // db.executeSqlSync({
+        //     name: 'loginLog',
+        //     sql: 'CREATE TABLE IF NOT EXISTS log(id INTEGER PRIMARY KEY AUTOINCREMENT, uid VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL,login_time DATETIME NOT NULL)'
+        // })
+        // db.executeSqlSync({
+        //     name: 'loginLog',
+        //     sql: "DELETE FROM log;"
+        // })
+        // db.executeSqlSync({
+        //     name: 'loginLog',
+        //     sql: "DELETE FROM sqlite_sequence WHERE name='log';"
+        // })
+        // const now = new Date();
+        // db.executeSqlSync({
+        //     name: 'loginLog',
+        //     sql: "INSERT INTO log (uid, username, login_time) VALUES ('" + $api.getStorage('uid') + "','" + $api.getStorage('realname') + "','" + now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0') + " " + String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0') + "');"
+        // })
+    };
+
+    //打开查看全部
+    function openList(index) {
+        api.openWin({
+            name: 'win-article-list',
+            url: 'articlenew/win-article-list.html',
+            pageParam: {index: index}
+        });
+    }
+
+    function closeTOwin() {
+        api.closeToWin({
+            name: 'win-stu-main'
+        })
+    }
+
+    function checkClassid() {
+        if (name == 'win-appstore') {
+            //            api.openWin({
+            //                name: 'win-appstore',
+            //                url: 'appStore/win-appstore.html'
+            //            });
+            return 0;
+        } else if (name == 'ChoiceSubject_win') {
+            api.openWin({
+                name: name,
+                url: path,
+                slidBackEnabled: false
+            });
+        } else if (name == 'classroom') {
+            apiObj.SetAuthToken($api.getStorage('token'));
+            apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    identitytype: '3'
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        if (ret.data != '') {
+                            if (ret.data[0].class && ret.data[0].class != '') {
+                                classid.length = 0;
+                                for (var i = 0; i < ret.data[0].class.length; i++) {
+                                    classid.push(ret.data[0].class[i].bjid);
+                                    $api.setStorage('groupSchoolid', ret.data[0].id);
+                                }
+                                var classArr = ret.data[0].class;
+                                if (name == "classroom") {
+                                    apiObj.Get(UrlRouter.GetV1ClasspayStatus, {
+                                        values: {
+                                            mac_addr: $api.getStorage('macAdress')
+                                            //                                            mac_addr:'54ef92b700c0'
+                                        }
+                                    }, function (ret, err) {
+                                        api.hideProgress();
+                                        if (ret) {
+                                            if (ret.ret == 0) {
+                                                if (ret.data) {
+                                                    if (ret.data.status >= 8) {
+                                                        //未开通付费功能
+                                                        api.openWin({
+                                                            name: 'win-classlimit',
+                                                            url: '../html/study/newClass/win-classlimit.html'
+                                                        });
+                                                    } else if (ret.data.status != 0 && ret.data.status != 3 && ret.data.status != 2 && ret.data.status != 5) {
+                                                        api.openWin({
+                                                            name: 'not_opened',
+                                                            url: 'not_opened.html'
+                                                        });
+                                                    } else {
+                                                        //接入H5课堂
+                                                        api.openWin({
+                                                            name: 'win-interaction-home-pad',
+                                                            //                                                            url: '../html/study/classNewTx/win-interaction-home-pad.html',
+                                                            url: '../html/study/newClass/win-interaction-home-pad.html',
+                                                            pageParam: {classArr: classArr},
+                                                            slidBackEnabled: false
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    api.openWin({
+                                        slidBackEnabled: false,
+                                        name: name,
+                                        url: path,
+                                        pageParam: {classid: classid}
+                                    });
+                                }
+                            } else {
+                                // alert('没有班级');
+                                apiObj.Get(UrlRouter.GetStudentAuditClass, {
+                                    values: {
+                                        uid: $api.getStorage('uid'),
+                                        type: '1'
+                                    }
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.ret == 0) {
+                                            if (ret.data.length == 0 && !hsClass) {
+                                                api.confirm({
+                                                    title: '',
+                                                    msg: '目前未加入班级，是否前往加入班级',
+                                                    buttons: ['取消', '确定']
+                                                }, function (ret, err) {
+                                                    if (ret) {
+                                                        if (ret.buttonIndex == 2) {
+                                                            openMyClassWin();
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                // alert('有班级，但是正在审核');
+                                                api.confirm({
+                                                    title: '',
+                                                    msg: '班级正在审核，是否前往查看',
+                                                    buttons: ['取消', '确定']
+                                                }, function (ret, err) {
+                                                    if (ret) {
+                                                        if (ret.buttonIndex == 2) {
+                                                            openMyClassWin();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        } else {
+                            // alert('没有班级');
+                            apiObj.Get(UrlRouter.GetStudentAuditClass, {
+                                values: {
+                                    uid: $api.getStorage('uid'),
+                                    type: '1'
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret == 0) {
+                                        if (ret.data.length == 0 && !hsClass) {
+                                            // alert('没有班级');
+                                            api.confirm({
+                                                title: '',
+                                                msg: '目前未加入班级，是否前往加入班级',
+                                                buttons: ['取消', '确定']
+                                            }, function (ret, err) {
+                                                if (ret) {
+                                                    if (ret.buttonIndex == 2) {
+                                                        openMyClassWin();
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            api.confirm({
+                                                title: '',
+                                                msg: '班级正在审核，是否前往查看',
+                                                buttons: ['取消', '确定']
+                                            }, function (ret, err) {
+                                                if (ret) {
+                                                    if (ret.buttonIndex == 2) {
+                                                        openMyClassWin();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                    errEmaill(err);
+                }
+            });
+        } else {
+            //请求classid
+            apiObj.Get(UrlRouter.GetUserSchoolInfo, {
+                values: {
+                    uid: $api.getStorage('uid'),
+                    identitytype: '3'
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        if (ret.data != '') {
+                            if (ret.data[0].class && ret.data[0].class != '') {
+                                $api.setStorage('newSchoolId', ret.data[0].id);
+                                $api.setStorage('stuXD', ret.data[0].class[0].xd);
+                                classid.length = 0;
+                                for (var i = 0; i < ret.data[0].class.length; i++) {
+                                    classid.push(ret.data[0].class[i].bjid);
+                                }
+                                if (name == "classroom") {
+                                    //接入H5课堂
+                                    var classArr = ret.data[0].class;
+                                    api.openWin({
+                                        name: 'win-interaction-home-pad',
+                                        url: '../html/study/newClass/win-interaction-home-pad.html',
+                                        pageParam: {classArr: classArr},
+                                        slidBackEnabled: false
+                                    });
+                                } else {
+                                    api.openWin({
+                                        slidBackEnabled: false,
+                                        name: name,
+                                        url: path,
+                                        pageParam: {classid: classid}
+                                    });
+                                }
+                            } else {
+                                // alert('没有班级');
+                                apiObj.Get(UrlRouter.GetStudentAuditClass, {
+                                    values: {
+                                        uid: $api.getStorage('uid'),
+                                        type: '1'
+                                    }
+                                }, function (ret, err) {
+                                    if (ret) {
+                                        if (ret.ret == 0) {
+                                            if (ret.data.length == 0 && !hsClass) {
+                                                var noClass = api.confirm({
+                                                    title: '',
+                                                    msg: '目前未加入班级，是否前往加入班级',
+                                                    buttons: ['取消', '确定']
+                                                }, function (ret, err) {
+                                                    if (ret) {
+                                                        if (ret.buttonIndex == 2) {
+                                                            openMyClassWin();
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                var auditClass = api.confirm({
+                                                    title: '',
+                                                    msg: '班级正在审核，是否前往查看',
+                                                    buttons: ['取消', '确定']
+                                                }, function (ret, err) {
+                                                    if (ret) {
+                                                        if (ret.buttonIndex == 2) {
+                                                            openMyClassWin();
+                                                        }
+                                                        if (ret.buttonIndex == 1) {
+
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        } else {
+                            // alert('没有班级');
+                            apiObj.Get(UrlRouter.GetStudentAuditClass, {
+                                values: {
+                                    uid: $api.getStorage('uid'),
+                                    type: '1'
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                    if (ret.ret == 0) {
+                                        if (ret.data.length == 0 && !hsClass) {
+                                            // alert('没有班级');
+                                            var noClass = api.confirm({
+                                                title: '',
+                                                msg: '目前未加入班级，是否前往加入班级',
+                                                buttons: ['取消', '确定']
+                                            }, function (ret, err) {
+                                                if (ret) {
+
+                                                    if (ret.buttonIndex == 2) {
+                                                        openMyClassWin();
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            // alert('有班级，但是正在审核');
+                                            var auditClass = api.confirm({
+                                                title: '',
+                                                msg: '班级正在审核，是否前往查看',
+                                                buttons: ['取消', '确定']
+                                            }, function (ret, err) {
+                                                if (ret) {
+                                                    if (ret.buttonIndex == 2) {
+                                                        openMyClassWin();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                    errEmaill(err);
+                }
+            });
+        }
+    }
+
+    //获取学生已经申请并且还没有创建的行政班级列表
+    function getClassB() {
+        apiObj.Get(UrlRouter.GetStudentAuditClassB, {
+            values: {
+                uid: $api.getStorage('uid')
+                //uid:myuid,
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.length == 0) {
+                        hsClass = false;
+                    } else {
+                        hsClass = true;
+                    }
+                } else {
+                    hsClass = false;
+                }
+            } else {
+                hsClass = false;
+            }
+        });
+    }
+
+    function openMyClassWin() {
+        api.openWin({
+            slidBackEnabled: false,
+            name: 'myclass_win',
+            url: '../html/mine/myclass/myclass_win.html',
+            reload: true
+        });
+    }
+
+    function articleSwitch(index) {
+        apiObj.Get(UrlRouter.GetWeiboSetting, {
+            values: {
+                schoolid: $api.getStorage('schoolid'),
+                uid: $api.getStorage('uid'),
+                identitytype: '3'
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (ret.data.article != 1) {
+                        toast12xue('资讯动态暂不开放展示！');
+                    } else {
+                        switch (index) {
+                            case 0:
+                                //课外驿站
+                                openList(index);
+                                break;
+                            case 1:
+                                //兴趣体验
+                                openList(index);
+                                break;
+                            case 2:
+                                //有点意思
+                                openList(index);
+                                break;
+                            case 3:
+                                api.openWin({
+                                    name: 'win-article-list',
+                                    url: 'articlenew/win-article-list.html'
+                                });
+                                break;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    //签到
+    function sign(type) {
+        if ($api.getStorage('isLogin') == 'true') {
+            if (type == 'checkSign') {
+                apiObj.Get(UrlRouter.UserSign, "", function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            if ((ret.time * 1000) > stortTime()) {
+                                $api.setStorage(getToday() + 'sign', true);
+                                $api.addCls($api.dom('.imgSign'), 'aui-hide');
+                                $api.removeCls($api.dom('.txtSigned'), 'aui-hide');
+                            } else {
+                                $api.addCls($api.dom('.txtSigned'), 'aui-hide');
+                                $api.removeCls($api.dom('.imgSign'), 'aui-hide');
+                            }
+                        }
+                    }
+                });
+            } else {
+                apiObj.Post(UrlRouter.UserSign, "", function (ret, err) {
+                    if (ret) {
+                        $api.setStorage(getToday() + 'sign', true);
+                        if (ret.ret == 0) {
+                            //上传打分信息
+                            updatebycode();
+                            $api.addCls($api.dom('.imgSign'), 'aui-hide');
+                            $api.removeCls($api.dom('.txtSigned'), 'aui-hide');
+                            //获取分值信息
+                            getSignedInfo('sign_earn_points');
+                        } else {
+                            $api.addCls($api.dom('.imgSign'), 'aui-hide');
+                            $api.removeCls($api.dom('.txtSigned'), 'aui-hide');
+                        }
+                    }
+                });
+            }
+        } else {
+            if (!type) {
+                return;
+            }
+            // 未登录
+            api.openWin({
+                name: 'login_win',
+                url: 'login/login_win.html',
+                slidBackEnabled: false
+            });
+        }
+    }
+
+    //签到成功后增加成长值
+    function updatebycode() {
+        apiObj.Put(UrlRouter.Postupdatebycode, {
+            values: {
+                "code": "sign_earn_points"
+            }
+        }, function (ret, err) {
+            if (ret.ret == 0) {
+                //增加成长值
+                apiObj.Put(UrlRouter.Postupdatebycode, {
+                    values: {
+                        "code": "sign_earn_prestige"
+                    }
+                }, function (ret, err) {
+                    if (ret.ret == 0) {
+                        api.sendEvent({
+                            name: 'init_user'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    var points = 0;
+    var prestige = 0;
+
+    function getSignedInfo(code) {
+        //获取签到积分
+        apiObj.Get(UrlRouter.GetUserConfigInfo, {
+            values: {
+                uid: $api.getStorage('uid'),
+                code: code
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (code == 'sign_earn_points') {
+                        points = ret.data.value;
+                        getSignedInfo('sign_earn_prestige')
+                    } else {
+                        prestige = ret.data.value;
+                        api.openFrame({
+                            name: 'frame_finish_sign',
+                            url: 'frame_finish_sign.html',
+                            rect: {
+                                x: 0,
+                                y: 0,
+                                w: api.winWidth,
+                                h: api.winHeight
+                            },
+                            pageParam: {
+                                prestige: prestige,
+                                points: points
+                            },
+                            bounces: false
+                        });
+                    }
+                } else {
+                    $api.toast('温馨提示', '签到成功', 1000);
+                }
+            }
+        });
+    }
+
+    function getToday() {
+        var date = new Date();
+        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+    }
+
+    function stortTime() {
+        var date = new Date();
+        date.setDate(date.getDate());
+        var tomorrow = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate();
+        return time = Date.parse(new Date(tomorrow));
+    }
+
+    //检查学校服务是否关闭
+    function getIndexCheck() {
+        apiObj2.Get(UrlRouter.GetIndexCheck, {
+            values: {
+                identitytype: '3',
+                schoolid: $api.getStorage('schoolid')
+            }
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.data == 1) {
+                    setTimeout(function () {
+
+                        $api.setStorage('isLogin', 'false');
+
+                        api.sendEvent({
+                            name: 'openIndexCheck'
+                        });
+
+                        api.closeToWin({
+                            name: 'root'
+                        });
+
+                    }, 1000);//1秒后跳转
+                }
+            }
+        });
+    }
+
+    function errEmaill(info) {
+        var msg = JSON.stringify(info);
+        api.ajax({
+            url: errorEmail,
+            method: 'post',
+            timeout: 30,
+            dataType: 'json',
+            returnAll: false,
+            data: {
+                values: {
+                    msg: msg,
+                    file: 'frame-stu-home-pad',
+                    number: 'UserInfo',
+                    version: api.appVersion,
+                    app: '12xue OS',
+                    system: api.systemType,
+                    system_version: api.systemVersion,
+                    device_id: '',
+                    device_mode: api.deviceModel,
+                    device_name: api.deviceName,
+                    uid: $api.getStorage('uid')
+                }
+            }
+        }, function (ret, err) {
+        });
+    }
+
+    function postLoginSync() {
+        apiObj.Post(UrlRouter.postLoginSync, {
+            values: {
+                uid: $api.getStorage('uid'),
+                identitytype: 3
+            }
+        }, function (ret, err) {
+            $api.setStorage('loginSyncTime', getCurrentTimestamp());
+        })
+    }
+
+    function yisign() {
+        api.toast({
+            msg: '今日已签到',
+            duration: 2000,
+            location: 'middle'
+        });
+    }
+
+    /**获取当前时间戳 秒**/
+    function getCurrentTimestamp() {
+        return Math.round(new Date() / 1000)
+    }
+</script>
+
+</html>

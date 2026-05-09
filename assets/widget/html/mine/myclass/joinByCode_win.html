@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加班级</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style type="text/css">
+        .qr {
+            border: 1px solid #4bc7c7;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            font-size: 0.7rem !important;
+            margin-right: 10px;
+        }
+        .aui-bar-nav .aui-iconfont {
+            line-height: 1.25rem
+        }
+        .qr:active{
+            background: #4bc7c7;
+            color: #fff;
+        }
+        .aui-icon-check:before {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()' ></span>添加班级
+    </a>
+    <span class="aui-iconfont   aui-pull-right qr" tapmode onclick="addClassbycode()"> 加入班级</span>
+</header>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript">
+        apiready=function () {
+            var header = document.querySelector('header');
+            var headerH = $api.offset(header).h;
+            var frameH = padWinHeight - headerH;
+            api.setStatusBarStyle({
+                style: 'light'
+            });
+            api.openFrame({
+                name: 'joinByCode',
+                url: 'joinByCode_frame.html',
+                rect: {
+                    x: 0,
+                    y: headerH,
+                    w: 'auto',
+                    h: frameH
+                },
+                bounces: false,
+                pageParam: {road: api.pageParam.road}
+            });
+        };
+        function addClassbycode(){
+            //在当前window中找到
+            //名为frmName的frame，并在该frame中执行jsfun脚本
+            var jsfun30 = 'joinClass();';
+            api.execScript({
+                frameName: 'joinByCode',
+                script: jsfun30
+            });
+        }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }   .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .content {
+            width: 35%;
+            max-height: 50%;
+            height: auto;
+            top: 25%;
+            position: absolute;
+            left: 32.5%;
+            overflow-y: scroll;
+            border-radius: 5px;
+        }
+        .aui-border-t:before, .aui-border-b:after{ height: 0px;}
+        .content dl {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            margin: 0 auto;
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+
+
+        .content dl dd {
+            line-height: 55px;
+            font-size: 0.7rem;
+            color: #333333;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;;
+        }
+        .content dl dd:active {
+            line-height: 55px;
+            font-size: 0.7rem;
+            color: #4bc7c7;
+            border-bottom: 1px solid #e3e3e3;
+            padding: 0 10%;;
+        }
+        .close {
+            width: 100%;
+            height: 100%
+        }
+        [v-cloak] {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+<!--<div class="backgroud" tapmode onclick="api.closeFrame({-->
+    <!--name: 'frame-tab-dy'-->
+<!--});"></div>-->
+
+
+
+<div class="close" tapmode onclick="api.closeFrame({
+    name: 'frame-tab-dy'
+});"></div>
+<div  id="app" class="content">
+    <dl >
+        <dd  v-for="item in datalist" :style="id==item.id?'color:#4bc7c7':'color:#333333'"   class="item-content aui-border-b aui-ellipsis-1" tapmode @click="itemClick(item)" v-text="item.name">
+        </dd>
+    </dl>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/vue.min.js"></script>
+<script type="text/javascript">
+    var vm;
+    apiready = function () {
+        array = api.pageParam.array;
+        arrayId = api.pageParam.arrayId;
+        vm = new Vue({
+            el: '.content',
+            data: {
+                datalist: api.pageParam.array,
+                id: api.pageParam.id
+            },
+            methods: {
+                itemClick: function (item) {
+                    api.sendEvent({
+                        name: 'selecttxdata',
+                        extra: {txdata: item}
+                    });
+                    api.closeFrame({
+                        name: 'frame-tab-dy'
+                    });
+                }
+            }
+        });
+
+    };
+</script>
+</html>

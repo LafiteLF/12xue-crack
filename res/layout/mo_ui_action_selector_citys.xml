@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:id="@id/selectorContainer" android:background="#ffffffff" android:layout_width="match_parent" android:layout_height="280.0dp" android:layout_alignParentBottom="true">
+        <RelativeLayout android:id="@id/rl_navigation" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:gravity="center" android:id="@id/btn_cancle" android:padding="0.0dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5.0dp" android:layout_alignParentLeft="true" android:layout_centerVertical="true" />
+            <TextView android:gravity="center" android:id="@id/btn_enter" android:padding="0.0dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="5.0dp" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+            <TextView android:gravity="center" android:id="@id/titleText" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_toLeftOf="@id/btn_enter" android:layout_toRightOf="@id/btn_cancle" android:layout_centerInParent="true" />
+        </RelativeLayout>
+        <View android:id="@id/border" android:background="#ffff0000" android:layout_width="match_parent" android:layout_height="1.0dp" />
+        <LinearLayout android:layout_gravity="center_horizontal" android:orientation="horizontal" android:id="@id/wheel_layout" android:layout_width="wrap_content" android:layout_height="match_parent">
+            <com.uzmap.pkg.uzmodules.UIActionSelector.widget.WheelView android:layout_gravity="center_vertical" android:id="@id/id_province" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" />
+            <com.uzmap.pkg.uzmodules.UIActionSelector.widget.WheelView android:layout_gravity="center_vertical" android:id="@id/id_city" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" />
+            <com.uzmap.pkg.uzmodules.UIActionSelector.widget.WheelView android:layout_gravity="center_vertical" android:id="@id/id_area" android:layout_width="0.0dp" android:layout_height="wrap_content" android:layout_weight="1.0" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

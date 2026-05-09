@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>英语提升 - 离线模式</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 4vh 5vw;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 2vw;
+            box-shadow: 0 2vh 5vh rgba(0, 0, 0, 0.3);
+            width: 60vw; 
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .icon {
+            width: 25vh; 
+            margin: 0 auto 2vh auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        h1 {
+            font-size: 3.5vh;
+            color: #333;
+            margin-bottom: 1.5vh;
+            font-weight: 600;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.8vh 2.5vw;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 4vh;
+            font-size: 2vh;
+            margin-bottom: 2.5vh;
+        }
+
+        .message {
+            font-size: 2.4vh;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 3vh;
+        }
+
+        .tips {
+            background: #f8f9fa;
+            border-radius: 1.5vw;
+            padding: 2vh 3vw;
+            margin-bottom: 3vh;
+            text-align: left;
+            width: 100%;
+        }
+
+        .tips h3 { font-size: 2.2vh; color: #333; margin-bottom: 1vh; }
+        .tips li { font-size: 1.8vh; color: #777; padding: 0.5vh 0; list-style: none; }
+        .tips li::before { content: "• "; color: #667eea; }
+
+        .buttons {
+            display: flex;
+            gap: 2vw;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 1.8vh 4vw;
+            border: none;
+            border-radius: 5vh;
+            font-size: 2.2vh;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 0.5vh 1.5vh rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 0.2vh solid #667eea;
+        }
+
+        .network-status {
+            margin-top: 2.5vh;
+            font-size: 1.8vh;
+            font-weight: 500;
+        }
+        .online { color: #2ecc71; }
+        .offline { color: #e74c3c; }
+
+        @media (max-height: 600px) {
+            .tips { display: none; }
+            .container { width: 80vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon"><img src="../../../image/network_err.png" alt="error"></div>
+        <h1>英语提升</h1>
+        <div class="status" id="statusText">连接已中断</div>
+        
+        <div class="message">
+            <p>无法访问英语提升服务</p>
+            <p style="font-size: 1.8vh; color: #999; margin-top: 1vh;">请确保您的设备已连接互联网</p>
+        </div>
+
+        <div class="tips">
+            <h3>建议操作：</h3>
+            <ul>
+                <li>检查 WiFi 或移动网络信号</li>
+                <li>尝试点击下方的“重新连接”按钮</li>
+            </ul>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="retryConnection()">重新连接</button>
+            <button class="btn btn-secondary" onclick="goBack()">返回首页</button>
+        </div>
+
+        <div id="netIndicator" class="network-status">正在检测网络状态...</div>
+    </div>
+
+    <script type="text/javascript" src="../../../script/api.js"></script>
+    <script type="text/javascript" src="../../../script/common.js"></script> <!-- 确保引入 common.js 以获取 enWebEntry -->
+    <script>
+        apiready = function() {
+            // 初始检测
+            checkNet();
+            
+            // 监听网络切换事件
+            api.addEventListener({ name: 'online' }, function() { checkNet(); });
+            api.addEventListener({ name: 'offline' }, function() { checkNet(); });
+        };
+
+        function checkNet() {
+            var type = api.connectionType;
+            var isOff = (type === 'none' || type === 'unknown');
+            var indicator = document.getElementById('netIndicator');
+            var statusText = document.getElementById('statusText');
+            
+            if (isOff) {
+                indicator.innerHTML = "● 当前网络不可用";
+                indicator.className = "network-status offline";
+                statusText.innerHTML = "网络离线";
+            } else {
+                indicator.innerHTML = "● 基础网络已连接";
+                indicator.className = "network-status online";
+                statusText.innerHTML = "准备重连";
+            }
+        }
+
+        function retryConnection() {
+            var connectionType = api.connectionType;
+            
+            // 1. 检查物理网络连接
+            if (connectionType === 'none' || connectionType === 'unknown') {
+                api.toast({ msg: '检测到设备未联网', location: 'middle' });
+                return;
+            }
+
+            // 2. 构造目标地址 (严格检查变量是否存在)
+            var ruurl = "";
+            if (typeof enWebEntry !== 'undefined' && enWebEntry) {
+                ruurl = enWebEntry;
+            } else {
+                // 兜底逻辑：如果 common.js 没加载或没定义 enWebEntry
+                var apiUrlIndex = api.pageParam.apiUrlIndex || $api.getStorage('apiUrlIndex');
+                ruurl = (apiUrlIndex == '3') ? 'https://en-test-front.12xue.com/static/' : 'https://enweb-new.12xue.com/static/';
+            }
+            var targetUrl =ruurl;
+
+            // 3. 动态深度检测
+            api.showProgress({ title: '正在校验服务...', modal: true });
+
+            console.log("正在尝试连接地址: " + targetUrl);
+
+            api.ajax({
+                url: targetUrl,
+                method: 'get', // 改用 get 尝试，部分服务器可能拦截了 head 请求
+                timeout: 10    // 增加到 10 秒超时，排除网络波动
+            }, function(ret, err) {
+                api.hideProgress();
+                
+                if (ret || (err && err.statusCode == 200)) {
+                    // 成功：有返回结果或者状态码是 200
+                    openTargetWin(targetUrl);
+                } else {
+                    // 失败：弹出详细诊断信息
+                    var debugMsg = "【诊断信息】\n";
+                    debugMsg += "目标URL: " + targetUrl + "\n";
+                    debugMsg += "网络类型: " + connectionType + "\n";
+                    
+                    if (err) {
+                        debugMsg += "错误码(code): " + err.code + "\n"; // 0:连接错误, 1:超时, 2:授权, 3:数据类型错误
+                        debugMsg += "状态码(statusCode): " + err.statusCode + "\n";
+                        debugMsg += "错误描述: " + err.msg + "\n";
+                    } else {
+                        debugMsg += "未知错误：未触发回调但连接失败\n";
+                    }
+
+                    // 使用 alert 方便复制或截图
+                    api.alert({
+                        title: '服务连接失败诊断',
+                        msg: debugMsg,
+                        buttons: ['确定']
+                    });
+                    
+                    console.error(JSON.stringify(err));
+                }
+            });
+        }
+
+        function openTargetWin(url) {
+            // 获取并合并参数，确保业务逻辑连续
+            var pageParams = api.pageParam || {};
+            
+            api.openWin({
+                name: 'oralTraining-win-main',
+                url: url,
+                pageParam: pageParams,
+                slidBackEnabled: false,
+                reload: true, // 强制刷新
+                bgColor: '#ffffff'
+            });
+
+            // 延迟关闭离线提示页，防止切换时的闪烁
+            setTimeout(function() {
+                api.hideProgress();
+                api.closeWin(); 
+            }, 1000);
+        }
+
+        function goBack() {
+            api.closeWin();
+        }
+    </script>
+</body>
+</html>

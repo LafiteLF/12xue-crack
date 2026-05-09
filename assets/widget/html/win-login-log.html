@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录日志</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/javascript" src="../script/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        html {
+            --wrem: 1vw;
+            --hrem: 1vh;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            height: 100%;
+        }
+
+        #app {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div style="display: flex; flex-direction: column; align-items: center; height: 100%;padding: calc(30 * var(--hrem));box-sizing: border-box;">
+        <div style="font-size: calc(30 * var(--wrem))">登录日志</div>
+        <div style="display: grid; grid-template-columns: auto;row-gap: calc(20*var(--hrem)); margin-top: calc(40 * var(--hrem)); font-size: calc(25 * var(--wrem));overflow-y: auto;">
+            <div v-if="data.length !== 0" v-for="item in data" style="display: flex; flex-direction: row;">
+                <span style="margin-right: calc(10 * var(--wrem))">{{ item.username }}</span>登录于<span
+                    style="margin-left: calc(10 * var(--wrem))">{{ item['login_time'] }}</span>
+            </div>
+            <div v-else>无登录信息</div>
+        </div>
+    </div>
+</div>
+<script>
+    const {createApp, onBeforeMount, ref} = Vue
+    createApp({
+        setup() {
+            const db = ref(null);
+            const data = ref([]);
+            onBeforeMount(() => {
+                $('html').css({
+                    "--wrem": (window.innerWidth / 1920) + "px",
+                    "--hrem": (window.innerHeight / 1200) + "px",
+                    width: window.visualViewport.width + "px",
+                    height: window.visualViewport.height + "px",
+                })
+
+                apiready = () => {
+                    db.value = api.require('db')
+                    const res = db.value.selectSqlSync({
+                        name: 'loginLog',
+                        sql: 'SELECT id, uid, username, login_time FROM log ORDER BY login_time DESC;'
+                    })
+                    // console.log(JSON.stringify(res))
+                    if (res.status) {
+                        data.value = res.data
+                    }
+                }
+            })
+            return {
+                data,
+            }
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <style>
+        html body {
+            background-color: #f2f2f2;
+            padding-top: 20px;
+        }
+
+        .clearfix:before,
+        .clearfix:after {
+            content: " ";
+            display: table;
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        /*清除浮动*/
+        .content {
+            width: calc(100% - 20px);
+            margin: 0 auto;
+            background: #fff;
+            padding-top: 30px;
+            height: 100%;
+        }
+
+        .main {
+            width: calc(100% - 100px);
+            padding-left: 80px;
+            height: 230px;
+            padding-top: 30px;
+        }
+
+        ul {
+            white-space: nowrap;
+            padding-top: 40px;
+        }
+
+        ul li {
+            float: left;
+            width: 100px;
+            height: 10px;
+            background: #dfdde0;
+            margin-left: 50px;
+            position: relative
+        }
+
+        ul li .dengji {
+            display: block;
+            width: 50px;
+            height: 50px;
+            background: url("../../../image/stuHomePad/dengji.png") no-repeat 5px 5px #dfdde0;
+            background-size: 40px;
+            border-radius: 200px;
+            position: absolute;
+            left: -50px;
+            top: -20px;
+            text-align: center;
+            line-height: 45px;
+            font-size: 0.6rem;
+            color: #fff
+        }
+
+        ul li:nth-of-type(6) {
+            width: 0px !important;
+        }
+
+        ul li:nth-of-type(7) {
+            display: none
+        }
+
+        ul li p {
+            height: 100%;
+            background: #fbe9b6;
+            position: relative
+        }
+
+        .chengzhagnzhi {
+            position: absolute;
+            display: block;
+            width: 80px;
+            height: 80px;
+            right: 0px;
+            top: -54px;
+            background: url("../../../image/stuHomePad/qi.png") no-repeat top;
+            background-size: 100%;
+            text-align: right;
+            color: #fff;
+            font-size: 0.45rem;
+            padding-top: 2px;
+            padding-right: 5px
+        }
+
+        .dengjitop {
+            width: 100%
+        }
+
+        .dengjitop p {
+            width: 140px;
+            height: 120px;
+            background: url("../../../image/stuHomePad/dengji.png") no-repeat center;
+            background-size: 100%;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 100px;
+            color: #fff
+        }
+
+        .title {
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .title span {
+            font-size: 1rem;
+            margin-left: 5px;
+            color: #4bc7c7
+        }
+
+        .item {
+            display: inline-block;
+            position: absolute;
+            bottom: -50px;
+            left: -80px;
+            font-size: 0.6rem;
+            width: 100px;
+            text-align: center
+        }
+
+        .bottom {
+            font-size: 0.8rem;
+            text-align: center;
+
+        }
+
+        .bottom span {
+            font-size: 1rem;
+            margin: 0 5px;
+            color: #4bc7c7
+        }
+        [v-cloak]{ display: none}
+        .bottom,.dengjitop{ display: none}
+
+    </style>
+</head>
+<body>
+<div class="content" v-cloak>
+    <div class="dengjitop">
+        <p>V{{rank_code}}</p>
+        <div class="title" >成长值<span v-html="prestige>0?prestige:'0'"></span></div>
+    </div>
+    <div class="main">
+        <ul class="clearfix">
+            <li v-for="(list , index) in data" :style="{width:liwidth}">
+                <p :style="{width:jindu(index)+'%'}">
+                    <span class="chengzhagnzhi" :style="jindu(index)<100 && jindu(index)>0?'display:block':prestige==list.experience?'display:block':'display:none'">成长值{{prestige}}</span>
+                </p>
+                <span class="dengji" :style="prestige>=list.experience?'background-color:#fbe9b6':'background-color: #dfdde0'">{{list.alias}} </span>
+                <div class="item">{{list.experience}}成长值</div>
+            </li>
+        </ul>
+    </div>
+    <p class="bottom">距离下一个等级还有<span>{{nowtexp}}</span>成长值</p>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vm.mainwidth();
+        vm.GetUserstore();
+    };
+    var vm = new Vue({
+        el: '.content',
+        data: {
+            data: [],
+            prestige: '',
+            liwidth: '',
+            nowtexp: '',
+            rank_code: ''
+        },
+        updated:function () {
+            $('.dengjitop').show();
+            $('.bottom').show();
+        },
+        methods: {
+            mainwidth: function () {
+                vm.liwidth = (($('.main').width() - 50) / 5 - 50) + 'px';
+                vm.nowtexp = api.pageParam.nowtexp;
+                vm.rank_code = api.pageParam.rank_code;
+            },
+            jindu: function (index) {
+                if (index + 1 < vm.data.length) {
+                    var nextexperience = vm.data[index + 1].experience;
+                    var nowexperience = vm.data[index].experience;
+                    if (vm.prestige >= nextexperience) {
+                        return 100;
+                    } else if (vm.prestige > nowexperience) {
+                        return (vm.prestige - nowexperience) / (nextexperience - nowexperience) * 100
+                    } else {
+                        return 0
+                    }
+                } else {
+                    return 100
+                }
+            },
+            GetUserstore: function () {//获取用户的学币/积分/威望/经验详情
+                apiObj.Get(UrlRouter.GetUserstore, "", function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            $api.setStorage('point', ret.point);
+                            $api.setStorage('prestige', ret.prestige);
+                            $api.setStorage('experience', ret.experience);
+                            $api.html($api.dom('.cz'), ret.prestige);
+                            vm.prestige = parseInt(ret.prestige);
+                            vm.GetUserrank();
+                        } else {
+                            api.toast(
+                                    {
+                                        msg: ret.msg,
+                                        duration: 2000,
+                                        location: 'bottom'
+                                    }
+                            )
+                        }
+                    } else {
+                        api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                        )
+                    }
+
+                });
+
+            },
+            GetUserrank: function () {
+                apiObj.Get(UrlRouter.GetUserrank, {
+                    values: {}
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            if (vm.rank_code > 4) {
+                                var action = parseInt(vm.rank_code) - 3;
+                                var end = parseInt(vm.rank_code) + 3;
+                                vm.data = ret.data.slice(action, end);
+                            } else {
+                                vm.data = ret.data.slice(-0, 7);
+                            }
+
+                        } else {
+                            //alert(ret.msg);
+                        }
+                    } else {
+
+                        api.toast(
+                                {
+                                    msg: err.msg,
+                                    duration: 2000,
+                                    location: 'bottom'
+                                }
+                        )
+                    }
+                })
+
+            }
+        }
+    })
+
+</script>

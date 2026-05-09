@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <!--<link rel="stylesheet" type="text/css" href="../../../css/frameDetail.css"/>-->
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            width: 100%;
+            height: 100%;
+        }
+
+        .content {
+            width: 70%;
+            height: 60%;
+            top: 20%;
+            position: absolute;
+            left: 15%;
+            overflow-x: scroll;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        .topContent {
+            border: none;
+
+        }
+
+        .topContent ul {
+            height: 52px;
+            background: #f6f6f6;
+            border: none
+        }
+
+        .topContent ul li {
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            margin-top: 9px;
+            font-size: 1.2rem;
+            background: #f6f6f6
+        }
+
+        .scroll li {
+            position: relative
+        }
+
+        .topContent ul {
+            width: 10000px;
+            height: 60px;
+        }
+
+        .topContent ul li {
+            float: left;
+            line-height: 26px;
+            text-align: center;
+            color: #4bc7c7;
+            margin: 0 7px;
+            margin-top: 19px;
+            font-size: 1rem !important;
+            width: 60px !important;
+            height: 40px !important;
+            border-bottom: solid 2px #4bc7c7;
+        }
+
+        .zqda{
+            margin: 10px 10px 10px 20px;
+            vertical-align: top;
+        }
+
+        .zqdan{
+            margin: 10px 10px 10px 20px;
+            vertical-align: top;
+        }
+
+
+        .zqdan img{
+            max-width: calc(100% - 40px);
+            height: auto;
+        }
+
+        .dajx{
+            margin: 10px 10px 10px 20px;vertical-align: top;
+        }
+        .daanjiexi{
+            margin: 10px 10px 10px 20px;vertical-align: top;
+        }
+
+        .daanjiexi img{
+            max-width: calc(100% - 40px);
+            height: auto;
+        }
+        [v-cloak] {
+            display: none;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="close" tapmode onclick="api.closeFrame({
+    name: 'popCorrentAnswer'
+});"></div>
+<div id="app1" class="content"  v-cloak>
+    <div v-if="tx_code!=5&&tx_code!=2">
+        <p class="zqda" v-text="getdaTitle(tx)"></p>
+        <p class="zqdan" v-if="tx!='ldt'" v-html="zqda">无</p>
+        <p class="zqdan" v-if="tx=='ldt'&&exercisesInfo.ldtdastr==''">无</p>
+        <p class="zqdan" v-if="tx=='ldt'&&exercisesInfo.ldtdastr!=''" v-html="exercisesInfo.ldtdastr"></p>
+    </div>
+    <div v-if="tx_code==2">
+        <p class="zqda" v-text="getdaTitle(tx)"></p>
+        <p class="zqdan" v-if="exercisesInfo.daoptions[sort].description==''">无</p>
+        <p class="zqdan" v-html="exercisesInfo.daoptions[sort].description">无</p>
+    </div>
+    <div v-if="tx_code==5">
+        <p class="zqda">正确答案</p>
+        <p class="zqdan" v-if="tx!='ldt'" v-html="exercisesInfo.children[sort].dastr">无</p>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+        if(api.pageParam.tx_code == 5){
+            vm.tx = api.pageParam.exercisesInfo.children[api.pageParam.sort - 1].tx;
+        }
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                zqda: api.pageParam.zqda,
+                tx:api.pageParam.tx,
+                tx_code:api.pageParam.tx_code,
+                exercisesInfo:api.pageParam.exercisesInfo,
+                sort: api.pageParam.sort - 1,
+            },
+            updated: function () {
+
+            },
+            methods: {
+                getdaTitle: function (tx) {
+                    if (tx == 'smbd' || tx == 'wendt' || tx == 'yybd' || tx == 'zw' || tx == 'bxt' || tx == 'jdt3') {
+                        return '参考答案';
+                    } else if (tx == 'zmt') {
+                        return '证明过程';
+                    } else if (tx == 'ldt') {
+                        return '朗读材料';
+                    }else {
+                        return '正确答案';
+                    }
+                }
+            }
+        });
+    }
+
+
+</script>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style type="text/css">
+        body {
+            background-color: #f2f2f2;
+            padding-top: 20px;
+        }
+        .back{
+            background-color: #fff;
+            width: 80%; margin: 0 auto;
+        }
+        .aui-btn-block{
+            width: 30%;
+            height: 50px;
+            line-height: 20px;
+            background-color:#4bc7c7;
+            font-size: 0.8rem;
+        }
+        .aui-list-view-cell{
+            font-size: 0.8rem;
+            color: gray;
+            height: 70px;
+        }
+        li div {
+            /* margin-top: 0.2rem; */
+            height: 46px;
+            line-height: 46px;
+        }
+        input{border: none!important; padding: 10px 0px!important;}
+    </style>
+</head>
+<body>
+<div class="back">
+    <ul>
+        <li class="aui-list-view-cell">
+            <div ><input type="text" class="aui-input name" placeholder="请输入姓名" style=""></div>
+        </li>
+        <li class="aui-list-view-cell" >
+            <div ><input type="text" class="aui-input phone" placeholder="请输入联系电话" style=""></div>
+        </li>
+        <li class="aui-list-view-cell" tapmode onclick="Clock(1)">
+            <!--<div ><input type="text" class="aui-input" placeholder="请输入购买日期，如 2017-07-11" ></div>-->
+            <div class="time1">请输入购买日期</div>
+        </li>
+        <li class="aui-list-view-cell" tapmode onclick="Clock(2)">
+            <!--<div ><input type="text" class="aui-input" placeholder="请输入购买日期，如 2018-07-11" ></div>-->
+            <div class="time2" >请输入有效时间</div>
+        </li>
+        <li class="aui-list-view-cell" tapmode onclick="Channel(0)">
+            <div class="aui-arrow-right qudao" >请选择购买渠道</div>
+        </li>
+        <li class="aui-list-view-cell" tapmode onclick="Channel(1)">
+            <div class="aui-arrow-right khjl" >请选择客户经理</div>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+
+    var schoolId;
+    var apiObj;
+    var time1;
+    var time2;
+    var qdId;
+    var khjlId;
+    var qdName;
+    var khjlName;
+    var personName;
+    var phoneNum;
+
+    //设备相关
+    var deviceId;
+    var deviceModel;
+    var deviceName;
+    apiready = function () {
+        apiObj = new GridOpenApi(UrlDomain, source, version);
+        schoolId = api.pageParam.schoolId;
+        // deviceId = api.deviceId.replace(new RegExp(":", "gm"), "");
+        deviceId = '';
+        deviceModel = api.deviceModel;
+        deviceName = api.deviceName;
+
+        api.addEventListener({
+            name: 'selectFinish'
+        }, function (ret, err) {
+            if (ret) {
+                if (ret.value.idx == 0) { //渠道
+                    qdId = ret.value.id;
+                    $api.text($api.dom('.qudao'), ret.value.name);
+                    qdName = ret.value.name;
+                } else if (ret.value.idx == 1) { // 客户经理
+                    khjlId = ret.value.id;
+                    $api.text($api.dom('.khjl'), ret.value.name);
+                    khjlName = ret.value.name;
+                }
+            }
+        });
+
+    };
+
+    function Clock(idx) {
+        api.openPicker({
+            type: 'date',
+//            date: '2014-05-01',
+            title: '选择时间'
+        }, function(ret, err) {
+            if (ret) {
+                if (idx == 1) {
+                    time1 = ret.year + '/' + ret.month + '/' + ret.day;
+                    time2 = (ret.year + 10) + '/' + ret.month + '/' + ret.day;
+                } else if (idx == 2) {
+                    time2 = ret.year + '/' + ret.month + '/' + ret.day;
+                }
+                $api.text($api.dom('.time1'), time1);
+                $api.text($api.dom('.time2'), time2);
+            }
+        });
+    }
+    
+    function Channel(idx) {
+        api.openFrame({
+            name: 'select_frame',
+            url: 'select_frame.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+            },
+            bounces: false,
+            pageParam: {idx: idx}
+        });
+    }
+
+
+    function Commit() {
+        if ($api.dom('.name').value != '') {
+            personName = $api.dom('.aui-input').value;
+            if ($api.dom('.phone').value != '') {
+                if ($api.dom('.phone').value.match('^0?(13|15|18|14|17|16|19)[0-9]{9}$')) {
+                    phoneNum = $api.dom('.phone').value;
+                    if ($api.text($api.dom('.time1')) != '请输入购买日期') {
+                        if ($api.text($api.dom('.qudao')) != '请选择购买渠道') {
+                            if ($api.text($api.dom('.khjl')) != '请选择客户经理') {
+                                submit();
+                            } else {
+                                api.toast({
+                                    msg: '请选择客户经理',
+                                    duration: 2000,
+                                    location: 'bottom'
+                                });
+                            }
+                        } else {
+                            api.toast({
+                                msg: '请选择购买渠道',
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    } else {
+                        api.toast({
+                            msg: '请选择购买日期',
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: '手机号不合法',
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: '手机号不能为空',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        } else {
+            api.toast({
+                msg: '姓名不能为空',
+                duration: 2000,
+                location: 'bottom'
+            });
+        }
+    }
+    
+    
+    function submit() {
+        api.showProgress({
+            title: '加载中',
+            text: '请稍后...',
+            modal: false
+        });
+        apiObj.Post(UrlRouter.PostDevice,{
+            values:{
+                device_id: deviceId,
+                device_name: deviceName,
+                device_mode: deviceModel,
+                realname: personName,
+                telephone: phoneNum,
+                schoolid: schoolId,
+                create_time: time1,
+                expire_time: time2,
+                qds_id: qdId,
+                khjl_id: khjlId
+            }
+        },function(ret,err){
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.toast({
+                        msg: '设备信息添加成功',
+                        duration: 3000,
+                        location: 'bottom'
+                    });
+
+                    api.sendEvent({
+                        name: 'deviceSuccess'
+                    });
+
+                    api.closeToWin({
+                        name: 'win-equipment-pad'
+                    });
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+            api.hideProgress();
+        });
+
+    }
+
+
+</script>

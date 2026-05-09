@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>title</title>
+    <link rel="stylesheet" href="../../../css/sm.min.css">
+    <link rel="stylesheet" href="../../../css/common.css">
+    <link rel="stylesheet" href="../../../css/analysis.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        body {
+            background: #f2f2f2;
+
+        }
+
+        .qr {
+            border: 1px solid #00c8c8;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            font-size: 0.7rem !important;
+            margin-right: 10px;
+        }
+
+        .aui-bar-nav .aui-iconfont {
+            line-height: 1.25rem
+        }
+
+        .aui-icon-check:before {
+            margin-right: 5px;
+        }
+
+        .jtzz {
+            width: 80%;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            background: #fff;
+            margin: 0 auto;
+            margin-top: 10px;
+            padding: 0 20px;;
+        }
+
+        .nav-spanBtn {
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 3px;
+            padding: 5px 10px;
+            margin-right: 10px;
+            font-size: 0.8rem
+        }
+
+        .nav-spanBtn:active {
+            color: #fff;
+            background-color: #4bc7c7;
+        }
+
+        .aui-bar-nav .aui-btn.aui-btn-outlined {
+            padding: 0 0.5rem;
+        }
+
+        .aui-icon-check:before {
+            content: "\e619";
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .aui-bar-nav .aui-btn.aui-btn-outlined {
+            background: none;
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav content aui-clearfix">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick='api.closeWin()'></span>家庭住址
+    </a>
+    <div style="float: right" class="submit">
+        <span class="nav-spanBtn  aui-iconfont aui-icon-check"
+              style="font-size: 0.7rem" tapmode onclick="commitAddress()">确定</span>
+    </div>
+</header>
+<div class="jtzz" style="padding-top: 20px">
+    <input id="address" type="text" class="aui-input" placeholder="家庭住址" style="height: 1rem !important;min-height: 1rem;line-height: 1rem"/>
+</div>
+<!--<div class="jtzz" style="padding-top: 20px">-->
+    <!--<textarea name="" id="" cols="30" rows="1" placeholder="家庭住址" style="height: 1rem !important;min-height: 1rem;line-height: 1rem"></textarea>-->
+<!--</div>-->
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        var address = api.pageParam.key;
+        $api.val($api.byId('address'), address);
+    };
+    function commitAddress() {
+        var apiObj = new GridOpenApi(UrlDomain, source, version);
+        apiObj.SetAuthToken($api.getStorage('token'));
+        var newAddress = clear_emoji($api.val($api.byId('address')));
+        var pat = new RegExp("[`~!@$^&*=|{}\\[\\].<>/?~！@￥……&*|{}【】？%+]");
+        if (pat.test(newAddress) == true) {
+            alert('家庭住址不能含有特殊字符');
+        } else {
+            if (newAddress.length > 240) {
+                api.toast({
+                    msg: '地址长度最多为240位',
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            } else {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Put(UrlRouter.ChangeUserData, {
+                    values: {
+                        uid: $api.getStorage('uid'),
+                        jtzz:encodeURIComponent(newAddress)
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            api.accessNative({
+                                name: 'changeAddress',
+                                extra: {
+                                    address: newAddress
+                                }
+                            }, function (ret, err) {
+                                if (ret) {
+                                } else {
+                                    alert(JSON.stringify(err));
+                                }
+                            });
+                            api.sendEvent({
+                                name: 'changeAddress',
+                                extra: {address: newAddress}
+                            });
+                            api.closeWin();
+                        } else {
+                            api.hideProgress();
+                            //alert(ret.msg);
+                        }
+                    } else {
+                        api.hideProgress();
+
+                    }
+                })
+            }
+        }
+    }
+</script>
+</html>

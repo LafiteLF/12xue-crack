@@ -1,0 +1,69 @@
+/**
+ * pull-refresh-new.css
+ * 新一代下拉刷新样式
+ * @version 1.0.0
+ */
+
+/* 容器样式 */
+.pull-refresh-container {
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+/* 刷新指示器 */
+.pull-refresh-indicator {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    background: transparent;
+}
+
+/* 刷新图标容器 */
+.pull-refresh-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 6px;
+    transition: transform 0.2s ease;
+}
+
+/* 刷新文本 */
+.pull-refresh-text {
+    font-size: 14px;
+    color: #999;
+    user-select: none;
+}
+
+/* 准备刷新状态 */
+.aui-refresh-content.pull-refresh-ready .pull-refresh-text {
+    color: #4bc7c7;
+}
+
+/* 加载中状态 */
+.aui-refresh-content.pull-refresh-loading .pull-refresh-icon {
+    animation: pull-refresh-spin 1s linear infinite;
+}
+
+/* 旋转动画 */
+@keyframes pull-refresh-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 平滑过渡 */
+.aui-refresh-content {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+

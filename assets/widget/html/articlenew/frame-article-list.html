@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui-pull-refresh.css"/>
+    <title>文章列表</title>
+    <style>
+        body{ padding-top: 10px}
+        .image {
+            height: 50px;
+        }
+
+        .i-edu {
+            padding: 11px 15px;
+            height: 40px;
+            background-color: #f4f4f4;
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.5rem 0;
+        }
+
+        /*默认信息条隐藏*/
+        .aui-tips {
+            text-align: center;
+            display: none;
+        }
+
+        .aui-list-item-media {
+            margin-top: 0px;
+        }
+
+        .img-height-small {
+            width: 2.5rem;
+            height: 3rem;
+        }
+
+        .img-height-big {
+            max-height: 4rem;
+        }
+
+        section {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        ul, h1 {
+            background: #fff;
+            border: 0px !important;
+        }
+        h1:nth-of-type(1){
+            margin-top: 0px;
+        }
+        h1 {
+            font-size: 0.75rem;
+            background: #fff;
+            color: #6ec2c3;
+            padding: 10px 5%;
+            position: relative;
+            margin-top: 10px;
+        }
+        h1 b{     display: block;
+            width: 5px;
+            height: 25px;
+            background: #ffcd06;
+            position: absolute;
+            left: 0px;
+            top: 12px; }
+
+        h1 span {
+            float: right;
+            font-size: 0.65rem;padding-top: 3px;
+        }
+        .aui-media-list .aui-list-item {
+            display: block;
+            width: 90%;
+            margin: 0 auto;
+        }
+        ul li{ border-bottom: 0px!important;   }
+        .aui-list:before {
+            height: 0px;
+        }
+        h1:after {
+            height: 1px;
+            background-color: #dddddd;
+            display: block;
+            content: '';
+            position: absolute;
+            bottom:0px;
+            left: 5%;
+            right: auto;
+            width: 90%;
+            z-index: 2;
+            -webkit-transform-origin: 50% 100%;
+            transform-origin: 50% 100%;
+            pointer-events: none;
+        }
+        .aui-list:after {
+            height: 0;}
+        .aui-list .aui-list-item {
+            padding-left: 0rem;
+        }
+        .aui-info {
+            padding:  0px;
+        }
+        .aui-list .aui-list-item-media {
+            width: 5rem;  padding: 0.3rem 9px; padding-right: 0px;}
+        .aui-list .aui-list-item-title {
+            font-size: 0.8rem!important;}
+        .aui-info-item > *, .aui-info > * {
+            padding-top: 2px;    color: #999;
+        }
+        [v-cloak] {
+            display: none
+        }
+        .content{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="aui-refresh-content">
+    <div class="content " v-cloak>
+        <h1><b></b>课外驿站<span @click="openmore(0)">查看更多></span></h1>
+        <ul class="aui-list aui-media-list">
+            <li v-for="article in articles" :id="article.id" :description="article.description" :url="article.url "
+                :title=" article.title " class="aui-list-item" tapmode
+                onclick="vm.OpenXiangqing(this); ">
+                <div class="aui-media-list-item-inner">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-text">
+                            <div class="aui-list-item-title aui-font-size-18 aui-ellipsis-2" v-html="article.title">
+
+                            </div>
+                        </div>
+                        <div class="aui-info aui-padded-b-0">
+                            <div class="aui-info-item aui-font-size-12">
+                                <img src="../../icon/icon_hot.png" style="width:1.2rem"/>
+                                <span class="aui-margin-l-5" v-html="'&nbsp;&nbsp;'+article.user_text +'&nbsp;&nbsp;  '+ article.good+'赞'+'&nbsp;&nbsp;  ' + time(article.create_time)"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aui-list-item-media ">
+                        <img class="img-height-small" :src="article.cover_text">
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <h1><b></b>兴趣体验 <span @click="openmore(1)">查看更多></span></h1>
+        <ul class="aui-list aui-media-list">
+            <li v-for="xqarticle in xqarticles" :id="xqarticle.id" :description="xqarticle.description"
+                :url=" xqarticle.url " :title=" xqarticle.title " class="aui-list-item" tapmode
+                onclick="vm.OpenXiangqing(this); ">
+                <div class="aui-media-list-item-inner">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-text">
+                            <div class="aui-list-item-title aui-font-size-18 aui-ellipsis-2" v-html="xqarticle.title">
+                                title
+                            </div>
+                        </div>
+                        <div class="aui-info aui-padded-b-0">
+                            <div class="aui-info-item aui-font-size-12">
+                                <img src="../../icon/icon_hot.png" style="width:1.2rem"/>
+                                <span class="aui-margin-l-5" v-html="'&nbsp;&nbsp;'+xqarticle.user_text +'&nbsp;&nbsp;' +  xqarticle.good+'赞' +'&nbsp;&nbsp; '+  time(xqarticle.create_time)"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aui-list-item-media ">
+                        <img class="img-height-small" :src="xqarticle.cover_text">
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <h1><b></b>有点意思 <span @click="openmore(2)">查看更多></span></h1>
+        <ul class="aui-list aui-media-list">
+            <li v-for="ydarticle in ydarticles" :id="ydarticle.id" :description="ydarticle.description"
+                :url=" ydarticle.url " :title=" ydarticle.title " class="aui-list-item" tapmode
+                onclick="vm.OpenXiangqing(this); ">
+                <div class="aui-media-list-item-inner">
+                    <div class="aui-list-item-inner">
+                        <div class="aui-list-item-text">
+                            <div class="aui-list-item-title aui-font-size-18 aui-ellipsis-2" v-html="ydarticle.title">
+                            </div>
+                        </div>
+                        <div class="aui-info aui-padded-b-0">
+                            <div class="aui-info-item aui-font-size-12">
+                                <img src="../../icon/icon_hot.png" style="width:1.2rem"/>
+                                <span class="aui-margin-l-5" v-html="'&nbsp;&nbsp;'+ydarticle.user_text +'&nbsp;&nbsp; ' +  ydarticle.good+'赞'+'&nbsp;&nbsp;' +  time(ydarticle.create_time)"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aui-list-item-media ">
+                        <img class="img-height-small" :src="ydarticle.cover_text">
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+
+</html>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../script/vue.js"></script>
+<script type="text/javascript" src="../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../script/aui-pull-refresh.js"></script>
+<script type="application/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    var data;
+    var pages = 1;
+    var index;
+    var articleid;
+    apiready = function () {
+        index = api.pageParam.index;
+        vm.more(pages, index);
+        //下拉刷新
+        var pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                setTimeout(function () {
+                    pages = 1;
+                    vm.articles= [];
+                    vm.xqarticles= [];
+                    vm.ydarticles= [];
+                    vm.more(pages, index);
+                    pullRefresh.cancelLoading(); //刷新成功后调用此方法隐藏
+                }, 500)
+            }
+        });
+        // api.addEventListener({
+        //     name: 'refresh-list'
+        // }, function (ret, err) {
+        //         articleid=ret.value.id;
+        //         if(vm.articles!=null)
+        //         {
+        //
+        //             for (var i=0;i<vm.articles.length;i++)
+        //             {
+        //                 if(vm.articles[i].id==articleid)
+        //                 {
+        //                     pages=Math.floor(i/10)+1;
+        //                 }
+        //             }
+        //         }
+        //         if(vm.xqarticles!=null)
+        //         {
+        //             for (var i=0;i<vm.xqarticles.length;i++)
+        //             {
+        //                 if(vm.xqarticles[i].id==articleid)
+        //                 {
+        //                     pages=Math.floor(i/10)+1;
+        //                 }
+        //             }
+        //         }
+        //         if(vm.ydarticles!=null)
+        //         {
+        //             for (var i=0;i<vm.ydarticles.length;i++)
+        //             {
+        //                 if(vm.ydarticles[i].id==articleid)
+        //                 {
+        //                     pages=Math.floor(i/10)+1;
+        //                 }
+        //             }
+        //         }
+        //     vm.more(pages, index);
+        // });
+        //下拉到底部的监听
+        api.addEventListener({
+            name: 'scrolltobottom',
+            extra: {
+                threshold: 0            //设置距离底部多少距离时触发，默认值为0，数字类型
+            }
+        }, function (ret, err) {
+            if(index<3){
+                pages++;
+                vm.more(pages, index);}
+        });
+    };
+    //1 兴趣体验 2课外驿站 3有点意思
+    var vm = new Vue({
+        el: '.content',
+        data: {
+//           articles: [{"id":831,"user_id":3,"title":"测试字体091903","url":"http:\/\/www.12xuetest.com\/share\/article\/831.html","category_id":2,"description":"","cover_id":987,"view":19,"comment":19,"good":4,"create_time":1474268177,"update_time":"1474268245","tags":"","copyfrom":"","push_to":"student","style":"1","type":"hot","category_text":"课外驿站","user_text":"12xue","cover_text":"http:\/\/upload.12xue.com\/.\/o_1at0jje841b9r1s7arru1os514v67.jpg"},{"id":1,"user_id":3,"title":"【12xue V5版本上线公告！】","url":"http:\/\/www.12xuetest.com\/share\/article\/1.html","category_id":2,"description":"","cover_id":791,"view":1980,"comment":5,"good":328,"create_time":1472697596,"update_time":"1472697596","tags":"study","copyfrom":"12xue","push_to":"student,teacher,parent","style":"2","type":"hot","category_text":"课外驿站","user_text":"12xue","cover_text":"http:\/\/upload.12xue.com\/cms_cover_20160815_a5d28d2240d6d7ae837c.jpg"}],
+            articles:[],
+            xqarticles: [],
+            ydarticles: [],
+            notearticles:[],
+            page:0
+        },
+        updated:function () {
+            $('.content').show();
+        },
+        methods: {
+            articlelist: function (pages, num) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetArticleList, {
+                    values: {
+                        category: 2,
+                        p: pages,
+                        num: num
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            if(pages==1)
+                            {
+                                if(articleid==null)
+                                {
+                                    vm.articles =vm.articles.concat(ret.list);
+                                }
+                                if(articleid!=null)
+                                {
+                                    for (var i=0;i<vm.articles.length;i++)
+                                    {
+                                        if(vm.articles[i].id==articleid)
+                                        {
+                                            var j=i%10;
+                                            vm.articles.splice(i,1,ret.list[j]);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+
+                                vm.articles.splice(((pages-1)*num),10,ret.list[0],ret.list[1],ret.list[2],ret.list[3],ret.list[4],ret.list[5],ret.list[6],ret.list[7],ret.list[8],ret.list[9]);
+                                for (var i=0;i<vm.articles.length;i++)
+                                {
+                                    if(vm.articles[i].id==articleid&&Math.floor(i/10)+1==pages)
+                                    {
+                                        var j=i%10;
+                                        vm.articles.splice(i,1,ret.list[j]);
+                                    }
+                                }
+                            }
+                        }else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    }else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            },
+            xqarticlelist: function (pages, num) {
+
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetArticleList, {
+                    values: {
+                        category: 1,
+                        p: pages,
+                        num: num
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            if(pages==1)
+                            {
+
+                                if(articleid==null)
+                                {
+                                    vm.xqarticles =vm.xqarticles.concat(ret.list);
+                                }
+                                if(articleid!=null)
+                                {
+                                    for (var i=0;i<vm.xqarticles.length;i++)
+                                    {
+                                        if(vm.xqarticles[i].id==articleid)
+                                        {
+                                            var j=i%10;
+                                            vm.xqarticles.splice(i,1,ret.list[j]);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                vm.xqarticles.splice(((pages-1)*num),10,ret.list[0],ret.list[1],ret.list[2],ret.list[3],ret.list[4],ret.list[5],ret.list[6],ret.list[7],ret.list[8],ret.list[9]);
+                                for (var i=0;i<vm.xqarticles.length;i++)
+                                {
+                                    if(vm.xqarticles[i].id==articleid&&Math.floor(i/10)+1==pages)
+                                    {
+                                         var j=i%10;
+                                         vm.xqarticles.splice(i,1,ret.list[j]);
+                                    }
+                                }
+                            }
+                        }else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    }else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            },
+            ydarticlelist: function (pages, num) {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetArticleList, {
+                    values: {
+                        category: 3,
+                        p: pages,
+                        num: num
+                    }
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.ret == 0) {
+                            api.hideProgress();
+                            if(pages==1)
+                            {
+                                if(articleid==null)
+                                {
+                                    vm.ydarticles =vm.ydarticles.concat(ret.list);
+                                }
+                                if(articleid!=null)
+                                {
+                                    for (var i=0;i<vm.ydarticles.length;i++)
+                                    {
+                                        if(vm.ydarticles[i].id==articleid)
+                                        {
+                                            var j=i%10;
+                                            vm.ydarticles.splice(i,1,ret.list[j]);
+                                        }
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                vm.ydarticles.splice(((pages-1)*num),10,ret.list[0],ret.list[1],ret.list[2],ret.list[3],ret.list[4],ret.list[5],ret.list[6],ret.list[7],ret.list[8],ret.list[9]);
+                                for (var i=0;i<vm.ydarticles.length;i++)
+                                {
+                                    if(vm.ydarticles[i].id==articleid&&Math.floor(i/10)+1==pages)
+                                    {
+                                        var j=i%10;
+                                        vm.ydarticles.splice(i,1,ret.list[j]);
+                                    }
+                                }
+                            }
+                        }else {
+                            api.hideProgress();
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    }else {
+                        api.hideProgress();
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            },
+            time: function (data) {
+                var d = new Date(data * 1000);
+                var date = (d.getFullYear()) + "/" + (d.getMonth() + 1) + "/" + (d.getDate());
+                return date;
+            },
+            more: function (pages, index) {
+                var pages = pages;
+                if (index == 0) {
+
+                    api.sendEvent({
+                        name: 'title',
+                        extra: {
+                            index: index
+                        }
+                    });
+                    $('ul').eq(1).hide();
+                    $('ul').eq(2).hide();
+                    $('h1').hide();
+                    var num = 10;
+//                    vm. articles=[];
+                    vm.articlelist(pages, num);
+                } else if (index == 1) {
+                    api.sendEvent({
+                        name: 'title',
+                        extra: {
+                            index: index
+                        }
+                    });
+                    $('ul').eq(0).hide();
+                    $('ul').eq(2).hide();
+                    $('h1').hide();
+                    var num = 10;
+//                    vm. xqarticles=[];
+                    vm.xqarticlelist(pages, num);
+                } else if (index == 2) {
+                    api.sendEvent({
+                        name: 'title',
+                        extra: {
+                            index: index
+                        }
+                    });
+                    $('ul').eq(1).hide();
+                    $('ul').eq(0).hide();
+                    $('h1').hide();
+                    var num = 10;
+//                    vm. ydarticles=[];
+                    vm.ydarticlelist(pages, num);
+                } else {
+                    var num = 2;
+                    vm.articlelist(pages, num);
+                    vm.ydarticlelist(pages, num);
+                    vm.xqarticlelist(pages, num);
+                }
+            },
+            openmore: function (index1) {
+                index = index1;
+                vm. xqarticles=[];
+                vm. ydarticles=[];
+                vm. articles=[];
+                vm.more(pages, index);
+            },
+            OpenXiangqing: function (context) {
+                var id = $api.attr(context, 'id');
+                var title = $api.attr(context, 'title');
+                var url = $api.attr(context, 'url');
+                var description = $api.attr(context, 'description');
+                api.openWin({
+                    name: 'win-article-detail',
+                    url: 'win-article-detail.html',
+                    pageParam: {
+                        id: id,
+                        url: url,
+                        title: title,
+                        description: description
+                    }
+                });
+
+            }
+        }
+    });
+
+
+</script>

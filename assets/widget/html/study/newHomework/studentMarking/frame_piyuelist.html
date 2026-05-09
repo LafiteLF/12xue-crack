@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>习题列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/exerciseCss.css"/>
+    <style>
+        .ex_content{ display: none}
+        .ex-xiaoti{
+            right: 65px;
+        }
+        [v-cloak] {
+            display: none
+        }
+
+        .topPeople{
+            width: calc(100% - 30px);
+            min-height: 30px;
+            background-color: white;
+            margin-top: 15px;
+            line-height: 30px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .zuoyeKong{
+            width: 24%;
+            margin-left: 38%;
+            margin-top: 50px;
+        }
+
+        .ex-daipi{
+            color: #878787;
+        }
+
+        .wjzz{
+            float: left;
+        }
+
+        .topPeoplea{
+            color: #ff5962;
+            display: inline-block;
+            width: calc(100% - 100px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="topPeople">
+    <span class="wjzz">未交作业组员：</span>
+    <span class="topPeoplea"></span>
+</div>
+
+<div class="ex_content"  v-cloak>
+    <dl v-if="materiallist.length>0">
+        <dt>基础类</dt>
+        <dd v-for="(list,index) in materiallist" :id="index"  tapmode @click="openWinDetail(list)">
+            <p v-html="index+1+'.'+getzymc(list.txstr,list.zyqf,list.tx,list.zymc,list.ytlx)"></p>
+            <span  class="ex-xiaoti" v-if=" list.xts>0" v-text="list.tx_code==2?'['+list.xts+'填空]':'['+list.xts+'小题]'"></span>
+            <span  class="ex-daipi">待批<span v-text="list.dprs" style="color: #ff5962;"></span>人</span>
+        </dd>
+    </dl>
+    <dl v-if="materialtzxt.length>0">
+        <dt>拓展类</dt>
+        <dd v-for="(list,index) in materialtzxt" :id="index" tapmode @click="openWinDetail(list)">
+            <p v-html="index+1+'.'+getzymc(list.txstr,list.zyqf,list.tx,list.zymc,list.ytlx)"></p>
+            <span  class="ex-xiaoti" v-if=" list.xts>0" v-text="list.tx_code==2?'['+list.xts+'填空]':'['+list.xts+'小题]'"></span>
+            <span  class="ex-daipi" v-text="'待批'+list.dprs+'人'"></span>
+        </dd>
+    </dl>
+    <img v-if="materiallist.length==0&&materialtzxt.length==0" class="zuoyeKong" src="../../../../image/newhomework/zuoyeKong.png" alt="">
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/common.js"></script>
+<script type="text/javascript" src="../../../../script/fastclick.js"></script>
+<script>
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var hwid;
+    var xsbjid;
+    apiready = function () {
+
+        api.addEventListener({
+            name:'viewappear'
+        }, function(ret, err){
+            vm.getHomeworkList();
+        });
+
+
+        vm.getHomeworkList();
+    };
+
+    var vm= new Vue({
+            el: '.ex_content',
+            data: {
+                data:[],
+                materiallist:[],
+                materialtzxt:[],
+            },
+            updated: function () {
+            },
+            methods: {
+                openWinDetail:function(list){
+                    api.openWin({
+                        name: 'win_marking',
+                        url: 'win_marking.html',
+                        pageParam: {
+                            tuid: api.pageParam.tuid,
+                            ytlx: list.ytlx,
+                            hwid:list.hwid,
+                            classid:api.pageParam.xsbjid,
+                            xtid:list.zyid,
+                            tx_code:list.tx_code,
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                openWinDetailTZ:function(context){
+                    var index = $(context).attr('id');
+                    api.openWin({
+                        name: 'win_detail_kzxt',
+                        url: 'kzxt/win_detail_kzxt.html',
+                        pageParam: {
+                            detailData: api.pageParam.homeworkListData,
+                            complete:2,
+                            index:index,
+                        },
+                        slidBackEnabled: false
+                    });
+                },
+                getHomeworkList:function() {
+                    api.showProgress({
+                        title: '加载中',
+                        text: '请稍后...',
+                        modal: false
+                    });
+                    apiObj.Get(UrlRouter.GetCorrectGetHomeworkCorrectList, {
+                        values: {
+                            hwid: api.pageParam.hwid,
+                            classid: api.pageParam.xsbjid,
+                            leaderuid: $api.getStorage('uid')
+                        }
+                    }, function (ret, err) {
+                        // pullRefresh.cancelLoading();
+                        api.hideProgress();
+                        if (ret) {
+                            if (ret.ret == 0) {
+                                $('.ex_content').show();
+                                if(ret.data.uncompleteUsers.length != 0){
+                                    $api.text($api.dom('.topPeoplea'),ret.data.uncompleteUsers.join('，'));
+                                    $api.css($api.dom('.topPeople'),'display:block');
+                                }
+                                vm.data = ret;
+                                vm.materiallist = ret.data.jcMaterialList;
+                                vm.materialtzxt = ret.data.tzMaterialList;
+                            }
+                            // vm.isNull = true;
+                        }
+                    });
+
+                },
+                getzymc: function (txstr,zyqf,tx,zymc,ytlx) {
+                    if(zyqf == 2){
+                        if(tx!='tdjh' && tx!='tdh' &&tx!='tdb'&&tx!='ttt'){
+                            return '【'+txstr+'】'+zymc;
+                        }else{
+                            return '【'+txstr+'】'+'<img src="../../../image/newhomework/tlbt.png">';
+                        }
+                    }else if(zyqf == 1){
+                        if(ytlx==3){
+                            return '【学习单】'+zymc
+                        }else{
+                            return '【素材】'+zymc
+                        }
+                    }else{
+                        return '作业要求'
+                    }
+                },
+
+
+            }
+        });
+
+
+</script>
+</html>

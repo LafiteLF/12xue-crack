@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" href="../../../css/ThirdCss/style.css"/>
+    <style type="text/css">
+        body {
+            background-color: #e5e5e5
+        }
+        .nav-spanBtn{
+            border: 1px solid #4bc7c7 !important;
+            border-radius: 20%;
+            font-size: 0.8rem
+        }
+    </style>
+</head>
+<body>
+<header class="aui-bar aui-bar-nav">
+    <a class="aui-toolbar-title aui-pull-left titlea" tapmode onclick="api.closeWin();">
+        <span class="aui-iconfont aui-icon-left" tapmode onclick="api.closeWin();"></span>作业评价
+    </a>
+</header>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script src="../../../script/ThridJS/iScroll-lite.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+//        api.pageParam.content;
+        var header = document.querySelector('header');
+//        $api.fixStatusBar(header);
+        api.setStatusBarStyle({
+            style: 'light'
+        });
+        var headerH = $api.offset(header).h;
+
+        api.openFrame({
+            name: 'homeworkJudge_frame',
+            url: 'homeworkJudge_frame.html',
+            rect: {
+                x: 0,
+                y: headerH,
+                w: api.winWidth,
+                h: $api.getStorage('padHeight') -headerH
+            },
+            pageParam: {classid: api.pageParam.classid,hwid: api.pageParam.zyid},
+            bounces: false
+        });
+    }
+</script>

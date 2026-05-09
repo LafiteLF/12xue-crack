@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../../css/aui.2.0.css"/>
+    <style>
+        body {
+            background: black;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .deletebtn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            z-index: 999;
+        }
+
+        .editbtn {
+            position: fixed;
+            top: 30px;
+            right: 100px;
+            width: 60px;
+            height: 60px;
+            z-index: 999;
+        }
+
+        .packbtn {
+            position: fixed;
+            bottom: 20px;
+            right: 5px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .correctbtn {
+            position: fixed;
+            bottom: 80px;
+            right: 5px;
+            width: 60px;
+            height: 60px;
+        }
+
+        .rightlist {
+            height: auto;
+            width: 40px;
+            position: fixed;
+            bottom: 150px;
+            right: 15px;
+            text-align: center;
+        }
+
+        .rightimg {
+            width: 40px;
+            height: 40px;
+            margin-top: 10px;
+            border-radius: 6px;
+        }
+
+        .rightimg img {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .bigimgdiv {
+            /*overflow-y: auto !important;*/
+            max-width: calc(100% - 70px);
+            max-height: 2000%;
+            height: auto;
+            display: none;
+        }
+
+        .bigimgdiv img {
+            max-width: 100%;
+            max-height: 100%;
+            width: 100%;
+            height: auto;
+        }
+
+        .selectedimg {
+            border: solid 2px #4bc7c7;
+        }
+    </style>
+</head>
+<body>
+<!--v-cloak-->
+<div class="content">
+    <img v-if="currentImgNums > 0 " tapmode onclick="openDeleteFrame();" class="deletebtn"
+         src="../../../../image/error/correction/error_delete.png" alt="">
+    <img v-if="currentImgNums > 0 " tapmode onclick="editImg();" class="editbtn"
+         src="../../../../image/error/correction/error_edit.png" alt="">
+    <img tapmode onclick="vm.packFrame();" class="packbtn" src="../../../../image/error/correction/error_pack.png"
+         alt="">
+    <img v-if="currentImgNums < 6 " tapmode onclick="addCorrectionImg();" class="correctbtn"
+         src="../../../../image/error/correction/error_new.png" alt="">
+
+    <ul v-if="currentImgNums > 0 " class="rightlist">
+        <li :class="currentImgIndex == index?'selectedimg':''" class="rightimg" v-for="(list,index) in currentImgData">
+            <img :src="list.content" onclick="openPic(this)" alt="" :index="index">
+        </li>
+    </ul>
+    <div id='slider' class="bigimgdiv">
+        <div class="pinch-zoom">
+            <img class="bigimg" :src="currentImg">
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../../script/api.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../../script/correction/pinchzoom.js"></script>
+<script type="text/javascript" src="../../../../script/correction/swipe.js"></script>
+<script type="text/javascript">
+    var vm;
+    var compressListener = {
+        allCount: 0,
+        successCount: 0
+    };
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+
+    var cameraflag = 0;
+    apiready = function () {
+        vue();
+
+        api.addEventListener({
+            name: 'refreshimglist'
+        }, function (ret, err) {
+            //请求纠错图片列表
+            GetCorrectionImageList(vm.current_sys_id, 0);
+        });
+
+        api.addEventListener({// 裁剪图片保存
+            name: 'cutImg' + api.frameName
+        }, function (ret, err) {
+            //区分是来自拍照还是直接编辑
+            var from = ret.value.from;
+            var src = ret.value.src;
+            if (from == 'edit') {
+                vm.currentImgSort = ret.value.sort;
+                cutAndDelete(src);
+            } else {
+                //sort等于最后一张的sort+1
+                cameraflag = 1;
+                if (vm.currentImgData.length == 0) {
+                    vm.currentImgSort = 1;
+                } else {
+                    vm.currentImgSort = parseInt(vm.currentImgData[vm.currentImgData.length - 1].sort) + 1;
+                }
+
+                compressImage(src);
+            }
+            api.closeFrame({
+                name: 'frame_cutImg'
+            });
+        });
+
+        if (api.pageParam.flag == 'zerocamera') {
+            var src = api.pageParam.src;
+            //sort等于最后一张的sort+1
+            cameraflag = 1;
+            if (vm.currentImgData.length == 0) {
+                vm.currentImgSort = 1;
+            } else {
+                vm.currentImgSort = parseInt(vm.currentImgData[vm.currentImgData.length - 1].sort) + 1;
+            }
+
+            compressImage(src);
+
+            api.closeFrame({
+                name: 'frame_cutImg'
+            });
+        }
+
+        if (vm.currentImgData.length > 0) {
+            vm.currentImg = vm.currentImgData[vm.currentImgData.length - 1].content;
+            vm.currentImgIndex = vm.currentImgData.length - 1;
+
+            //图片放大
+            $('div.pinch-zoom').each(function () {
+                new RTP.PinchZoom($(this), {});
+            });
+            window.mySwipe = new Swipe(document.getElementById('slider'), {
+                speed: 400
+            });
+
+            $('#slider').css('display', 'block');
+        }
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                currentImgNums: api.pageParam.currentImgNums,
+                currentImgData: api.pageParam.currentImgData,
+                current_sys_id: api.pageParam.current_sys_id,
+                currentImg: '',
+                currentImgIndex: 0,
+                currentImgSort: 0,
+            },
+            methods: {
+                packFrame: function (item) {
+                    api.setFrameAttr({
+                        name: 'frame_displayImg',
+                        hidden: true
+                    });
+                },
+            }
+        });
+    }
+
+    function openDeleteFrame() {
+        api.openFrame({
+            name: 'frame_deleteImg',
+            url: 'frame_deleteImg.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight
+            },
+            pageParam: {},
+            bounces: false
+        });
+    }
+
+    function deleteCorrectionImg() {
+        var params = {};
+        params['uid'] = $api.getStorage('uid');
+        params['sys_id'] = vm.current_sys_id;
+        params['sort'] = parseInt(vm.currentImgData[vm.currentImgIndex].sort);
+        api.showProgress();
+
+        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteCorrectionImage, {
+            body: params
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    GetCorrectionImageList(vm.current_sys_id, 0);
+                } else {
+                    api.toast(
+                        {
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                    )
+                }
+            } else {
+                api.toast(
+                    {
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    }
+                )
+            }
+
+        })
+    }
+
+    function openPic(context) {
+        $('div.pinch-zoom').each(function () {
+            new RTP.PinchZoom($(this), {});
+        });
+        setTimeout(function () {
+            var index = -1;
+            var url = $api.attr(context, 'src');
+            vm.currentImg = url;
+            vm.currentImgIndex = $api.attr(context, 'index');
+        }, 1);
+
+
+        $('body,html').animate({scrollTop: 0}, 100);
+    }
+
+    function addCorrectionImg() {
+        api.openFrame({
+            name: 'frame_chooseImg',
+            url: 'frame_chooseImg.html',
+            rect: {
+                x: 0,
+                y: 0,
+                w: api.winWidth,
+                h: api.winHeight
+            },
+            pageParam: {
+                currentImgNums: vm.currentImgNums,
+                sort: vm.currentImgData[vm.currentImgIndex].sort,
+                current_sys_id: vm.current_sys_id,
+                maxsort: vm.currentImgData[vm.currentImgData.length - 1].sort,
+            },
+            bounces: false
+        });
+    }
+
+    function editImg() {
+        api.download({
+            url: vm.currentImg,
+            savePath: 'fs:/' + vm.currentImgData[vm.currentImgIndex].create_time,
+            report: false,
+            cache: false,
+            allowResume: false
+        }, function (ret, err) {
+            if (ret && ret.state == 1) {
+                // 下载成功  ret.savePath
+                api.openFrame({
+                    name: 'frame_cutImg',
+                    url: 'frame_cutImg.html',
+                    rect: {
+                        x: 0,
+                        y: 0,
+                        w: 'auto',
+                        h: api.winHeight
+                    },
+                    pageParam: {
+                        src: ret.savePath,
+                        frameName: api.frameName,
+                        sort: vm.currentImgData[vm.currentImgIndex].sort,
+                        from: 'edit'
+                    },
+                    bounces: false
+                });
+            }
+        });
+    }
+
+    function cutAndDelete(src) {
+        var params = {};
+        params['uid'] = $api.getStorage('uid');
+        params['sys_id'] = vm.current_sys_id;
+        params['sort'] = parseInt(vm.currentImgSort);
+        api.showProgress();
+        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.DeleteCorrectionImage, {
+            body: params
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    compressImage(src);
+                } else {
+                    api.toast(
+                        {
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        }
+                    )
+                }
+            } else {
+                api.toast(
+                    {
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    }
+                )
+            }
+
+        })
+    }
+
+    // 图片压缩处理
+    function compressImage(url) {
+        api.showProgress();
+        compressListener.allCount = 1;
+        compressListener.successCount = 0;
+
+        var imageFilter = api.require('imageFilter');
+        var imgName = getUrlName(url);
+        var quality;
+        if (api.systemType == 'ios') {
+            quality = 0.2;
+        } else {
+            quality = 0.3;
+        }
+        imageFilter.compress({
+            img: url,
+            quality: quality,
+            save: {
+                imgPath: "fs://img_compress/",
+                imgName: imgName
+            }
+        }, function (ret, err) {
+            if (ret.status) {
+                compressListener.successCount++;
+                qiniuUpfile(api.fsDir + "/img_compress/" + imgName);
+            } else {
+                alert(JSON.stringify(err));
+            }
+            imageFilter = '';
+        })
+    }
+
+    function qiniuUpfile(url) {
+        //api.showProgress();
+        var fileKey = (new Date()).valueOf() + url;
+        apiObj.Get(UrlRouter.GetQiNiuToken, {
+            values: {
+                uid: $api.getStorage('uid'),
+                bucket: 'vodresource',
+                key: fileKey
+            }
+        }, function (ret, err) {
+            var qiniuStorage = api.require("qiniuStorage");
+            qiniuStorage.configUploader({
+                params: {},
+                checkCrc: false,
+                mimeType: ''
+            });
+            qiniuStorage.start({
+                token: ret.data.token,
+                path: url,
+                key: fileKey
+            });
+            qiniuStorage.addEventListener(function (ret) {
+                var code;
+                if (ret.eventType == 'complete' && (api.systemType == 'ios' ? ret.info.statusCode : ret.statusCode) == 200) {
+                    //上传七牛完毕
+                    postCorrectionImgs(QINIU_DOMAIN + ret.key);
+                }
+            });
+        })
+    }
+
+    function postCorrectionImgs(url) {
+        //api.showProgress();
+        var params = {};
+        params['uid'] = $api.getStorage('uid');
+        params['sys_id'] = vm.current_sys_id;
+        var data = [];
+        data.push({
+            'url': url,
+            'sort': vm.currentImgSort,
+        })
+        params['data'] = data;
+        apiObj.Header({'Content-Type': 'application/json'}).Post(UrlRouter.UploadCorrectionImage, {
+            body: params
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.toast({
+                        msg: '操作成功',
+                        duration: 2000,
+                        location: 'middle'
+                    });
+
+                    //区分是否来自拍照
+                    if (cameraflag == 1) {
+                        GetCorrectionImageList(vm.current_sys_id, 0);
+                    } else {
+                        GetCorrectionImageList(vm.current_sys_id, 1);
+                    }
+                    cameraflag = 0;
+
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+
+    function GetCorrectionImageList(id, flag) {
+        api.showProgress();
+        apiObj.Get(UrlRouter.GetCorrectionImageList, {
+            values: {
+                uid: $api.getStorage('uid'),
+                sys_id: id
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    vm.currentImgNums = ret.data.length;
+
+                    if (flag == 0) {
+                        if (vm.currentImgNums == 0) {
+                            api.closeFrame();
+                            api.sendEvent({
+                                name: 'refreshvmCurrentImgNums',
+                                extra: {
+                                    currentImgNums: 0,
+                                }
+                            });
+                        } else {
+                            var data = [];
+                            //data = ret.data.reverse();
+                            data = ret.data;
+                            vm.currentImgData = [];
+                            vm.currentImgData = data;
+                            vm.currentImg = vm.currentImgData[vm.currentImgData.length - 1].content;
+                            vm.currentImgIndex = vm.currentImgData.length - 1;
+
+
+                            //图片放大
+                            $('div.pinch-zoom').each(function () {
+                                new RTP.PinchZoom($(this), {});
+                            });
+                            window.mySwipe = new Swipe(document.getElementById('slider'), {
+                                speed: 400
+                            });
+
+                            $('#slider').css('display', 'block');
+
+
+                            api.sendEvent({
+                                name: 'refreshCurrentIcon',
+                                extra: {
+                                    currentImgNums: vm.currentImgNums,
+                                }
+                            });
+                        }
+                    } else {//编辑
+                        var data = [];
+                        //data = ret.data.reverse();
+                        data = ret.data;
+                        vm.currentImgData = [];
+                        vm.currentImgData = data;
+
+                        vm.currentImg = vm.currentImgData[vm.currentImgIndex].content;
+
+                        for (var i = 0; i < vm.currentImgData.length; i++) {
+                            if (vm.currentImgSort == vm.currentImgData[i].sort) {
+                                vm.currentImgIndex = i;
+                            }
+                        }
+                    }
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'bottom'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'bottom'
+                });
+            }
+        })
+    }
+
+    /**
+     * 检查图片压缩进度
+     * @returns {boolean} true 压缩完成
+     */
+    function checkImageCompress() {
+        if (compressListener.allCount != 0 && compressListener.allCount != compressListener.successCount) {
+            api.toast({
+                msg: '正在压缩图片，请稍后操作',
+                duration: 2000,
+                location: 'middle'
+            });
+            return false;
+        }
+        return true;
+    }
+
+    function getUrlName(url) {
+        var index = url.lastIndexOf("/");
+        var imgName;
+        if (api.systemType == 'ios') {
+            var idIndex = url.indexOf("id=");
+            if (idIndex != -1) {
+                var andIndex = url.indexOf("&");
+                imgName = url.substring(idIndex + 3, andIndex);
+            } else {
+                imgName = url.substring(index + 1);
+            }
+        } else {
+            imgName = url.substring(index + 1);
+        }
+        return imgName;
+    }
+</script>
+</html>

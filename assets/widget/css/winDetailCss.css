@@ -1,0 +1,194 @@
+header {
+    height: 49px;
+    background: #fff;
+    border-bottom: 1px solid #d5d5d5;
+    margin-bottom: 10px;
+}
+
+.winTitle {
+    height: 49px;
+    line-height: 51px;
+    font-size: 2rem;
+    padding-left: 50px;
+    max-width: calc(100% - 160px);
+    background: url("../image/newhomework/return.png") no-repeat 20px 15px;
+    background-size: 12px 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.winIcon li {
+    margin-right: 8px;
+    margin-top: 10px;
+}
+
+.winIcon {
+    padding-left: 10px;
+}
+
+.content {
+    width: 67px;
+    position: fixed;
+    left: 0;
+    top: 59px;
+    background: #fff;
+    height: calc(100% - 70px)
+}
+
+.type {
+    width: 100%;
+    height: 44px;
+    font-size: 1.4rem;
+    text-align: center;
+    line-height: 44px;
+    border: 1px solid #4BC7C7;
+    border-left: none;
+    border-top:none;
+}
+
+.scroll {
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+    border-left: none;
+    border-right: none;
+    overflow-y: auto;
+    padding-top: 10px;
+    height: calc(100% - 54px);
+}
+
+.scroll li {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 31px;
+    font-size: 1.2rem;
+    color: #4bc7c7;
+    border: 1px solid #4bc7c7;
+    border-radius: 100px;
+    margin: 0 auto;
+    margin-bottom: 15px;
+}
+
+.current {
+    width: 38px !important;
+    min-height: 38px !important;
+    color: #fff !important;
+    background: #4BC7C7!important;
+    line-height: 39px !important;
+    font-size: 1.4rem !important;
+}
+.buttonFour {
+    font-size: 1.2rem;
+    height: 27px;
+    line-height: 28px;
+    width: 90px;
+    overflow: hidden;
+    border: 1px solid #4BC7C7;
+    border-radius: 3px;
+    display: inline-block;
+    text-align: right;
+}
+.buttonTwo {
+    font-size: 1.2rem;
+    height: 27px;
+    line-height: 28px;
+    width: 75px;
+    overflow: hidden;
+    border: 1px solid #4BC7C7;
+    border-radius: 3px;
+    display: inline-block;
+    text-align: right;
+}
+.buttonFour p{ display: inline-block; height: 27px; width:66px; text-align: center}
+.buttonTwo p{ display: inline-block; height: 27px; width:52px; text-align: center}
+.wzxts{ font-size:1.4rem; height: 27px; line-height: 31px;   }
+.wzxts span { color: #ff778c}
+.right_btn{ position: fixed; right: 12px; top: calc(50% - 112px)}
+.right_btn li{ background: #a4a4a4; border-radius: 3px; width: 40px; height: 40px; margin: 36px 0;}
+.right_btn li img{width: 100%; height: 100%;}
+
+.allSubmit {
+    background: url(../image/newhomework/icon5.png) no-repeat 5px 5px #fff;
+    background-size: 19px 17px;
+}
+
+.allSubmit:active {
+    color: #fff;
+    background: url(../image/newhomework/icon5active.png) no-repeat 5px 5px #4bc7c7;
+    background-size: 19px 17px;
+}
+.removectb {
+    background: url(../image/newhomework/icon7.png) no-repeat 5px 5px #fff;
+    background-size: 19px 17px;
+}
+
+.removectb:active {
+    color: #fff;
+    background: url(../image/newhomework/icon7active.png) no-repeat 5px 5px #4bc7c7;
+    background-size: 19px 17px;
+}
+.tiwen {
+    background: url(../image/newhomework/icon6.png) no-repeat 8px 5px #fff;
+    background-size: 19px 17px;
+}
+.tiwen:active {
+    color: #fff;
+    background: url(../image/newhomework/icon6active.png) no-repeat 8px 5px #4bc7c7;
+    background-size: 19px 17px;
+}
+.pingjia {
+    background: url(../image/newhomework/icon8.png) no-repeat 8px 5px #fff;
+    background-size: 19px 17px;
+}
+.pingjia:active {
+    color: #fff;
+    background: url(../image/newhomework/icon8active.png) no-repeat 8px 5px #4bc7c7;
+    background-size: 19px 17px;
+}
+.uploadfj {
+    background: url(../image/newhomework/icon9.png) no-repeat 5px 5px #fff;
+    background-size: 19px 17px;
+}
+
+.uploadfj:active {
+    color: #fff;
+    background: url(../image/newhomework/icon9active.png) no-repeat 5px 5px #4bc7c7;
+    background-size: 19px 17px;
+}
+.answerStatistics {
+    background: url(../image/newhomework/icon1.png) no-repeat 5px 5px #fff;
+    background-size: 19px 17px;
+}
+.answerStatistics:active {
+    color: #fff;
+    background: url(../image/newhomework/icon1active.png) no-repeat 5px 5px #4bc7c7;
+    background-size: 19px 17px;
+}
+.examTime{
+    background: url(../image/exam/exam_time.png) no-repeat 5px 4px #fff;
+    background-size: 19px 19px;
+}
+.examTime:active{
+    color: #fff;
+    background: url(../image/exam/exam_time.png) no-repeat 5px 4px #4bc7c7;
+    background-size: 19px 19px;
+}
+.examType{
+    background: url(../image/exam/exam_type.png) no-repeat 5px 4px #fff;
+    background-size: 19px 19px;
+}
+.examType:active{
+    color: #fff;
+    background: url(../image/exam/exam_type.png) no-repeat 5px 4px #4bc7c7;
+    background-size: 19px 19px;
+}
+.AIbtnclick {
+    background: url(../image/newhomework/aibst.png) no-repeat 5px 5px #fff;
+    background-size: 19px 17px;
+}
+.AIbtnclick:active {
+    color: #fff;
+    background: url(../image/newhomework/aibstactive.png) no-repeat 5px 5px #4bc7c7;
+    background-size: 19px 17px;
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <style>
+        .content {
+            /*background: rgba(0, 0, 0, 0.3) none repeat scroll 0 0;*/
+            background: rgba(0, 0, 0, 0.3);
+            height: 100%;
+            width: 100px;
+            position: absolute;
+            right: 0;
+            top:0;
+            z-index: 9999;
+        }
+        .content ul {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        li {
+            color: white;
+            height: 60px;
+            list-style: none;
+            font-size: 16px;
+        }
+        .speed_selected {
+            color: rgb(81,147,188);
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <ul>
+        <li :class="index == selectedindex ? 'speed_selected' : ''" v-for="(name,index) in data" tapmode onclick="vm.choosespeed(this)" v-text="name" :index="index"></li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../script/vue.js"></script>
+<script type="text/javascript" src="../script/jquery-1.11.3.min.js"></script>
+<script>
+    var vm;
+    apiready = function () {
+        vue();
+        vm.data  = ['x 0.5', 'x 0.75', 'x 1.0', 'x 1.25', 'x 1.5', 'x 2.0'];
+
+
+        api.addEventListener({
+            name: 'closespeed'
+        }, function (ret, err) {
+            api.closeFrame();
+        });
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data:[],
+                selectedindex:api.pageParam.index,
+            },
+            methods: {
+                choosespeed: function (p) {
+                    var index = $(p).attr('index');
+                    api.sendEvent({
+                        name: 'speed',
+                        extra: {
+                            index: index
+                        }
+                    });
+                    api.closeFrame();
+                },
+            }
+        });
+    }
+</script>
+</html>

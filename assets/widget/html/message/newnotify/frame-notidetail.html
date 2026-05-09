@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>通知详情</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/notification/noti_detail.css"/>
+    <style>
+        .reject {
+            position: absolute;
+            left: 0;
+            top:0;
+            width: 52px;
+            height: 47.33px;
+        }
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <div v-if="data.rejectStatus == 1">
+        <div class="noti_title">
+            {{uncodeUtf16(data.title)}}
+        </div>
+        <div class="noti_list_bottom ">
+            <span class="noti_time aui-ellipsis-1">{{data.createtime}}&nbsp&nbsp&nbsp&nbsp&nbsp{{data.realname.length>4?data.realname.substr(0,4)+'...':data.realname}}老师</span>
+        </div>
+        <div class="noti_list_line"></div>
+        <div class="noti_content">
+            <p>
+                {{uncodeUtf16(data.content)}}
+            </p>
+        </div>
+
+        <div v-if="data.audio_list[0].length > 0 && data.audio_list.length == 1" class="display-voice">
+            <div class="btn-audio aui-btn aui-btn-primary" onclick="playAudio(this);">
+                <div class="yitu"><img src="../../../image/yuyin1.png" width="15px"></div>
+                <div id="seconds" class="seconds" v-text="jsonparse(data.audio_list[0])"></div>
+            </div>
+        </div>
+
+        <ul v-if="oldflag == 0 && data.image_list != ''" class="role_ul">
+            <li class="role_ul_li" v-for="(list,index) in data.image_list">
+                <img :src="list" onclick="openPic(this)" alt="">
+            </li>
+        </ul>
+        <ul v-if="oldflag == 1" class="role_ul">
+            <li class="role_ul_li" v-for="(list,index) in imglist">
+                <img :src="list" onclick="openPic(this)" alt="">
+            </li>
+        </ul>
+    </div>
+    <div v-if="data.rejectStatus == 0" class="kong">
+        <img class="rejectimg" src="../../../image/notification/noti_rejected.png" alt="">
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var path;
+    var photoBrowser;
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+
+        vm.imglist = vm.data.image_list;
+        if(vm.data.image_list){
+            var str = vm.data.image_list[0];
+            if(str.length > 0){
+                if(str.indexOf("|") != -1){
+                    vm.oldflag = 1;
+                    var imgarr = str.split('|');
+                    vm.imglist = $.extend(true, [], imgarr);//深拷贝
+                }
+            }
+        }
+
+
+        photoBrowser = api.require('photoBrowser');
+        $(".role_ul img").each(function () {
+            var width = $(this).width();
+            $(this).css('height', width);
+        });
+
+        $('.rejectimg').css('margin-top',api.frameHeight/2 - 95)
+        stuReadNotify();
+
+
+        api.addEventListener({
+            name: 'closeAudio'
+        }, function (ret, err) {
+            api.stopPlay();
+        });
+
+        api.addEventListener({
+            name : 'pause'
+        }, function(ret, err) {
+            api.stopPlay();
+            isPlaying = false;
+            $('.btn-audio').find('.yitu').html('<img src="../../../image/yuyin1.png" width="15px">');
+        });
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data: api.pageParam.list,
+                imglist: [],
+                oldflag: 0,
+            },
+            updated: function () {
+            },
+            methods: {
+                jsonparse: function (content) {
+                    var duration;
+                    var index = content.indexOf('amr');
+                    duration = content.substring(index + 3) + "″";
+                    path = content.substring(0,index+3);
+                    return duration;
+                },
+                uncodeUtf16: function (str) {
+                    var reg = /\&#.*?;/g;
+                    var result = str.replace(reg,function(char){
+                        var H,L,code;
+                        if(char.length == 9 ){
+                            code = parseInt(char.match(/[0-9]+/g));
+                            H = Math.floor((code-0x10000) / 0x400)+0xD800;
+                            L = (code - 0x10000) % 0x400 + 0xDC00;
+                            return unescape("%u"+H.toString(16)+"%u"+L.toString(16));
+                        }else{
+                            return char;
+                        }
+                    });
+                    return result;
+                },
+            }
+        });
+    }
+    function stuReadNotify() {
+        api.showProgress();
+        apiObj.Get(UrlRouter.StuReadNotify, {
+            values: {
+                uid: $api.getStorage('uid'),
+                notify_id: vm.data.notify_id
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            if (ret) {
+                if (ret.ret == 0) {
+                    api.sendEvent({
+                        name: 'refreshNotityList',
+                        extra: {}
+                    });
+                }else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            }else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        })
+    }
+    function openPic(context) {
+        var index = -1;
+        var url = $api.attr(context, 'src');
+        //计算索引 不能用id作为索引
+        if(vm.oldflag == 1){
+            for (var i = 0; i < vm.imglist.length; i++) {
+                if (url == vm.imglist[i]) {
+                    index = i;
+                }
+            }
+        }
+        else {
+            for (var i = 0; i < vm.data.image_list.length; i++) {
+                if (url == vm.data.image_list[i]) {
+                    index = i;
+                }
+            }
+        }
+        api.execScript({
+            script: "isOpenPic=true;"
+        });
+        photoBrowser.open({
+            images: vm.oldflag == 0?vm.data.image_list:vm.imglist,
+            placeholderImg: 'widget://../image/loading_more.gif',
+            bgColor: '#000000',
+            activeIndex: index
+        }, function (ret, err) {
+            if (ret.eventType == 'click') {
+                api.execScript({
+                    script: "isOpenPic=true;"
+                });
+                photoBrowser.close();
+            }
+        });
+    }
+
+    var isPlaying = false;// 是否正在播放
+    // 播放音频
+    function playAudio(context) {
+        //path = path.substr(27);
+        if (isPlaying) {
+            api.stopPlay();
+            $(context).find('.yitu').html('<img src="../../../image/yuyin1.png" width="15px">');
+        } else {
+            var newpath = "/audio/" + path.substr(27);
+            api.download({
+                url: path,
+                savePath: 'fs:/' + newpath,
+                report: false,
+                cache: false,
+                allowResume: false
+            }, function (ret, err) {
+                if (ret && ret.state == 1) {
+                    //alert($api.jsonToStr(ret))
+                    // 下载成功  ret.savePath
+                    api.startPlay({
+                        path: api.fsDir + newpath
+                    }, function (ret, err) {
+                        if (ret) {
+                            isPlaying = false;
+                            $(context).find('.yitu').html('<img src="../../../image/yuyin1.png" width="15px">');
+                        }
+                    });
+
+                }
+            });
+            $(context).find('.yitu').html('<img src="../../../image/yuyin2.gif" width="15px">');
+        }
+        isPlaying = !isPlaying;
+    }
+</script>
+</html>

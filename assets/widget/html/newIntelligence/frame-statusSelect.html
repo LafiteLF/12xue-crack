@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选择状态</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="../../script/vue.global.prod-3.5.18.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        [v-cloak] {
+            display: none !important;
+        }
+
+        html {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #main {
+            width: 100%;
+            height: 100%;
+        }
+
+        #main > div > div > div {
+            border-radius: 0.5vw;
+            border: 0.1vw solid #4BC7C7;
+            padding: 1vh 0;
+            width: 18vw;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div id="main" v-cloak>
+    <div v-show="ready" @click.stop.self="close"
+         style="background: rgba(0, 0, 0, 0.6); position: fixed; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+        <div style="display: grid; grid-template-columns: 1fr; background: white; border-radius: 0.5vw; color: #00C8C8; font-size: 2vw; padding: 5vh 8vw; justify-items: center; row-gap: 3vh;">
+            <div @click.stop="select('5', '全部')"
+                 :style="status.id === '5' ? {'background-color': '#00C8C8', 'color': '#FFFFFF'}: {}">全部
+            </div>
+            <div @click.stop="select('4', '未答题')"
+                 :style="status.id === '4' ? {'background-color': '#00C8C8', 'color': '#FFFFFF'}: {}">未答题
+            </div>
+            <div @click.stop="select('0', '未提交')"
+                 :style="status.id === '0' ? {'background-color': '#00C8C8', 'color': '#FFFFFF'}: {}">未提交
+            </div>
+            <div @click.stop="select('1', '未过关')"
+                 :style="status.id === '1' ? {'background-color': '#00C8C8', 'color': '#FFFFFF'}: {}">未过关
+            </div>
+            <div @click.stop="select('2', '暂过关')"
+                 :style="status.id === '2' ? {'background-color': '#00C8C8', 'color': '#FFFFFF'}: {}">暂过关
+            </div>
+            <div @click.stop="select('3', '已过关')"
+                 :style="status.id === '3' ? {'background-color': '#00C8C8', 'color': '#FFFFFF'}: {}">已过关
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    const {createApp, onMounted, ref} = Vue
+    createApp({
+        setup() {
+            const ready = ref(false);
+            const status = ref({id: '5', name: '全部'})
+
+            onMounted(async () => {
+                await new Promise(resolve => {
+                    apiready = () => {
+                        resolve();
+                    }
+                })
+                status.value = api.pageParam.nowstatus;
+                ready.value = true;
+            })
+
+            function select(id, name) {
+                status.value = {id: id, name: name};
+                api.sendEvent({
+                    name: 'selectdata',
+                    extra: {
+                        nowstatus: status.value
+                    }
+                });
+                close()
+            }
+
+            function close() {
+                api.closeFrame()
+            }
+
+            return {
+                ready,
+                status,
+                select,
+                close
+            }
+        }
+    }).mount('#main')
+</script>
+</html>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:background="@null" android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:voiceView="http://schemas.android.com/apk/res-auto">
+    <com.apicloud.audio.zhaofei.VoiceLineView android:id="@id/voiceLineactivity" android:background="@null" android:layout_width="match_parent" android:layout_height="match_parent" voiceView:fineness="three" voiceView:lineSpeed="90" voiceView:maxVolume="200.0" voiceView:middleLine="@null" voiceView:middleLineHeight="1.0dp" voiceView:rectSpace="2.0dp" voiceView:rectWidth="5.0dp" voiceView:sensibility="four" voiceView:viewMode="line" voiceView:voiceLine="@android:color/holo_green_dark" />
+</LinearLayout>

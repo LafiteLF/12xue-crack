@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>乐园</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <style>
+        body {
+
+        }
+
+        ul {
+            width: 100%;
+            padding: 10px 0px
+        }
+
+        ul li {
+            width: calc(50% - 30px);
+            float: left;
+            height: 210px;
+            margin-left: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background: url("../../../image/stuHomePad/xfjt.png") no-repeat 188px 90px #fff;
+            background-size: 20%
+        }
+
+        .student {
+            width: 130px;
+            height: 130px;
+            overflow: hidden;
+            border-radius: 400px;
+            margin-top: 25px;
+            background: #e1f6f6;
+        }
+        .sleft {
+            float: left;
+            margin-left: 5%;
+            position: relative
+        }
+
+        .txbg {
+            position: absolute;
+            left: -2px;
+            top: 23px;
+            width: 137px;
+        }
+
+        .sleft span {
+            position: absolute;
+            font-size: 0.8rem;
+            color: #fff;
+            display: block;
+            left: 16px;
+            top: 134px;
+            width: 99px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sright {
+            float: right;
+            position: relative;
+            margin-top: 30px;
+            margin-right: 5%
+        }
+
+        .anminal {
+            height: 122px;
+            width: 175px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .group-p{    padding-top: 35px;
+            font-size: 0.8rem;            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;text-align: center}
+        .groupLeader-p{            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;font-size: 0.6rem;text-align: center}
+        .anminal img {
+            max-width: 175px;
+            min-width: 175px;
+            min-height: 122px;
+        }
+
+        .anbg {
+            position: absolute;
+            top: -1px;
+            left: -5px;
+            width: 185px;
+        }
+
+        .sright span {
+            position: absolute;
+            font-size: 0.8rem;
+            color: #fff;
+            display: block;
+            left: 42px;
+            top: 108px;
+            width: 99px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+        .aui-content{ display: none}
+
+        @media only screen and (width: 1024px) {
+            ul li {
+                width: calc(50% - 40px);
+                float: left;
+                height: 210px;
+                margin-left: 10px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                background: url("../../../image/stuHomePad/xfjt.png") no-repeat 165px 90px #fff;
+                background-size: 20%
+            }
+        }
+    </style>
+</head>
+
+<body >
+<div class="aui-content" style="width: 30%; margin: 0 auto; padding-top: 10%; text-align: center">
+    <img style="width: 100%; max-width: 508px;"  src="../../../image/noclass.png"/>
+    <p style="font-size: 1rem; padding-top: 10px">暂无内容</p>
+</div>
+<div class="name-content" id="app" v-cloak>
+    <ul class="aui-clearfix">
+        <li v-for="item in contents">
+            <div class="sleft">
+                <div class="student">
+                    <p class="group-p" v-text="item.title" ></p>
+                    <p class="groupLeader-p">(组长:{{item.leader}})</p>
+                </div>
+                <img class="txbg" src="../../../image/stuHomePad/xftx.png">
+                <span v-text="item.score+'学分'"></span>
+            </div>
+            <div class="sright">
+                <div class="anminal"><img :src="item.img_url"></div>
+                <img class="anbg" src="../../../image/stuHomePad/xfzp.png">
+                <span v-text="item.grade"></span>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiready = function () {
+        apiObj.SetAuthToken($api.getStorage('token'));
+        vm.getGroupScoreRank();
+    };
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            contents: ''
+        },
+        methods:{
+            getGroupScoreRank: function () {
+                api.showProgress({
+                    title: '加载中',
+                    text: '请稍后...',
+                    modal: false
+                });
+                apiObj.Get(UrlRouter.GetGrouptechGroupRank, {
+                    values: {
+                        classid: api.pageParam.GroupData.classid,
+                        is_master: api.pageParam.GroupData.is_master
+                    }
+                }, function (ret, err) {
+                    api.hideProgress();
+                    if(ret){
+                        if(ret.ret == 0){
+                            vm.contents = ret.data;
+                            if(ret.data == null || ret.data.length == 0){
+                                var divEl = $api.dom('.aui-content');
+                                $api.css(divEl, 'display: block;');
+                            } else {
+                                var divEl = $api.dom('.aui-content');
+                                $api.css(divEl, 'display: none;');
+                            }
+                        }else {
+                            api.toast({
+                                msg: ret.msg,
+                                duration: 2000,
+                                location: 'bottom'
+                            });
+                        }
+                    }else {
+                        api.toast({
+                            msg: err.msg,
+                            duration: 2000,
+                            location: 'bottom'
+                        });
+                    }
+                })
+            }
+        }
+    });
+
+</script>
+</html>

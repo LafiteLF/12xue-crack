@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>win</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/publicCss.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/winDetailCss.css"/>
+    <style>
+        .winTitle {
+            width: calc(100% - 631px);
+        }
+    </style>
+</head>
+<body>
+<div class="content1" style="display: none">
+    <header class="clearfix">
+        <div tapmode @click="closeWin();" class="winTitle pull_left" v-text="homeworkName.replace(/<[^>]+>/g,'')"></div>
+    </header>
+    <div class="content">
+        <div class="type bg4BC7C7 fontFFF">{{1}}/{{1}}</div>
+        <ul class="scroll">
+            <li v-text="1" style="background-color: #70f0f0;color: white;border: 0 solid;"></li>
+        </ul>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript">
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    var vm;
+    apiready = function () {
+        vue();
+        $('.content1').show();
+        vm.openMyFrame();
+        // Android按返回键关闭页面时结束自定义页面统计
+        api.addEventListener({
+            name: 'keyback'
+        }, function (ret, err) {
+            vm.closeWin()
+        });
+    };
+
+    function vue() {
+        vm = new Vue({
+            el: '.content1',
+            data: {
+                homeworkListData: api.pageParam.detailData,//作业列表传过来的数据
+                homeworkName: api.pageParam.homeworkName,
+                tx_code: api.pageParam.tx_code
+            },
+            updated: function () {
+            },
+            methods: {
+                openMyFrame: function () {
+                    var header = document.querySelector('header'); 
+                    var leftW = $api.offset($api.dom('.content')).w; 
+                    var headerH = $api.offset(header).h;
+
+                    var url;
+                    if(vm.tx_code == 4 || vm.tx_code == 5) { 
+                        url = 'frame_sytj_exercises.html'; 
+                    } 
+                    else  { 
+                        url = 'frame_tkt_exercises.html'; 
+                    }
+                    api.openFrame({
+                        name: 'frame_exercises',
+                        url: url,
+                        rect: {
+                            x: leftW + 10,
+                            y: headerH + 10,
+                            w: api.winWidth - leftW - 30,
+                            h: $api.getStorage('padHeight') - headerH - 10
+                        },
+                        pageParam: {
+                            homeworkListData: api.pageParam.detailData,//作业列表传过来的数据
+                        },
+                        bounces: false,
+                        scrollEnabled: false
+                    });
+                },
+                closeWin: function () {
+                    api.closeWin();
+                    api.sendEvent({
+                        name: 'shuaxin-frame-homework-list-pad'
+                    });
+                },
+            }
+        })
+    }
+</script>
+</html>

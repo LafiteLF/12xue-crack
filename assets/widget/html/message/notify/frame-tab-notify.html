@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"><meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+
+    <title>title</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.css"/>
+    <style>
+        html, body {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .show {
+            position: absolute;
+            color: #000;
+            background-color: #ffffff;
+            top: 0;
+            width: 100%;
+        }
+
+        .item {
+            text-align: center;
+            padding: 3px;
+            height: 40px;
+            width: 100%;
+            font-size: 14px;
+            line-height: 40px;
+        }
+
+        .backgroud {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="backgroud" tapmode onclick="api.closeFrame({
+    name: this.name
+});"></div>
+<div class="show">
+    <!--<p id="3" class="item aui-border-b" tapmode onclick="itemClick(this)">全部</p>-->
+    <!--<p id="2" class="item aui-border-b" tapmode onclick="itemClick(this)">未发送</p>-->
+    <!--<p id="1" class="item aui-border-b" tapmode onclick="itemClick(this)">发送过</p>-->
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript">
+    var array;
+    apiready = function () {
+        array = api.pageParam.array;
+        for (var i = 0; i < array.length; i++) {
+            if (api.pageParam.item == "class") {
+                $api.append($api.dom('.show'), '<p id=' + i + ' class="item aui-border-b" tapmode onclick="itemClick(this,\'' + api.pageParam.item + '\')">' + array[i].classname + '</p>');
+            } else {
+                $api.append($api.dom('.show'), '<p id=' + i + ' class="item aui-border-b" tapmode onclick="itemClick(this,\'' + api.pageParam.item + '\')">' + array[i] + '</p>');
+            }
+        }
+    };
+
+    function itemClick(context, item) {
+        var index = $api.attr(context, 'id');
+        //改变tab的字样
+        var func = "$api.html($api.dom($api.dom('.tab-bar>." + item + "'),'.type'), '" + $api.text(context) + "');";
+        api.execScript({
+            script: func
+        });
+        //刷新列表
+        var refreshFunc = '';
+        if (item == "class") {
+            //classid加引号转string类型  不然会出错
+            refreshFunc = 'page=1;classid="' + array[index].bjid + '";getNotifies();';
+        } else {
+            var identify = '';//3 学生 4家长 不传全部
+            switch (index) {
+                case '0':
+                    identify = -1;
+                    break;
+                case '1':
+                    identify = 4;
+                    break;
+                case '2':
+                    identify = 3;
+                    break;
+                default:
+                    identify = -1;
+                    break;
+            }
+            refreshFunc = 'page=1;identify=' + identify + ';getNotifies();';
+        }
+        api.execScript({
+            frameName: 'frame-notify-main',
+            script: refreshFunc
+        });
+        api.closeFrame();
+    }
+</script>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <link rel="stylesheet" type="text/css" href="../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/aui.2.0.css"/>
+    <style>
+        .stu-name {
+            height: 50px;
+            line-height: 50px;
+            background-color: white;
+            padding-left: 0.75rem;
+        }
+
+        .aui-pull-right {
+            color: #ed5047;
+        }
+
+        .all-score {
+            color: black;
+        }
+
+        .aui-tips {
+            text-align: center;
+            display: none;
+        }
+
+        .top-header {
+            height: 50px;
+            padding: 0 0.75rem;
+        }
+
+        summary::-webkit-details-marker {
+            display: none
+        }
+
+        .aui-grid [class*=aui-col-] {
+            padding: 0.5rem 0;
+        }
+
+        .sec-content {
+            background-color: #fff;
+            padding: 0 0 0 2%;
+        }
+
+        .a-code {
+            color: #00bbd4;
+        }
+
+        .d-code {
+            color: red;
+        }
+
+        .aui-pull-left {
+            height: 50px;
+            line-height: 50px;
+
+        }
+
+        .aui-pull-right {
+            height: 50px;
+            line-height: 50px;
+            color: #4BC7C7;
+        }
+
+        .a-code {
+            color: #00bbd4;
+        }
+
+        .aui-list-item-title {
+            width: 75%;
+        }
+
+        .add-chl {
+            position: relative;
+            top: 0;
+            right: 0
+        }
+
+        .fangkuai {
+            height: 20px;
+            width: 3px;
+            margin-top: 15px;
+            margin-right: 3px;
+            background-color: #4BC7C7;
+        }
+
+        .fangkuai-li {
+            height: 20px;
+            width: 3px;
+            margin-top: 10px;
+            margin-right: 3px;
+            background-color: #4BC7C7;
+        }
+
+        .folding-content {
+            margin-top: 10px;
+        }
+
+        .li-li {
+            padding-left: 0.75rem;
+            border-top: solid;
+            border-width: 1px;
+            border-color: #ccc;
+            background-color: white;
+        }
+
+        .menu {
+            width: 100%;
+
+        }
+
+        .first-li-txt {
+            line-height: 40px;
+        }
+
+        .aui-img-round {
+            float: left;
+            margin-top: 5px;
+            height: 40px;
+            width: 40px;
+            margin-right: 10px;
+        }
+
+        .name {
+            line-height: 50px;
+            color: #4bc6c6;
+        }
+
+        .aui-checkbox {
+            height: 20px;
+            width: 20px;
+            float: right;
+            margin-top: 15px;
+            margin-right: 0.75rem;
+        }
+
+        .frist-li {
+            background-color: white;
+            height: 40px;
+            padding-right: 5px;
+        }
+
+        .from{
+            color: #8E8E8E;
+        }
+        .aui-icon-fold{
+            color:#8E8E8E ;
+        }
+        .title{
+            color: red;
+        }
+    </style>
+    <title>Title</title>
+</head>
+<body>
+<div class="stu-name">张三<span class="aui-pull-right title">-4分<span class="all-score">（总分88分）</span></span></div>
+<div class="aui-content aui-margin-b-15 folding-content">
+    <ul class="aui-list aui-list-in aui-list-first">
+
+        <li class="li-li ">
+            <details class="menu" open>
+                <summary class="frist-li">
+                    <span class="aui-pull-left fangkuai-li"></span>
+                    <span class="first-li-txt">卫生</span>
+                    <span class="aui-iconfont aui-icon-fold aui-pull-right"></span>
+                </summary>
+                <ul class="aui-list aui-list-in aui-list-second">
+
+
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-title">眼保健操睁眼<span class="d-code">-2</span>分</div>
+                        <div class="aui-list-item-inner ">
+                            <div>2016.11.10 08:30</div>
+                            <div class="from">来自：<span>政教处王二丫</span></div>
+                        </div>
+                    </li>
+
+
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-title">眼保健操睁眼<span class="d-code">-2</span>分</div>
+                        <div class="aui-list-item-inner ">
+                            <div>2016.11.10 08:30</div>
+                            <div class="from">来自：<span>政教处王二丫</span></div>
+                        </div>
+                    </li>
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-title">眼保健操睁眼<span class="a-code">+2</span>分</div>
+                        <div class="aui-list-item-inner ">
+                            <div>2016.11.10 08:30</div>
+                            <div class="from">来自：<span>政教处王二丫</span></div>
+                        </div>
+                    </li>
+                </ul>
+            </details>
+        </li>
+        <li class="li-li ">
+            <details class="menu" open>
+                <summary class="frist-li">
+                    <span class="aui-pull-left fangkuai-li"></span>
+                    <span class="first-li-txt">纪律</span>
+                    <span class="aui-iconfont aui-icon-fold aui-pull-right"></span>
+                </summary>
+                <ul class="aui-list aui-list-in aui-list-second">
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-title">眼保健操睁眼<span class="d-code">-2</span>分</div>
+                        <div class="aui-list-item-inner ">
+                            <div>2016.11.10 08:30</div>
+                            <div class="from">来自：<span>政教处王二丫</span></div>
+                        </div>
+                    </li>
+                    <li class="aui-card-list aui-border-b" onclick="addChild()">
+                        <div class="aui-list-item-title">眼保健操睁眼<span class="d-code">-2</span>分</div>
+                        <div class="aui-list-item-inner ">
+                            <div>2016.11.10 08:30</div>
+                            <div class="from">来自：<span>政教处王二丫</span></div>
+                        </div>
+                    </li>
+                </ul>
+            </details>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

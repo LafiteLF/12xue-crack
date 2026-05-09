@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>考试列表</title>
+    <link rel="stylesheet" type="text/css" href="../../../css/api.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui.2.0.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/aui-pull-refresh.css"/>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .kong {
+            width: 100%;
+            height: 100vh;
+            text-align: center;
+            background: white;
+        }
+
+        .kong img {
+            width: 360px;
+            height: 190px;
+            display: inline-block;
+        }
+
+        #mainList {
+            height: auto;
+            width: 100%;
+        }
+
+        #mainList li {
+            width: 100%;
+            background: #ffffff;
+            margin-top: 10px;
+        }
+
+        .yellow {
+            position: absolute;
+            left: 0;
+            top: 17px;
+            width: 5px;
+            height: 20px;
+            background: rgb(255, 215, 0);
+        }
+
+        .createtime {
+            padding-left: 30px;
+            height: 50px;
+            line-height: 50px;
+        }
+
+        .createtime span {
+            font-family: MicrosoftYaHei;
+            font-size: 16px;
+            font-weight: normal;
+            font-stretch: normal;
+            line-height: 20px;
+            letter-spacing: 0px;
+            color: #50b8b9;
+        }
+        .detail {
+            width: calc(100% - 60px);
+            margin: 15px 30px;
+            font-family: MicrosoftYaHei;
+            font-size: 16px;
+            font-weight: normal;
+            font-stretch: normal;
+            letter-spacing: 0px;
+            color: #666666;
+        }
+
+        .line {
+            margin-right: 30px;
+            margin-left: 30px;
+            width: calc(100% - 60px);
+            height: 1px;
+            background: rgb(220, 220, 220);
+        }
+
+        .look {
+            display: flex;
+            margin-top: 15px;
+            width: 100%;
+            padding-bottom: 15px;
+        }
+
+        .look p {
+            width: 100%;
+            text-align: center;
+            font-weight: normal;
+            font-stretch: normal;
+            letter-spacing: 0px;
+            color: #4bc7c7;
+            font-size: 16px;
+        }
+        .subtitle {
+            color: #333333;
+            margin-left: 30px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        .examtime {
+            margin-left: 30px;
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="content" v-cloak="">
+    <section class="aui-refresh-content">
+        <div class="aui-content">
+            <ul v-if="data.length > 0" id="mainList">
+                <li class="list-item aui-border-b" v-for="(list,index) in data " :index="index" :id="list.id" tapmode
+                    onclick="examdetail(this)" v-if="">
+                    <div class="yellow"></div>
+                    <div class="createtime">
+                        <span>{{list.createtime}}</span>
+                    </div>
+                    <div class="line"></div>
+                    <div v-if="list.tag.type == 1 ">
+                        <p class="subtitle aui-ellipsis-1">你于
+                            <span style="color: rgb(239,127,142)">{{list.tag.start_time}}</span>
+                            参加的
+                            <span style="color: rgb(239,127,142)">{{list.tag.xkmc}}</span>
+                            考试
+                        </p>
+                        <p class="detail">{{list.tag.title}}</p>
+                        <p class="examtime">已
+                            <span style="color: #f57f17;">阅卷完成，</span>
+                            请及时查看！
+                        </p>
+                    </div>
+                    <div v-if="list.tag.type == 2 ">
+                        <p class="subtitle aui-ellipsis-1">{{list.tag.fbrxm}}老师发布
+                            <span style="color: rgb(239,127,142)">{{list.tag.xkmc}}</span>
+                            考试
+                        </p>
+                        <p class="detail">{{list.tag.title}}</p>
+                        <p class="examtime">考试时间：
+                            <span style="color: #ff778c;">{{list.tag.start_time}}</span>
+                        </p>
+                    </div>
+                    <div class="line"></div>
+                    <div class="look">
+                        <p v-if="list.tag.type == 1 " style="color: #50b8b9;">前往查看 >></p>
+                        <p v-else style="color: #999999;">请按时参加考试</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+</body>
+<script type="text/javascript" src="../../../script/api.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_Router.js"></script>
+<script type="text/javascript" src="../../../script/12XueApi_SDK.js"></script>
+<script type="text/javascript" src="../../../script/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../../../script/vue.js"></script>
+<script type="text/javascript" src="../../../script/aui-pull-refresh.js"></script>
+<script type="text/javascript">
+    var num = 10;
+    var pullRefresh;
+    var p = 1;
+    var isClean = true;
+    var vm;
+    var apiObj = new GridOpenApi(UrlDomain, source, version);
+    apiObj.SetAuthToken($api.getStorage('token'));
+    apiready = function () {
+        vue();
+//        $('.kongimg').css('margin-top', api.frameHeight / 2 - 95);
+        getExamlist();
+
+        api.addEventListener({
+            name: 'refreshNotityList'
+        }, function (ret, err) {
+            p = 1;
+            isClean = true;
+            getExamlist();
+        });
+
+        pullRefresh = new auiPullToRefresh({
+            container: document.querySelector('.aui-refresh-content'),
+            triggerDistance: 100
+        }, function (ret) {
+            if (ret.status == "success") {
+                p = 1;
+                isClean = true;
+                getExamlist();
+            }
+        });
+    };
+    function vue() {
+        vm = new Vue({
+            el: '.content',
+            data: {
+                data: [],
+            },
+            updated: function () {
+            },
+            methods: {}
+        });
+    }
+    function getExamlist() {
+        api.showProgress();
+        apiObj.Get(UrlRouter.Getmessagelist, {
+            values: {
+                pageno: p,
+                uid: $api.getStorage("uid"),
+                pagesize: num,
+                identitytype: 3,
+            }
+        }, function (ret, err) {
+            api.hideProgress();
+            pullRefresh.cancelLoading();
+            if (ret) {
+                if (ret.ret == 0) {
+                    if (isClean) {
+                        vm.data = [];
+                    }
+                    var flag = ret.data.list.length;
+                    for (var i = 0; i < ret.data.list.length; i++) {
+                        if(ret.data.list[i].tag){
+                            vm.data.push(ret.data.list[i]);
+                        }
+                    }
+                    if (vm.data.length == 0) {
+                        showNoData();
+                        //$('.kong').css('display', 'block');
+                    }
+                    else {
+                        //$('.kong').css('display', 'none');
+                    }
+                    p++;
+                    api.addEventListener({
+                        name: 'scrolltobottom',
+                        extra: {
+                            threshold: 100
+                        }
+                    }, function (ret, err) {
+                        if (flag < num) {
+                            api.toast({
+                                msg: '已经到底啦，没有更多了',
+                                duration: 2000,
+                                location: 'middle'
+                            });
+                        } else {
+                            isClean = false;
+                            $api.removeCls($api.dom('.loading'), 'aui-hide');
+                            getExamlist();
+                            api.removeEventListener({
+                                name: 'scrolltobottom'
+                            });
+                        }
+                    });
+                } else {
+                    api.toast({
+                        msg: ret.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            } else {
+                api.toast({
+                    msg: err.msg,
+                    duration: 2000,
+                    location: 'middle'
+                });
+            }
+        })
+    }
+    function examdetail(e) {
+        var index = $(e).attr('index');
+        var item = vm.data[index].tag;
+        var type = item.type;
+        if(type == 1){
+            apiObj.Get(UrlRouter.GetPaperStuinfo, {
+                values: {
+                    classid: item.classid,
+                    uid: $api.getStorage("uid"),
+                    paperid: item.paper_id,
+                }
+            }, function (ret, err) {
+                if (ret) {
+                    if (ret.ret == 0) {
+                        api.openWin({
+                            name: 'win_exercises_list',
+                            url: '../../study/examination/win_exercises_list.html',
+                            pageParam: {
+                                examtitle: item.title,
+                                examid: item.paper_id,
+                                exambjid: item.classid,
+                                complete: ret.data.is_complete,
+                            }
+                        });
+                    } else {
+                        api.toast({
+                            msg: ret.msg,
+                            duration: 2000,
+                            location: 'middle'
+                        });
+                    }
+                } else {
+                    api.toast({
+                        msg: err.msg,
+                        duration: 2000,
+                        location: 'middle'
+                    });
+                }
+            })
+        }
+
+    }
+    function showNoData() {
+        $api.html($api.dom('.content'), '<div class="no-data"> <img class="img-null" src="../../../image/stuHomePad/noContent.png" style="height:auto!important;width:40%;vertical-align: middle;position: absolute;top: 20%;left: 30%;"/> </div>');
+        $api.css($api.dom('.img-null'), 'top:' + api.frameHeight / 4 + 'px');
+    }
+</script>
+</html>
